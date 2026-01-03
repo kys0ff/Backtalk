@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Backtalk</string>
     <string name="messages">Messages</string>
+    <string name="type_a_message">Type a message...</string>
+    <string name="send">Send</string>
+    <string name="cancel">Cancel</string>
+    <string name="message_selected">Message selected</string>
+    <string name="reply">Reply</string>
+    <string name="delete">Delete</string>
+    <string name="replying_to">Replying to</string>
 </resources>
