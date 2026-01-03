@@ -132,6 +132,7 @@ class MessagingScreen : Screen {
                             IconButton(onClick = {
                                 coroutineScope.launch {
                                     selectedMessageId?.let { dao.deleteMessageById(it) }
+                                    selectedMessageId = null
                                 }
                             }) {
                                 Icon(
