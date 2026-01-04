@@ -8,4 +8,7 @@
     <string name="reply">Reply</string>
     <string name="delete">Delete</string>
     <string name="replying_to">Replying to</string>
+    <string name="is_that_you">Is that you?</string>
+    <string name="log_in_using_your_biometric_credential">Log in using your biometric credential</string>
+    <string name="exit_app">Exit App</string>
 </resources>
