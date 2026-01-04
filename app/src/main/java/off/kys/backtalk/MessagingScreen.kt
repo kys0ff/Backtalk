@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -233,7 +232,7 @@ class MessagingScreen : Screen {
      * Swiping right reveals a reply icon and triggers the callback.
      */
     @Composable
-    fun SwipeToReplyWrapper(
+    private fun SwipeToReplyWrapper(
         onSwipe: () -> Unit,
         content: @Composable () -> Unit
     ) {
@@ -325,7 +324,8 @@ class MessagingScreen : Screen {
     }
 
     @Composable
-    fun InputBar(
+    private fun InputBar(
+        modifier: Modifier = Modifier,
         replyingTo: Message?,
         onCancelReply: () -> Unit,
         onMessageSend: (String) -> Unit
@@ -333,7 +333,7 @@ class MessagingScreen : Screen {
         var textState by remember { mutableStateOf("") }
 
         Surface(tonalElevation = 2.dp) {
-            Column(modifier = Modifier.navigationBarsPadding()) {
+            Column(modifier = modifier) {
                 AnimatedVisibility(
                     visible = replyingTo != null,
                     enter = expandVertically() + fadeIn(),
@@ -412,7 +412,7 @@ class MessagingScreen : Screen {
     }
 
     @Composable
-    fun TimestampHeader(timestamp: Long) {
+    private fun TimestampHeader(timestamp: Long) {
         val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
         Text(
             text = sdf.format(Date(timestamp)),
@@ -424,7 +424,7 @@ class MessagingScreen : Screen {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun MessageBubble(
+    private fun MessageBubble(
         message: Message,
         repliedMessage: Message?,
         isTop: Boolean,
