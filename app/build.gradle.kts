@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.bundles.koin)
     implementation(libs.bundles.room)
     implementation(libs.androidx.biometric)
+    implementation(libs.androidx.core.splashscreen)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
