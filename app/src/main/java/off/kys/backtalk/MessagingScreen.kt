@@ -44,7 +44,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -144,9 +143,11 @@ class MessagingScreen : Screen {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if (selectedMessageId != null)
-                            MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                        else MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = if (selectedMessageId != null) {
+                            TopAppBarDefaults.topAppBarColors().scrolledContainerColor
+                        } else {
+                            TopAppBarDefaults.topAppBarColors().containerColor
+                        }
                     )
                 )
             },

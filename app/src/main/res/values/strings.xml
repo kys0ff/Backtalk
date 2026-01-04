@@ -11,4 +11,5 @@
     <string name="is_that_you">Is that you?</string>
     <string name="log_in_using_your_biometric_credential">Log in using your biometric credential</string>
     <string name="exit_app">Exit App</string>
+    <string name="the_app_is_locked">The app is locked.</string>
 </resources>

@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
@@ -13,7 +16,7 @@ abstract class BaseBiometricActivity : AppCompatActivity() {
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     // Flag to keep the splash screen visible
-    protected var isReady = false
+    protected var isReady by mutableStateOf(false)
 
     private var lastTimestamp: Long = 0
     private val lockoutDuration = 30_000
