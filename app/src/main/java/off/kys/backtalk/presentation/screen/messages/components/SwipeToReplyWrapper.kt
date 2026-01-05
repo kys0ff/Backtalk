@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,14 +55,16 @@ fun SwipeToReplyWrapper(
     val progress = (offsetX.value / actionThreshold).coerceIn(0f, 1f)
     val isPastThreshold = offsetX.value >= actionThreshold
 
-    var hasVibratedThreshold by remember { mutableStateOf(false) }
+    val hasVibratedThreshold = remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
-                    onDragStart = { hasVibratedThreshold = false },
+                    onDragStart = {
+                        hasVibratedThreshold.value = false
+                    },
                     onDragEnd = {
                         scope.launch {
                             if (offsetX.value >= actionThreshold) {
@@ -85,12 +85,12 @@ fun SwipeToReplyWrapper(
                     onHorizontalDrag = { change, dragAmount ->
                         val newOffset = (offsetX.value + dragAmount).coerceIn(0f, maxDrag)
 
-                        if (newOffset >= actionThreshold && !hasVibratedThreshold) {
+                        if (newOffset >= actionThreshold && !hasVibratedThreshold.value) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            vibrationManager.vibrate()
-                            hasVibratedThreshold = true
+                            vibrationManager.vibrate(150L)
+                            hasVibratedThreshold.value = true
                         } else if (newOffset < actionThreshold) {
-                            hasVibratedThreshold = false
+                            hasVibratedThreshold.value = false
                         }
 
                         scope.launch { offsetX.snapTo(newOffset) }
