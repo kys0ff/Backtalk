@@ -9,10 +9,9 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesTopBar
-import off.kys.backtalk.presentation.viewmodel.MessagesUiEvent
+import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.concurrent.TimeUnit
 
 class MessagesScreen : Screen {
 

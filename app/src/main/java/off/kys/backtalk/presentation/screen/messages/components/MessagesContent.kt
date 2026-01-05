@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.viewmodel.MessagesUiState
+import off.kys.backtalk.presentation.state.MessagesUiState
 
 /**
  * Composable function that displays the messages content.

@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
+import off.kys.backtalk.presentation.event.MessagesUiEvent
+import off.kys.backtalk.presentation.state.MessagesUiState
 
 class MessagesViewModel(
     private val useCases: MessagesUseCases
@@ -69,18 +71,4 @@ class MessagesViewModel(
         }
         updateSelection(null)
     }
-}
-
-data class MessagesUiState(
-    val messages: List<MessageEntity> = emptyList(),
-    val replyingTo: MessageEntity? = null,
-    val selectedMessageId: MessageId? = null
-)
-
-sealed interface MessagesUiEvent {
-    data class SendMessage(val text: String) : MessagesUiEvent
-    data class ReplyTo(val message: MessageEntity?) : MessagesUiEvent
-    data class SelectMessage(val id: MessageId?) : MessagesUiEvent
-    data class DeleteMessage(val id: MessageId) : MessagesUiEvent
-    data object LoadMessages : MessagesUiEvent
 }
