@@ -6,7 +6,5 @@ import off.kys.backtalk.domain.repository.MessagesRepository
 class DeleteMessageById(
     private val repository: MessagesRepository
 ) {
-
     suspend operator fun invoke(id: MessageId) = repository.deleteMessageById(id)
-
 }

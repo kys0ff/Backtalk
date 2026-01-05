@@ -1,0 +1,61 @@
+package off.kys.backtalk.presentation.screen.messages.components
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import off.kys.backtalk.R
+import off.kys.backtalk.domain.model.MessageId
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessagesTopBar(
+    selectedMessageId: MessageId?,
+    onCloseSelection: () -> Unit,
+    onDelete: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = if (selectedMessageId != null)
+                    stringResource(R.string.message_selected)
+                else
+                    stringResource(R.string.messages)
+            )
+        },
+        navigationIcon = {
+            if (selectedMessageId != null) {
+                IconButton(onClick = onCloseSelection) {
+                    Icon(
+                        painterResource(R.drawable.round_close_24),
+                        contentDescription = null
+                    )
+                }
+            }
+        },
+        actions = {
+            if (selectedMessageId != null) {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_delete_24),
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = if (selectedMessageId != null) {
+                TopAppBarDefaults.topAppBarColors().scrolledContainerColor
+            } else {
+                TopAppBarDefaults.topAppBarColors().containerColor
+            }
+        )
+    )
+}

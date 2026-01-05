@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import off.kys.backtalk.common.base.BaseBiometricActivity
-import off.kys.backtalk.presentation.screen.MessagingScreen
+import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 
@@ -29,7 +29,7 @@ class MainActivity : BaseBiometricActivity() {
         enableEdgeToEdge()
         setContent {
             BacktalkTheme {
-                Navigator(MessagingScreen()) {
+                Navigator(MessagesScreen()) {
                     if (isReady) {
                         CurrentScreen()
                     } else {

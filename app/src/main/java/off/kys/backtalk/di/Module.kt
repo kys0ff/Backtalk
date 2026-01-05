@@ -11,14 +11,17 @@ import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.InsertMessage
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
+import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
     databaseModule()
     repositoryModule()
     useCaseModule()
+    viewModelModule()
     systemModule()
 }
 
@@ -53,6 +56,10 @@ private fun Module.useCaseModule() {
             deleteMessageById = get()
         )
     }
+}
+
+private fun Module.viewModelModule() {
+    viewModel { MessagesViewModel(get()) }
 }
 
 private fun Module.systemModule() {
