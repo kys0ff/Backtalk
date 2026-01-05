@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,12 +31,22 @@ fun ColumnScope.MessagesList(
     onReply: (MessageEntity?) -> Unit,
     onSelect: (MessageId?) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
+    // Auto-scroll when a new message is added
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .weight(1f),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
+        state = listState,
         reverseLayout = true
     ) {
         val reversed = messages.reversed()
