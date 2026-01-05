@@ -1,7 +1,7 @@
 package off.kys.backtalk.di
 
 import androidx.room.Room
-import off.kys.backtalk.common.VibrationManager
+import off.kys.backtalk.common.manager.VibrationManager
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl

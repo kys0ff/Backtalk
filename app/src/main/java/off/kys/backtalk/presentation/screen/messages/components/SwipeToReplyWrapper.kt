@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
-import off.kys.backtalk.common.VibrationManager
+import off.kys.backtalk.common.manager.VibrationManager
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
 

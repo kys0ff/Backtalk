@@ -1,4 +1,4 @@
-package off.kys.backtalk.common
+package off.kys.backtalk.common.manager
 
 import android.content.Context
 import android.os.Build
