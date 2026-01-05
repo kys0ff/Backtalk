@@ -1,6 +1,5 @@
-package off.kys.backtalk.ui.theme
+package off.kys.backtalk.presentation.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

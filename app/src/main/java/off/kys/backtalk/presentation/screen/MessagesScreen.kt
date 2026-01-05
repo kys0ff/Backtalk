@@ -1,4 +1,4 @@
-package off.kys.backtalk
+package off.kys.backtalk.presentation.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -66,6 +66,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.launch
+import off.kys.backtalk.data.local.database.DatabaseProvider
+import off.kys.backtalk.R
+import off.kys.backtalk.common.VibrationManager
+import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.domain.model.MessageId
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -88,7 +93,7 @@ class MessagingScreen : Screen {
         val messages by dao.getAllMessages().collectAsState(initial = emptyList())
         val sortedMessages = messages.sortedBy { it.timestamp }
 
-        var replyingTo by remember { mutableStateOf<Message?>(null) }
+        var replyingTo by remember { mutableStateOf<MessageEntity?>(null) }
         // State for message selection/deletion
         var selectedMessageId by remember { mutableStateOf<MessageId?>(null) }
 
@@ -191,8 +196,8 @@ class MessagingScreen : Screen {
                                 }
                             ) {
                                 MessageBubble(
-                                    message = current,
-                                    repliedMessage = repliedMessage,
+                                    messageEntity = current,
+                                    repliedMessageEntity = repliedMessage,
                                     isTop = isTop,
                                     isBottom = isBottom,
                                     isSelected = selectedMessageId == current.id,
@@ -213,13 +218,13 @@ class MessagingScreen : Screen {
                     replyingTo = replyingTo,
                     onCancelReply = { replyingTo = null },
                     onMessageSend = { text ->
-                        val message = Message(
+                        val messageEntity = MessageEntity(
                             id = MessageId.generate(),
                             text = text,
                             timestamp = System.currentTimeMillis(),
                             repliedToId = replyingTo?.id
                         )
-                        coroutineScope.launch { dao.insertMessage(message) }
+                        coroutineScope.launch { dao.insertMessage(messageEntity) }
                         replyingTo = null
                     }
                 )
@@ -326,7 +331,7 @@ class MessagingScreen : Screen {
     @Composable
     private fun InputBar(
         modifier: Modifier = Modifier,
-        replyingTo: Message?,
+        replyingTo: MessageEntity?,
         onCancelReply: () -> Unit,
         onMessageSend: (String) -> Unit
     ) {
@@ -425,8 +430,8 @@ class MessagingScreen : Screen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun MessageBubble(
-        message: Message,
-        repliedMessage: Message?,
+        messageEntity: MessageEntity,
+        repliedMessageEntity: MessageEntity?,
         isTop: Boolean,
         isBottom: Boolean,
         isSelected: Boolean,
@@ -475,11 +480,11 @@ class MessagingScreen : Screen {
                 )
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                    if (repliedMessage != null) {
-                        ReplyPreview(repliedMessage.text)
+                    if (repliedMessageEntity != null) {
+                        ReplyPreview(repliedMessageEntity.text)
                     }
                     Text(
-                        text = message.text,
+                        text = messageEntity.text,
                         color = contentColorFor(bubbleColor)
                     )
                 }
@@ -495,7 +500,7 @@ class MessagingScreen : Screen {
                         "h:mm a",
 
                         Locale.getDefault()
-                    ).format(Date(message.timestamp)),
+                    ).format(Date(messageEntity.timestamp)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.padding(top = 4.dp, bottom = 4.dp, end = 4.dp)

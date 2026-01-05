@@ -1,4 +1,4 @@
-package off.kys.backtalk
+package off.kys.backtalk.common.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import off.kys.backtalk.R
 
 abstract class BaseBiometricActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package off.kys.backtalk
+package off.kys.backtalk.presentation.activity
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -17,7 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import off.kys.backtalk.ui.theme.BacktalkTheme
+import off.kys.backtalk.common.base.BaseBiometricActivity
+import off.kys.backtalk.presentation.screen.MessagingScreen
+import off.kys.backtalk.R
+import off.kys.backtalk.presentation.theme.BacktalkTheme
 
 class MainActivity : BaseBiometricActivity() {
     @OptIn(ExperimentalMaterial3Api::class)

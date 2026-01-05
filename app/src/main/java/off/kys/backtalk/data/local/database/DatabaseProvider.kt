@@ -1,8 +1,9 @@
-package off.kys.backtalk
+package off.kys.backtalk.data.local.database
 
 import android.content.Context
 import androidx.room.Room
 
+// TODO: Delete
 class DatabaseProvider(
     private val context: Context
 ) {
