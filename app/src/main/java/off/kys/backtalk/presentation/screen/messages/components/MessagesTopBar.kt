@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,7 +26,8 @@ import off.kys.backtalk.domain.model.MessageId
 fun MessagesTopBar(
     selectedMessageId: MessageId?,
     onCloseSelection: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior
 ) {
     TopAppBar(
         title = {
@@ -57,6 +59,7 @@ fun MessagesTopBar(
                 }
             }
         },
+        scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = if (selectedMessageId != null) {
                 TopAppBarDefaults.topAppBarColors().scrolledContainerColor
