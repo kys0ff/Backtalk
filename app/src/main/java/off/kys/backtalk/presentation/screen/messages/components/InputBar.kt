@@ -35,6 +35,14 @@ import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
 
+/**
+ * Composable function that displays the input bar for sending messages.
+ *
+ * @param modifier The modifier to be applied to the layout.
+ * @param replyingTo The message being replied to, if any.
+ * @param onCancelReply The callback function to handle canceling the reply.
+ * @param onMessageSend The callback function to handle sending a message.
+ */
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,

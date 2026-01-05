@@ -7,6 +7,15 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.viewmodel.MessagesUiState
 
+/**
+ * Composable function that displays the messages content.
+ *
+ * @param modifier The modifier to be applied to the layout.
+ * @param state The current state of the messages screen.
+ * @param onReply The callback function to handle replying to a message.
+ * @param onSelect The callback function to handle selecting a message.
+ * @param onSend The callback function to handle sending a message.
+ */
 @Composable
 fun MessagesContent(
     modifier: Modifier,

@@ -32,8 +32,10 @@ import org.koin.compose.koinInject
 import kotlin.math.roundToInt
 
 /**
- * A wrapper that adds swipe-to-trigger functionality.
- * Swiping right reveals a reply icon and triggers the callback.
+ * Composable function that displays a message bubble with a swipe-to-reply feature.
+ *
+ * @param onSwipe The callback function to handle the swipe-to-reply action.
+ * @param content The content to be displayed inside the message bubble.
  */
 @Composable
 fun SwipeToReplyWrapper(

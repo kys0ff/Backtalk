@@ -10,6 +10,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Composable function that displays a timestamp header.
+ *
+ * @param timestamp The timestamp to display.
+ */
 @Composable
 fun TimestampHeader(timestamp: Long) {
     val sdf = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())

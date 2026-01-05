@@ -31,6 +31,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Composable function that displays a message bubble.
+ *
+ * @param messageEntity The message entity to display.
+ * @param repliedMessageEntity The replied message entity, if any.
+ * @param isTop Whether the message is at the top of its group.
+ * @param isBottom Whether the message is at the bottom of its group.
+ * @param isSelected Whether the message is selected.
+ * @param onClick The callback function to handle clicks on the message.
+ * @param onLongClick The callback function to handle long clicks on the message.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(

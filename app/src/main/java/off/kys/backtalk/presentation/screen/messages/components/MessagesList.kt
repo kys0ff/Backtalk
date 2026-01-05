@@ -14,6 +14,14 @@ import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 
+/**
+ * Composable function that displays the messages list.
+ *
+ * @param messages The list of messages to display.
+ * @param selectedMessageId The ID of the currently selected message.
+ * @param onReply The callback function to handle replying to a message.
+ * @param onSelect The callback function to handle selecting a message.
+ */
 @Composable
 fun ColumnScope.MessagesList(
     messages: List<MessageEntity>,

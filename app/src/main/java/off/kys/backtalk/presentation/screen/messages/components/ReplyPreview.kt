@@ -16,6 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Composable function that displays a reply preview.
+ *
+ * @param text The text to display in the reply preview.
+ */
 @Composable
 fun ReplyPreview(text: String) {
     Row(

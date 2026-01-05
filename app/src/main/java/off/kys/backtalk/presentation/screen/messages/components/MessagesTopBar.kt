@@ -13,6 +13,13 @@ import androidx.compose.ui.res.stringResource
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.MessageId
 
+/**
+ * Composable function that displays the messages top bar.
+ *
+ * @param selectedMessageId The ID of the currently selected message.
+ * @param onCloseSelection The callback function to handle closing the selection.
+ * @param onDelete The callback function to handle deleting the selected message.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessagesTopBar(
