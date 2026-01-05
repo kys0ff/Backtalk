@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -54,18 +57,14 @@ fun SwipeToReplyWrapper(
     val progress = (offsetX.value / actionThreshold).coerceIn(0f, 1f)
     val isPastThreshold = offsetX.value >= actionThreshold
 
+    var hasVibratedThreshold by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
-
-                // 🔹 Gesture-local state (NOT Compose state)
-                var hasVibratedThreshold = false
-
                 detectHorizontalDragGestures(
-                    onDragStart = {
-                        hasVibratedThreshold = false
-                    },
+                    onDragStart = { hasVibratedThreshold = false },
                     onDragEnd = {
                         scope.launch {
                             if (offsetX.value >= actionThreshold) {
@@ -84,8 +83,7 @@ fun SwipeToReplyWrapper(
                         scope.launch { offsetX.animateTo(0f) }
                     },
                     onHorizontalDrag = { change, dragAmount ->
-                        val newOffset =
-                            (offsetX.value + dragAmount).coerceIn(0f, maxDrag)
+                        val newOffset = (offsetX.value + dragAmount).coerceIn(0f, maxDrag)
 
                         if (newOffset >= actionThreshold && !hasVibratedThreshold) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
