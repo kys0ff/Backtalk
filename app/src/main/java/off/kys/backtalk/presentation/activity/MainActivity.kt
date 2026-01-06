@@ -17,12 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import off.kys.backtalk.common.base.BaseBiometricActivity
-import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.R
+import off.kys.backtalk.common.base.BaseLockActivity
+import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.theme.BacktalkTheme
+import kotlin.time.Duration.Companion.minutes
 
-class MainActivity : BaseBiometricActivity() {
+class MainActivity : BaseLockActivity() {
+
+    override val autoLockTimeout: Long
+        get() = 1.minutes.inWholeMilliseconds
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +35,7 @@ class MainActivity : BaseBiometricActivity() {
         setContent {
             BacktalkTheme {
                 Navigator(MessagesScreen()) {
-                    if (isReady) {
+                    if (isLoggedIn) {
                         CurrentScreen()
                     } else {
                         LockedView()

@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.bundles.room)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.lifecycle.process)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
