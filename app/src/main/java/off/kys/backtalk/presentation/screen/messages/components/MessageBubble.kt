@@ -104,7 +104,7 @@ fun MessageBubble(
                 )
             }
         }
-        // ... (Timestamp visibility logic remains same)
+
         AnimatedVisibility(
             visible = showTime,
             enter = fadeIn() + expandVertically(),
@@ -113,7 +113,6 @@ fun MessageBubble(
             Text(
                 text = SimpleDateFormat(
                     "h:mm a",
-
                     Locale.getDefault()
                 ).format(Date(messageEntity.timestamp)),
                 style = MaterialTheme.typography.labelSmall,

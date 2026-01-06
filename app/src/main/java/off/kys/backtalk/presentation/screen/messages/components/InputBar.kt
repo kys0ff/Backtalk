@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.util.emptyString
 
 /**
  * Composable function that displays the input bar for sending messages.
@@ -77,7 +78,7 @@ fun InputBar(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            replyingTo?.text ?: "",
+                            replyingTo?.text ?: emptyString(),
                             maxLines = 1,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -115,7 +116,7 @@ fun InputBar(
                     onClick = {
                         if (textState.isNotBlank()) {
                             onMessageSend(textState)
-                            textState = ""
+                            textState = emptyString()
                         }
                     },
                     enabled = textState.isNotBlank()

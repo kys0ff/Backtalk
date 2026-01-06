@@ -24,7 +24,7 @@ fun MessagesContent(
     onSelect: (MessageId?) -> Unit,
     onSend: (String) -> Unit
 ) {
-    Column(modifier) {
+    Column(modifier = modifier) {
         MessagesList(
             messages = state.messages,
             selectedMessageId = state.selectedMessageId,
