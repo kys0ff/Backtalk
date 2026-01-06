@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -20,17 +22,27 @@ import androidx.compose.ui.unit.dp
  * Composable function that displays a reply preview.
  *
  * @param text The text to display in the reply preview.
+ * @param onPreviewClick The callback function to handle clicks on the reply preview.
  */
 @Composable
-fun ReplyPreview(text: String) {
+fun ReplyPreview(
+    text: String,
+    onPreviewClick: () -> Unit
+) {
+    val cornerShape = RoundedCornerShape(4.dp)
+
     Row(
         modifier = Modifier
             .padding(bottom = 4.dp)
             .height(IntrinsicSize.Min)
+            .clip(cornerShape)
             .background(
                 color = Color.White.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(4.dp)
+                shape = cornerShape
             )
+            .clickable {
+                onPreviewClick()
+            }
     ) {
         Box(
             modifier = Modifier

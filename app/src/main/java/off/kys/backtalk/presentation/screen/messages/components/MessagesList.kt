@@ -9,9 +9,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
@@ -19,6 +26,7 @@ import off.kys.backtalk.domain.model.MessageId
 /**
  * Composable function that displays the messages list.
  *
+ * @param ColumnScope The scope for the column.
  * @param messages The list of messages to display.
  * @param selectedMessageId The ID of the currently selected message.
  * @param onReply The callback function to handle replying to a message.
@@ -31,7 +39,10 @@ fun ColumnScope.MessagesList(
     onReply: (MessageEntity?) -> Unit,
     onSelect: (MessageId?) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+
+    var blinkMessageId by remember { mutableStateOf<MessageId?>(null) }
 
     // Auto-scroll when a new message is added
     LaunchedEffect(messages.size) {
@@ -55,7 +66,6 @@ fun ColumnScope.MessagesList(
             count = reversed.size,
             key = { reversed[it].id() }
         ) { index ->
-
             val current = reversed[index]
             val next = reversed.getOrNull(index - 1)
             val prev = reversed.getOrNull(index + 1)
@@ -89,10 +99,24 @@ fun ColumnScope.MessagesList(
                     MessageBubble(
                         messageEntity = current,
                         repliedMessageEntity = repliedMessage,
+                        blinkMessageId = blinkMessageId,
                         isTop = isTop,
                         isBottom = isBottom,
                         selectMode = selectedMessageId != null,
                         isSelected = selectedMessageId == current.id,
+                        onReplyPreviewClick = {
+                            current.repliedToId?.let { id ->
+                                coroutineScope.launch {
+                                    val targetIndex = reversed.indexOfFirst { it.id == id }
+                                    if (targetIndex != -1) {
+                                        listState.animateScrollToItem(targetIndex)
+                                        blinkMessageId = id
+                                        delay(1920) // duration of blink
+                                        blinkMessageId = null
+                                    }
+                                }
+                            }
+                        },
                         onClick = {
                             if (selectedMessageId != null) {
                                 onSelect(
