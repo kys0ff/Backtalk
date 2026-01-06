@@ -56,7 +56,8 @@ class MainActivity : BaseLockActivity() {
         ) {
             Text(
                 text = stringResource(R.string.the_app_is_locked),
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
