@@ -49,6 +49,7 @@ fun MessageBubble(
     repliedMessageEntity: MessageEntity?,
     isTop: Boolean,
     isBottom: Boolean,
+    selectMode: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit
@@ -85,7 +86,9 @@ fun MessageBubble(
                 interactionSource = interactionSource,
                 indication = null, // This removes the ripple effect
                 onClick = {
-                    if (!isSelected) showTime = !showTime
+                    if (!selectMode) {
+                        if (!isSelected) showTime = !showTime
+                    }
                     onClick()
                 },
                 onLongClick = {

@@ -91,6 +91,7 @@ fun ColumnScope.MessagesList(
                         repliedMessageEntity = repliedMessage,
                         isTop = isTop,
                         isBottom = isBottom,
+                        selectMode = selectedMessageId != null,
                         isSelected = selectedMessageId == current.id,
                         onClick = {
                             if (selectedMessageId != null) {
