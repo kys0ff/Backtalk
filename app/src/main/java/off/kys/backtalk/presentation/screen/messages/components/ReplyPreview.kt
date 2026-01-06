@@ -27,7 +27,10 @@ fun ReplyPreview(text: String) {
         modifier = Modifier
             .padding(bottom = 4.dp)
             .height(IntrinsicSize.Min)
-            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+            .background(
+                color = Color.White.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(4.dp)
+            )
     ) {
         Box(
             modifier = Modifier
@@ -40,7 +43,10 @@ fun ReplyPreview(text: String) {
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.7f),
             maxLines = 2,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(
+                horizontal = 8.dp,
+                vertical = 4.dp
+            )
         )
     }
 }
