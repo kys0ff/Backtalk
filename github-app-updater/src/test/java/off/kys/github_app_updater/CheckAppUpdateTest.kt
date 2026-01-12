@@ -1,15 +1,18 @@
 package off.kys.github_app_updater
 
 import kotlinx.coroutines.runBlocking
+import off.kys.github_app_updater.common.ChangelogSource
 import org.junit.Test
 
-class AppUpdateCheckerTest {
+class CheckAppUpdateTest {
 
     @Test
-    fun testUpdateChecker() = runBlocking {
-        AppUpdateChecker.check {
+    fun testCheckAppUpdate() = runBlocking {
+        checkAppUpdate {
             githubRepo("kys0ff/kli")
-            currentVersion("0.1.6")
+            currentVersion("0.1.0")
+            changelogSource(ChangelogSource.COMMITS)
+
             onUpdateAvailable { result ->
                 println(
                     """
@@ -19,7 +22,7 @@ class AppUpdateCheckerTest {
                     Changelog:
                     ${result.changeLog}
                     Download URL: ${result.downloadUrls}
-                    """.trimIndent()
+                    """.trimIndent().trimMargin()
                 )
             }
             onUpToDate {

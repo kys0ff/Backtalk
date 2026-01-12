@@ -1,6 +1,9 @@
 package off.kys.github_app_updater.model.github
 
-internal data class GitHubAsset(
+import com.squareup.moshi.Json
+
+data class GitHubAsset(
     val name: String,
-    val browser_download_url: String
+    @param:Json(name = "browser_download_url")
+    val browserDownloadUrl: String
 )

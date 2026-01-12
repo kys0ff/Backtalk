@@ -22,7 +22,7 @@ object UpdateEngine {
         val api = GitHubApi.create(config.token)
 
         val release = api.latestRelease(config.repo)
-        val latestVersion = release.tag_name.normalize()
+        val latestVersion = release.tagName.normalize()
 
         if (Version(latestVersion) <= Version(config.currentVersion)) {
             config.onUpToDate()
@@ -31,10 +31,10 @@ object UpdateEngine {
 
         // Fetch commits as fallback
         val commits = fetchAllCommits(
-            api,
-            config.repo,
-            config.currentVersion.normalizeTag(),
-            release.tag_name
+            api = api,
+            repo = config.repo,
+            base = config.currentVersion.normalizeTag(),
+            head = release.tagName
         )
 
         val changelog = when (config.changelogSource) {
@@ -45,16 +45,16 @@ object UpdateEngine {
         }
 
         // Pick APK asset
-        val asset = release.assets.firstOrNull {
+        val assets = release.assets.filter {
             it.name.endsWith(".apk", ignoreCase = true) ||
-                    it.browser_download_url.endsWith(".apk", ignoreCase = true)
+                    it.browserDownloadUrl.endsWith(".apk", ignoreCase = true)
         }
 
         config.onUpdateAvailable(
             UpdateResult(
                 latestVersion = latestVersion,
                 changeLog = changelog,
-                downloadUrl = asset?.browser_download_url.orEmpty()
+                downloadUrls = assets
             )
         )
     }
