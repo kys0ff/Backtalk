@@ -41,6 +41,9 @@ class MessagesViewModel(
         }
     }
 
+    /**
+     * Loads all messages from the repository and updates the UI state.
+     */
     private fun loadMessages() {
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
@@ -51,6 +54,11 @@ class MessagesViewModel(
         }
     }
 
+    /**
+     * Sends a message with the given text.
+     *
+     * @param text The text of the message to send.
+     */
     private fun sendMessage(text: String) {
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
@@ -66,10 +74,20 @@ class MessagesViewModel(
         updateReply(null)
     }
 
+    /**
+     * Updates the UI state with the given message as the replying to message.
+     *
+     * @param message The message to set as the replying to
+     */
     private fun updateReply(message: MessageEntity?) {
         _uiState.value = _uiState.value.copy(replyingTo = message)
     }
 
+    /**
+     * Toggles the selection of a message with the given ID.
+     *
+     * @param id The ID of the message to toggle selection for.
+     */
     private fun toggleSelection(id: MessageId) {
         val current = _uiState.value.selectedMessageIds
         _uiState.value = _uiState.value.copy(
@@ -78,10 +96,16 @@ class MessagesViewModel(
         )
     }
 
+    /**
+     * Clears the selection of all messages.
+     */
     private fun clearSelection() {
         _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
     }
 
+    /**
+     * Deletes the selected messages.
+     */
     private fun deleteSelected() {
         val ids = _uiState.value.selectedMessageIds
         viewModelScope.launch {
@@ -90,6 +114,9 @@ class MessagesViewModel(
         clearSelection()
     }
 
+    /**
+     * Copies the selected messages to the clipboard.
+     */
     private fun copySelected() {
         val selectedIds = _uiState.value.selectedMessageIds
         viewModelScope.launch {
