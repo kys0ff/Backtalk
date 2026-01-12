@@ -17,13 +17,13 @@ class MainViewModel(
     private val checkAppUpdate: CheckAppUpdate
 ) : AndroidViewModel(application) {
 
-    private val _updateState = MutableStateFlow<MainUiState>(MainUiState.Idle)
-    val updateState: StateFlow<MainUiState> = _updateState
+    private val _mainUiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
+    val mainUiState: StateFlow<MainUiState> = _mainUiState
 
     fun onEvent(event: MainUiEvent) {
         when (event) {
             is MainUiEvent.CheckUpdate -> checkForUpdate()
-            is MainUiEvent.DismissDialog -> _updateState.value = MainUiState.Idle
+            is MainUiEvent.DismissDialog -> _mainUiState.value = MainUiState.Idle
             is MainUiEvent.UpdateNow -> {
                 // Trigger update logic (e.g., open browser/download)
                 openUpdateUrl(event.downloadUrl)
@@ -33,18 +33,18 @@ class MainViewModel(
 
     private fun checkForUpdate() {
         viewModelScope.launch {
-            _updateState.value = MainUiState.Checking
+            _mainUiState.value = MainUiState.Checking
             try {
                 checkAppUpdate(
                     onUpdateAvailable = { result ->
-                        _updateState.value = MainUiState.UpdateAvailable(result)
+                        _mainUiState.value = MainUiState.UpdateAvailable(result)
                     },
                     onUpToDate = {
-                        _updateState.value = MainUiState.UpToDate
+                        _mainUiState.value = MainUiState.UpToDate
                     }
                 )
             } catch (e: Exception) {
-                _updateState.value = MainUiState.Error(e.message ?: "Unknown error")
+                _mainUiState.value = MainUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

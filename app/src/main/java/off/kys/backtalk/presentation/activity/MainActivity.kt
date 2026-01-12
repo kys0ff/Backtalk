@@ -31,7 +31,7 @@ class MainActivity : BaseLockActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel = koinViewModel<MainViewModel>()
-            val updateState by viewModel.updateState.collectAsState()
+            val updateState by viewModel.mainUiState.collectAsState()
 
             BacktalkTheme {
                 Navigator(MessagesScreen()) {
