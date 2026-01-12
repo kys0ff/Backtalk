@@ -17,4 +17,8 @@
     <string name="copied_text">Copied Text</string>
     <string name="messages_selected_count">%1$d selected</string>
     <string name="close">Close</string>
+    <string name="update_available">Update Available</string>
+    <string name="a_new_version_is_available">A new version %1$s is available.\n\n%2$s</string>
+    <string name="update_now">Update Now</string>
+    <string name="later">Later</string>
 </resources>

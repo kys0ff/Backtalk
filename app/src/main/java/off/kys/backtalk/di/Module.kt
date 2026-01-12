@@ -6,12 +6,14 @@ import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.domain.repository.MessagesRepository
+import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.domain.use_case.CopyMessagesByIds
 import off.kys.backtalk.domain.use_case.DeleteMessageById
 import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.InsertMessage
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
+import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -50,6 +52,7 @@ private fun Module.useCaseModule() {
     single { InsertMessage(get()) }
     single { DeleteMessageById(get()) }
     single { CopyMessagesByIds(get(), get()) }
+    single { CheckAppUpdate() }
     single {
         MessagesUseCases(
             getAllMessages = get(),
@@ -62,6 +65,7 @@ private fun Module.useCaseModule() {
 }
 
 private fun Module.viewModelModule() {
+    viewModel { MainViewModel(get(), get()) }
     viewModel { MessagesViewModel(get()) }
 }
 

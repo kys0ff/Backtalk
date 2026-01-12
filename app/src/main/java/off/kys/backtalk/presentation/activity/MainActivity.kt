@@ -11,6 +11,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,6 +24,10 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.theme.BacktalkTheme
+import off.kys.backtalk.presentation.viewmodel.AppUpdateEvent
+import off.kys.backtalk.presentation.viewmodel.AppUpdateState
+import off.kys.backtalk.presentation.viewmodel.MainViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : BaseLockActivity() {
@@ -33,12 +40,34 @@ class MainActivity : BaseLockActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel = koinViewModel<MainViewModel>()
+            val updateState by viewModel.updateState.collectAsState()
+
             BacktalkTheme {
                 Navigator(MessagesScreen()) {
                     if (isLoggedIn) {
                         CurrentScreen()
                     } else {
                         LockedView()
+                    }
+
+                    // Trigger update check
+                    LaunchedEffect(key1 = Unit) {
+                        viewModel.onEvent(AppUpdateEvent.CheckUpdate)
+                    }
+
+                    // Show dialog if needed
+                    if (updateState is AppUpdateState.UpdateAvailable) {
+                        val result = (updateState as AppUpdateState.UpdateAvailable).result
+                        AppUpdateDialog(
+                            updateResult = result,
+                            onDismissRequest = {
+                                viewModel.onEvent(AppUpdateEvent.DismissDialog)
+                            },
+                            onUpdateClick = {
+                                viewModel.onEvent(AppUpdateEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl))
+                            }
+                        )
                     }
                 }
             }
