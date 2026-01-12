@@ -1,5 +1,6 @@
 package off.kys.github_app_updater.core
 
+import off.kys.github_app_updater.common.ChangelogSource
 import off.kys.github_app_updater.model.updater.UpdateResult
 
 /**
@@ -30,6 +31,12 @@ class UpdateConfig {
      * Callback when the app is up to date.
      */
     var onUpToDate: () -> Unit = {}
+
+    /**
+     * Changelog source type: RELEASE_BODY or COMMITS
+     * Default: RELEASE_BODY
+     */
+    var changelogSource: ChangelogSource = ChangelogSource.RELEASE_BODY
 
     /**
      * Sets the GitHub repository.
@@ -68,5 +75,12 @@ class UpdateConfig {
      */
     fun onUpToDate(block: () -> Unit) {
         onUpToDate = block
+    }
+
+    /**
+     * Set the changelog source
+     */
+    fun changelogSource(source: ChangelogSource) {
+        changelogSource = source
     }
 }

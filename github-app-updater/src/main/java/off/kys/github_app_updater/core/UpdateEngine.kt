@@ -1,6 +1,7 @@
 package off.kys.github_app_updater.core
 
 import off.kys.github_app_updater.api.GitHubApi
+import off.kys.github_app_updater.common.ChangelogSource
 import off.kys.github_app_updater.model.github.GitHubCommit
 import off.kys.github_app_updater.model.updater.UpdateResult
 import off.kys.github_app_updater.util.Version
@@ -36,9 +37,11 @@ object UpdateEngine {
             release.tag_name
         )
 
-        // Build changelog: Prefer release body if available, else commit messages
-        val changelog = release.body?.takeIf { it.isNotBlank() } ?: commits.joinToString("\n") {
-            "• ${it.commit.message.lineSequence().first()}"
+        val changelog = when (config.changelogSource) {
+            ChangelogSource.RELEASE_BODY -> release.body?.takeIf { it.isNotBlank() }
+                ?: commits.joinToString("\n") { "• ${it.commit.message.lineSequence().first()}" }
+
+            ChangelogSource.COMMITS -> commits.joinToString("\n") { "• ${it.commit.message.lineSequence().first()}" }
         }
 
         // Pick APK asset
