@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         google {
@@ -21,3 +23,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Backtalk"
 include(":app")
+include(":github-app-updater")
