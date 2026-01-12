@@ -24,8 +24,8 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.theme.BacktalkTheme
-import off.kys.backtalk.presentation.viewmodel.AppUpdateEvent
-import off.kys.backtalk.presentation.viewmodel.AppUpdateState
+import off.kys.backtalk.presentation.event.MainUiEvent
+import off.kys.backtalk.presentation.state.MainUiState
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.minutes
@@ -53,19 +53,19 @@ class MainActivity : BaseLockActivity() {
 
                     // Trigger update check
                     LaunchedEffect(key1 = Unit) {
-                        viewModel.onEvent(AppUpdateEvent.CheckUpdate)
+                        viewModel.onEvent(MainUiEvent.CheckUpdate)
                     }
 
                     // Show dialog if needed
-                    if (updateState is AppUpdateState.UpdateAvailable) {
-                        val result = (updateState as AppUpdateState.UpdateAvailable).result
+                    if (updateState is MainUiState.UpdateAvailable) {
+                        val result = (updateState as MainUiState.UpdateAvailable).result
                         AppUpdateDialog(
                             updateResult = result,
                             onDismissRequest = {
-                                viewModel.onEvent(AppUpdateEvent.DismissDialog)
+                                viewModel.onEvent(MainUiEvent.DismissDialog)
                             },
                             onUpdateClick = {
-                                viewModel.onEvent(AppUpdateEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl))
+                                viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl))
                             }
                         )
                     }

@@ -9,20 +9,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
+import off.kys.backtalk.presentation.event.MainUiEvent
+import off.kys.backtalk.presentation.state.MainUiState
 
 class MainViewModel(
     private val application: Application,
     private val checkAppUpdate: CheckAppUpdate
 ) : AndroidViewModel(application) {
 
-    private val _updateState = MutableStateFlow<AppUpdateState>(AppUpdateState.Idle)
-    val updateState: StateFlow<AppUpdateState> = _updateState
+    private val _updateState = MutableStateFlow<MainUiState>(MainUiState.Idle)
+    val updateState: StateFlow<MainUiState> = _updateState
 
-    fun onEvent(event: AppUpdateEvent) {
+    fun onEvent(event: MainUiEvent) {
         when (event) {
-            is AppUpdateEvent.CheckUpdate -> checkForUpdate()
-            is AppUpdateEvent.DismissDialog -> _updateState.value = AppUpdateState.Idle
-            is AppUpdateEvent.UpdateNow -> {
+            is MainUiEvent.CheckUpdate -> checkForUpdate()
+            is MainUiEvent.DismissDialog -> _updateState.value = MainUiState.Idle
+            is MainUiEvent.UpdateNow -> {
                 // Trigger update logic (e.g., open browser/download)
                 openUpdateUrl(event.downloadUrl)
             }
@@ -31,18 +33,18 @@ class MainViewModel(
 
     private fun checkForUpdate() {
         viewModelScope.launch {
-            _updateState.value = AppUpdateState.Checking
+            _updateState.value = MainUiState.Checking
             try {
                 checkAppUpdate(
                     onUpdateAvailable = { result ->
-                        _updateState.value = AppUpdateState.UpdateAvailable(result)
+                        _updateState.value = MainUiState.UpdateAvailable(result)
                     },
                     onUpToDate = {
-                        _updateState.value = AppUpdateState.UpToDate
+                        _updateState.value = MainUiState.UpToDate
                     }
                 )
             } catch (e: Exception) {
-                _updateState.value = AppUpdateState.Error(e.message ?: "Unknown error")
+                _updateState.value = MainUiState.Error(e.message ?: "Unknown error")
             }
         }
     }
