@@ -15,4 +15,6 @@
     <string name="copy">Copy</string>
     <string name="text_copied_to_clipboard">Text copied to clipboard</string>
     <string name="copied_text">Copied Text</string>
+    <string name="messages_selected_count">%1$d selected</string>
+    <string name="close">Close</string>
 </resources>

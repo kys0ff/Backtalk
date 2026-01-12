@@ -8,6 +8,11 @@ import off.kys.backtalk.domain.model.MessageId
  */
 sealed interface MessagesUiEvent {
     /**
+     * UI event to load messages from the data source.
+     */
+    data object LoadMessages : MessagesUiEvent
+
+    /**
      * UI event to send a message.
      *
      * @param text The text of the message to send.
@@ -22,28 +27,24 @@ sealed interface MessagesUiEvent {
     data class ReplyTo(val message: MessageEntity?) : MessagesUiEvent
 
     /**
-     * UI event to select a message by its ID.
+     * UI event to select a message.
      *
-     * @param id The ID of the message to select.
+     * @param id The ID of the message to select
      */
-    data class SelectMessage(val id: MessageId?) : MessagesUiEvent
+    data class ToggleSelection(val id: MessageId) : MessagesUiEvent
 
     /**
-     * UI event to delete a message by its ID.
-     *
-     * @param id The ID of the message to delete.
+     * UI event to delete a message.
      */
-    data class DeleteMessage(val id: MessageId) : MessagesUiEvent
+    object ClearSelection : MessagesUiEvent
 
     /**
-     * UI event to copy a message by its ID.
-     *
-     * @param id The ID of the message to copy.
+     * UI event to delete a message.
      */
-    data class CopyMessage(val id: MessageId) : MessagesUiEvent
+    object DeleteSelected : MessagesUiEvent
 
     /**
-     * UI event to load messages from the data source.
+     * UI event to copy a message.
      */
-    data object LoadMessages : MessagesUiEvent
+    object CopySelected : MessagesUiEvent
 }

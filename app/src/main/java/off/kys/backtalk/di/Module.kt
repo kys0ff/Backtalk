@@ -6,7 +6,7 @@ import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.domain.repository.MessagesRepository
-import off.kys.backtalk.domain.use_case.CopyMessageById
+import off.kys.backtalk.domain.use_case.CopyMessagesByIds
 import off.kys.backtalk.domain.use_case.DeleteMessageById
 import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
@@ -49,14 +49,14 @@ private fun Module.useCaseModule() {
     single { GetMessageById(get()) }
     single { InsertMessage(get()) }
     single { DeleteMessageById(get()) }
-    single { CopyMessageById(get(), get()) }
+    single { CopyMessagesByIds(get(), get()) }
     single {
         MessagesUseCases(
             getAllMessages = get(),
             getMessageById = get(),
             insertMessage = get(),
             deleteMessageById = get(),
-            copyMessageById = get()
+            copyMessagesByIds = get()
         )
     }
 }

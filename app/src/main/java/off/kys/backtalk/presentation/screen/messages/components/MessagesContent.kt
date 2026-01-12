@@ -21,15 +21,15 @@ fun MessagesContent(
     modifier: Modifier,
     state: MessagesUiState,
     onReply: (MessageEntity?) -> Unit,
-    onSelect: (MessageId?) -> Unit,
+    onToggleSelect: (MessageId) -> Unit,
     onSend: (String) -> Unit
 ) {
     Column(modifier = modifier) {
         MessagesList(
             messages = state.messages,
-            selectedMessageId = state.selectedMessageId,
+            selectedMessageIds = state.selectedMessageIds,
             onReply = onReply,
-            onSelect = onSelect
+            onToggleSelect = onToggleSelect
         )
 
         InputBar(

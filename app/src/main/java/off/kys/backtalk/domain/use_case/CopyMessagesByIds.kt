@@ -1,19 +1,19 @@
 package off.kys.backtalk.domain.use_case
 
 import android.content.Context
+import kotlinx.coroutines.flow.firstOrNull
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.util.copyToClipboard
 
-class CopyMessageById(
+class CopyMessagesByIds(
     private val context: Context,
     private val repository: MessagesRepository
 ) {
-    suspend operator fun invoke(id: MessageId) {
-        val message = repository.getMessageById(id)
+    suspend operator fun invoke(ids: Set<MessageId>) {
+        val messages = repository.getMessagesByIds(ids).firstOrNull()?.toSet() ?: return
+        val messagesBody = messages.joinToString("\n\n") { it.text }
         // Copy the message to the clipboard
-        message?.let { messageEntity ->
-            context.copyToClipboard(messageEntity.text)
-        }
+        context.copyToClipboard(messagesBody)
     }
 }

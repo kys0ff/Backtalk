@@ -22,14 +22,22 @@ class MessagesViewModel(
         onEvent(MessagesUiEvent.LoadMessages)
     }
 
+    /**
+     * Handles UI events related to messages.
+     *
+     * @param event The UI event to handle.
+     */
     fun onEvent(event: MessagesUiEvent) {
         when (event) {
             is MessagesUiEvent.LoadMessages -> loadMessages()
             is MessagesUiEvent.SendMessage -> sendMessage(event.text)
             is MessagesUiEvent.ReplyTo -> updateReply(event.message)
-            is MessagesUiEvent.SelectMessage -> updateSelection(event.id)
-            is MessagesUiEvent.DeleteMessage -> deleteMessage(event.id)
-            is MessagesUiEvent.CopyMessage -> copyMessage(event.id)
+
+            is MessagesUiEvent.ToggleSelection -> toggleSelection(event.id)
+            is MessagesUiEvent.ClearSelection -> clearSelection()
+
+            is MessagesUiEvent.DeleteSelected -> deleteSelected()
+            is MessagesUiEvent.CopySelected -> copySelected()
         }
     }
 
@@ -62,20 +70,31 @@ class MessagesViewModel(
         _uiState.value = _uiState.value.copy(replyingTo = message)
     }
 
-    private fun updateSelection(id: MessageId?) {
-        _uiState.value = _uiState.value.copy(selectedMessageId = id)
+    private fun toggleSelection(id: MessageId) {
+        val current = _uiState.value.selectedMessageIds
+        _uiState.value = _uiState.value.copy(
+            selectedMessageIds =
+                if (id in current) current - id else current + id
+        )
     }
 
-    private fun deleteMessage(id: MessageId) {
-        viewModelScope.launch {
-            useCases.deleteMessageById(id)
-        }
-        updateSelection(null)
+    private fun clearSelection() {
+        _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
     }
 
-    private fun copyMessage(id: MessageId) {
+    private fun deleteSelected() {
+        val ids = _uiState.value.selectedMessageIds
         viewModelScope.launch {
-            useCases.copyMessageById(id)
+            ids.forEach { useCases.deleteMessageById(it) }
         }
+        clearSelection()
+    }
+
+    private fun copySelected() {
+        val selectedIds = _uiState.value.selectedMessageIds
+        viewModelScope.launch {
+            useCases.copyMessagesByIds(selectedIds)
+        }
+        clearSelection()
     }
 }

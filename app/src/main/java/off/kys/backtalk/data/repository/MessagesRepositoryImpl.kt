@@ -27,6 +27,12 @@ class MessagesRepositoryImpl(
     override suspend fun getMessageById(id: MessageId): MessageEntity? = messagesDao.getMessage(id)
 
     /**
+     * Get a set of messages from the database by their IDs.
+     * @param ids The set of IDs of the messages to retrieve.
+     */
+    override fun getMessagesByIds(ids: Set<MessageId>): Flow<List<MessageEntity>> = messagesDao.getMessagesByIds(ids)
+
+    /**
      * Insert a new message into the database.
      * @param messageEntity The [MessageEntity] object to insert.
      */

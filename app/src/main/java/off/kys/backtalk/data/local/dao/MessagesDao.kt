@@ -13,7 +13,10 @@ interface MessagesDao {
     @Query("SELECT * FROM messages WHERE id = :id")
     suspend fun getMessage(id: MessageId): MessageEntity?
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Query("SELECT * FROM messages WHERE id IN (:ids)")
+    fun getMessagesByIds(ids: Set<MessageId>): Flow<List<MessageEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessage(messageEntity: MessageEntity)
 
     @Query("DELETE FROM messages WHERE id = :id")

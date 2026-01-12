@@ -28,21 +28,23 @@ import off.kys.backtalk.domain.model.MessageId
  *
  * @param ColumnScope The scope for the column.
  * @param messages The list of messages to display.
- * @param selectedMessageId The ID of the currently selected message.
+ * @param selectedMessageIds The set of selected message IDs.
  * @param onReply The callback function to handle replying to a message.
- * @param onSelect The callback function to handle selecting a message.
+ * @param onToggleSelect The callback function to handle toggling the selection of a message.
  */
 @Composable
 fun ColumnScope.MessagesList(
     messages: List<MessageEntity>,
-    selectedMessageId: MessageId?,
+    selectedMessageIds: Set<MessageId>,
     onReply: (MessageEntity?) -> Unit,
-    onSelect: (MessageId?) -> Unit
+    onToggleSelect: (MessageId) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
     var blinkMessageId by remember { mutableStateOf<MessageId?>(null) }
+
+    val selectionMode = selectedMessageIds.isNotEmpty()
 
     // Auto-scroll when a new message is added
     LaunchedEffect(messages.size) {
@@ -84,6 +86,8 @@ fun ColumnScope.MessagesList(
                     messages.find { it.id == id }
                 }
 
+            val isSelected = current.id in selectedMessageIds
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showTimestamp) {
                     TimestampHeader(current.timestamp)
@@ -91,9 +95,9 @@ fun ColumnScope.MessagesList(
 
                 SwipeToReplyWrapper(
                     onSwipe = {
-                        onReply(
-                            if (current.id == selectedMessageId) null else current
-                        )
+                        if (!selectionMode) {
+                            onReply(current)
+                        }
                     }
                 ) {
                     MessageBubble(
@@ -102,30 +106,29 @@ fun ColumnScope.MessagesList(
                         blinkMessageId = blinkMessageId,
                         isTop = isTop,
                         isBottom = isBottom,
-                        selectMode = selectedMessageId != null,
-                        isSelected = selectedMessageId == current.id,
+                        selectMode = selectionMode,
+                        isSelected = isSelected,
                         onReplyPreviewClick = {
                             current.repliedToId?.let { id ->
                                 coroutineScope.launch {
-                                    val targetIndex = reversed.indexOfFirst { it.id == id }
+                                    val targetIndex =
+                                        reversed.indexOfFirst { it.id == id }
                                     if (targetIndex != -1) {
                                         listState.animateScrollToItem(targetIndex)
                                         blinkMessageId = id
-                                        delay(1920) // duration of blink
+                                        delay(1920)
                                         blinkMessageId = null
                                     }
                                 }
                             }
                         },
                         onClick = {
-                            if (selectedMessageId != null) {
-                                onSelect(
-                                    if (selectedMessageId == current.id) null else current.id
-                                )
+                            if (selectionMode) {
+                                onToggleSelect(current.id)
                             }
                         },
                         onLongClick = {
-                            onSelect(current.id)
+                            onToggleSelect(current.id)
                         }
                     )
                 }

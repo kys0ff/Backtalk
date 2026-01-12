@@ -12,12 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import off.kys.backtalk.R
-import off.kys.backtalk.domain.model.MessageId
 
 /**
  * Composable function that displays the messages top bar.
  *
- * @param selectedMessageId The ID of the currently selected message.
+ * @param scrollBehavior The scroll behavior of the top bar.
+ * @param selectedCount The number of selected messages.
  * @param onCloseSelection The callback function to handle closing the selection.
  * @param onDelete The callback function to handle deleting the selected message.
  * @param onCopy The callback function to handle copying the selected message.
@@ -26,32 +26,35 @@ import off.kys.backtalk.domain.model.MessageId
 @Composable
 fun MessagesTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    selectedMessageId: MessageId?,
+    selectedCount: Int,
     onCloseSelection: () -> Unit,
     onDelete: () -> Unit,
     onCopy: () -> Unit
 ) {
+    val selectionActive = selectedCount > 0
+
     TopAppBar(
         title = {
             Text(
-                text = if (selectedMessageId != null)
-                    stringResource(R.string.message_selected)
-                else
+                text = if (selectionActive) {
+                    stringResource(R.string.messages_selected_count, selectedCount)
+                } else {
                     stringResource(R.string.messages)
+                }
             )
         },
         navigationIcon = {
-            if (selectedMessageId != null) {
+            if (selectionActive) {
                 IconButton(onClick = onCloseSelection) {
                     Icon(
-                        painterResource(R.drawable.round_close_24),
-                        contentDescription = null
+                        painter = painterResource(R.drawable.round_close_24),
+                        contentDescription = stringResource(R.string.close)
                     )
                 }
             }
         },
         actions = {
-            if (selectedMessageId != null) {
+            if (selectionActive) {
                 IconButton(onClick = onDelete) {
                     Icon(
                         painter = painterResource(R.drawable.round_delete_24),
@@ -63,14 +66,14 @@ fun MessagesTopBar(
                 IconButton(onClick = onCopy) {
                     Icon(
                         painter = painterResource(R.drawable.round_content_copy_24),
-                        contentDescription = stringResource(R.string.copy),
+                        contentDescription = stringResource(R.string.copy)
                     )
                 }
             }
         },
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = if (selectedMessageId != null) {
+            containerColor = if (selectionActive) {
                 TopAppBarDefaults.topAppBarColors().scrolledContainerColor
             } else {
                 TopAppBarDefaults.topAppBarColors().containerColor

@@ -25,8 +25,8 @@ class MessagesScreen : Screen {
         val state by viewModel.uiState
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        BackHandler(state.selectedMessageId != null) {
-            viewModel.onEvent(MessagesUiEvent.SelectMessage(null))
+        BackHandler(state.selectedMessageIds.isNotEmpty()) {
+            viewModel.onEvent(MessagesUiEvent.ClearSelection)
         }
 
         BackHandler(state.replyingTo != null) {
@@ -38,28 +38,24 @@ class MessagesScreen : Screen {
             topBar = {
                 MessagesTopBar(
                     scrollBehavior = scrollBehavior,
-                    selectedMessageId = state.selectedMessageId,
+                    selectedCount = state.selectedMessageIds.size,
                     onCloseSelection = {
-                        viewModel.onEvent(MessagesUiEvent.SelectMessage(null))
+                        viewModel.onEvent(MessagesUiEvent.ClearSelection)
                     },
                     onDelete = {
-                        state.selectedMessageId?.let {
-                            viewModel.onEvent(MessagesUiEvent.DeleteMessage(it))
-                        }
+                        viewModel.onEvent(MessagesUiEvent.DeleteSelected)
                     },
                     onCopy = {
-                        state.selectedMessageId?.let {
-                            viewModel.onEvent(MessagesUiEvent.CopyMessage(it))
-                        }
+                        viewModel.onEvent(MessagesUiEvent.CopySelected)
                     }
                 )
             }
-        ) { padding ->
+        ) { scaffoldPadding ->
             MessagesContent(
-                modifier = Modifier.padding(padding),
+                modifier = Modifier.padding(scaffoldPadding),
                 state = state,
                 onReply = { viewModel.onEvent(MessagesUiEvent.ReplyTo(it)) },
-                onSelect = { viewModel.onEvent(MessagesUiEvent.SelectMessage(it)) },
+                onToggleSelect = { viewModel.onEvent(MessagesUiEvent.ToggleSelection(it)) },
                 onSend = { viewModel.onEvent(MessagesUiEvent.SendMessage(it)) }
             )
         }
