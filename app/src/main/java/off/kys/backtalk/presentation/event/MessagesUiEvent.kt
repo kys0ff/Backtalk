@@ -36,6 +36,13 @@ sealed interface MessagesUiEvent {
     data class DeleteMessage(val id: MessageId) : MessagesUiEvent
 
     /**
+     * UI event to copy a message by its ID.
+     *
+     * @param id The ID of the message to copy.
+     */
+    data class CopyMessage(val id: MessageId) : MessagesUiEvent
+
+    /**
      * UI event to load messages from the data source.
      */
     data object LoadMessages : MessagesUiEvent

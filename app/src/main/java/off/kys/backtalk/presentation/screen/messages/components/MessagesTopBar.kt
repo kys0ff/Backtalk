@@ -20,14 +20,16 @@ import off.kys.backtalk.domain.model.MessageId
  * @param selectedMessageId The ID of the currently selected message.
  * @param onCloseSelection The callback function to handle closing the selection.
  * @param onDelete The callback function to handle deleting the selected message.
+ * @param onCopy The callback function to handle copying the selected message.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessagesTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
     selectedMessageId: MessageId?,
     onCloseSelection: () -> Unit,
     onDelete: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior
+    onCopy: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -55,6 +57,13 @@ fun MessagesTopBar(
                         painter = painterResource(R.drawable.round_delete_24),
                         contentDescription = stringResource(R.string.delete),
                         tint = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                IconButton(onClick = onCopy) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_content_copy_24),
+                        contentDescription = stringResource(R.string.copy),
                     )
                 }
             }

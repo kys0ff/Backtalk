@@ -12,4 +12,7 @@
     <string name="log_in_using_your_biometric_credential">Log in using your biometric credential</string>
     <string name="exit_app">Exit App</string>
     <string name="the_app_is_locked">The app is locked.</string>
+    <string name="copy">Copy</string>
+    <string name="text_copied_to_clipboard">Text copied to clipboard</string>
+    <string name="copied_text">Copied Text</string>
 </resources>

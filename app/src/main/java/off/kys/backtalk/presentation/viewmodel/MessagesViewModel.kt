@@ -29,6 +29,7 @@ class MessagesViewModel(
             is MessagesUiEvent.ReplyTo -> updateReply(event.message)
             is MessagesUiEvent.SelectMessage -> updateSelection(event.id)
             is MessagesUiEvent.DeleteMessage -> deleteMessage(event.id)
+            is MessagesUiEvent.CopyMessage -> copyMessage(event.id)
         }
     }
 
@@ -70,5 +71,11 @@ class MessagesViewModel(
             useCases.deleteMessageById(id)
         }
         updateSelection(null)
+    }
+
+    private fun copyMessage(id: MessageId) {
+        viewModelScope.launch {
+            useCases.copyMessageById(id)
+        }
     }
 }

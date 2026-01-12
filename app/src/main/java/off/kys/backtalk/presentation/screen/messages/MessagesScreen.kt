@@ -46,6 +46,11 @@ class MessagesScreen : Screen {
                         state.selectedMessageId?.let {
                             viewModel.onEvent(MessagesUiEvent.DeleteMessage(it))
                         }
+                    },
+                    onCopy = {
+                        state.selectedMessageId?.let {
+                            viewModel.onEvent(MessagesUiEvent.CopyMessage(it))
+                        }
                     }
                 )
             }
