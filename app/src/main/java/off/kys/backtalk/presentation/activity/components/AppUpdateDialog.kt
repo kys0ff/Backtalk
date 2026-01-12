@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.activity
+package off.kys.backtalk.presentation.activity.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
