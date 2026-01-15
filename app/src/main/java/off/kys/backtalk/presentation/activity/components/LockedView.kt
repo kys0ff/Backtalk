@@ -13,6 +13,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 
+/**
+ * Composable for the locked view.
+ *
+ * @param modifier The modifier for the view.
+ */
 @Composable
 fun LockedView(modifier: Modifier = Modifier) {
     Box(

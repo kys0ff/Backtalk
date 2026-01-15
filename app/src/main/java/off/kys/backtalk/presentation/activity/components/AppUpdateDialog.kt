@@ -8,6 +8,13 @@ import androidx.compose.ui.res.stringResource
 import off.kys.backtalk.R
 import off.kys.github_app_updater.model.updater.UpdateResult
 
+/**
+ * Composable for displaying an app update dialog.
+ *
+ * @param updateResult The result of the update check.
+ * @param onDismissRequest The callback to be invoked when the dialog is dismissed.
+ * @param onUpdateClick The callback to be invoked when the update button is clicked.
+ */
 @Composable
 fun AppUpdateDialog(
     updateResult: UpdateResult,
