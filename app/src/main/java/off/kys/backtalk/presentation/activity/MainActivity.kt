@@ -51,12 +51,8 @@ class MainActivity : BaseLockActivity() {
                         val result = (updateState as MainUiState.UpdateAvailable).result
                         AppUpdateDialog(
                             updateResult = result,
-                            onDismissRequest = {
-                                viewModel.onEvent(MainUiEvent.DismissDialog)
-                            },
-                            onUpdateClick = {
-                                viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl))
-                            }
+                            onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
+                            onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl)) }
                         )
                     }
                 }
