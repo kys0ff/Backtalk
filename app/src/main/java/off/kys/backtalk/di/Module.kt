@@ -20,6 +20,9 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
+/**
+ * Koin module for the app.
+ */
 val appModule = module {
     databaseModule()
     repositoryModule()
@@ -28,6 +31,9 @@ val appModule = module {
     systemModule()
 }
 
+/**
+ * Koin module for the database.
+ */
 private fun Module.databaseModule() {
     single {
         Room.databaseBuilder(
@@ -42,10 +48,16 @@ private fun Module.databaseModule() {
     single<MessagesDao> { get<MessagesDatabase>().messagesDao() }
 }
 
+/**
+ * Koin module for the repository.
+ */
 private fun Module.repositoryModule() {
     single<MessagesRepository> { MessagesRepositoryImpl(get()) }
 }
 
+/**
+ * Koin module for the use cases.
+ */
 private fun Module.useCaseModule() {
     single { GetAllMessages(get()) }
     single { GetMessageById(get()) }
@@ -64,11 +76,17 @@ private fun Module.useCaseModule() {
     }
 }
 
+/**
+ * Koin module for the view models.
+ */
 private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get()) }
     viewModel { MessagesViewModel(get()) }
 }
 
+/**
+ * Koin module for the system.
+ */
 private fun Module.systemModule() {
     single { VibrationManager(get()) }
 }
