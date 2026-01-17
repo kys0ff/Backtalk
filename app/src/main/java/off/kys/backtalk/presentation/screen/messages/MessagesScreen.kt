@@ -25,6 +25,7 @@ class MessagesScreen : Screen {
         val state by viewModel.uiState
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+
         BackHandler(state.selectedMessageIds.isNotEmpty()) {
             viewModel.onEvent(MessagesUiEvent.ClearSelection)
         }

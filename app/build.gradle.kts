@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.splashscreen)
     implementation(project(":github-app-updater"))
+    implementation(project(":preferences"))
     implementation(libs.androidx.lifecycle.process)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)

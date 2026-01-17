@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":preferences")
+
+
 pluginManagement {
     repositories {
         google {
