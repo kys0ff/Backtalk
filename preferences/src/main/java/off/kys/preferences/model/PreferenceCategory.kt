@@ -1,6 +1,7 @@
-package off.kys.preferences
+package off.kys.preferences.model
 
 import androidx.compose.ui.graphics.painter.Painter
+import off.kys.preferences.model.PreferenceItem
 
 data class PreferenceCategory(
     val id: String,

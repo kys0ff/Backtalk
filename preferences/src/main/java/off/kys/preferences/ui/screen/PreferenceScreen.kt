@@ -1,4 +1,4 @@
-package off.kys.preferences
+package off.kys.preferences.ui.screen
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
@@ -22,6 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import off.kys.preferences.data.PreferenceManager
+import off.kys.preferences.model.PreferenceCategory
+import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.ui.item.ActionPreferenceItem
+import off.kys.preferences.ui.item.ListPreference
+import off.kys.preferences.ui.item.PreferenceCategoryItem
+import off.kys.preferences.ui.item.SliderPreferenceItem
+import off.kys.preferences.ui.item.SwitchPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

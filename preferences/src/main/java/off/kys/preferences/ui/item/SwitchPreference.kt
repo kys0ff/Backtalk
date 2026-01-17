@@ -1,4 +1,4 @@
-package off.kys.preferences
+package off.kys.preferences.ui.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
+import off.kys.preferences.data.PreferenceManager
+import off.kys.preferences.model.PreferenceItem
 
 @Composable
 fun SwitchPreference(

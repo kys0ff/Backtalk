@@ -1,4 +1,4 @@
-package off.kys.preferences
+package off.kys.preferences.core
 
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -19,5 +19,3 @@ sealed class PreferenceKey {
         is List -> stringPreferencesKey(title)
     } as Preferences.Key<T>
 }
-
-fun singleValueList(vararg values: String) = values.associateWith { it }

@@ -1,4 +1,4 @@
-package off.kys.preferences
+package off.kys.preferences.ui.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Icon
@@ -10,6 +10,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import off.kys.preferences.data.PreferenceManager
+import off.kys.preferences.model.PreferenceItem
 import java.util.Locale
 
 @Composable

@@ -1,4 +1,4 @@
-package off.kys.preferences
+package off.kys.preferences.ui.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.data.PreferenceManager
 
 private const val TAG = "ListPreference"
 
