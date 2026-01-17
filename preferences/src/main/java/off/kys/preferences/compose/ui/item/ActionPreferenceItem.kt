@@ -7,6 +7,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import off.kys.preferences.model.PreferenceItem
 
@@ -21,7 +22,7 @@ fun ActionPreferenceItem(
         leadingContent = item.icon?.let {
             {
                 Icon(
-                    painter = it,
+                    painter = painterResource(it),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )

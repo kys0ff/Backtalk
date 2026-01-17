@@ -28,15 +28,15 @@ import off.kys.preferences.compose.ui.item.ListPreference
 import off.kys.preferences.compose.ui.item.PreferenceCategoryItem
 import off.kys.preferences.compose.ui.item.SliderPreferenceItem
 import off.kys.preferences.compose.ui.item.SwitchPreference
+import off.kys.preferences.core.PreferenceScreenScope
 import off.kys.preferences.data.PreferenceManager
-import off.kys.preferences.model.PreferenceCategory
 import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.model.builder.PreferenceCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceScreen(
-    categories: List<PreferenceCategory>
-) {
+fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
+    val scope = remember { PreferenceScreenScope().apply(build) }
     val context = LocalContext.current
     val preferenceManager = remember { PreferenceManager(context) }
 
@@ -82,7 +82,7 @@ fun PreferenceScreen(
             if (category == null) {
                 // --- SCREEN 1: CATEGORY LIST ---
                 LazyColumn {
-                    items(items = categories) { cat ->
+                    items(items = scope.categories) { cat ->
                         PreferenceCategoryItem(
                             title = cat.title,
                             description = cat.description,

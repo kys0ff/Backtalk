@@ -23,10 +23,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import off.kys.preferences.model.PreferenceItem
 import off.kys.preferences.data.PreferenceManager
+import off.kys.preferences.model.PreferenceItem
 
 private const val TAG = "ListPreference"
 
@@ -47,13 +48,13 @@ fun ListPreference(
     }
 
     val currentDisplay =
-        item.options.entries.find { it.value == selectedValue }?.key ?: "Select"
+        item.entries.entries.find { it.value == selectedValue }?.key ?: "Select"
 
     ListItem(
         modifier = Modifier.clickable { showDialog = true },
         headlineContent = { Text(item.title) },
         supportingContent = { Text(currentDisplay) }, // Show current selection
-        leadingContent = item.icon?.let { { Icon(painter = it, contentDescription = null) } }
+        leadingContent = item.icon?.let { { Icon(painter = painterResource(it), contentDescription = null) } }
     )
 
     if (showDialog) {
@@ -62,7 +63,7 @@ fun ListPreference(
             title = { Text(item.title) },
             text = {
                 Column {
-                    item.options.forEach { (displayName, storedValue) ->
+                    item.entries.forEach { (displayName, storedValue) ->
                         Row(
                             Modifier
                                 .fillMaxWidth()

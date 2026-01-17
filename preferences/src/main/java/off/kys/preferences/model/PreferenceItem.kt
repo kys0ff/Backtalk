@@ -1,13 +1,13 @@
 package off.kys.preferences.model
 
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.annotation.DrawableRes
 import off.kys.preferences.core.PreferenceKey
 
 sealed class PreferenceItem {
     data class Action(
         val title: String,
         val summary: String? = null,
-        val icon: Painter? = null,
+        @DrawableRes val icon: Int? = null,
         val onClick: (() -> Unit)?
     ) : PreferenceItem()
 
@@ -16,7 +16,7 @@ sealed class PreferenceItem {
         val title: String,
         val summary: String? = null,
         val defaultValue: Boolean = false,
-        val icon: Painter? = null
+        @DrawableRes val icon: Int? = null
     ) : PreferenceItem()
 
     data class Slider(
@@ -25,15 +25,15 @@ sealed class PreferenceItem {
         val defaultValue: Float = 0f,
         val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
         val steps: Int = 0,
-        val icon: Painter? = null
+        @DrawableRes val icon: Int? = null
     ) : PreferenceItem()
 
     // You can add Dialog/List here following the previous pattern
     data class List(
         val key: PreferenceKey.List,
         val title: String,
-        val options: Map<String, String>,
+        val entries: Map<String, String>,
         val defaultValue: String,
-        val icon: Painter? = null
+        @DrawableRes val icon: Int? = null
     ) : PreferenceItem()
 }
