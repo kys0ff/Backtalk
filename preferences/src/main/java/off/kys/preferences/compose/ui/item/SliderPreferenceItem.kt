@@ -1,4 +1,4 @@
-package off.kys.preferences.ui.item
+package off.kys.preferences.compose.ui.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Icon

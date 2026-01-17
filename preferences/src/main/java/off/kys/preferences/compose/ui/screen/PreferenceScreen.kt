@@ -1,6 +1,5 @@
-package off.kys.preferences.ui.screen
+package off.kys.preferences.compose.ui.screen
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
@@ -21,23 +20,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import off.kys.preferences.R
+import off.kys.preferences.compose.ui.item.ActionPreferenceItem
+import off.kys.preferences.compose.ui.item.ListPreference
+import off.kys.preferences.compose.ui.item.PreferenceCategoryItem
+import off.kys.preferences.compose.ui.item.SliderPreferenceItem
+import off.kys.preferences.compose.ui.item.SwitchPreference
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceCategory
 import off.kys.preferences.model.PreferenceItem
-import off.kys.preferences.ui.item.ActionPreferenceItem
-import off.kys.preferences.ui.item.ListPreference
-import off.kys.preferences.ui.item.PreferenceCategoryItem
-import off.kys.preferences.ui.item.SliderPreferenceItem
-import off.kys.preferences.ui.item.SwitchPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferenceScreen(
-    arrowBackIcon: Painter,
-    context: Context,
     categories: List<PreferenceCategory>
 ) {
+    val context = LocalContext.current
     val preferenceManager = remember { PreferenceManager(context) }
 
     // STATE: Keeps track of which category is currently open (null = Main Menu)
@@ -57,7 +57,7 @@ fun PreferenceScreen(
                     if (selectedCategory != null) {
                         IconButton(onClick = { selectedCategory = null }) {
                             Icon(
-                                painter = arrowBackIcon,
+                                painter = painterResource(R.drawable.round_arrow_back_24),
                                 contentDescription = "Navigate up"
                             )
                         }
