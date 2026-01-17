@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
@@ -26,8 +27,8 @@ fun SliderPreferenceItem(
         .collectAsState(initial = item.defaultValue)
 
     ListItem(
-        headlineContent = { Text(item.title) },
-        leadingContent = item.icon?.let { { Icon(painterResource(it), contentDescription = null) } },
+        headlineContent = { Text(stringResource(item.titleRes)) },
+        leadingContent = item.iconRes?.let { { Icon(painterResource(it), contentDescription = null) } },
         supportingContent = {
             Column {
                 // Display the current value formatted nicely

@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import off.kys.preferences.R
 import off.kys.preferences.compose.ui.item.ActionPreferenceItem
 import off.kys.preferences.compose.ui.item.ListPreference
@@ -33,6 +34,7 @@ import off.kys.preferences.core.PreferenceScreenScope
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
 import off.kys.preferences.model.builder.PreferenceCategory
+import off.kys.preferences.util.putIfNotNullOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +54,10 @@ fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(selectedCategory?.title ?: "Settings") },
+                title = {
+                    Text(putIfNotNullOrNull(selectedCategory?.titleRes) { stringResource(it) }
+                        ?: "Settings")
+                },
                 navigationIcon = {
                     // Show Back Arrow only if we are inside a category
                     if (selectedCategory != null) {
@@ -86,8 +91,12 @@ fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
                     LazyColumn {
                         items(items = scope.categories) { cat ->
                             PreferenceCategoryItem(
-                                title = cat.title,
-                                description = cat.description,
+                                title = stringResource(cat.titleRes),
+                                description = putIfNotNullOrNull(cat.descriptionRes) {
+                                    stringResource(
+                                        it
+                                    )
+                                },
                                 icon = cat.icon,
                                 onClick = { selectedCategory = cat } // Navigate "deeper"
                             )

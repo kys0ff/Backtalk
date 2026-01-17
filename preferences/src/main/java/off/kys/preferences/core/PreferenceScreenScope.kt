@@ -3,6 +3,7 @@
 package off.kys.preferences.core
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import off.kys.preferences.core.dsl.PreferenceDsl
 import off.kys.preferences.model.builder.PreferenceCategory as PreferenceCategoryBuilder
 
@@ -11,15 +12,15 @@ class PreferenceScreenScope {
     internal val categories = mutableListOf<PreferenceCategoryBuilder>()
 
     fun PreferenceCategory(
-        title: String,
-        description: String? = null,
-        @DrawableRes icon: Int? = null,
+        @StringRes titleRes: Int,
+        @StringRes descriptionRes: Int? = null,
+        @DrawableRes iconRes: Int? = null,
         build: PreferenceCategoryBuilder.() -> Unit
     ) {
         categories += PreferenceCategoryBuilder(
-            title = title,
-            description = description,
-            icon = icon,
+            titleRes = titleRes,
+            descriptionRes = descriptionRes,
+            icon = iconRes,
             build = build
         )
     }

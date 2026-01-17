@@ -3,6 +3,7 @@
 package off.kys.preferences.model.builder
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import off.kys.preferences.core.PreferenceKey
 import off.kys.preferences.core.dsl.PreferenceDsl
@@ -10,8 +11,8 @@ import off.kys.preferences.model.PreferenceItem
 
 @PreferenceDsl
 class PreferenceCategory(
-    val title: String,
-    val description: String? = null,
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int? = null,
     @DrawableRes val icon: Int? = null,
     val build: PreferenceCategory.() -> Unit
 ) {
@@ -26,47 +27,47 @@ class PreferenceCategory(
     }
 
     fun Action(
-        title: String,
-        summary: String? = null,
+        @StringRes titleRes: Int,
+        @StringRes summaryRes: Int? = null,
         @DrawableRes icon: Int? = null,
         onClick: (() -> Unit)?
     ) {
         items += PreferenceItem.Action(
-            title = title,
-            summary = summary,
-            icon = icon,
+            titleRes = titleRes,
+            summaryRes = summaryRes,
+            iconRes = icon,
             onClick = onClick
         )
     }
 
     fun Switch(
         key: PreferenceKey.Switch,
-        title: String,
-        @DrawableRes icon: Int? = null,
-        summary: String? = null,
+        @StringRes titleRes: Int,
+        @StringRes summaryRes: Int? = null,
+        @DrawableRes iconRes: Int? = null,
         defaultValue: Boolean = false
     ) {
         items += PreferenceItem.Switch(
             key = key,
-            title = title,
-            icon = icon,
-            summary = summary,
+            titleRes = titleRes,
+            iconRes = iconRes,
+            summaryRes = summaryRes,
             defaultValue = defaultValue
         )
     }
 
     fun Slider(
         key: PreferenceKey.Slider,
-        title: String,
-        @DrawableRes icon: Int? = null,
+        @StringRes title: Int,
+        @DrawableRes iconRes: Int? = null,
         valueRange: ClosedFloatingPointRange<Float>,
         steps: Int = 0,
         defaultValue: Float
     ) {
         items += PreferenceItem.Slider(
             key = key,
-            title = title,
-            icon = icon,
+            titleRes = title,
+            iconRes = iconRes,
             valueRange = valueRange,
             steps = steps,
             defaultValue = defaultValue
@@ -75,15 +76,15 @@ class PreferenceCategory(
 
     fun List(
         key: PreferenceKey.List,
-        title: String,
-        @DrawableRes icon: Int? = null,
+        @StringRes titleRes: Int,
+        @DrawableRes iconRes: Int? = null,
         entries: Map<String, String>,
         defaultValue: String
     ) {
         items += PreferenceItem.List(
             key = key,
-            title = title,
-            icon = icon,
+            titleRes = titleRes,
+            iconRes = iconRes,
             entries = entries,
             defaultValue = defaultValue
         )

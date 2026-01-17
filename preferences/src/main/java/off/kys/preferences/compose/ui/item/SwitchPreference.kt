@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
@@ -28,9 +29,9 @@ fun SwitchPreference(
         modifier = Modifier.clickable {
             scope.launch { preferenceManager.setPreference(item.key.toPreferencesKey(), !value) }
         },
-        headlineContent = { Text(item.title) },
-        supportingContent = item.summary?.let { { Text(it) } },
-        leadingContent = item.icon?.let { { Icon(painterResource(it), contentDescription = null) } },
+        headlineContent = { Text(stringResource(item.titleRes)) },
+        supportingContent = item.summaryRes?.let { { Text(stringResource(it)) } },
+        leadingContent = item.iconRes?.let { { Icon(painterResource(it), contentDescription = null) } },
         trailingContent = {
             Switch(
                 checked = value,

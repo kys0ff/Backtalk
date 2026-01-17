@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
@@ -52,15 +53,15 @@ fun ListPreference(
 
     ListItem(
         modifier = Modifier.clickable { showDialog = true },
-        headlineContent = { Text(item.title) },
+        headlineContent = { Text(stringResource(item.titleRes)) },
         supportingContent = { Text(currentDisplay) }, // Show current selection
-        leadingContent = item.icon?.let { { Icon(painter = painterResource(it), contentDescription = null) } }
+        leadingContent = item.iconRes?.let { { Icon(painter = painterResource(it), contentDescription = null) } }
     )
 
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(item.title) },
+            title = { Text(stringResource(item.titleRes)) },
             text = {
                 Column {
                     item.entries.forEach { (displayName, storedValue) ->

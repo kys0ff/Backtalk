@@ -1,17 +1,21 @@
 package off.kys.backtalk.presentation.screen.preferences
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import off.kys.backtalk.BuildConfig
@@ -29,22 +33,22 @@ class PreferencesScreen : Screen {
 
         PreferenceScreen {
             PreferenceCategory(
-                title = "General",
-                description = "General app behavior",
-                icon = R.drawable.round_home_24
+                titleRes = R.string.general,
+                descriptionRes = R.string.general_app_behavior,
+                iconRes = R.drawable.round_home_24
             ) {
                 Switch(
                     key = PreferenceKey.Switch("dark_mode"),
-                    title = "Dark Mode",
-                    summary = "Use dark theme",
+                    titleRes = R.string.dark_mode,
+                    summaryRes = R.string.use_dark_theme,
                     defaultValue = isSystemInDarkTheme
                 )
             }
 
             PreferenceCategory(
-                icon = R.drawable.round_info_24,
-                title = "About",
-                description = "About the app"
+                iconRes = R.drawable.round_info_24,
+                titleRes = R.string.about,
+                descriptionRes = R.string.about_the_app
             ) {
                 Preference {
                     Box(
@@ -61,11 +65,12 @@ class PreferencesScreen : Screen {
                         )
                     }
                 }
-                Action(
-                    title = "Version",
-                    summary = BuildConfig.VERSION_NAME
-                ) {
-                    context.copyToClipboard("Version: " + BuildConfig.VERSION_NAME)
+                Preference {
+                    ListItem(
+                        modifier = Modifier.clickable { context.copyToClipboard(BuildConfig.VERSION_NAME) },
+                        headlineContent = { Text(stringResource(R.string.version)) },
+                        supportingContent = { Text(BuildConfig.VERSION_NAME) },
+                    )
                 }
             }
         }

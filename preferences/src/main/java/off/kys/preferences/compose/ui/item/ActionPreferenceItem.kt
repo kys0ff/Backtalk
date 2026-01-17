@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.preferences.model.PreferenceItem
 
@@ -17,9 +18,9 @@ fun ActionPreferenceItem(
 ) {
     ListItem(
         modifier = Modifier.clickable { item.onClick?.let { it() } },
-        headlineContent = { Text(item.title) },
-        supportingContent = item.summary?.let { { Text(it) } },
-        leadingContent = item.icon?.let {
+        headlineContent = { Text(stringResource(item.titleRes)) },
+        supportingContent = item.summaryRes?.let { { Text(stringResource(it)) } },
+        leadingContent = item.iconRes?.let {
             {
                 Icon(
                     painter = painterResource(it),

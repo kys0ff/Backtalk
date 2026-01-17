@@ -22,4 +22,11 @@
     <string name="update_now">Update Now</string>
     <string name="later">Later</string>
     <string name="settings">Settings</string>
+    <string name="general">General</string>
+    <string name="general_app_behavior">General app behavior</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="use_dark_theme">Use dark theme</string>
+    <string name="about">About</string>
+    <string name="about_the_app">About the app</string>
+    <string name="version">Version</string>
 </resources>
