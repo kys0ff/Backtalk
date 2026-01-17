@@ -10,18 +10,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
+import off.kys.backtalk.util.copyToClipboard
 import off.kys.preferences.compose.ui.screen.PreferenceScreen
 import off.kys.preferences.core.PreferenceKey
 
 class PreferencesScreen : Screen {
-    
+
     @Composable
     override fun Content() {
+        val context = LocalContext.current
         val isSystemInDarkTheme = isSystemInDarkTheme()
 
         PreferenceScreen {
@@ -39,7 +42,9 @@ class PreferencesScreen : Screen {
             }
 
             PreferenceCategory(
-                title = "About"
+                icon = R.drawable.round_info_24,
+                title = "About",
+                description = "About the app"
             ) {
                 Preference {
                     Box(
@@ -51,7 +56,7 @@ class PreferencesScreen : Screen {
                         Icon(
                             modifier = Modifier.size(84.dp),
                             painter = painterResource(R.mipmap.ic_launcher_foreground),
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.onBackground,
                             contentDescription = null
                         )
                     }
@@ -60,7 +65,7 @@ class PreferencesScreen : Screen {
                     title = "Version",
                     summary = BuildConfig.VERSION_NAME
                 ) {
-
+                    context.copyToClipboard("Version: " + BuildConfig.VERSION_NAME)
                 }
             }
         }
