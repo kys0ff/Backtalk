@@ -3,6 +3,7 @@
 package off.kys.preferences.model.builder
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Composable
 import off.kys.preferences.core.PreferenceKey
 import off.kys.preferences.core.dsl.PreferenceDsl
 import off.kys.preferences.model.PreferenceItem
@@ -18,6 +19,10 @@ class PreferenceCategory(
 
     init {
         build()
+    }
+
+    fun Preference(block: @Composable () -> Unit) {
+        items += PreferenceItem.Preference(block)
     }
 
     fun Action(

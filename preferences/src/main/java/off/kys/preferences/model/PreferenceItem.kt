@@ -1,9 +1,12 @@
 package off.kys.preferences.model
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Composable
 import off.kys.preferences.core.PreferenceKey
 
 sealed class PreferenceItem {
+    data class Preference(val block: @Composable () -> Unit): PreferenceItem()
+
     data class Action(
         val title: String,
         val summary: String? = null,

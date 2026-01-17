@@ -10,9 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesTopBar
+import off.kys.backtalk.presentation.screen.preferences.PreferencesScreen
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -21,6 +24,7 @@ class MessagesScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinViewModel<MessagesViewModel>()
         val state by viewModel.uiState
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -48,6 +52,9 @@ class MessagesScreen : Screen {
                     },
                     onCopy = {
                         viewModel.onEvent(MessagesUiEvent.CopySelected)
+                    },
+                    onSettings = {
+                        navigator += PreferencesScreen()
                     }
                 )
             }

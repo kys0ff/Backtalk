@@ -3,6 +3,7 @@ package off.kys.backtalk.presentation.activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +18,9 @@ import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.state.MainUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
+import off.kys.preferences.compose.provider.PreferenceProvider
+import off.kys.preferences.compose.provider.rememberPreference
+import off.kys.preferences.core.PreferenceKey
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.minutes
 
@@ -30,30 +34,37 @@ class MainActivity : BaseLockActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val viewModel = koinViewModel<MainViewModel>()
-            val updateState by viewModel.mainUiState.collectAsState()
+            PreferenceProvider {
+                val isDarkTheme =
+                    rememberPreference(
+                        key = PreferenceKey.Switch("dark_mode"),
+                        defaultValue = isSystemInDarkTheme()
+                    )
+                val viewModel = koinViewModel<MainViewModel>()
+                val updateState by viewModel.mainUiState.collectAsState()
 
-            BacktalkTheme {
-                Navigator(MessagesScreen()) {
-                    if (isLoggedIn) {
-                        CurrentScreen()
-                    } else {
-                        LockedView()
-                    }
+                BacktalkTheme(isDarkTheme) {
+                    Navigator(MessagesScreen()) {
+                        if (isLoggedIn) {
+                            CurrentScreen()
+                        } else {
+                            LockedView()
+                        }
 
-                    // Trigger update check
-                    LaunchedEffect(key1 = Unit) {
-                        viewModel.onEvent(MainUiEvent.CheckUpdate)
-                    }
+                        // Trigger update check
+                        LaunchedEffect(key1 = Unit) {
+                            viewModel.onEvent(MainUiEvent.CheckUpdate)
+                        }
 
-                    // Show dialog if needed
-                    if (updateState is MainUiState.UpdateAvailable) {
-                        val result = (updateState as MainUiState.UpdateAvailable).result
-                        AppUpdateDialog(
-                            updateResult = result,
-                            onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
-                            onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl)) }
-                        )
+                        // Show dialog if needed
+                        if (updateState is MainUiState.UpdateAvailable) {
+                            val result = (updateState as MainUiState.UpdateAvailable).result
+                            AppUpdateDialog(
+                                updateResult = result,
+                                onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
+                                onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl)) }
+                            )
+                        }
                     }
                 }
             }

@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -66,57 +67,61 @@ fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
             )
         }
     ) { padding ->
-        // Simple Animation to slide between screens
-        AnimatedContent(
-            targetState = selectedCategory,
-            modifier = Modifier.padding(padding),
-            label = "SettingsTransition",
-            transitionSpec = {
-                if (targetState != null) {
-                    slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-                } else {
-                    slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
-                }
-            }
-        ) { category ->
-            if (category == null) {
-                // --- SCREEN 1: CATEGORY LIST ---
-                LazyColumn {
-                    items(items = scope.categories) { cat ->
-                        PreferenceCategoryItem(
-                            title = cat.title,
-                            description = cat.description,
-                            icon = cat.icon,
-                            onClick = { selectedCategory = cat } // Navigate "deeper"
-                        )
+        Surface {
+            // Simple Animation to slide between screens
+            AnimatedContent(
+                targetState = selectedCategory,
+                modifier = Modifier.padding(padding),
+                label = "SettingsTransition",
+                transitionSpec = {
+                    if (targetState != null) {
+                        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+                    } else {
+                        slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
                     }
                 }
-            } else {
-                // --- SCREEN 2: SETTINGS CONTENTS ---
-                LazyColumn {
-                    items(category.items) { item ->
-                        when (item) {
-                            is PreferenceItem.Action -> ActionPreferenceItem(item)
+            ) { category ->
+                if (category == null) {
+                    // --- SCREEN 1: CATEGORY LIST ---
+                    LazyColumn {
+                        items(items = scope.categories) { cat ->
+                            PreferenceCategoryItem(
+                                title = cat.title,
+                                description = cat.description,
+                                icon = cat.icon,
+                                onClick = { selectedCategory = cat } // Navigate "deeper"
+                            )
+                        }
+                    }
+                } else {
+                    // --- SCREEN 2: SETTINGS CONTENTS ---
+                    LazyColumn {
+                        items(category.items) { item ->
+                            when (item) {
+                                is PreferenceItem.Preference -> item.block()
 
-                            is PreferenceItem.Switch -> {
-                                SwitchPreference(
-                                    preferenceManager = preferenceManager,
-                                    item = item
-                                )
-                            }
+                                is PreferenceItem.Action -> ActionPreferenceItem(item)
 
-                            is PreferenceItem.Slider -> {
-                                SliderPreferenceItem(
-                                    preferenceManager = preferenceManager,
-                                    item = item
-                                )
-                            }
+                                is PreferenceItem.Switch -> {
+                                    SwitchPreference(
+                                        preferenceManager = preferenceManager,
+                                        item = item
+                                    )
+                                }
 
-                            is PreferenceItem.List -> {
-                                ListPreference(
-                                    preferenceManager = preferenceManager,
-                                    item = item
-                                )
+                                is PreferenceItem.Slider -> {
+                                    SliderPreferenceItem(
+                                        preferenceManager = preferenceManager,
+                                        item = item
+                                    )
+                                }
+
+                                is PreferenceItem.List -> {
+                                    ListPreference(
+                                        preferenceManager = preferenceManager,
+                                        item = item
+                                    )
+                                }
                             }
                         }
                     }

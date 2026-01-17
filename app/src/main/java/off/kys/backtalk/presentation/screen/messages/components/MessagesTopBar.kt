@@ -21,6 +21,7 @@ import off.kys.backtalk.R
  * @param onCloseSelection The callback function to handle closing the selection.
  * @param onDelete The callback function to handle deleting the selected message.
  * @param onCopy The callback function to handle copying the selected message.
+ * @param onSettings The callback function to handle opening the settings screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,8 @@ fun MessagesTopBar(
     selectedCount: Int,
     onCloseSelection: () -> Unit,
     onDelete: () -> Unit,
-    onCopy: () -> Unit
+    onCopy: () -> Unit,
+    onSettings: () -> Unit
 ) {
     val selectionActive = selectedCount > 0
 
@@ -67,6 +69,13 @@ fun MessagesTopBar(
                     Icon(
                         painter = painterResource(R.drawable.round_content_copy_24),
                         contentDescription = stringResource(R.string.copy)
+                    )
+                }
+            } else {
+                IconButton(onClick = onSettings) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_settings_24),
+                        contentDescription = stringResource(R.string.settings)
                     )
                 }
             }
