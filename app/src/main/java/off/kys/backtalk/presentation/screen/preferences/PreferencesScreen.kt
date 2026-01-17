@@ -46,6 +46,19 @@ class PreferencesScreen : Screen {
             }
 
             PreferenceCategory(
+                titleRes = R.string.security,
+                descriptionRes = R.string.security_app_behavior,
+                iconRes = R.drawable.round_security_24
+            ) {
+                Switch(
+                    key = PreferenceKey.Switch("app_lock"),
+                    titleRes = R.string.app_lock,
+                    summaryRes = R.string.lock_the_app,
+                    defaultValue = true,
+                )
+            }
+
+            PreferenceCategory(
                 iconRes = R.drawable.round_info_24,
                 titleRes = R.string.about,
                 descriptionRes = R.string.about_the_app

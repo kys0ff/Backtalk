@@ -29,4 +29,8 @@
     <string name="about">About</string>
     <string name="about_the_app">About the app</string>
     <string name="version">Version</string>
+    <string name="security_app_behavior">Security app behavior</string>
+    <string name="security">Security</string>
+    <string name="app_lock">App lock</string>
+    <string name="lock_the_app">Lock the app on start up using biometric authentication</string>
 </resources>
