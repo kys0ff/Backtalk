@@ -19,12 +19,14 @@ fun SectionItem(@StringRes titleRes: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(top = 6.dp)
+            .padding(8.dp)
+            .padding(start = 4.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text = stringResource(titleRes),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary
         )
     }
