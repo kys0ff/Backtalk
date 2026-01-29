@@ -37,13 +37,20 @@ class PreferencesScreen : Screen {
                 descriptionRes = R.string.theme_language,
                 iconRes = R.drawable.round_home_24
             ) {
-                Section(R.string.language)
+                Section(R.string.theme)
                 Switch(
                     key = PreferenceKey.Switch("dark_mode"),
                     titleRes = R.string.dark_mode,
                     summaryRes = R.string.use_dark_theme,
                     defaultValue = isSystemInDarkTheme
                 )
+                Switch(
+                    key = PreferenceKey.Switch("use_dynamic_color"),
+                    titleRes = R.string.use_dynamic_color,
+                    defaultValue = true
+                )
+                Section(R.string.language)
+
             }
 
             PreferenceCategory(

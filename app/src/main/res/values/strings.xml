@@ -35,4 +35,6 @@
     <string name="lock_the_app">Lock the app on start up using biometric authentication</string>
     <string name="theme_language">Theme, Language</string>
     <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="use_dynamic_color">Use dynamic colors</string>
 </resources>

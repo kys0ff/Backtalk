@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import off.kys.backtalk.common.PreferenceKeys
 import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.presentation.activity.components.AppUpdateDialog
 import off.kys.backtalk.presentation.activity.components.LockedView
@@ -20,7 +21,6 @@ import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.preferences.compose.provider.PreferenceProvider
 import off.kys.preferences.compose.provider.rememberPreference
-import off.kys.preferences.core.PreferenceKey
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.minutes
 
@@ -37,13 +37,20 @@ class MainActivity : BaseLockActivity() {
             PreferenceProvider {
                 val isDarkTheme =
                     rememberPreference(
-                        key = PreferenceKey.Switch("dark_mode"),
-                        defaultValue = isSystemInDarkTheme()
+                        key = PreferenceKeys.DARK_MODE,
+                        initialValue = isSystemInDarkTheme()
                     )
+                val dynamicColor = rememberPreference(
+                    key = PreferenceKeys.USE_DYNAMIC_COLOR,
+                    initialValue = true
+                )
                 val viewModel = koinViewModel<MainViewModel>()
                 val updateState by viewModel.mainUiState.collectAsState()
 
-                BacktalkTheme(isDarkTheme) {
+                BacktalkTheme(
+                    darkTheme = isDarkTheme,
+                    dynamicColor = dynamicColor
+                ) {
                     Navigator(MessagesScreen()) {
                         if (isLoggedIn) {
                             CurrentScreen()
