@@ -92,7 +92,7 @@ fun MessageBubble(
     )
 
 
-    LaunchedEffect(isBlinking) {
+    LaunchedEffect(key1 = isBlinking) {
         if (isBlinking) {
             blinkAlpha.snapTo(0f)
             scale.snapTo(1f)
