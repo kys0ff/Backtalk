@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import off.kys.preferences.R
 import off.kys.preferences.compose.ui.item.ActionPreferenceItem
+import off.kys.preferences.compose.ui.item.InfoItem
 import off.kys.preferences.compose.ui.item.ListPreference
 import off.kys.preferences.compose.ui.item.PreferenceCategoryItem
 import off.kys.preferences.compose.ui.item.SectionItem
@@ -109,6 +110,8 @@ fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
                         items(category.items) { item ->
                             when (item) {
                                 is PreferenceItem.Preference -> item.block()
+
+                                is PreferenceItem.Info -> InfoItem(item.infoRes)
 
                                 is PreferenceItem.Section -> SectionItem(item.titleRes)
 

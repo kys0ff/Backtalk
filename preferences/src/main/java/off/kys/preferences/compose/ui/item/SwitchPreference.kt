@@ -40,7 +40,7 @@ fun SwitchPreference(
         supportingContent = item.summaryRes?.let {
             {
                 Text(
-                    stringResource(it),
+                    text = stringResource(it),
                     color = getPreferenceContentColorByEnabled(item.enabled)
                 )
             }

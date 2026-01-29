@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.screen.preferences
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
 import off.kys.backtalk.common.PreferenceKeys
+import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.util.copyToClipboard
+import off.kys.backtalk.util.isBiometricAvailable
 import off.kys.preferences.compose.ui.screen.PreferenceScreen
 
 class PreferencesScreen : Screen {
@@ -30,6 +33,7 @@ class PreferencesScreen : Screen {
     override fun Content() {
         val context = LocalContext.current
         val isSystemInDarkTheme = isSystemInDarkTheme()
+        val activity = LocalActivity.current as BaseLockActivity
 
         PreferenceScreen {
             PreferenceCategory(
@@ -64,7 +68,12 @@ class PreferencesScreen : Screen {
                     titleRes = R.string.app_lock,
                     summaryRes = R.string.lock_the_app,
                     defaultValue = true,
+                    enabled = context.isBiometricAvailable()
                 )
+
+                if (context.isBiometricAvailable())
+                    Info(infoRes = R.string.biometric_not_available)
+
                 Switch(
                     key = PreferenceKeys.SECURE_SCREEN,
                     titleRes = R.string.enable_secure_screen,

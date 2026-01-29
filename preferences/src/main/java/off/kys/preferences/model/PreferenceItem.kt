@@ -10,6 +10,10 @@ sealed class PreferenceItem {
 
     data class Section(@StringRes val titleRes: Int) : PreferenceItem()
 
+    data class Info(
+        @StringRes val infoRes: Int
+    ) : PreferenceItem()
+
     data class Action(
         @StringRes val titleRes: Int,
         @StringRes val summaryRes: Int? = null,

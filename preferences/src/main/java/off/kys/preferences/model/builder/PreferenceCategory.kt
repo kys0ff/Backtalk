@@ -30,6 +30,10 @@ class PreferenceCategory(
         items += PreferenceItem.Preference(block)
     }
 
+    fun Info(@StringRes infoRes: Int) {
+        items += PreferenceItem.Info(infoRes)
+    }
+
     fun Action(
         @StringRes titleRes: Int,
         @StringRes summaryRes: Int? = null,
