@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +54,10 @@ fun InputBar(
 ) {
     var textState by remember { mutableStateOf("") }
 
-    Surface(tonalElevation = 2.dp) {
+    Surface(
+        modifier = Modifier.imePadding(),
+        tonalElevation = 2.dp
+    ) {
         Column(modifier = modifier) {
             AnimatedVisibility(
                 visible = replyingTo != null,

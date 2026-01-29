@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.components.rememberPopupState
 
 /**
  * Composable function that displays the messages list.
@@ -68,6 +69,7 @@ fun ColumnScope.MessagesList(
             count = reversed.size,
             key = { reversed[it].id() }
         ) { index ->
+            val popupState = rememberPopupState()
             val current = reversed[index]
             val next = reversed.getOrNull(index - 1)
             val prev = reversed.getOrNull(index + 1)
@@ -101,6 +103,7 @@ fun ColumnScope.MessagesList(
                     }
                 ) {
                     MessageBubble(
+                        popupState = popupState,
                         messageEntity = current,
                         repliedMessageEntity = repliedMessage,
                         blinkMessageId = blinkMessageId,
@@ -128,6 +131,7 @@ fun ColumnScope.MessagesList(
                             }
                         },
                         onLongClick = {
+                            popupState.toggle()
                             onToggleSelect(current.id)
                         }
                     )

@@ -33,6 +33,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.components.ManagedPopup
+import off.kys.backtalk.presentation.components.PopupActionItem
+import off.kys.backtalk.presentation.components.PopupState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,6 +43,7 @@ import java.util.Locale
 /**
  * Composable function that displays a message bubble.
  *
+ * @param popupState The state of the popup.
  * @param messageEntity The message entity to display.
  * @param repliedMessageEntity The replied message entity, if any.
  * @param blinkMessageId The ID of the message to blink, if any.
@@ -54,6 +58,7 @@ import java.util.Locale
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(
+    popupState: PopupState,
     messageEntity: MessageEntity,
     repliedMessageEntity: MessageEntity?,
     blinkMessageId: MessageId?,
@@ -130,52 +135,65 @@ fun MessageBubble(
             .padding(top = if (isTop) 6.dp else 0.dp),
         horizontalAlignment = Alignment.End
     ) {
-        Surface(
-            modifier = Modifier
-                .graphicsLayer {
-                    scaleX = scale.value
-                    scaleY = scale.value
-                }
-                .combinedClickable(
-                    interactionSource = interactionSource,
-                    indication = null, // This removes the ripple effect
-                    onClick = {
-                        if (!selectMode) {
-                            if (!isSelected) showTime = !showTime
+        ManagedPopup(
+            state = popupState,
+            anchor = {
+                Surface(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            scaleX = scale.value
+                            scaleY = scale.value
                         }
-                        onClick()
-                    },
-                    onLongClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onLongClick()
-                    }
-                ),
-            color = baseBubbleColor,
-            shape = bubbleShape
-        ) {
-            Surface(
-                color = blinkOverlayColor,
-            ) {
-                Column(
-                    modifier = Modifier.padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    )
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null, // This removes the ripple effect
+                            onClick = {
+                                if (!selectMode) {
+                                    if (!isSelected) showTime = !showTime
+                                }
+                                onClick()
+                            },
+                            onLongClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onLongClick()
+                            }
+                        ),
+                    color = baseBubbleColor,
+                    shape = bubbleShape
                 ) {
-                    if (repliedMessageEntity != null) {
-                        ReplyPreview(
-                            text = repliedMessageEntity.text,
-                            onPreviewClick = onReplyPreviewClick
-                        )
-                    }
+                    Surface(
+                        color = blinkOverlayColor,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(
+                                horizontal = 12.dp,
+                                vertical = 8.dp
+                            )
+                        ) {
+                            if (repliedMessageEntity != null) {
+                                ReplyPreview(
+                                    text = repliedMessageEntity.text,
+                                    onPreviewClick = onReplyPreviewClick
+                                )
+                            }
 
-                    Text(
-                        text = messageEntity.text,
-                        color = contentColorFor(baseBubbleColor)
-                    )
+                            Text(
+                                text = messageEntity.text,
+                                color = contentColorFor(baseBubbleColor)
+                            )
+                        }
+                    }
                 }
             }
+        ) { state ->
+            PopupActionItem(
+                text = "Edit",
+                onClick = {
+                    state.hide()
+                }
+            )
         }
+
 
         AnimatedVisibility(
             visible = showTime,
