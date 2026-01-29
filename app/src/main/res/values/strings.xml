@@ -37,4 +37,8 @@
     <string name="language">Language</string>
     <string name="theme">Theme</string>
     <string name="use_dynamic_color">Use dynamic colors</string>
+    <string name="app_lock_secure_screen">App lock, secure screen</string>
+    <string name="security_and_privacy">Security and privacy</string>
+    <string name="enable_secure_screen">Enable secure screen</string>
+    <string name="secure_screen_summary">Secure screen hides app content when switching apps and block screenshots</string>
 </resources>

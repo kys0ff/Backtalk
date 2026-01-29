@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
+import off.kys.backtalk.common.PreferenceKeys
 import off.kys.backtalk.util.copyToClipboard
 import off.kys.preferences.compose.ui.screen.PreferenceScreen
 import off.kys.preferences.core.PreferenceKey
@@ -54,14 +55,21 @@ class PreferencesScreen : Screen {
             }
 
             PreferenceCategory(
-                titleRes = R.string.security,
-                descriptionRes = R.string.security_app_behavior,
+                titleRes = R.string.security_and_privacy,
+                descriptionRes = R.string.app_lock_secure_screen,
                 iconRes = R.drawable.round_security_24
             ) {
+                Section(R.string.security)
                 Switch(
-                    key = PreferenceKey.Switch("app_lock"),
+                    key = PreferenceKeys.APP_LOCK,
                     titleRes = R.string.app_lock,
                     summaryRes = R.string.lock_the_app,
+                    defaultValue = true,
+                )
+                Switch(
+                    key = PreferenceKeys.SECURE_SCREEN,
+                    titleRes = R.string.enable_secure_screen,
+                    summaryRes = R.string.secure_screen_summary,
                     defaultValue = true,
                 )
             }
