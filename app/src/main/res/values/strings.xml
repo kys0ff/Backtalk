@@ -33,4 +33,6 @@
     <string name="security">Security</string>
     <string name="app_lock">App lock</string>
     <string name="lock_the_app">Lock the app on start up using biometric authentication</string>
+    <string name="theme_language">Theme, Language</string>
+    <string name="language">Language</string>
 </resources>

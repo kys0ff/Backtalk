@@ -22,6 +22,10 @@ class PreferenceCategory(
         build()
     }
 
+    fun Section(@StringRes titleRes: Int) {
+        items += PreferenceItem.Section(titleRes)
+    }
+
     fun Preference(block: @Composable () -> Unit) {
         items += PreferenceItem.Preference(block)
     }

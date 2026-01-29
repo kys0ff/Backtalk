@@ -34,9 +34,10 @@ class PreferencesScreen : Screen {
         PreferenceScreen {
             PreferenceCategory(
                 titleRes = R.string.general,
-                descriptionRes = R.string.general_app_behavior,
+                descriptionRes = R.string.theme_language,
                 iconRes = R.drawable.round_home_24
             ) {
+                Section(R.string.language)
                 Switch(
                     key = PreferenceKey.Switch("dark_mode"),
                     titleRes = R.string.dark_mode,

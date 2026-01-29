@@ -28,6 +28,7 @@ import off.kys.preferences.R
 import off.kys.preferences.compose.ui.item.ActionPreferenceItem
 import off.kys.preferences.compose.ui.item.ListPreference
 import off.kys.preferences.compose.ui.item.PreferenceCategoryItem
+import off.kys.preferences.compose.ui.item.SectionItem
 import off.kys.preferences.compose.ui.item.SliderPreferenceItem
 import off.kys.preferences.compose.ui.item.SwitchPreference
 import off.kys.preferences.core.PreferenceScreenScope
@@ -108,6 +109,8 @@ fun PreferenceScreen(build: PreferenceScreenScope.() -> Unit) {
                         items(category.items) { item ->
                             when (item) {
                                 is PreferenceItem.Preference -> item.block()
+
+                                is PreferenceItem.Section -> SectionItem(item.titleRes)
 
                                 is PreferenceItem.Action -> ActionPreferenceItem(item)
 

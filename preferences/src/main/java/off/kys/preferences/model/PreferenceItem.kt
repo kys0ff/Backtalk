@@ -8,6 +8,8 @@ import off.kys.preferences.core.PreferenceKey
 sealed class PreferenceItem {
     data class Preference(val block: @Composable () -> Unit) : PreferenceItem()
 
+    data class Section(@StringRes val titleRes: Int) : PreferenceItem()
+
     data class Action(
         @StringRes val titleRes: Int,
         @StringRes val summaryRes: Int? = null,
