@@ -23,7 +23,6 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.PreferenceKeys
 import off.kys.backtalk.util.copyToClipboard
 import off.kys.preferences.compose.ui.screen.PreferenceScreen
-import off.kys.preferences.core.PreferenceKey
 
 class PreferencesScreen : Screen {
 
@@ -40,13 +39,13 @@ class PreferencesScreen : Screen {
             ) {
                 Section(R.string.theme)
                 Switch(
-                    key = PreferenceKey.Switch("dark_mode"),
+                    key = PreferenceKeys.DARK_MODE,
                     titleRes = R.string.dark_mode,
                     summaryRes = R.string.use_dark_theme,
                     defaultValue = isSystemInDarkTheme
                 )
                 Switch(
-                    key = PreferenceKey.Switch("use_dynamic_color"),
+                    key = PreferenceKeys.USE_DYNAMIC_COLOR,
                     titleRes = R.string.use_dynamic_color,
                     defaultValue = true
                 )

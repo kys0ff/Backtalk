@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.util.getPreferenceContentColorByEnabled
 
 private const val TAG = "ListPreference"
 
@@ -39,7 +40,10 @@ fun ListPreference(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val currentValue by preferenceManager.getPreference(item.key.toPreferencesKey(), item.defaultValue)
+    val currentValue by preferenceManager.getPreference(
+        item.key.toPreferencesKey(),
+        item.defaultValue
+    )
         .collectAsState(initial = item.defaultValue)
 
     var selectedValue by remember { mutableStateOf(currentValue) }
@@ -52,10 +56,28 @@ fun ListPreference(
         item.entries.entries.find { it.value == selectedValue }?.key ?: "Select"
 
     ListItem(
-        modifier = Modifier.clickable { showDialog = true },
-        headlineContent = { Text(stringResource(item.titleRes)) },
-        supportingContent = { Text(currentDisplay) }, // Show current selection
-        leadingContent = item.iconRes?.let { { Icon(painter = painterResource(it), contentDescription = null) } }
+        modifier = Modifier.clickable(enabled = item.enabled) { showDialog = true },
+        headlineContent = {
+            Text(
+                text = stringResource(item.titleRes),
+                color = getPreferenceContentColorByEnabled(item.enabled)
+            )
+        },
+        supportingContent = { // Show current selection
+            Text(
+                text = currentDisplay,
+                color = getPreferenceContentColorByEnabled(item.enabled)
+            )
+        },
+        leadingContent = item.iconRes?.let {
+            {
+                Icon(
+                    painter = painterResource(it),
+                    contentDescription = null,
+                    tint = getPreferenceContentColorByEnabled(item.enabled)
+                )
+            }
+        }
     )
 
     if (showDialog) {

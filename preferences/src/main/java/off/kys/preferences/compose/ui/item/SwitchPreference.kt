@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.util.getPreferenceContentColorByEnabled
 
 @Composable
 fun SwitchPreference(
@@ -22,21 +23,48 @@ fun SwitchPreference(
     item: PreferenceItem.Switch
 ) {
     val scope = rememberCoroutineScope()
-    val value by preferenceManager.getPreference(item.key.toPreferencesKey(), item.defaultValue).collectAsState(initial = item.defaultValue)
+    val value by preferenceManager.getPreference(item.key.toPreferencesKey(), item.defaultValue)
+        .collectAsState(initial = item.defaultValue)
 
-    
+
     ListItem(
-        modifier = Modifier.clickable {
+        modifier = Modifier.clickable(enabled = item.enabled) {
             scope.launch { preferenceManager.setPreference(item.key.toPreferencesKey(), !value) }
         },
-        headlineContent = { Text(stringResource(item.titleRes)) },
-        supportingContent = item.summaryRes?.let { { Text(stringResource(it)) } },
-        leadingContent = item.iconRes?.let { { Icon(painterResource(it), contentDescription = null) } },
+        headlineContent = {
+            Text(
+                stringResource(item.titleRes),
+                color = getPreferenceContentColorByEnabled(item.enabled)
+            )
+        },
+        supportingContent = item.summaryRes?.let {
+            {
+                Text(
+                    stringResource(it),
+                    color = getPreferenceContentColorByEnabled(item.enabled)
+                )
+            }
+        },
+        leadingContent = item.iconRes?.let {
+            {
+                Icon(
+                    painterResource(it),
+                    contentDescription = null,
+                    tint = getPreferenceContentColorByEnabled(item.enabled)
+                )
+            }
+        },
         trailingContent = {
             Switch(
+                enabled = item.enabled,
                 checked = value,
                 onCheckedChange = { newValue ->
-                    scope.launch { preferenceManager.setPreference(item.key.toPreferencesKey(), newValue) }
+                    scope.launch {
+                        preferenceManager.setPreference(
+                            item.key.toPreferencesKey(),
+                            newValue
+                        )
+                    }
                 }
             )
         }

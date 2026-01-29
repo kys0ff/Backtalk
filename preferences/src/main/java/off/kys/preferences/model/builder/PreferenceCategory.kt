@@ -34,12 +34,14 @@ class PreferenceCategory(
         @StringRes titleRes: Int,
         @StringRes summaryRes: Int? = null,
         @DrawableRes icon: Int? = null,
+        enabled: Boolean = true,
         onClick: (() -> Unit)?
     ) {
         items += PreferenceItem.Action(
             titleRes = titleRes,
             summaryRes = summaryRes,
             iconRes = icon,
+            enabled = enabled,
             onClick = onClick
         )
     }
@@ -49,6 +51,7 @@ class PreferenceCategory(
         @StringRes titleRes: Int,
         @StringRes summaryRes: Int? = null,
         @DrawableRes iconRes: Int? = null,
+        enabled: Boolean = true,
         defaultValue: Boolean = false
     ) {
         items += PreferenceItem.Switch(
@@ -56,6 +59,7 @@ class PreferenceCategory(
             titleRes = titleRes,
             iconRes = iconRes,
             summaryRes = summaryRes,
+            enabled = enabled,
             defaultValue = defaultValue
         )
     }
@@ -66,7 +70,8 @@ class PreferenceCategory(
         @DrawableRes iconRes: Int? = null,
         valueRange: ClosedFloatingPointRange<Float>,
         steps: Int = 0,
-        defaultValue: Float
+        defaultValue: Float,
+        enabled: Boolean = true,
     ) {
         items += PreferenceItem.Slider(
             key = key,
@@ -74,7 +79,8 @@ class PreferenceCategory(
             iconRes = iconRes,
             valueRange = valueRange,
             steps = steps,
-            defaultValue = defaultValue
+            defaultValue = defaultValue,
+            enabled = enabled
         )
     }
 
@@ -83,14 +89,16 @@ class PreferenceCategory(
         @StringRes titleRes: Int,
         @DrawableRes iconRes: Int? = null,
         entries: Map<String, String>,
-        defaultValue: String
+        defaultValue: String,
+        enabled: Boolean = true,
     ) {
         items += PreferenceItem.List(
             key = key,
             titleRes = titleRes,
             iconRes = iconRes,
             entries = entries,
-            defaultValue = defaultValue
+            defaultValue = defaultValue,
+            enabled = enabled
         )
     }
 }

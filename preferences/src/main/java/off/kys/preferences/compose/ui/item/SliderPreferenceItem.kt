@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import off.kys.preferences.data.PreferenceManager
 import off.kys.preferences.model.PreferenceItem
+import off.kys.preferences.util.getPreferenceContentColorByEnabled
 import java.util.Locale
 
 @Composable
@@ -27,21 +28,43 @@ fun SliderPreferenceItem(
         .collectAsState(initial = item.defaultValue)
 
     ListItem(
-        headlineContent = { Text(stringResource(item.titleRes)) },
-        leadingContent = item.iconRes?.let { { Icon(painterResource(it), contentDescription = null) } },
+        headlineContent = {
+            Text(
+                text = stringResource(item.titleRes),
+                color = getPreferenceContentColorByEnabled(item.enabled)
+            )
+        },
+        leadingContent = item.iconRes?.let {
+            {
+                Icon(
+                    painter = painterResource(it),
+                    contentDescription = null,
+                    tint = getPreferenceContentColorByEnabled(item.enabled)
+                )
+            }
+        },
         supportingContent = {
             Column {
                 // Display the current value formatted nicely
-                Text(text = String.format(Locale.getDefault(), "%.1f", value))
+                Text(
+                    text = String.format(Locale.getDefault(), "%.1f", value),
+                    color = getPreferenceContentColorByEnabled(item.enabled)
+                )
 
                 Slider(
                     value = value,
                     onValueChange = { newValue ->
                         // Instant update to DataStore
-                        scope.launch { preferenceManager.setPreference(item.key.toPreferencesKey(), newValue) }
+                        scope.launch {
+                            preferenceManager.setPreference(
+                                item.key.toPreferencesKey(),
+                                newValue
+                            )
+                        }
                     },
                     valueRange = item.valueRange,
-                    steps = item.steps
+                    steps = item.steps,
+                    enabled = item.enabled
                 )
             }
         }
