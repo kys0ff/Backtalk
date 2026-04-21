@@ -12,9 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.launch
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.base.BaseLockActivity
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.activity.components.AppUpdateDialog
 import off.kys.backtalk.presentation.activity.components.LockedView
 import off.kys.backtalk.presentation.event.MainUiEvent
@@ -30,7 +30,6 @@ class MainActivity : BaseLockActivity() {
 
     val preferences by inject<BacktalkPreferences>()
 
-    // Change these to vars with default values
     override var autoLockTimeout: Long = 1.minutes.inWholeMilliseconds
     override var lockOnCreateEnabled: Boolean = preferences.lockEnabled
     override var isAnonymousMode: Boolean = preferences.secureScreenEnabled
@@ -58,12 +57,10 @@ class MainActivity : BaseLockActivity() {
                         LockedView()
                     }
 
-                    // Trigger update check
                     LaunchedEffect(key1 = Unit) {
                         viewModel.onEvent(MainUiEvent.CheckUpdate)
                     }
 
-                    // Show dialog if needed
                     if (updateState is MainUiState.UpdateAvailable) {
                         val result = (updateState as MainUiState.UpdateAvailable).result
                         AppUpdateDialog(
@@ -84,7 +81,6 @@ class MainActivity : BaseLockActivity() {
 
     private fun observePreferences() {
         lifecycleScope.launch {
-            // Observe App Lock
             launch {
                 preferences.observeChanges { key ->
                     when (key) {
