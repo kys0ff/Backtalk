@@ -36,12 +36,6 @@ android {
         }
     }
 
-    sourceSets {
-        getByName("github") {
-            java.directories += "src/github/java"
-        }
-    }
-
     buildTypes {
         debug {
             isMinifyEnabled = false
