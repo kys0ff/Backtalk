@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.launch
+import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -65,12 +66,14 @@ class MainActivity : BaseLockActivity() {
                     }
 
                     if (updateState is MainUiState.UpdateAvailable) {
-                        val result = (updateState as MainUiState.UpdateAvailable).result
-                        AppUpdateDialog(
-                            updateResult = result,
-                            onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
-                            onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl)) }
-                        )
+                        if (!BuildConfig.IS_FDROID) {
+                            val result = (updateState as MainUiState.UpdateAvailable).result
+                            AppUpdateDialog(
+                                updateResult = result,
+                                onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
+                                onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(result.downloadUrls.first().browserDownloadUrl)) }
+                            )
+                        }
                     }
                 }
             }

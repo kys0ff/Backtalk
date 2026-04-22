@@ -8,9 +8,8 @@ plugins {
 
 android {
     namespace = "off.kys.backtalk"
-    compileSdk {
-        version = release(36)
-    }
+    //noinspection GradleDependency
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "off.kys.backtalk"
@@ -22,6 +21,25 @@ android {
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    flavorDimensions.add("distribution")
+
+    productFlavors {
+        create("github") {
+            dimension = "distribution"
+            buildConfigField("Boolean", "IS_FDROID", "false")
+        }
+        create("fdroid") {
+            dimension = "distribution"
+            buildConfigField("Boolean", "IS_FDROID", "true")
+        }
+    }
+
+    sourceSets {
+        getByName("github") {
+            java.directories += "src/github/java"
+        }
     }
 
     buildTypes {
@@ -39,22 +57,17 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    sourceSets {
-        getByName("debug") {
-            kotlin.directories += "build/generated/ksp/debug/kotlin"
-        }
-        getByName("release") {
-            kotlin.directories += "build/generated/ksp/release/kotlin"
-        }
-    }
+
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
@@ -84,6 +97,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.process)
+    implementation(libs.androidx.concurrent.futures)
     implementation(libs.gau)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)

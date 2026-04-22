@@ -11,6 +11,12 @@ class CheckAppUpdate {
         onUpdateAvailable: (UpdateResult) -> Unit,
         onUpToDate: () -> Unit
     ) {
+
+        if (BuildConfig.IS_FDROID) {
+            onUpToDate()
+            return
+        }
+
         checkAppUpdate {
             githubRepo("kys0ff/Backtalk")
             currentVersion(BuildConfig.VERSION_NAME)

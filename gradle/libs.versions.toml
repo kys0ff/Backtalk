@@ -1,5 +1,6 @@
 [versions]
 agp = "9.1.1"
+concurrentFutures = "1.3.0"
 datastorePreferences = "1.2.1"
 gau = "1.0.0"
 kotlin = "2.3.20"
@@ -19,6 +20,7 @@ coreSplashscreen = "1.2.0"
 lifecycleProcess = "2.10.0"
 
 [libraries]
+androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 gau = { module = "com.github.kys0ff:Gau", version.ref = "gau" }

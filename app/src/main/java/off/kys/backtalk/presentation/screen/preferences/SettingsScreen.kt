@@ -126,29 +126,31 @@ class SettingsScreen : Screen {
                     }
                 )
 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
-                PreferenceCategory(stringResource(R.string.updates))
+                if (!BuildConfig.IS_FDROID) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+                    PreferenceCategory(stringResource(R.string.updates))
 
-                ToggleSetting(
-                    label = stringResource(R.string.auto_check_updates),
-                    supportingText = stringResource(R.string.auto_check_updates_desc),
-                    icon = painterResource(R.drawable.round_update_24),
-                    checked = autoUpdate,
-                    onCheckedChange = {
-                        prefs.autoUpdateEnabled = it
-                        autoUpdate = it
-                    }
-                )
+                    ToggleSetting(
+                        label = stringResource(R.string.auto_check_updates),
+                        supportingText = stringResource(R.string.auto_check_updates_desc),
+                        icon = painterResource(R.drawable.round_update_24),
+                        checked = autoUpdate,
+                        onCheckedChange = {
+                            prefs.autoUpdateEnabled = it
+                            autoUpdate = it
+                        }
+                    )
 
-                InfoRow(
-                    label = stringResource(R.string.check_for_updates_now),
-                    value = stringResource(R.string.tap_to_check_latest_version),
-                    icon = painterResource(R.drawable.round_refresh_24),
-                    onClick = {
-                        context.toast(R.string.checking_for_updates)
-                        mainActivity.checkForUpdates()
-                    }
-                )
+                    InfoRow(
+                        label = stringResource(R.string.check_for_updates_now),
+                        value = stringResource(R.string.tap_to_check_latest_version),
+                        icon = painterResource(R.drawable.round_refresh_24),
+                        onClick = {
+                            context.toast(R.string.checking_for_updates)
+                            mainActivity.checkForUpdates()
+                        }
+                    )
+                }
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
                 PreferenceCategory(stringResource(R.string.about))
