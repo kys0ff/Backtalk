@@ -207,7 +207,7 @@ private fun MessageContent(
     }
 
     if (message.editedText != null && showOriginal) {
-        Text(
+        SmartText(
             text = message.text,
             style = MaterialTheme.typography.bodySmall,
             color = contentColor.copy(alpha = 0.6f),
@@ -215,7 +215,7 @@ private fun MessageContent(
         )
     }
 
-    Text(
+    SmartText(
         text = message.editedText ?: message.text,
         color = contentColor,
         style = MaterialTheme.typography.bodyLarge
