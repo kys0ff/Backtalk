@@ -7,13 +7,16 @@ import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.InsertMessage
 
 /**
- * Data class representing a bundle of use cases related to messages.
+ * A bundle of use cases related to message operations.
  *
- * @property getAllMessages The use case to get all messages.
- * @property getMessageById The use case to get a message by its ID.
- * @property insertMessage The use case to insert a new message.
- * @property deleteMessageById The use case to delete a message by its ID.
- * @property copyMessagesByIds The use case to copy messages by their IDs.
+ * This class serves as a convenient way to inject all message-related use cases
+ * into ViewModels or other components.
+ *
+ * @property getAllMessages Use case to retrieve all messages.
+ * @property getMessageById Use case to retrieve a specific message by its ID.
+ * @property insertMessage Use case to insert a new message.
+ * @property deleteMessageById Use case to delete a message by its ID.
+ * @property copyMessagesByIds Use case to copy multiple messages by their IDs.
  */
 data class MessagesUseCases(
     val getAllMessages: GetAllMessages,
