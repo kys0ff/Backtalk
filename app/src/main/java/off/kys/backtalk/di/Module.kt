@@ -24,7 +24,11 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 /**
- * Koin module for the app.
+ * Main Koin module for the application.
+ *
+ * This module aggregates all submodules required for dependency injection
+ * across the app, including database, repositories, use cases, view models,
+ * and system-level components.
  */
 val appModule = module {
     databaseModule()
@@ -35,10 +39,14 @@ val appModule = module {
 }
 
 /**
- * Koin module for the database.
+ * Configures database-related dependencies.
+ *
+ * Provides a single instance of [MessagesDatabase] and its associated [MessagesDao].
+ * Handles Room database creation and migration configurations.
  */
 private fun Module.databaseModule() {
     single {
+        @Suppress("SpellCheckingInspection")
         Room.databaseBuilder(
             androidContext(),
             MessagesDatabase::class.java,
@@ -52,14 +60,19 @@ private fun Module.databaseModule() {
 }
 
 /**
- * Koin module for the repository.
+ * Configures repository dependencies.
+ *
+ * Provides the [MessagesRepository] implementation used by the domain layer.
  */
 private fun Module.repositoryModule() {
     single<MessagesRepository> { MessagesRepositoryImpl(get()) }
 }
 
 /**
- * Koin module for the use cases.
+ * Configures use case dependencies.
+ *
+ * Provides individual business logic use cases and a [MessagesUseCases]
+ * wrapper class for simplified injection into ViewModels.
  */
 private fun Module.useCaseModule() {
     single { GetAllMessages(get()) }
@@ -80,7 +93,10 @@ private fun Module.useCaseModule() {
 }
 
 /**
- * Koin module for the view models.
+ * Configures ViewModel dependencies.
+ *
+ * Registers ViewModels for injection into UI components, ensuring they are
+ * scoped correctly to their respective lifecycles.
  */
 private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get()) }
@@ -88,7 +104,10 @@ private fun Module.viewModelModule() {
 }
 
 /**
- * Koin module for the system.
+ * Configures system-level dependencies.
+ *
+ * Provides utilities for handling app preferences, vibration, and other
+ * low-level Android system interactions.
  */
 private fun Module.systemModule() {
     single { BacktalkPreferences(get()) }
