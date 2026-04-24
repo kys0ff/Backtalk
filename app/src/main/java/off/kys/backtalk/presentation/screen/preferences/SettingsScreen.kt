@@ -47,8 +47,17 @@ import off.kys.backtalk.util.openUrl
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
 
+/**
+ * The settings screen of the application.
+ *
+ * This screen provides options for the user to customize the appearance,
+ * privacy/security settings, check for updates, and view information about the app.
+ */
 class SettingsScreen : Screen {
 
+    /**
+     * The content of the settings screen.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -178,6 +187,12 @@ class SettingsScreen : Screen {
         }
     }
 
+    /**
+     * The top app bar for the settings screen.
+     *
+     * @param onNavigateBack The callback to be invoked when the back button is clicked.
+     * @param scrollBehavior The scroll behavior for the top app bar.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun SettingsTopAppBar(
@@ -198,6 +213,11 @@ class SettingsScreen : Screen {
         )
     }
 
+    /**
+     * A category header for a group of preferences.
+     *
+     * @param text The title of the category.
+     */
     @Composable
     private fun PreferenceCategory(text: String) {
         Text(
@@ -208,6 +228,16 @@ class SettingsScreen : Screen {
         )
     }
 
+    /**
+     * A preference item with a toggle switch.
+     *
+     * @param label The primary text of the preference.
+     * @param icon The icon to be displayed before the label.
+     * @param supportingText The secondary text of the preference.
+     * @param checked Whether the switch is currently checked.
+     * @param requireRestart Whether the app needs to be restarted for the change to take effect.
+     * @param onCheckedChange The callback to be invoked when the switch state changes.
+     */
     @Composable
     private fun ToggleSetting(
         label: String,
@@ -235,6 +265,14 @@ class SettingsScreen : Screen {
         )
     }
 
+    /**
+     * A preference item that displays information.
+     *
+     * @param label The primary text of the preference.
+     * @param value The value text of the preference.
+     * @param icon The icon to be displayed before the label.
+     * @param onClick The callback to be invoked when the item is clicked.
+     */
     @Composable
     private fun InfoRow(
         label: String,
@@ -250,6 +288,12 @@ class SettingsScreen : Screen {
         )
     }
 
+    /**
+     * A preference item for selecting the theme mode.
+     *
+     * @param selected The currently selected theme mode.
+     * @param onSelected The callback to be invoked when a theme mode is selected.
+     */
     @Composable
     private fun ThemeSelector(selected: ThemeMode, onSelected: (ThemeMode) -> Unit) {
         Column(Modifier.selectableGroup()) {

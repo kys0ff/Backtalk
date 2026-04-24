@@ -6,6 +6,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import off.kys.backtalk.domain.model.MessageId
 
+/**
+ * Represents a message entity stored in the local Room database.
+ *
+ * @property id The unique identifier of the message.
+ * @property text The body content of the message.
+ * @property timestamp The time the message was sent, in milliseconds.
+ * @property repliedToId The ID of the message this message is replying to, or null if it's not a reply.
+ * @property editedText The content of the message after being edited, or null if it hasn't been edited.
+ * @property editedAt The time the message was last edited, or null if it hasn't been edited.
+ */
 @Keep
 @Entity(tableName = "messages")
 data class MessageEntity(

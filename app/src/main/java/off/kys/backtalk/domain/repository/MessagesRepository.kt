@@ -4,15 +4,42 @@ import kotlinx.coroutines.flow.Flow
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 
+/**
+ * Repository for managing [MessageEntity] data.
+ */
 interface MessagesRepository {
 
+    /**
+     * Returns a [Flow] of all messages in the repository.
+     */
     fun getAllMessages(): Flow<List<MessageEntity>>
 
+    /**
+     * Retrieves a message by its [id].
+     *
+     * @param id The ID of the message to retrieve.
+     * @return The message with the given ID, or null if not found.
+     */
     suspend fun getMessageById(id: MessageId): MessageEntity?
 
+    /**
+     * Returns a [Flow] of messages with the given [ids].
+     *
+     * @param ids The set of IDs of the messages to retrieve.
+     */
     fun getMessagesByIds(ids: Set<MessageId>): Flow<List<MessageEntity>>
 
+    /**
+     * Inserts a [messageEntity] into the repository.
+     *
+     * @param messageEntity The message to insert.
+     */
     suspend fun insertMessage(messageEntity: MessageEntity)
 
+    /**
+     * Deletes a message by its [id].
+     *
+     * @param id The ID of the message to delete.
+     */
     suspend fun deleteMessageById(id: MessageId)
 }

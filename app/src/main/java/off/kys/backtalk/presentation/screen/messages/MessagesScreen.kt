@@ -19,8 +19,19 @@ import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * A [Screen] that handles the display and interaction of messages within a conversation.
+ * It manages message selection, replying, editing, and navigation to settings.
+ */
 class MessagesScreen : Screen {
 
+    /**
+     * Composable content for the messages screen.
+     *
+     * It initializes the [MessagesViewModel], observes its UI state, and sets up
+     * the [Scaffold] with a [MessagesTopBar] and [MessagesContent].
+     * It also manages [BackHandler]s for clearing selection, canceling replies, or edits.
+     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {

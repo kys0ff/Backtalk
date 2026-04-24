@@ -6,8 +6,20 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 
+/**
+ * Manager class responsible for handling device vibrations and haptic feedback.
+ *
+ * It abstracts the differences between various Android API levels for vibration,
+ * providing a unified interface for simple vibration tasks.
+ *
+ * @param context The application context used to retrieve the vibration service.
+ */
 class VibrationManager(context: Context) {
 
+    /**
+     * The [Vibrator] instance used to perform vibration operations.
+     * It handles the selection of the default vibrator based on the Android version.
+     */
     private val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibratorManager =
             context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -18,7 +30,12 @@ class VibrationManager(context: Context) {
     }
 
     /**
-     * Vibrate for a specific duration in milliseconds.
+     * Vibrates the device for a specific duration.
+     *
+     * On Android O (API 26) and above, it uses [VibrationEffect.createOneShot] with [VibrationEffect.DEFAULT_AMPLITUDE].
+     * On older versions, it uses the deprecated [Vibrator.vibrate] method.
+     *
+     * @param duration The duration of the vibration in milliseconds. Defaults to 500ms.
      */
     fun vibrate(duration: Long = 500) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -31,21 +48,4 @@ class VibrationManager(context: Context) {
         }
     }
 
-    /**
-     * Create a "click" or haptic feedback feel.
-     */
-    fun click() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
-        } else {
-            vibrate(50)
-        }
-    }
-
-    /**
-     * Stop any ongoing vibration.
-     */
-    fun cancel() {
-        vibrator.cancel()
-    }
 }

@@ -13,6 +13,12 @@ import off.kys.backtalk.util.openUrl
 
 /**
  * ViewModel for the main screen.
+ *
+ * This ViewModel manages the UI state for the main activity and coordinates
+ * app update checks using the [CheckAppUpdate] use case.
+ *
+ * @param application The [Application] context.
+ * @param checkAppUpdate The use case to check for application updates.
  */
 class MainViewModel(
     private val application: Application,
@@ -20,19 +26,20 @@ class MainViewModel(
 ) : AndroidViewModel(application) {
 
     /**
-     * Mutable state flow for the main UI state.
+     * Internal mutable state flow for the main UI.
      */
     private val _mainUiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
 
     /**
-     * State flow for the main UI state.
+     * Publicly exposed state flow for the main UI.
+     * Observers can use this to react to changes in the UI state.
      */
     val mainUiState: StateFlow<MainUiState> = _mainUiState
 
     /**
-     * Handles UI events for the main screen.
+     * Processes UI events originating from the main screen.
      *
-     * @param event The UI event to handle.
+     * @param event The [MainUiEvent] to handle, such as checking for updates or dismissing dialogs.
      */
     fun onEvent(event: MainUiEvent) {
         when (event) {
@@ -43,7 +50,14 @@ class MainViewModel(
     }
 
     /**
-     * Checks for app updates.
+     * Initiates a check for app updates.
+     *
+     * This method launches a coroutine to perform the update check. It updates
+     * the [_mainUiState] to reflect the current progress and results:
+     * - [MainUiState.Checking]: While the update check is in progress.
+     * - [MainUiState.UpdateAvailable]: If a new version is found.
+     * - [MainUiState.UpToDate]: If the app is already at the latest version.
+     * - [MainUiState.Error]: If an exception occurs during the check.
      */
     private fun checkForUpdate() {
         viewModelScope.launch {

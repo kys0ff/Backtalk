@@ -6,7 +6,9 @@ import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.entity.MessageEntity
 
 /**
- * Database class for the app.
+ * The Room database for the application, responsible for persisting message data.
+ *
+ * This database includes the [MessageEntity] and provides access to [MessagesDao].
  */
 @Database(
     entities = [MessageEntity::class],
@@ -15,7 +17,9 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 )
 abstract class MessagesDatabase: RoomDatabase() {
     /**
-     * Get the DAO for messages.
+     * Returns the Data Access Object (DAO) for the messages table.
+     *
+     * @return An instance of [MessagesDao].
      */
     abstract fun messagesDao(): MessagesDao
 }
