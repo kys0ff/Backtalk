@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.TextUnit
  * @param color The color to be applied to the text.
  * @param style The style configuration for the text such as color, font, line height etc.
  * @param textDecoration The decorations to paint on the text (e.g., an underline).
+ * @param maxLines An optional maximum number of lines for the text to span, wrapping if necessary.
  */
 @Composable
 fun SmartText(
@@ -29,17 +30,19 @@ fun SmartText(
     fontSize: TextUnit = TextUnit.Unspecified,
     color: Color = Color.Unspecified,
     style: TextStyle = LocalTextStyle.current,
-    textDecoration: TextDecoration = TextDecoration.None
+    textDecoration: TextDecoration = TextDecoration.None,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     Text(
         text = text,
         modifier = modifier,
+        maxLines = maxLines,
         style = style.copy(
             color = if (color != Color.Unspecified) color else style.color,
             fontSize = if (fontSize != TextUnit.Unspecified) fontSize else style.fontSize,
             textDecoration = textDecoration,
             textDirection = TextDirection.Content,
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
         )
     )
 }

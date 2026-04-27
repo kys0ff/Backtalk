@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +48,7 @@ fun ReplyPreview(
                 .fillMaxHeight()
                 .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
         )
-        Text(
+        SmartText(
             text = text,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
