@@ -16,7 +16,7 @@ android {
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 8
+        versionCode = 9
         versionName = "0.1.5"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
