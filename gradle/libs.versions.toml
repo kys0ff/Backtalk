@@ -4,11 +4,14 @@ concurrentFutures = "1.3.0"
 datastorePreferences = "1.2.1"
 gau = "1.0.0"
 kotlin = "2.3.20"
+kotlinxSerialization = "1.11.0"
 coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
+mockito = "5.23.0"
+mockitoKotlin = "6.3.0"
 activityCompose = "1.13.0"
 composeBom = "2026.03.01"
 ksp = "2.3.2"
@@ -49,6 +52,10 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.10.2" }
 
 [bundles]
 # Group them into a bundle
@@ -60,4 +67,5 @@ koin = ["koin-core", "koin-android", "koin-androidx-compose"]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }

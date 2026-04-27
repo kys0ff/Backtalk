@@ -56,4 +56,10 @@ interface MessagesDao {
      */
     @Query("SELECT * FROM messages")
     fun getAllMessages(): Flow<List<MessageEntity>>
+
+    /**
+     * Deletes all messages from the database.
+     */
+    @Query("DELETE FROM messages")
+    suspend fun deleteAllMessages()
 }

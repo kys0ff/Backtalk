@@ -1,5 +1,6 @@
 package off.kys.backtalk.domain.model
 
+import kotlinx.serialization.Serializable
 import kotlin.random.Random
 
 /**
@@ -7,6 +8,7 @@ import kotlin.random.Random
  *
  * @property value The underlying long value of the message ID.
  */
+@Serializable
 @JvmInline
 value class MessageId(val value: Long) {
 

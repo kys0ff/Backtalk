@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import off.kys.backtalk.domain.model.MessageId
 
 /**
@@ -17,6 +18,7 @@ import off.kys.backtalk.domain.model.MessageId
  * @property editedAt The time the message was last edited, or null if it hasn't been edited.
  */
 @Keep
+@Serializable
 @Entity(tableName = "messages")
 data class MessageEntity(
     @PrimaryKey

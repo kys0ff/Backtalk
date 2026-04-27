@@ -1,27 +1,39 @@
 package off.kys.backtalk.presentation.screen.preferences
 
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +44,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -40,38 +53,77 @@ import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.ThemeMode
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.activity.MainActivity
+import off.kys.backtalk.presentation.event.SettingsUiEvent
+import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
+import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.isSecurityEnabled
 import off.kys.backtalk.util.openUrl
 import off.kys.backtalk.util.toast
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * The settings screen of the application.
- *
- * This screen provides options for the user to customize the appearance,
- * privacy/security settings, check for updates, and view information about the app.
  */
 class SettingsScreen : Screen {
 
-    /**
-     * The content of the settings screen.
-     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val mainActivity = LocalActivity.current as MainActivity
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         val navigator = LocalNavigator.currentOrThrow
-        val prefs = koinInject<BacktalkPreferences>()
         val context = LocalContext.current
+        val viewModel = koinViewModel<SettingsViewModel>()
+        val state by viewModel.state.collectAsState(SettingsUiState())
 
-        var themeMode by remember { mutableStateOf(prefs.themeMode) }
-        var dynamicColor by remember { mutableStateOf(prefs.dynamicColorEnabled) }
-        var lockEnabled by remember { mutableStateOf(prefs.lockEnabled) }
-        var secureScreen by remember { mutableStateOf(prefs.secureScreenEnabled) }
-        var autoUpdate by remember { mutableStateOf(prefs.autoUpdateEnabled) }
+        var showExportDialog by remember { mutableStateOf(false) }
+        var showImportStrategyDialog by remember { mutableStateOf(false) }
+        var showPasswordDialog by remember { mutableStateOf(false) }
+
+        var selectedUri by remember { mutableStateOf<android.net.Uri?>(null) }
+        var password by remember { mutableStateOf("") }
+        var isImporting by remember { mutableStateOf(false) }
+
+        val exportLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("application/json")
+        ) { uri ->
+            uri?.let {
+                selectedUri = it
+                showExportDialog = true
+            }
+        }
+
+        val importLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument()
+        ) { uri ->
+            uri?.let {
+                viewModel.onEvent(SettingsUiEvent.CheckBackupEncryption(it))
+            }
+        }
+
+        LaunchedEffect(state.isBackupEncrypted) {
+            if (state.isBackupEncrypted == false) {
+                showImportStrategyDialog = true
+            } else if (state.isBackupEncrypted == true) {
+                showImportStrategyDialog = true
+            }
+        }
+
+        LaunchedEffect(state.error) {
+            state.error?.let {
+                context.toast(it)
+                viewModel.onEvent(SettingsUiEvent.ClearError)
+            }
+        }
+
+        LaunchedEffect(state.successMessage) {
+            state.successMessage?.let {
+                context.toast(it)
+                viewModel.onEvent(SettingsUiEvent.ClearSuccess)
+            }
+        }
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -88,25 +140,23 @@ class SettingsScreen : Screen {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                if (state.backupLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+
                 PreferenceCategory(stringResource(R.string.appearance))
 
                 ThemeSelector(
-                    selected = themeMode,
-                    onSelected = {
-                        prefs.themeMode = it
-                        themeMode = it
-                    }
+                    selected = state.themeMode,
+                    onSelected = { viewModel.onEvent(SettingsUiEvent.OnThemeModeChange(it)) }
                 )
 
                 ToggleSetting(
                     label = stringResource(R.string.material_you_dynamic_color),
                     supportingText = stringResource(R.string.apply_system_colors_to_the_app_interface),
                     icon = painterResource(R.drawable.round_palette_24),
-                    checked = dynamicColor,
-                    onCheckedChange = {
-                        prefs.dynamicColorEnabled = it
-                        dynamicColor = it
-                    }
+                    checked = state.dynamicColorEnabled,
+                    onCheckedChange = { viewModel.onEvent(SettingsUiEvent.OnDynamicColorToggle(it)) }
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
@@ -116,38 +166,59 @@ class SettingsScreen : Screen {
                     ToggleSetting(
                         label = stringResource(R.string.enable_app_lock),
                         icon = painterResource(R.drawable.round_lock_24),
-                        checked = lockEnabled,
+                        checked = state.lockEnabled,
                         requireRestart = true,
-                        onCheckedChange = {
-                            prefs.lockEnabled = it
-                            lockEnabled = it
-                        }
+                        onCheckedChange = { viewModel.onEvent(SettingsUiEvent.OnLockToggle(it)) }
                     )
                 }
 
                 ToggleSetting(
                     label = stringResource(R.string.secure_screen_block_screenshots),
                     icon = painterResource(R.drawable.round_screen_lock_portrait_24),
-                    checked = secureScreen,
-                    onCheckedChange = {
-                        prefs.secureScreenEnabled = it
-                        secureScreen = it
+                    checked = state.secureScreenEnabled,
+                    onCheckedChange = { viewModel.onEvent(SettingsUiEvent.OnSecureScreenToggle(it)) }
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+                PreferenceCategory(stringResource(R.string.backup_restore))
+
+                InfoRow(
+                    label = stringResource(R.string.export_backup),
+                    value = stringResource(R.string.export_backup_desc),
+                    icon = painterResource(R.drawable.round_send_24),
+                    onClick = { exportLauncher.launch("backtalk_backup_${System.currentTimeMillis()}.json") }
+                )
+
+                InfoRow(
+                    label = stringResource(R.string.import_backup),
+                    value = stringResource(R.string.import_backup_desc),
+                    icon = painterResource(R.drawable.round_reply_24),
+                    onClick = {
+                        importLauncher.launch(
+                            arrayOf(
+                                "application/json",
+                                "application/octet-stream",
+                                "*/*"
+                            )
+                        )
                     }
                 )
 
                 if (!BuildConfig.IS_FDROID) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(
+                            vertical = 8.dp,
+                            horizontal = 16.dp
+                        )
+                    )
                     PreferenceCategory(stringResource(R.string.updates))
 
                     ToggleSetting(
                         label = stringResource(R.string.auto_check_updates),
                         supportingText = stringResource(R.string.auto_check_updates_desc),
                         icon = painterResource(R.drawable.round_update_24),
-                        checked = autoUpdate,
-                        onCheckedChange = {
-                            prefs.autoUpdateEnabled = it
-                            autoUpdate = it
-                        }
+                        checked = state.autoUpdateEnabled,
+                        onCheckedChange = { viewModel.onEvent(SettingsUiEvent.OnAutoUpdateToggle(it)) }
                     )
 
                     InfoRow(
@@ -185,14 +256,168 @@ class SettingsScreen : Screen {
                 )
             }
         }
+
+        // Dialogs
+        if (showExportDialog) {
+            var useEncryption by remember { mutableStateOf(false) }
+            AlertDialog(
+                onDismissRequest = { showExportDialog = false },
+                title = { Text(stringResource(R.string.export_backup)) },
+                text = {
+                    Column {
+                        Text(stringResource(R.string.backup_password_prompt))
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            Text(stringResource(R.string.security))
+                            Spacer(Modifier.weight(1f))
+                            Switch(
+                                checked = useEncryption,
+                                onCheckedChange = { useEncryption = it })
+                        }
+                        if (useEncryption) {
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = { password = it },
+                                label = { Text(stringResource(R.string.enter_password)) },
+                                visualTransformation = PasswordVisualTransformation(),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showExportDialog = false
+                        selectedUri?.let { uri ->
+                            viewModel.onEvent(
+                                SettingsUiEvent.ExportBackup(
+                                    uri,
+                                    if (useEncryption) password else null
+                                )
+                            )
+                        }
+                        password = ""
+                    }) {
+                        Text(stringResource(R.string.send))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showExportDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+
+        if (showImportStrategyDialog) {
+            AlertDialog(
+                onDismissRequest = { showImportStrategyDialog = false },
+                title = { Text(stringResource(R.string.import_strategy)) },
+                text = { Text(stringResource(R.string.import_strategy_desc)) },
+                confirmButton = {
+                    Row {
+                        TextButton(
+                            onClick = {
+                                showImportStrategyDialog = false
+                                isImporting = false // clearExisting is false for merge
+                                if (state.isBackupEncrypted == true) {
+                                    showPasswordDialog = true
+                                } else {
+                                    state.selectedBackupUri?.let { uri ->
+                                        viewModel.onEvent(SettingsUiEvent.ImportBackup(uri, null, false))
+                                    }
+                                }
+                            }
+                        ) {
+                            Text(stringResource(R.string.merge_data))
+                        }
+                        TextButton(
+                            onClick = {
+                                showImportStrategyDialog = false
+                                isImporting = true // clearExisting is true for clear_and_import
+                                if (state.isBackupEncrypted == true) {
+                                    showPasswordDialog = true
+                                } else {
+                                    state.selectedBackupUri?.let { uri ->
+                                        viewModel.onEvent(SettingsUiEvent.ImportBackup(uri, null, true))
+                                    }
+                                }
+                            }
+                        ) {
+                            Text(
+                                stringResource(R.string.clear_and_import),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showImportStrategyDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+
+        if (showPasswordDialog || state.wrongPasswordError) {
+            AlertDialog(
+                onDismissRequest = { 
+                    showPasswordDialog = false
+                    viewModel.onEvent(SettingsUiEvent.ResetBackupState)
+                },
+                title = { Text(stringResource(R.string.enter_password)) },
+                text = {
+                    Column {
+                        if (state.wrongPasswordError) {
+                            Text(
+                                text = stringResource(R.string.incorrect_password_please_try_again),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text(stringResource(R.string.enter_password)) },
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            isError = state.wrongPasswordError
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showPasswordDialog = false
+                        state.selectedBackupUri?.let { uri ->
+                            viewModel.onEvent(
+                                SettingsUiEvent.ImportBackup(
+                                    uri,
+                                    password.ifBlank { null },
+                                    isImporting
+                                )
+                            )
+                        }
+                        password = emptyString()
+                    }) {
+                        Text(stringResource(R.string.submit))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { 
+                        showPasswordDialog = false
+                        viewModel.onEvent(SettingsUiEvent.ResetBackupState)
+                    }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
     }
 
-    /**
-     * The top app bar for the settings screen.
-     *
-     * @param onNavigateBack The callback to be invoked when the back button is clicked.
-     * @param scrollBehavior The scroll behavior for the top app bar.
-     */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun SettingsTopAppBar(
@@ -213,11 +438,6 @@ class SettingsScreen : Screen {
         )
     }
 
-    /**
-     * A category header for a group of preferences.
-     *
-     * @param text The title of the category.
-     */
     @Composable
     private fun PreferenceCategory(text: String) {
         Text(
@@ -228,16 +448,6 @@ class SettingsScreen : Screen {
         )
     }
 
-    /**
-     * A preference item with a toggle switch.
-     *
-     * @param label The primary text of the preference.
-     * @param icon The icon to be displayed before the label.
-     * @param supportingText The secondary text of the preference.
-     * @param checked Whether the switch is currently checked.
-     * @param requireRestart Whether the app needs to be restarted for the change to take effect.
-     * @param onCheckedChange The callback to be invoked when the switch state changes.
-     */
     @Composable
     private fun ToggleSetting(
         label: String,
@@ -265,14 +475,6 @@ class SettingsScreen : Screen {
         )
     }
 
-    /**
-     * A preference item that displays information.
-     *
-     * @param label The primary text of the preference.
-     * @param value The value text of the preference.
-     * @param icon The icon to be displayed before the label.
-     * @param onClick The callback to be invoked when the item is clicked.
-     */
     @Composable
     private fun InfoRow(
         label: String,
@@ -288,12 +490,6 @@ class SettingsScreen : Screen {
         )
     }
 
-    /**
-     * A preference item for selecting the theme mode.
-     *
-     * @param selected The currently selected theme mode.
-     * @param onSelected The callback to be invoked when a theme mode is selected.
-     */
     @Composable
     private fun ThemeSelector(selected: ThemeMode, onSelected: (ThemeMode) -> Unit) {
         Column(Modifier.selectableGroup()) {
@@ -305,7 +501,7 @@ class SettingsScreen : Screen {
                     leadingContent = {
                         RadioButton(
                             selected = (mode == selected),
-                            onClick = null // Handled by ListItem click
+                            onClick = null
                         )
                     },
                     modifier = Modifier.clickable { onSelected(mode) }

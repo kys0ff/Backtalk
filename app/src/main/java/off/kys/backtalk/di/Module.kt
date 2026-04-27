@@ -7,17 +7,24 @@ import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.local.migrations.MIGRATION_1_2
 import off.kys.backtalk.data.local.migrations.MIGRATION_2_3
+import off.kys.backtalk.data.repository.BackupRepositoryImpl
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
+import off.kys.backtalk.domain.repository.BackupRepository
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.domain.use_case.CopyMessagesByIds
 import off.kys.backtalk.domain.use_case.DeleteMessageById
+import off.kys.backtalk.domain.use_case.ExportBackup
 import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
+import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.InsertMessage
+import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
+import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
@@ -66,6 +73,7 @@ private fun Module.databaseModule() {
  */
 private fun Module.repositoryModule() {
     single<MessagesRepository> { MessagesRepositoryImpl(get()) }
+    single<BackupRepository> { BackupRepositoryImpl(get()) }
 }
 
 /**
@@ -81,6 +89,8 @@ private fun Module.useCaseModule() {
     single { DeleteMessageById(get()) }
     single { CopyMessagesByIds(get(), get()) }
     single { CheckAppUpdate() }
+    single { ExportBackup(get(), get(), get()) }
+    single { ImportBackup(get(), get(), get()) }
     single {
         MessagesUseCases(
             getAllMessages = get(),
@@ -88,6 +98,13 @@ private fun Module.useCaseModule() {
             insertMessage = get(),
             deleteMessageById = get(),
             copyMessagesByIds = get()
+        )
+    }
+    single {
+        BackupUseCases(
+            exportBackup = get(),
+            importBackup = get(),
+            backupRepository = get()
         )
     }
 }
@@ -101,6 +118,7 @@ private fun Module.useCaseModule() {
 private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get()) }
     viewModel { MessagesViewModel(get()) }
+    viewModel { SettingsViewModel(androidApplication(), get(), get()) }
 }
 
 /**
