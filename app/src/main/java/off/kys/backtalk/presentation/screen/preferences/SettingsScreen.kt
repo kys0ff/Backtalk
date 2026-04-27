@@ -4,6 +4,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,6 +29,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -38,12 +43,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -71,19 +79,18 @@ class SettingsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val mainActivity = LocalActivity.current as MainActivity
+        val mainActivity = LocalActivity.current as? MainActivity
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
         val viewModel = koinViewModel<SettingsViewModel>()
         val state by viewModel.state.collectAsState(SettingsUiState())
 
-        var showExportDialog by remember { mutableStateOf(false) }
-        var showImportStrategyDialog by remember { mutableStateOf(false) }
-        var showPasswordDialog by remember { mutableStateOf(false) }
+        val showExportDialog = remember { mutableStateOf(false) }
+        val showImportStrategyDialog = remember { mutableStateOf(false) }
+        val showPasswordDialog = remember { mutableStateOf(false) }
 
         var selectedUri by remember { mutableStateOf<android.net.Uri?>(null) }
-        var password by remember { mutableStateOf("") }
         var isImporting by remember { mutableStateOf(false) }
 
         val exportLauncher = rememberLauncherForActivityResult(
@@ -91,7 +98,7 @@ class SettingsScreen : Screen {
         ) { uri ->
             uri?.let {
                 selectedUri = it
-                showExportDialog = true
+                showExportDialog.value = true
             }
         }
 
@@ -104,10 +111,8 @@ class SettingsScreen : Screen {
         }
 
         LaunchedEffect(state.isBackupEncrypted) {
-            if (state.isBackupEncrypted == false) {
-                showImportStrategyDialog = true
-            } else if (state.isBackupEncrypted == true) {
-                showImportStrategyDialog = true
+            if (state.isBackupEncrypted != null) {
+                showImportStrategyDialog.value = true
             }
         }
 
@@ -227,7 +232,7 @@ class SettingsScreen : Screen {
                         icon = painterResource(R.drawable.round_refresh_24),
                         onClick = {
                             context.toast(R.string.checking_for_updates)
-                            mainActivity.checkForUpdates()
+                            mainActivity?.checkForUpdates()
                         }
                     )
                 }
@@ -258,164 +263,253 @@ class SettingsScreen : Screen {
         }
 
         // Dialogs
-        if (showExportDialog) {
-            var useEncryption by remember { mutableStateOf(false) }
-            AlertDialog(
-                onDismissRequest = { showExportDialog = false },
-                title = { Text(stringResource(R.string.export_backup)) },
-                text = {
-                    Column {
-                        Text(stringResource(R.string.backup_password_prompt))
-                        Spacer(Modifier.height(8.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                        ) {
-                            Text(stringResource(R.string.security))
-                            Spacer(Modifier.weight(1f))
-                            Switch(
-                                checked = useEncryption,
-                                onCheckedChange = { useEncryption = it })
-                        }
-                        if (useEncryption) {
-                            OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text(stringResource(R.string.enter_password)) },
-                                visualTransformation = PasswordVisualTransformation(),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showExportDialog = false
-                        selectedUri?.let { uri ->
-                            viewModel.onEvent(
-                                SettingsUiEvent.ExportBackup(
-                                    uri,
-                                    if (useEncryption) password else null
-                                )
-                            )
-                        }
-                        password = ""
-                    }) {
-                        Text(stringResource(R.string.send))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showExportDialog = false }) {
-                        Text(stringResource(R.string.cancel))
+        if (showExportDialog.value) {
+            ExportDialog(
+                onDismiss = { showExportDialog.value = false },
+                onConfirm = { exportPassword ->
+                    showExportDialog.value = false
+                    selectedUri?.let { uri ->
+                        viewModel.onEvent(
+                            SettingsUiEvent.ExportBackup(uri, exportPassword)
+                        )
                     }
                 }
             )
         }
 
-        if (showImportStrategyDialog) {
-            AlertDialog(
-                onDismissRequest = { showImportStrategyDialog = false },
-                title = { Text(stringResource(R.string.import_strategy)) },
-                text = { Text(stringResource(R.string.import_strategy_desc)) },
-                confirmButton = {
-                    Row {
-                        TextButton(
-                            onClick = {
-                                showImportStrategyDialog = false
-                                isImporting = false // clearExisting is false for merge
-                                if (state.isBackupEncrypted == true) {
-                                    showPasswordDialog = true
-                                } else {
-                                    state.selectedBackupUri?.let { uri ->
-                                        viewModel.onEvent(SettingsUiEvent.ImportBackup(uri, null, false))
-                                    }
-                                }
-                            }
-                        ) {
-                            Text(stringResource(R.string.merge_data))
-                        }
-                        TextButton(
-                            onClick = {
-                                showImportStrategyDialog = false
-                                isImporting = true // clearExisting is true for clear_and_import
-                                if (state.isBackupEncrypted == true) {
-                                    showPasswordDialog = true
-                                } else {
-                                    state.selectedBackupUri?.let { uri ->
-                                        viewModel.onEvent(SettingsUiEvent.ImportBackup(uri, null, true))
-                                    }
-                                }
-                            }
-                        ) {
-                            Text(
-                                stringResource(R.string.clear_and_import),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showImportStrategyDialog = false }) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                }
-            )
-        }
-
-        if (showPasswordDialog || state.wrongPasswordError) {
-            AlertDialog(
-                onDismissRequest = { 
-                    showPasswordDialog = false
+        if (showImportStrategyDialog.value) {
+            ImportStrategyDialog(
+                onDismiss = {
+                    showImportStrategyDialog.value = false
                     viewModel.onEvent(SettingsUiEvent.ResetBackupState)
                 },
-                title = { Text(stringResource(R.string.enter_password)) },
-                text = {
-                    Column {
-                        if (state.wrongPasswordError) {
-                            Text(
-                                text = stringResource(R.string.incorrect_password_please_try_again),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                onConfirm = { clearAndImport ->
+                    showImportStrategyDialog.value = false
+                    isImporting = clearAndImport
+                    if (state.isBackupEncrypted == true) {
+                        showPasswordDialog.value = true
+                    } else {
+                        state.selectedBackupUri?.let { uri ->
+                            viewModel.onEvent(
+                                SettingsUiEvent.ImportBackup(uri, null, clearAndImport)
                             )
                         }
+                    }
+                }
+            )
+        }
+
+        if (showPasswordDialog.value || state.wrongPasswordError) {
+            PasswordDialog(
+                wrongPasswordError = state.wrongPasswordError,
+                onDismiss = {
+                    showPasswordDialog.value = false
+                    viewModel.onEvent(SettingsUiEvent.ResetBackupState)
+                },
+                onConfirm = { enteredPassword ->
+                    showPasswordDialog.value = false
+                    state.selectedBackupUri?.let { uri ->
+                        viewModel.onEvent(
+                            SettingsUiEvent.ImportBackup(
+                                uri,
+                                enteredPassword.ifBlank { null },
+                                isImporting
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun ExportDialog(
+        onDismiss: () -> Unit,
+        onConfirm: (String?) -> Unit
+    ) {
+        var useEncryption by remember { mutableStateOf(false) }
+        var password by remember { mutableStateOf(emptyString()) }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(R.string.export_backup)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.backup_password_prompt))
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.security))
+                        Spacer(Modifier.weight(1f))
+                        Switch(
+                            checked = useEncryption,
+                            onCheckedChange = { useEncryption = it }
+                        )
+                    }
+                    if (useEncryption) {
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
                             label = { Text(stringResource(R.string.enter_password)) },
                             visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier.fillMaxWidth(),
-                            isError = state.wrongPasswordError
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showPasswordDialog = false
-                        state.selectedBackupUri?.let { uri ->
-                            viewModel.onEvent(
-                                SettingsUiEvent.ImportBackup(
-                                    uri,
-                                    password.ifBlank { null },
-                                    isImporting
-                                )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { onConfirm(if (useEncryption) password else null) }) {
+                    Text(stringResource(R.string.export))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun ImportStrategyDialog(
+        onDismiss: () -> Unit,
+        onConfirm: (Boolean) -> Unit
+    ) {
+        // Default to 'false' (Merge) to be safe
+        var clearData by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            icon = {
+                Icon(
+                    painterResource(R.drawable.round_file_download_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(text = stringResource(R.string.import_strategy))
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.import_strategy_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Option 1: Merge
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = !clearData,
+                                onClick = { clearData = false },
+                                role = Role.RadioButton
                             )
-                        }
-                        password = emptyString()
-                    }) {
-                        Text(stringResource(R.string.submit))
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = !clearData, onClick = null)
+                        Text(
+                            text = stringResource(R.string.merge_data),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { 
-                        showPasswordDialog = false
-                        viewModel.onEvent(SettingsUiEvent.ResetBackupState)
-                    }) {
-                        Text(stringResource(R.string.cancel))
+
+                    // Option 2: Clear and Import (The "Danger" option)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = clearData,
+                                onClick = { clearData = true },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = clearData,
+                            onClick = null,
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.error
+                            )
+                        )
+                        Text(
+                            text = stringResource(R.string.clear_and_import),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (clearData) MaterialTheme.colorScheme.error else Color.Unspecified,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
                     }
                 }
-            )
-        }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onConfirm(clearData) },
+                    colors = if (clearData) {
+                        ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    } else {
+                        ButtonDefaults.buttonColors()
+                    }
+                ) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    @Composable
+    private fun PasswordDialog(
+        wrongPasswordError: Boolean,
+        onDismiss: () -> Unit,
+        onConfirm: (String) -> Unit
+    ) {
+        var password by remember { mutableStateOf(emptyString()) }
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text(stringResource(R.string.enter_password)) },
+            text = {
+                Column {
+                    if (wrongPasswordError) {
+                        Text(
+                            text = stringResource(R.string.incorrect_password_please_try_again),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(stringResource(R.string.enter_password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = wrongPasswordError
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { onConfirm(password) }) {
+                    Text(stringResource(R.string.submit))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

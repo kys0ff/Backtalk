@@ -94,4 +94,6 @@
     <string name="backup_exported_successfully">Backup exported successfully</string>
     <string name="incorrect_password_please_try_again">Incorrect password. Please try again.</string>
     <string name="submit">Submit</string>
+    <string name="export">Export</string>
+    <string name="confirm">Confirm</string>
 </resources>
