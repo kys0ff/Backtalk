@@ -39,25 +39,23 @@ class SettingsViewModel(
     )
     val state = _state.asStateFlow()
 
-    fun onEvent(event: SettingsUiEvent) {
-        when (event) {
-            is SettingsUiEvent.OnThemeModeChange -> onThemeModeChange(event.themeMode)
-            is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
-            is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
-            is SettingsUiEvent.OnSecureScreenToggle -> onSecureScreenToggle(event.enabled)
-            is SettingsUiEvent.OnAutoUpdateToggle -> onAutoUpdateToggle(event.enabled)
-            is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
-            is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
-            is SettingsUiEvent.ImportBackup -> importBackup(
-                event.uri,
-                event.password,
-                event.clearExisting
-            )
+    fun onEvent(event: SettingsUiEvent) = when (event) {
+        is SettingsUiEvent.OnThemeModeChange -> onThemeModeChange(event.themeMode)
+        is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
+        is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
+        is SettingsUiEvent.OnSecureScreenToggle -> onSecureScreenToggle(event.enabled)
+        is SettingsUiEvent.OnAutoUpdateToggle -> onAutoUpdateToggle(event.enabled)
+        is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
+        is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
+        is SettingsUiEvent.ImportBackup -> importBackup(
+            event.uri,
+            event.password,
+            event.clearExisting
+        )
 
-            SettingsUiEvent.ClearError -> clearError()
-            SettingsUiEvent.ClearSuccess -> clearSuccess()
-            SettingsUiEvent.ResetBackupState -> resetBackupState()
-        }
+        SettingsUiEvent.ClearError -> clearError()
+        SettingsUiEvent.ClearSuccess -> clearSuccess()
+        SettingsUiEvent.ResetBackupState -> resetBackupState()
     }
 
     private fun onThemeModeChange(themeMode: ThemeMode) {
