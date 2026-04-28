@@ -62,6 +62,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -249,7 +250,7 @@ class SettingsScreen : Screen {
                         val noFolderSelected = stringResource(R.string.no_folder_selected)
                         val folderName = remember(state.autoExportUri, noFolderSelected) {
                             state.autoExportUri?.let { uriString ->
-                                val uri = android.net.Uri.parse(uriString)
+                                val uri = uriString.toUri()
                                 androidx.documentfile.provider.DocumentFile.fromTreeUri(context, uri)?.name
                             } ?: noFolderSelected
                         }

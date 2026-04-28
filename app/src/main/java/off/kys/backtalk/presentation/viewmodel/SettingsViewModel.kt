@@ -6,6 +6,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -13,9 +16,11 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.data.worker.AutoExportWorker
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
+import java.util.concurrent.TimeUnit
 import javax.crypto.BadPaddingException
 
 /**
@@ -140,8 +145,8 @@ class SettingsViewModel(
 
     private fun scheduleAutoExport() {
         val interval = preferences.autoExportInterval
-        val workRequest = androidx.work.PeriodicWorkRequestBuilder<off.kys.backtalk.data.worker.AutoExportWorker>(
-            interval.days.toLong(), java.util.concurrent.TimeUnit.DAYS
+        val workRequest = PeriodicWorkRequestBuilder<AutoExportWorker>(
+            interval.days.toLong(), TimeUnit.DAYS
         )
             .setConstraints(
                 androidx.work.Constraints.Builder()
@@ -150,15 +155,15 @@ class SettingsViewModel(
             )
             .build()
 
-        androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "auto_export_work",
-            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
         )
     }
 
     private fun cancelAutoExport() {
-        androidx.work.WorkManager.getInstance(context).cancelUniqueWork("auto_export_work")
+        WorkManager.getInstance(context).cancelUniqueWork("auto_export_work")
     }
 
     private fun exportBackup(uri: Uri, password: String?) {

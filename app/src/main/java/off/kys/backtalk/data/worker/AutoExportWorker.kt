@@ -1,7 +1,7 @@
 package off.kys.backtalk.data.worker
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -29,7 +29,7 @@ class AutoExportWorker(
         if (!preferences.autoExportEnabled) return Result.success()
 
         val directoryUriString = preferences.autoExportUri ?: return Result.failure()
-        val directoryUri = Uri.parse(directoryUriString)
+        val directoryUri = directoryUriString.toUri()
         
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "backtalk_backup_$timestamp.json"
