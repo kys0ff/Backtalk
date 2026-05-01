@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-MVVM-orange)
 ![UI](https://img.shields.io/badge/UI-Declarative-blueviolet)
-![Version](https://img.shields.io/badge/Version-0.1.5-informational)
+![Version](https://img.shields.io/badge/Version-0.1.6-informational)
 ![Maintained](https://img.shields.io/badge/Maintained-Yes-2ea44f)
 [![Liberapay](https://img.shields.io/badge/Liberapay-Support%20me-F6C915)](https://liberapay.com/kys0ff)
 
@@ -30,16 +30,17 @@ It lets you talk to yourself — reply, reflect, organize thoughts — all in a 
 - 💾 **Offline-first** with Room database
 - 🧩 **Clean architecture** using Koin for dependency injection
 - 📱 **Modern Android UI** with Material 3
-- 🔄 **Backup & Restore** — manual and automatic periodic backups
-- 👈 **Swipe actions** — swipe to edit or delete messages
+- 🔄 **Backup & Restore** — manual and automatic periodic backups with encryption
+- 📜 **Open Source Licenses** — view project dependencies and licenses
+- 👈 **Swipe actions** — swipe to edit or reply to messages
 
-## 🚀 Recent Changes (v0.1.5)
+## 🚀 Recent Changes (v0.1.6)
 
-- ✨ **Backup & Restore** functionality with encryption.
-- 🕒 **Automatic Backups** in the background.
-- 👆 **Swipe gestures** for easier message management.
-- 🎨 **Enhanced UI** with custom Material 3 theming.
-- 📦 **F-Droid support** with a dedicated build flavor.
+- ⚙️ **Settings Redesign** — cleaner, sectioned layout for better navigation.
+- 🔐 **Secure Auto-Export** — encryption support for background backups.
+- 📜 **Licenses Screen** — dedicated view for open source attributions.
+- 🛡️ **Improved Privacy** — removed internet permission from F-Droid flavor.
+- 🎨 **UX Refinement** — updated dialogs and theme selection flow.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 
@@ -49,7 +50,7 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 - 🧵 **Threaded view** (original message in the middle, replies shown above/below)
 - 🖼️ **Image messages**
 - 🎙️ **Voice messages**
-- ☁️ Optional encrypted backup
+- ☁️ ~~**Optional encrypted backup**~~
 
 ---
 
@@ -87,7 +88,7 @@ Backtalk is designed to be **private by default**:
 1. **Clone the repository:**
 
    ```bash
-   git clone [https://github.com/kys0ff/Backtalk.git](https://github.com/kys0ff/Backtalk.git)
+   git clone https://github.com/kys0ff/Backtalk.git
    cd Backtalk
 
 2. **Open in Android Studio:** Open the project in Android Studio (Hedgehog or newer recommended).

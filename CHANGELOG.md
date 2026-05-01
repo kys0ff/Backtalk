@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6] - 2026-05-01
+
+### Added
+- **Open Source Licenses**: New screen to display project dependencies and their licenses.
+
+### Changed
+- **Settings Redesign**: Completely overhauled the Settings screen with a sectioned layout, custom components, and better UX.
+- **License UI**: Redesigned the License screen and externalized library metadata for better maintainability.
+- **Dialogs Refactoring**: Refactored settings dialogs to include confirmation buttons and externalized all strings.
+- **Theme Selection**: Integrated theme selection directly into the settings flow.
+
+### Refactored
+- Added an initial delay to `AutoExportWorker` to avoid immediate execution on app start.
+- Cleaned up and removed unused UI components from the Settings screen.
+
+### Build
+- **F-Droid Privacy**: Removed `INTERNET` permission from the f-droid build variant.
+- **Maintenance**: Bumped `versionCode` to 11.
+
+---
+
 ## [0.1.5] - 2026-04-28
 
 ### Added
