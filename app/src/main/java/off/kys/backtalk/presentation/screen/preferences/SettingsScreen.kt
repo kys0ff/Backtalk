@@ -72,11 +72,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
+import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.event.SettingsUiEvent
@@ -289,7 +291,7 @@ class SettingsScreen : Screen {
                                 color = MaterialTheme.colorScheme.outlineVariant
                             )
                             val folderName = state.autoExportUri?.let {
-                                androidx.documentfile.provider.DocumentFile.fromTreeUri(
+                                DocumentFile.fromTreeUri(
                                     context,
                                     it.toUri()
                                 )?.name
@@ -297,7 +299,7 @@ class SettingsScreen : Screen {
                             SettingsItem(
                                 label = stringResource(R.string.auto_export_folder),
                                 value = folderName,
-                                icon = painterResource(R.drawable.round_description_24),
+                                icon = painterResource(R.drawable.round_folder_24),
                                 onClick = { folderLauncher.launch(null) }
                             )
                             SettingsItem(
@@ -306,6 +308,27 @@ class SettingsScreen : Screen {
                                 icon = painterResource(R.drawable.round_refresh_24),
                                 onClick = { showIntervalDialog.value = true }
                             )
+                            SettingsToggle(
+                                label = stringResource(R.string.auto_export_encrypt),
+                                icon = painterResource(R.drawable.round_lock_24),
+                                checked = state.autoExportEncrypted,
+                                onCheckedChange = {
+                                    viewModel.onEvent(SettingsUiEvent.OnAutoExportEncryptionToggle(it))
+                                    if (it && state.autoExportPassword.isNullOrBlank()) {
+                                        showAutoExportPasswordDialog.value = true
+                                    }
+                                }
+                            )
+                            AnimatedVisibility(visible = state.autoExportEncrypted) {
+                                SettingsItem(
+                                    label = stringResource(R.string.auto_export_password),
+                                    value = if (state.autoExportPassword.isNullOrBlank())
+                                        stringResource(R.string.common_not_set)
+                                    else stringResource(R.string.common_password_set),
+                                    icon = painterResource(R.drawable.round_security_24),
+                                    onClick = { showAutoExportPasswordDialog.value = true }
+                                )
+                            }
                         }
                     }
                 }
@@ -578,9 +601,9 @@ class SettingsScreen : Screen {
 
     @Composable
     private fun IntervalSelectionDialog(
-        selected: off.kys.backtalk.common.ExportInterval,
+        selected: ExportInterval,
         onDismiss: () -> Unit,
-        onSelected: (off.kys.backtalk.common.ExportInterval) -> Unit
+        onSelected: (ExportInterval) -> Unit
     ) {
         var tempSelected by remember { mutableStateOf(selected) }
 
@@ -599,7 +622,7 @@ class SettingsScreen : Screen {
                     modifier = Modifier.selectableGroup(),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    off.kys.backtalk.common.ExportInterval.entries.forEach { interval ->
+                    ExportInterval.entries.forEach { interval ->
                         val isSelected = interval == tempSelected
                         Surface(
                             selected = isSelected,
