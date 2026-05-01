@@ -42,7 +42,7 @@ class AutoExportWorker(
                 onSuccess = { Result.success() },
                 onFailure = { Result.retry() }
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Result.failure()
         }
     }

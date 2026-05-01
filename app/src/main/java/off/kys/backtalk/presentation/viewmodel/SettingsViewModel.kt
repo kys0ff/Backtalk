@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -148,8 +149,9 @@ class SettingsViewModel(
         val workRequest = PeriodicWorkRequestBuilder<AutoExportWorker>(
             interval.days.toLong(), TimeUnit.DAYS
         )
+            .setInitialDelay(interval.days.toLong(), TimeUnit.DAYS)
             .setConstraints(
-                androidx.work.Constraints.Builder()
+                Constraints.Builder()
                     .setRequiresStorageNotLow(true)
                     .build()
             )
