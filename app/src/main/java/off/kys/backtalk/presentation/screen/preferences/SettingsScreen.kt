@@ -359,6 +359,14 @@ class SettingsScreen : Screen {
         }
 
         // Dialogs
+        if (showThemeDialog.value) {
+            ThemeSelectionDialog(
+                selected = state.themeMode,
+                onDismiss = { showThemeDialog.value = false },
+                onSelected = { viewModel.onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value = false }
+            )
+        }
+
         if (showExportDialog.value) {
             ExportDialog(
                 onDismiss = {
@@ -449,6 +457,46 @@ class SettingsScreen : Screen {
     }
 
     @Composable
+    private fun ThemeSelectionDialog(
+        selected: ThemeMode,
+        onDismiss: () -> Unit,
+        onSelected: (ThemeMode) -> Unit
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Choose Theme") },
+            text = {
+                Column(Modifier.selectableGroup()) {
+                    ThemeMode.entries.forEach { mode ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = (mode == selected),
+                                    onClick = { onSelected(mode) },
+                                    role = Role.RadioButton
+                                )
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = (mode == selected), onClick = null)
+                            Text(
+                                text = mode.name.lowercase().replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
+            }
+        )
+    }
+
+    @Composable
     private fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
@@ -529,45 +577,6 @@ class SettingsScreen : Screen {
         }
     }
 
-    @Composable
-    private fun ThemeSelectionDialog(
-        selected: ThemeMode,
-        onDismiss: () -> Unit,
-        onSelected: (ThemeMode) -> Unit
-    ) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Choose Theme") },
-            text = {
-                Column(Modifier.selectableGroup()) {
-                    ThemeMode.entries.forEach { mode ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .selectable(
-                                    selected = (mode == selected),
-                                    onClick = { onSelected(mode) },
-                                    role = Role.RadioButton
-                                )
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(selected = (mode == selected), onClick = null)
-                            Text(
-                                text = mode.name.lowercase().replaceFirstChar { it.uppercase() },
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) }
-            }
-        )
-    }
 }
 
 @Composable
@@ -966,76 +975,4 @@ private fun SettingsTopAppBar(
         title = { Text(text = stringResource(R.string.settings_title)) },
         scrollBehavior = scrollBehavior
     )
-}
-
-@Composable
-private fun PreferenceCategory(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
-    )
-}
-
-@Composable
-private fun ToggleSetting(
-    label: String,
-    icon: Painter? = null,
-    supportingText: String? = null,
-    checked: Boolean,
-    requireRestart: Boolean = false,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    val context = LocalContext.current
-    ListItem(
-        headlineContent = { Text(label) },
-        supportingContent = supportingText?.let { { Text(it) } },
-        leadingContent = icon?.let { { Icon(it, contentDescription = null) } },
-        trailingContent = {
-            Switch(
-                checked = checked,
-                onCheckedChange = {
-                    onCheckedChange(it)
-                    if (requireRestart) context.toast(R.string.settings_restart_required)
-                }
-            )
-        },
-        modifier = Modifier.clickable { onCheckedChange(!checked) }
-    )
-}
-
-@Composable
-private fun InfoRow(
-    label: String,
-    value: String,
-    icon: Painter? = null,
-    onClick: (() -> Unit)? = null
-) {
-    ListItem(
-        headlineContent = { Text(label) },
-        supportingContent = { Text(value) },
-        leadingContent = icon?.let { { Icon(it, contentDescription = null) } },
-        modifier = Modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-    )
-}
-
-@Composable
-private fun ThemeSelector(selected: ThemeMode, onSelected: (ThemeMode) -> Unit) {
-    Column(Modifier.selectableGroup()) {
-        ThemeMode.entries.forEach { mode ->
-            ListItem(
-                headlineContent = {
-                    Text(mode.name.lowercase().replaceFirstChar { it.uppercase() })
-                },
-                leadingContent = {
-                    RadioButton(
-                        selected = (mode == selected),
-                        onClick = null
-                    )
-                },
-                modifier = Modifier.clickable { onSelected(mode) }
-            )
-        }
-    }
 }
