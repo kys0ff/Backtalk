@@ -17,6 +17,7 @@ sealed class SettingsUiEvent {
     data class OnAutoExportFolderChange(val uri: Uri) : SettingsUiEvent()
     data class OnAutoExportEncryptionToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnAutoExportPasswordChange(val password: String?) : SettingsUiEvent()
+    data class OnHapticFeedbackToggle(val enabled: Boolean) : SettingsUiEvent()
     
     data class ExportBackup(val uri: Uri, val password: String?) : SettingsUiEvent()
     data class CheckBackupEncryption(val uri: Uri) : SettingsUiEvent()

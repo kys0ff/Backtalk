@@ -57,6 +57,9 @@ class BacktalkPreferences(context: Context) {
 
         /** Preference key for auto export encryption password. */
         const val KEY_AUTO_EXPORT_PASSWORD = "auto_export_password"
+
+        /** Preference key for enabling/disabling haptic feedback. */
+        const val KEY_HAPTIC_FEEDBACK = "haptic_feedback"
     }
 
     /**
@@ -157,4 +160,11 @@ class BacktalkPreferences(context: Context) {
     var autoExportPassword: String?
         get() = prefs.getString(KEY_AUTO_EXPORT_PASSWORD, null)
         set(value) = prefs.edit { putString(KEY_AUTO_EXPORT_PASSWORD, value) }
+
+    /**
+     * Whether haptic feedback (vibration) is enabled for user interactions.
+     */
+    var hapticFeedbackEnabled: Boolean
+        get() = prefs.getBoolean(KEY_HAPTIC_FEEDBACK, true)
+        set(value) = prefs.edit { putBoolean(KEY_HAPTIC_FEEDBACK, value) }
 }

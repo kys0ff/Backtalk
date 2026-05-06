@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import off.kys.backtalk.common.pref.BacktalkPreferences
 
 /**
  * Manager class responsible for handling device vibrations and haptic feedback.
@@ -13,8 +14,9 @@ import android.os.VibratorManager
  * providing a unified interface for simple vibration tasks.
  *
  * @param context The application context used to retrieve the vibration service.
+ * @param preferences The application preferences used to check if vibration is enabled.
  */
-class VibrationManager(context: Context) {
+class VibrationManager(context: Context, private val preferences: BacktalkPreferences) {
 
     /**
      * The [Vibrator] instance used to perform vibration operations.
@@ -35,9 +37,13 @@ class VibrationManager(context: Context) {
      * On Android O (API 26) and above, it uses [VibrationEffect.createOneShot] with [VibrationEffect.DEFAULT_AMPLITUDE].
      * On older versions, it uses the deprecated [Vibrator.vibrate] method.
      *
+     * Vibration only occurs if [BacktalkPreferences.hapticFeedbackEnabled] is true.
+     *
      * @param duration The duration of the vibration in milliseconds. Defaults to 500ms.
      */
     fun vibrate(duration: Long = 500) {
+        if (!preferences.hapticFeedbackEnabled) return
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(
                 VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)

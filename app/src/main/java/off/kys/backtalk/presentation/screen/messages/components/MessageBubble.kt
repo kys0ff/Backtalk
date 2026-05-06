@@ -39,8 +39,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -76,6 +78,7 @@ fun MessageBubble(
 ) {
     var showExtraInfo by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
+    val preferences = koinInject<BacktalkPreferences>()
     val interactionSource = remember { MutableInteractionSource() }
 
     val isBlinking = blinkMessageId == messageEntity.id
@@ -113,7 +116,9 @@ fun MessageBubble(
                     onClick()
                 },
                 onLongClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (preferences.hapticFeedbackEnabled) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
                     onLongClick()
                 }
             )

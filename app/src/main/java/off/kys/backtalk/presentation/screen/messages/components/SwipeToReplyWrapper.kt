@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.manager.VibrationManager
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import org.koin.compose.koinInject
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -55,6 +56,7 @@ fun SwipeToReplyWrapper(
     content: @Composable () -> Unit
 ) {
     val vibrationManager = koinInject<VibrationManager>()
+    val preferences = koinInject<BacktalkPreferences>()
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
@@ -127,7 +129,9 @@ fun SwipeToReplyWrapper(
                         }
 
                         if (abs(newOffset) >= actionThreshold && !hasVibratedThreshold) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            if (preferences.hapticFeedbackEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
                             vibrationManager.vibrate(50L)
                             hasVibratedThreshold = true
                         } else if (abs(newOffset) < actionThreshold) {

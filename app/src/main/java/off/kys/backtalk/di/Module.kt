@@ -129,7 +129,7 @@ private fun Module.viewModelModule() {
  */
 private fun Module.systemModule() {
     single { BacktalkPreferences(get()) }
-    single { VibrationManager(get()) }
+    single { VibrationManager(get(), get()) }
 }
 
 

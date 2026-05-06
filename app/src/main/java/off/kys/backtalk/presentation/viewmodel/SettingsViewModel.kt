@@ -46,7 +46,8 @@ class SettingsViewModel(
             autoExportInterval = preferences.autoExportInterval,
             autoExportUri = preferences.autoExportUri,
             autoExportEncrypted = preferences.autoExportEncrypted,
-            autoExportPassword = preferences.autoExportPassword
+            autoExportPassword = preferences.autoExportPassword,
+            hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
         )
     )
     val state = _state.asStateFlow()
@@ -62,6 +63,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportFolderChange -> onAutoExportFolderChange(event.uri)
         is SettingsUiEvent.OnAutoExportEncryptionToggle -> onAutoExportEncryptionToggle(event.enabled)
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
+        is SettingsUiEvent.OnHapticFeedbackToggle -> onHapticFeedbackToggle(event.enabled)
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -142,6 +144,11 @@ class SettingsViewModel(
     private fun onAutoExportPasswordChange(password: String?) {
         preferences.autoExportPassword = password
         _state.update { it.copy(autoExportPassword = password) }
+    }
+
+    private fun onHapticFeedbackToggle(enabled: Boolean) {
+        preferences.hapticFeedbackEnabled = enabled
+        _state.update { it.copy(hapticFeedbackEnabled = enabled) }
     }
 
     private fun scheduleAutoExport() {

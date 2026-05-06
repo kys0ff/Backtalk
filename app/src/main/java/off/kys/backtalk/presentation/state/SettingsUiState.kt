@@ -1,5 +1,7 @@
 package off.kys.backtalk.presentation.state
 
+import android.net.Uri
+import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.ThemeMode
 
 /**
@@ -12,14 +14,15 @@ data class SettingsUiState(
     val secureScreenEnabled: Boolean = false,
     val autoUpdateEnabled: Boolean = false,
     val autoExportEnabled: Boolean = false,
-    val autoExportInterval: off.kys.backtalk.common.ExportInterval = off.kys.backtalk.common.ExportInterval.DAILY,
+    val autoExportInterval: ExportInterval = ExportInterval.DAILY,
     val autoExportUri: String? = null,
     val autoExportEncrypted: Boolean = false,
     val autoExportPassword: String? = null,
+    val hapticFeedbackEnabled: Boolean = true,
     val backupLoading: Boolean = false,
     val isBackupEncrypted: Boolean? = null,
     val wrongPasswordError: Boolean = false,
-    val selectedBackupUri: android.net.Uri? = null,
+    val selectedBackupUri: Uri? = null,
     val error: String? = null,
     val successMessage: String? = null
 )

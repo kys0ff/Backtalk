@@ -70,6 +70,8 @@
     <string name="settings_dynamic_color_desc">Apply system colors to the app interface</string>
     <string name="settings_privacy_security">Privacy &amp; Security</string>
     <string name="settings_enable_app_lock">Enable App Lock</string>
+    <string name="settings_haptic_feedback">Haptic feedback</string>
+    <string name="settings_haptic_feedback_desc">Vibrate on interactions like swipe-to-reply or long-press</string>
     <string name="settings_restart_required">Requires restart to apply changes</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_dev_name">kys0ff</string>
