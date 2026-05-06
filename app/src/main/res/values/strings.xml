@@ -34,6 +34,9 @@
     <string name="chat_status_edited">edited</string>
     <string name="chat_sent_at">Sent at</string>
     <string name="chat_edited_at">Edited at %1$s</string>
+    <string name="link_safety_title">External Link</string>
+    <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>    <string name="link_safety_open">Open</string>
+    <string name="link_safety_cancel">Cancel</string>
 
     <!-- Auth -->
     <string name="auth_title">Verify your identity</string>

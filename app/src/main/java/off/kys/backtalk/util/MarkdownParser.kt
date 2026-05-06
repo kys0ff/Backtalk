@@ -1,12 +1,15 @@
 package off.kys.backtalk.util
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 
 /**
@@ -28,18 +31,32 @@ object MarkdownParser {
         StyleDef("`", SpanStyle(fontFamily = FontFamily.Monospace))
     )
 
-    fun toAnnotatedString(text: String): AnnotatedString = buildAnnotatedString {
-        parseRecursive(text, this)
+    private val MARKDOWN_LINK_REGEX = Regex("""\[([^\]]+)\]\(([^)]+)\)""")
+    private val NAKED_URL_REGEX = Regex("""(https?://[^\s)\]]+)""")
+
+    fun toAnnotatedString(
+        text: String,
+        linkStyles: TextLinkStyles? = null,
+        onLinkClicked: ((LinkAnnotation) -> Unit)? = null
+    ): AnnotatedString = buildAnnotatedString {
+        parseRecursive(text, this, linkStyles, onLinkClicked)
     }
 
-    private fun parseRecursive(text: String, builder: AnnotatedString.Builder) {
+    private fun parseRecursive(
+        text: String,
+        builder: AnnotatedString.Builder,
+        linkStyles: TextLinkStyles? = null,
+        onLinkClicked: ((LinkAnnotation) -> Unit)? = null
+    ) {
         if (text.isEmpty()) return
 
         var earliestMatch = -1
         var bestStyle: StyleDef? = null
         var bestClosingIndex = -1
+        var linkMatch: MatchResult? = null
+        var isNakedUrl = false
 
-        // Scan character by character to find the absolute earliest valid tag
+        // 1. Check for Style tags
         for (i in text.indices) {
             for (styleDef in STYLES) {
                 if (text.startsWith(styleDef.delimiter, i)) {
@@ -48,30 +65,60 @@ object MarkdownParser {
                         earliestMatch = i
                         bestStyle = styleDef
                         bestClosingIndex = closingIndex
-                        break // Break out of STYLES loop
+                        break
                     }
                 }
             }
-            if (earliestMatch != -1) break // Break out of text.indices loop
+            if (earliestMatch != -1) break
         }
 
-        if (bestStyle == null || earliestMatch == -1) {
+        // 2. Check for Markdown links
+        val mLink = MARKDOWN_LINK_REGEX.find(text)
+        if (mLink != null && (earliestMatch == -1 || mLink.range.first < earliestMatch)) {
+            earliestMatch = mLink.range.first
+            bestStyle = null
+            linkMatch = mLink
+            isNakedUrl = false
+        }
+
+        // 3. Check for Naked URLs
+        val nLink = NAKED_URL_REGEX.find(text)
+        if (nLink != null && (earliestMatch == -1 || nLink.range.first < earliestMatch)) {
+            earliestMatch = nLink.range.first
+            bestStyle = null
+            linkMatch = nLink
+            isNakedUrl = true
+        }
+
+        if (earliestMatch == -1) {
             builder.append(text)
             return
         }
 
-        val delimiter = bestStyle.delimiter
-
-        // 1. Append everything before the tag
+        // Append text before the match
         builder.append(text.substring(0, earliestMatch))
 
-        // 2. Apply style and recurse inside the tags (allows nesting)
-        builder.withStyle(bestStyle.style) {
-            parseRecursive(text.substring(earliestMatch + delimiter.length, bestClosingIndex), this)
-        }
+        if (bestStyle != null) {
+            val delimiter = bestStyle.delimiter
+            builder.withStyle(bestStyle.style) {
+                parseRecursive(text.substring(earliestMatch + delimiter.length, bestClosingIndex), this, linkStyles, onLinkClicked)
+            }
+            parseRecursive(text.substring(bestClosingIndex + delimiter.length), builder, linkStyles, onLinkClicked)
+        } else if (linkMatch != null) {
+            val url = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[2]
+            val displayText = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[1]
 
-        // 3. Recurse on everything after the tag
-        parseRecursive(text.substring(bestClosingIndex + delimiter.length), builder)
+            builder.withLink(
+                LinkAnnotation.Url(
+                    url = url,
+                    styles = linkStyles,
+                    linkInteractionListener = onLinkClicked
+                )
+            ) {
+                append(displayText)
+            }
+            parseRecursive(text.substring(linkMatch.range.last + 1), builder, linkStyles, onLinkClicked)
+        }
     }
 
     private fun findClosingTag(text: String, startIndex: Int, delimiter: String): Int {
