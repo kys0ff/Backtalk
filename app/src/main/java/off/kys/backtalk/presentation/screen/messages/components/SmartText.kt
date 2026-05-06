@@ -41,6 +41,7 @@ import off.kys.backtalk.util.emptyString
  *
  * @param text The text to be displayed.
  * @param modifier The [Modifier] to be applied to the layout.
+ * @param clickableLink Whether URLs found within the text should be interactive and trigger a safety dialog.
  * @param fontSize The size of glyphs to use when painting the text.
  * @param color The color to be applied to the text.
  * @param style The style configuration for the text such as color, font, line height etc.
@@ -51,6 +52,7 @@ import off.kys.backtalk.util.emptyString
 fun SmartText(
     text: String,
     modifier: Modifier = Modifier,
+    clickableLink: Boolean = true,
     fontSize: TextUnit = TextUnit.Unspecified,
     color: Color = MaterialTheme.colorScheme.background,
     style: TextStyle = LocalTextStyle.current,
@@ -63,7 +65,7 @@ fun SmartText(
 
     val linkStyles = TextLinkStyles(
         style = SpanStyle(
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = MaterialTheme.colorScheme.inversePrimary,
             textDecoration = TextDecoration.Underline
         )
     )
@@ -72,6 +74,8 @@ fun SmartText(
         text = text,
         linkStyles = linkStyles,
         onLinkClicked = { annotation ->
+            if (!clickableLink)
+                return@toAnnotatedString
             if (annotation is LinkAnnotation.Url) {
                 pendingUrl = annotation.url
                 showSafetyDialog.value = true

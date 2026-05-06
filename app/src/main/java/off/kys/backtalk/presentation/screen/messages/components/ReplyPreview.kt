@@ -34,10 +34,7 @@ fun ReplyPreview(
             .padding(bottom = 4.dp)
             .height(IntrinsicSize.Min)
             .clip(cornerShape)
-            .background(
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f),
-                shape = cornerShape
-            )
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f))
             .clickable {
                 onPreviewClick()
             }

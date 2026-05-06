@@ -122,8 +122,9 @@ fun InputBar(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        Text(
-                            (editingMessage ?: replyingTo)?.text ?: emptyString(),
+                        SmartText(
+                            text = (editingMessage ?: replyingTo)?.text ?: emptyString(),
+                            clickableLink = false,
                             maxLines = 1,
                             style = MaterialTheme.typography.bodySmall
                         )

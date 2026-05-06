@@ -247,7 +247,7 @@ class SettingsScreen : Screen {
                     SettingsToggle(
                         label = stringResource(R.string.settings_haptic_feedback),
                         supportingText = stringResource(R.string.settings_haptic_feedback_desc),
-                        icon = painterResource(R.drawable.round_warning_24), // Using warning icon as it usually represents vibration/haptic in some icon sets, or maybe there's a better one. Looking at available icons, maybe refresh or security. Let's use round_refresh_24 if it looks like a vibration icon or stick to a generic one. round_warning_24 might be okay if it looks like a bell/vibration. Wait, I'll use round_refresh_24.
+                        icon = painterResource(R.drawable.round_warning_24),
                         checked = state.hapticFeedbackEnabled,
                         onCheckedChange = {
                             viewModel.onEvent(
