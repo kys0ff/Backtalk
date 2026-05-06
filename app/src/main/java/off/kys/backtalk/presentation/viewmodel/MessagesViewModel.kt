@@ -187,14 +187,23 @@ class MessagesViewModel(
      * @param query The new search query.
      */
     private fun updateSearchQuery(query: String) {
+        val previousQuery = _uiState.value.searchQuery
+
+        if (query == previousQuery) return
+
         val results = if (query.isBlank()) {
             emptyList()
         } else {
-            val terms = query.lowercase().split(" ").filter { it.isNotBlank() }
-            _uiState.value.messages.filter { message ->
-                val text = (message.editedText ?: message.text).lowercase()
-                terms.all { term -> text.contains(term) }
-            }.map { it.id }.reversed() // Newest first
+            val terms = query.trim().lowercase().split(Regex("\\s+"))
+
+            _uiState.value.messages.asSequence()
+                .filter { message ->
+                    val text = (message.editedText ?: message.text).lowercase()
+                    terms.all { term -> text.contains(term) }
+                }
+                .map { it.id }
+                .toList()
+                .reversed()
         }
 
         _uiState.value = _uiState.value.copy(
