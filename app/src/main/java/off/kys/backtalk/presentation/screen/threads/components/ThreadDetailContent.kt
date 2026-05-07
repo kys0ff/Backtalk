@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,19 +44,24 @@ import java.util.Date
 fun ThreadDetailContent(
     modifier: Modifier,
     thread: Thread,
+    listState: LazyListState = rememberSaveable(saver = LazyListState.Saver) {
+        LazyListState()
+    },
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onReplyClick: (MessageEntity) -> Unit,
     getReplyCount: (MessageEntity) -> Int
 ) {
     val allMessages = listOf(thread.root) + thread.replies
-    val listState = rememberLazyListState()
 
     LazyColumn(
         modifier = modifier,
         state = listState
     ) {
-        itemsIndexed(allMessages) { index, message ->
+        itemsIndexed(
+            items = allMessages,
+            key = { _, message -> message.id() }
+        ) { index, message ->
             val threadsSize = allMessages.size - 1
             if (index == 0) {
                 MainThreadItem(
@@ -85,7 +91,8 @@ private fun MainThreadItem(
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit
 ) {
-    val fullDateFormat = SimpleDateFormat("h:mm a · MMM d, yyyy", LocalLocale.current.platformLocale)
+    val fullDateFormat =
+        SimpleDateFormat("h:mm a · MMM d, yyyy", LocalLocale.current.platformLocale)
     val textToCopyOrShare = message.editedText ?: message.text
 
     Column(
@@ -232,7 +239,13 @@ private fun ThreadMessageItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${stringResource(R.string.threads_at_you)} · ${timeFormat.format(Date(message.timestamp))}",
+                    text = "${stringResource(R.string.threads_at_you)} · ${
+                        timeFormat.format(
+                            Date(
+                                message.timestamp
+                            )
+                        )
+                    }",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,
                     maxLines = 1,
