@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,8 +49,12 @@ fun ThreadDetailContent(
     getReplyCount: (MessageEntity) -> Int
 ) {
     val allMessages = listOf(thread.root) + thread.replies
+    val listState = rememberLazyListState()
 
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState
+    ) {
         itemsIndexed(allMessages) { index, message ->
             val threadsSize = allMessages.size - 1
             if (index == 0) {
