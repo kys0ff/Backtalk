@@ -28,6 +28,7 @@ import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -36,17 +37,7 @@ import off.kys.backtalk.util.MarkdownParser
 import off.kys.backtalk.util.emptyString
 
 /**
- * A custom [Text] composable that provides a convenient way to override specific text styles
- * while maintaining defaults from [LocalTextStyle].
- *
- * @param text The text to be displayed.
- * @param modifier The [Modifier] to be applied to the layout.
- * @param clickableLink Whether URLs found within the text should be interactive and trigger a safety dialog.
- * @param fontSize The size of glyphs to use when painting the text.
- * @param color The color to be applied to the text.
- * @param style The style configuration for the text such as color, font, line height etc.
- * @param textDecoration The decorations to paint on the text (e.g., an underline).
- * @param maxLines An optional maximum number of lines for the text to span, wrapping if necessary.
+ * A custom [Text] composable that handles Markdown, links, and mentions.
  */
 @Composable
 fun SmartText(
@@ -59,7 +50,8 @@ fun SmartText(
     textDecoration: TextDecoration = TextDecoration.None,
     maxLines: Int = Int.MAX_VALUE,
     lineHeight: TextUnit = TextUnit.Unspecified,
-    highlightQuery: String? = null
+    highlightQuery: String? = null,
+    onMentionClicked: (String) -> Unit = {}
 ) {
     val uriHandler = LocalUriHandler.current
     val showSafetyDialog = remember { mutableStateOf(false) }
@@ -76,12 +68,18 @@ fun SmartText(
         text = text,
         linkStyles = linkStyles,
         highlightQuery = highlightQuery,
-        onLinkClicked = { annotation ->
-            if (!clickableLink)
-                return@toAnnotatedString
-            if (annotation is LinkAnnotation.Url) {
-                pendingUrl = annotation.url
-                showSafetyDialog.value = true
+        onAnnotationClicked = { annotation ->
+            when (annotation) {
+                is LinkAnnotation.Url -> {
+                    if (clickableLink) {
+                        pendingUrl = annotation.url
+                        showSafetyDialog.value = true
+                    }
+                }
+
+                is LinkAnnotation.Clickable -> {
+                    onMentionClicked(annotation.tag)
+                }
             }
         }
     )
@@ -92,6 +90,7 @@ fun SmartText(
         maxLines = maxLines,
         lineHeight = lineHeight,
         style = style.copy(
+            textDirection = TextDirection.Content,
             color = if (color != Color.Unspecified) color else style.color,
             fontSize = if (fontSize != TextUnit.Unspecified) fontSize else style.fontSize,
             textDecoration = textDecoration,

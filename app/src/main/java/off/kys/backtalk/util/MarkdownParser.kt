@@ -13,7 +13,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 
 /**
- * A Markdown-ish parser that doesn't give up when things get complicated.
+ * A Markdown-ish parser that handles styles, links, and mentions.
  */
 object MarkdownParser {
 
@@ -22,7 +22,6 @@ object MarkdownParser {
         val style: SpanStyle
     )
 
-    // Order matters: longer delimiters must come before shorter ones sharing the same prefix.
     private val STYLES = listOf(
         StyleDef("**", SpanStyle(fontWeight = FontWeight.Bold)),
         StyleDef("__", SpanStyle(textDecoration = TextDecoration.Underline)),
@@ -33,15 +32,16 @@ object MarkdownParser {
 
     private val MARKDOWN_LINK_REGEX = Regex("""\[([^]]+)]\(([^)]+)\)""")
     private val NAKED_URL_REGEX = Regex("""(https?://[^\s)\]]+)""")
+    private val MENTION_REGEX = Regex("""@(\w+)""")
 
     fun toAnnotatedString(
         text: String,
         linkStyles: TextLinkStyles? = null,
         highlightQuery: String? = null,
-        onLinkClicked: ((LinkAnnotation) -> Unit)? = null
+        onAnnotationClicked: ((LinkAnnotation) -> Unit)? = null
     ): AnnotatedString = buildAnnotatedString {
         val base = buildAnnotatedString {
-            parseRecursive(text, this, linkStyles, onLinkClicked)
+            parseRecursive(text, this, linkStyles, onAnnotationClicked)
         }
         append(base)
 
@@ -66,7 +66,7 @@ object MarkdownParser {
         text: String,
         builder: AnnotatedString.Builder,
         linkStyles: TextLinkStyles? = null,
-        onLinkClicked: ((LinkAnnotation) -> Unit)? = null
+        onAnnotationClicked: ((LinkAnnotation) -> Unit)? = null
     ) {
         if (text.isEmpty()) return
 
@@ -75,8 +75,9 @@ object MarkdownParser {
         var bestClosingIndex = -1
         var linkMatch: MatchResult? = null
         var isNakedUrl = false
+        var mentionMatch: MatchResult? = null
 
-        // 1. Check for Style tags
+        // Check for basic styles
         for (i in text.indices) {
             for (styleDef in STYLES) {
                 if (text.startsWith(styleDef.delimiter, i)) {
@@ -92,22 +93,33 @@ object MarkdownParser {
             if (earliestMatch != -1) break
         }
 
-        // 2. Check for Markdown links
+        // Check for Markdown links
         val mLink = MARKDOWN_LINK_REGEX.find(text)
         if (mLink != null && (earliestMatch == -1 || mLink.range.first < earliestMatch)) {
             earliestMatch = mLink.range.first
             bestStyle = null
             linkMatch = mLink
             isNakedUrl = false
+            mentionMatch = null
         }
 
-        // 3. Check for Naked URLs
+        // Check for naked URLs
         val nLink = NAKED_URL_REGEX.find(text)
         if (nLink != null && (earliestMatch == -1 || nLink.range.first < earliestMatch)) {
             earliestMatch = nLink.range.first
             bestStyle = null
             linkMatch = nLink
             isNakedUrl = true
+            mentionMatch = null
+        }
+
+        // Check for mentions
+        val mention = MENTION_REGEX.find(text)
+        if (mention != null && (earliestMatch == -1 || mention.range.first < earliestMatch)) {
+            earliestMatch = mention.range.first
+            bestStyle = null
+            linkMatch = null
+            mentionMatch = mention
         }
 
         if (earliestMatch == -1) {
@@ -115,29 +127,44 @@ object MarkdownParser {
             return
         }
 
-        // Append text before the match
         builder.append(text.substring(0, earliestMatch))
 
-        if (bestStyle != null) {
-            val delimiter = bestStyle.delimiter
-            builder.withStyle(bestStyle.style) {
-                parseRecursive(text.substring(earliestMatch + delimiter.length, bestClosingIndex), this, linkStyles, onLinkClicked)
+        when {
+            bestStyle != null -> {
+                val delimiter = bestStyle.delimiter
+                builder.withStyle(bestStyle.style) {
+                    parseRecursive(text.substring(earliestMatch + delimiter.length, bestClosingIndex), this, linkStyles, onAnnotationClicked)
+                }
+                parseRecursive(text.substring(bestClosingIndex + delimiter.length), builder, linkStyles, onAnnotationClicked)
             }
-            parseRecursive(text.substring(bestClosingIndex + delimiter.length), builder, linkStyles, onLinkClicked)
-        } else if (linkMatch != null) {
-            val url = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[2]
-            val displayText = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[1]
+            linkMatch != null -> {
+                val url = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[2]
+                val displayText = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[1]
 
-            builder.withLink(
-                LinkAnnotation.Url(
-                    url = url,
-                    styles = linkStyles,
-                    linkInteractionListener = onLinkClicked
-                )
-            ) {
-                append(displayText)
+                builder.withLink(
+                    LinkAnnotation.Url(
+                        url = url,
+                        styles = linkStyles,
+                        linkInteractionListener = onAnnotationClicked
+                    )
+                ) {
+                    append(displayText)
+                }
+                parseRecursive(text.substring(linkMatch.range.last + 1), builder, linkStyles, onAnnotationClicked)
             }
-            parseRecursive(text.substring(linkMatch.range.last + 1), builder, linkStyles, onLinkClicked)
+            mentionMatch != null -> {
+                val username = mentionMatch.groupValues[1]
+                builder.withLink(
+                    LinkAnnotation.Clickable(
+                        tag = username,
+                        styles = linkStyles,
+                        linkInteractionListener = onAnnotationClicked
+                    )
+                ) {
+                    append("@$username")
+                }
+                parseRecursive(text.substring(mentionMatch.range.last + 1), builder, linkStyles, onAnnotationClicked)
+            }
         }
     }
 
@@ -145,7 +172,6 @@ object MarkdownParser {
         var i = startIndex
         while (i <= text.length - delimiter.length) {
             if (text.startsWith(delimiter, i)) {
-                // Prevent shorter tags from accidentally matching inside longer tags (e.g., "*" matching inside "**")
                 val largerDelimiter = STYLES.find {
                     it.delimiter != delimiter &&
                             it.delimiter.startsWith(delimiter) &&
@@ -153,7 +179,6 @@ object MarkdownParser {
                 }
 
                 if (largerDelimiter != null) {
-                    // Skip past the larger delimiter entirely so we don't accidentally match inside it
                     i += largerDelimiter.delimiter.length
                     continue
                 }
