@@ -115,7 +115,6 @@ fun InputBar(
         )
     }
 
-    // Auto-dismiss the hint after 2 seconds of human confusion
     LaunchedEffect(showTapHint) {
         if (showTapHint) {
             delay(2000)
@@ -155,7 +154,8 @@ fun InputBar(
 
     LaunchedEffect(key1 = messageInput) {
         if (messageInput != textValue.text) {
-            textValue = TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
+            textValue =
+                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
         }
     }
 
@@ -163,7 +163,8 @@ fun InputBar(
         val selection = textValue.selection
         val text = textValue.text
         val selectedText = text.substring(selection.start, selection.end)
-        val newText = text.replaceRange(selection.start, selection.end, "$startSym$selectedText$endSym")
+        val newText =
+            text.replaceRange(selection.start, selection.end, "$startSym$selectedText$endSym")
         val newCursorPos = selection.start + startSym.length + selectedText.length + endSym.length
         textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
     }
@@ -260,7 +261,7 @@ fun InputBar(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.round_keyboard_voice_24),
+                                painter = painterResource(R.drawable.round_delete_24),
                                 contentDescription = null,
                                 tint = Color.Red,
                                 modifier = Modifier.size(24.dp)
@@ -273,7 +274,7 @@ fun InputBar(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "< Slide to cancel",
+                                text = stringResource(R.string.chat_input_slide_to_cancel),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -313,8 +314,11 @@ fun InputBar(
                                     tonalElevation = 4.dp
                                 ) {
                                     Text(
-                                        text = "Hold to record",
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        text = stringResource(R.string.chat_input_hold_to_record),
+                                        modifier = Modifier.padding(
+                                            horizontal = 12.dp,
+                                            vertical = 6.dp
+                                        ),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onTertiaryContainer
                                     )
@@ -342,7 +346,8 @@ fun InputBar(
                                             onDrag = { change, dragAmount ->
                                                 if (isRecording) {
                                                     change.consume()
-                                                    offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
+                                                    offsetX =
+                                                        (offsetX + dragAmount.x).coerceAtMost(0f)
                                                     if (offsetX < -300f) {
                                                         isRecording = false
                                                         audioRecorder.cancelRecording()
@@ -376,7 +381,7 @@ fun InputBar(
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.round_keyboard_voice_24),
-                                    contentDescription = "Record",
+                                    contentDescription = stringResource(R.string.chat_input_record_cd),
                                     tint = if (shakeOffset.value != 0f && !showTapHint)
                                         MaterialTheme.colorScheme.error
                                     else
@@ -400,11 +405,36 @@ fun InputBar(
                         .horizontalScroll(rememberScrollState()),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FormattingButton(label = "B") { applyStyle("**", "**") }
-                    FormattingButton(label = "I") { applyStyle("*", "*") }
-                    FormattingButton(label = "U") { applyStyle("__", "__") }
-                    FormattingButton(label = "S") { applyStyle("~~", "~~") }
-                    FormattingButton(label = "M") { applyStyle("`", "`") }
+                    FormattingButton(label = stringResource(R.string.chat_input_format_bold)) {
+                        applyStyle(
+                            "**",
+                            "**"
+                        )
+                    }
+                    FormattingButton(label = stringResource(R.string.chat_input_format_italic)) {
+                        applyStyle(
+                            "*",
+                            "*"
+                        )
+                    }
+                    FormattingButton(label = stringResource(R.string.chat_input_format_underline)) {
+                        applyStyle(
+                            "__",
+                            "__"
+                        )
+                    }
+                    FormattingButton(label = stringResource(R.string.chat_input_format_strikethrough)) {
+                        applyStyle(
+                            "~~",
+                            "~~"
+                        )
+                    }
+                    FormattingButton(label = stringResource(R.string.chat_input_format_monospace)) {
+                        applyStyle(
+                            "`",
+                            "`"
+                        )
+                    }
                 }
             }
         }

@@ -38,6 +38,14 @@
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_sent_at">Sent at</string>
     <string name="chat_edited_at">Edited at %1$s</string>
+    <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
+    <string name="chat_input_hold_to_record">Hold to record</string>
+    <string name="chat_input_record_cd">Record</string>
+    <string name="chat_input_format_bold">B</string>
+    <string name="chat_input_format_italic">I</string>
+    <string name="chat_input_format_underline">U</string>
+    <string name="chat_input_format_strikethrough">S</string>
+    <string name="chat_input_format_monospace">M</string>
     <string name="link_safety_title">External Link</string>
     <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>    <string name="link_safety_open">Open</string>
     <string name="link_safety_cancel">Cancel</string>
