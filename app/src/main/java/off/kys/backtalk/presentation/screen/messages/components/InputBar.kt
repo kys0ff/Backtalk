@@ -66,6 +66,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
@@ -75,18 +76,6 @@ import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
 
-/**
- * Composable function that displays the input bar for sending messages.
- *
- * @param modifier The modifier to be applied to the layout.
- * @param messageInput The current input text for the message.
- * @param replyingTo The message being replied to, if any.
- * @param editingMessage The message being edited, if any.
- * @param onCancelReply The callback function to handle canceling the reply.
- * @param onCancelEdit The callback function to handle canceling the edit.
- * @param onMessageSend The callback function to handle sending a message.
- * @param onVoiceSend The callback function to handle sending a voice message.
- */
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,
@@ -101,10 +90,13 @@ fun InputBar(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val audioRecorder = remember { AudioRecorder(context) }
+
     var isRecording by remember { mutableStateOf(false) }
+    var showTapHint by remember { mutableStateOf(false) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     val amplitudes by audioRecorder.amplitudes.collectAsState()
     val shakeOffset = remember { Animatable(0f) }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -112,6 +104,7 @@ fun InputBar(
             Log.i(TAG, "InputBar: Microphone permission is granted")
         }
     }
+
     var recordingStartTime by remember { mutableLongStateOf(0L) }
     var textValue by remember {
         mutableStateOf(
@@ -120,6 +113,14 @@ fun InputBar(
                 selection = TextRange(messageInput.length)
             )
         )
+    }
+
+    // Auto-dismiss the hint after 2 seconds of human confusion
+    LaunchedEffect(showTapHint) {
+        if (showTapHint) {
+            delay(2000)
+            showTapHint = false
+        }
     }
 
     fun triggerDeniedShake() {
@@ -154,8 +155,7 @@ fun InputBar(
 
     LaunchedEffect(key1 = messageInput) {
         if (messageInput != textValue.text) {
-            textValue =
-                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
+            textValue = TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
         }
     }
 
@@ -163,13 +163,9 @@ fun InputBar(
         val selection = textValue.selection
         val text = textValue.text
         val selectedText = text.substring(selection.start, selection.end)
-        val newText =
-            text.replaceRange(selection.start, selection.end, "$startSym$selectedText$endSym")
+        val newText = text.replaceRange(selection.start, selection.end, "$startSym$selectedText$endSym")
         val newCursorPos = selection.start + startSym.length + selectedText.length + endSym.length
-        textValue = TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPos)
-        )
+        textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
     }
 
     Surface(
@@ -304,63 +300,89 @@ fun InputBar(
                             )
                         }
                     } else {
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .offset {
-                                    IntOffset(
-                                        (offsetX + shakeOffset.value).roundToInt(),
-                                        0
+                        Box(contentAlignment = Alignment.TopCenter) {
+                            this@Row.AnimatedVisibility(
+                                visible = showTapHint,
+                                enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
+                                exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom),
+                                modifier = Modifier.offset(y = (-48).dp)
+                            ) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                                    shape = RoundedCornerShape(8.dp),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    Text(
+                                        text = "Hold to record",
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
                                     )
                                 }
-                                .pointerInput(Unit) {
-                                    detectDragGestures(
-                                        onDragStart = {
-                                            startRecordingInternal()
-                                        },
-                                        onDrag = { change, dragAmount ->
-                                            if (isRecording) {
-                                                change.consume()
-                                                offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
-                                                if (offsetX < -300f) {
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    showTapHint = true
+                                    triggerDeniedShake()
+                                },
+                                modifier = Modifier
+                                    .offset {
+                                        IntOffset(
+                                            (offsetX + shakeOffset.value).roundToInt(),
+                                            0
+                                        )
+                                    }
+                                    .pointerInput(Unit) {
+                                        detectDragGestures(
+                                            onDragStart = {
+                                                showTapHint = false
+                                                startRecordingInternal()
+                                            },
+                                            onDrag = { change, dragAmount ->
+                                                if (isRecording) {
+                                                    change.consume()
+                                                    offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
+                                                    if (offsetX < -300f) {
+                                                        isRecording = false
+                                                        audioRecorder.cancelRecording()
+                                                        offsetX = 0f
+                                                    }
+                                                }
+                                            },
+                                            onDragEnd = {
+                                                if (isRecording) {
+                                                    isRecording = false
+                                                    val file = audioRecorder.stopRecording()
+                                                    if (file != null) {
+                                                        onVoiceSend(
+                                                            file.absolutePath,
+                                                            System.currentTimeMillis() - recordingStartTime,
+                                                            amplitudes
+                                                        )
+                                                    }
+                                                }
+                                                offsetX = 0f
+                                            },
+                                            onDragCancel = {
+                                                if (isRecording) {
                                                     isRecording = false
                                                     audioRecorder.cancelRecording()
-                                                    offsetX = 0f
                                                 }
+                                                offsetX = 0f
                                             }
-                                        },
-                                        onDragEnd = {
-                                            if (isRecording) {
-                                                isRecording = false
-                                                val file = audioRecorder.stopRecording()
-                                                if (file != null) {
-                                                    onVoiceSend(
-                                                        file.absolutePath,
-                                                        System.currentTimeMillis() - recordingStartTime,
-                                                        amplitudes
-                                                    )
-                                                }
-                                            }
-                                            offsetX = 0f
-                                        },
-                                        onDragCancel = {
-                                            if (isRecording) {
-                                                isRecording = false
-                                                audioRecorder.cancelRecording()
-                                            }
-                                            offsetX = 0f
-                                        }
-                                    )
-                                }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_keyboard_voice_24),
-                                contentDescription = "Record",
-                                tint = if (shakeOffset.value != 0f)
-                                    MaterialTheme.colorScheme.error
-                                else
-                                    MaterialTheme.colorScheme.primary
-                            )
+                                        )
+                                    }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.round_keyboard_voice_24),
+                                    contentDescription = "Record",
+                                    tint = if (shakeOffset.value != 0f && !showTapHint)
+                                        MaterialTheme.colorScheme.error
+                                    else
+                                        MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
