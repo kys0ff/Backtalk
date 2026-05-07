@@ -25,7 +25,7 @@ import off.kys.backtalk.util.copyToClipboard
 import off.kys.backtalk.util.shareText
 import org.koin.compose.viewmodel.koinViewModel
 
-data class ThreadDetailScreen(val thread: Thread) : Screen {
+class ThreadDetailScreen(val thread: Thread) : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
