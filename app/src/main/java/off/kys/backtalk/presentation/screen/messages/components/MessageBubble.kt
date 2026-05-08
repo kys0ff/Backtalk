@@ -7,16 +7,21 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -107,6 +115,7 @@ fun MessageBubble(
             isSelected = isSelected,
             isTop = isTop,
             isBottom = isBottom,
+            isReminder = messageEntity.isReminder,
             blinkAlpha = blinkAlpha.value,
             scale = scale.value,
             modifier = Modifier.combinedClickable(
@@ -136,7 +145,10 @@ fun MessageBubble(
         MessageFooter(
             isVisible = showExtraInfo,
             timestamp = messageEntity.timestamp,
-            editedAt = messageEntity.editedAt
+            editedAt = messageEntity.editedAt,
+            isReminder = messageEntity.isReminder,
+            originalTimestamp = messageEntity.originalCreationTimestamp,
+            targetTimestamp = messageEntity.scheduledTimestamp
         )
     }
 }
@@ -157,13 +169,20 @@ private fun MessageSurface(
     isSelected: Boolean,
     isTop: Boolean,
     isBottom: Boolean,
+    isReminder: Boolean,
     blinkAlpha: Float,
     scale: Float,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val bubbleColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+    val baseColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
     else MaterialTheme.colorScheme.primary
+
+    val bubbleColor = if (isReminder && !isSelected) {
+        baseColor.copy(alpha = 0.9f)
+    } else {
+        baseColor
+    }
 
     val shape = RoundedCornerShape(
         topStart = 18.dp,
@@ -172,10 +191,18 @@ private fun MessageSurface(
         bottomStart = 18.dp
     )
 
+    val border = if (isReminder) {
+        BorderStroke(
+            1.dp,
+            contentColorFor(baseColor).copy(alpha = 0.5f)
+        )
+    } else null
+
     Surface(
         modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale },
         color = bubbleColor,
         shape = shape,
+        border = border,
         shadowElevation = 1.dp
     ) {
         Box {
@@ -208,6 +235,11 @@ private fun MessageContent(
     highlightQuery: String? = null
 ) {
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
+
+    if (message.isReminder) {
+        ReminderTag(contentColor)
+        Spacer(modifier = Modifier.height(4.dp))
+    }
 
     if (message.voicePath != null) {
         VoiceMessageBubble(
@@ -251,6 +283,33 @@ private fun MessageContent(
     }
 }
 
+@Composable
+private fun ReminderTag(contentColor: Color) {
+    Surface(
+        color = contentColor.copy(alpha = 0.15f),
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.round_send_24), // Use a more appropriate icon if available
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = contentColor
+            )
+            Text(
+                text = stringResource(R.string.chat_reminder_tag),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = contentColor
+            )
+        }
+    }
+}
+
 /**
  * Displays the message metadata such as timestamp and edit time.
  * This footer is typically toggled by clicking the message bubble.
@@ -263,30 +322,46 @@ private fun MessageContent(
 private fun MessageFooter(
     isVisible: Boolean,
     timestamp: Long,
-    editedAt: Long?
+    editedAt: Long?,
+    isReminder: Boolean = false,
+    originalTimestamp: Long? = null,
+    targetTimestamp: Long? = null
 ) {
     val timeFormat = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
 
-    AnimatedVisibility(
+    androidx.compose.animation.AnimatedVisibility(
         visible = isVisible,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
+        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
     ) {
         Column(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(end = 8.dp, top = 2.dp)
         ) {
-            Text(
-                text = "${if (editedAt != null) stringResource(R.string.chat_sent_at) else ""} ${
-                    timeFormat.format(
-                        Date(
-                            timestamp
+            if (isReminder && originalTimestamp != null && targetTimestamp != null) {
+                Text(
+                    text = "${stringResource(R.string.chat_reminder_original_time)} ${timeFormat.format(Date(originalTimestamp))}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = "${stringResource(R.string.chat_reminder_target_time)} ${timeFormat.format(Date(targetTimestamp))}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            } else {
+                Text(
+                    text = "${if (editedAt != null) stringResource(R.string.chat_sent_at) else ""} ${
+                        timeFormat.format(
+                            Date(
+                                timestamp
+                            )
                         )
-                    )
-                }".trim(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outline
-            )
+                    }".trim(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
             editedAt?.let {
                 Text(
                     text = stringResource(R.string.chat_edited_at, timeFormat.format(Date(it))),

@@ -2,6 +2,7 @@ package off.kys.backtalk.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
 import off.kys.backtalk.domain.model.MessageId
 
 /**
@@ -42,4 +43,29 @@ interface MessagesRepository {
      * @param id The ID of the message to delete.
      */
     suspend fun deleteMessageById(id: MessageId)
+
+    /**
+     * Inserts a [scheduledMessageEntity] into the repository.
+     */
+    suspend fun insertScheduledMessage(scheduledMessageEntity: ScheduledMessageEntity)
+
+    /**
+     * Returns a [Flow] of all scheduled messages.
+     */
+    fun getAllScheduledMessages(): Flow<List<ScheduledMessageEntity>>
+
+    /**
+     * Retrieves a scheduled message by its [id].
+     */
+    suspend fun getScheduledMessageById(id: MessageId): ScheduledMessageEntity?
+
+    /**
+     * Deletes a scheduled message by its [id].
+     */
+    suspend fun deleteScheduledMessageById(id: MessageId)
+
+    /**
+     * Retrieves all scheduled messages as a list.
+     */
+    suspend fun getAllScheduledMessagesSync(): List<ScheduledMessageEntity>
 }

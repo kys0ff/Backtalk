@@ -34,5 +34,8 @@ data class MessageEntity(
     val editedAt: Long? = null,
     val voicePath: String? = null,
     val voiceDuration: Long? = null,
-    val waveformData: List<Float>? = null
+    val waveformData: List<Float>? = null,
+    val isReminder: Boolean = false,
+    val originalCreationTimestamp: Long? = null,
+    val scheduledTimestamp: Long? = null
 )

@@ -2,6 +2,7 @@ package off.kys.backtalk.presentation.state
 
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.util.emptyString
 
 /**
  * Data class representing the state of the messages screen.
@@ -17,7 +18,8 @@ data class MessagesUiState(
     val editingMessage: MessageEntity? = null,
     val selectedMessageIds: Set<MessageId> = emptySet(),
     val isSearchActive: Boolean = false,
-    val searchQuery: String = "",
+    val searchQuery: String = emptyString(),
     val searchResults: List<MessageId> = emptyList(),
-    val currentSearchResultIndex: Int = -1
+    val currentSearchResultIndex: Int = -1,
+    val showPermissionRationale: Boolean = false
 )

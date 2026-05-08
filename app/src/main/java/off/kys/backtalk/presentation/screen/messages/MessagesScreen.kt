@@ -38,9 +38,6 @@ class MessagesScreen : Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val listState = rememberLazyListState()
         val scope = rememberCoroutineScope()
-
-        // Telegram usually triggers the FAB when the user has scrolled up a bit.
-        // Index > 2 is usually enough to signal they are "away" from the bottom.
         val showScrollToBottom by remember {
             derivedStateOf {
                 listState.firstVisibleItemIndex > 2
@@ -114,7 +111,11 @@ class MessagesScreen : Screen {
                 onSend = { viewModel.onEvent(MessagesUiEvent.SendMessage(it)) },
                 onSendVoice = { path, duration, waveform ->
                     viewModel.onEvent(MessagesUiEvent.SendVoiceMessage(path, duration, waveform))
-                }
+                },
+                onSchedule = { text, time ->
+                    viewModel.onEvent(MessagesUiEvent.ScheduleMessage(text, time))
+                },
+                onDismissRationale = { viewModel.onEvent(MessagesUiEvent.DismissPermissionRationale) }
             )
         }
     }

@@ -5,11 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * ViewModel for the Messages screen.
@@ -21,7 +24,9 @@ import off.kys.backtalk.presentation.state.MessagesUiState
  */
 class MessagesViewModel(
     private val useCases: MessagesUseCases
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+
+    private val alarmScheduler: AlarmScheduler by inject()
 
     private val _uiState = mutableStateOf(MessagesUiState())
 
@@ -57,12 +62,33 @@ class MessagesViewModel(
             is MessagesUiEvent.ToggleSearch -> toggleSearch(event.active)
             is MessagesUiEvent.UpdateSearchQuery -> updateSearchQuery(event.query)
             is MessagesUiEvent.NavigateSearch -> navigateSearch(event.up)
+            is MessagesUiEvent.ScheduleMessage -> scheduleMessage(event.text, event.scheduledTime)
+            MessagesUiEvent.DismissPermissionRationale -> {
+                _uiState.value = _uiState.value.copy(showPermissionRationale = false)
+            }
         }
     }
 
     /**
      * Loads all messages from the repository and updates the UI state.
      */
+    private fun scheduleMessage(text: String, scheduledTime: Long) {
+        if (!alarmScheduler.canScheduleExactAlarms()) {
+            _uiState.value = _uiState.value.copy(showPermissionRationale = true)
+            return
+        }
+        
+        val replyTo = _uiState.value.replyingTo
+        viewModelScope.launch {
+            useCases.scheduleMessage(
+                text = text,
+                scheduledTime = scheduledTime,
+                repliedToId = replyTo?.id
+            )
+        }
+        updateReply(null)
+    }
+
     private fun loadMessages() {
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->

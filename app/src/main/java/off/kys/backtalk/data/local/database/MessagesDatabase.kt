@@ -4,8 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import off.kys.backtalk.data.local.dao.MessagesDao
+import off.kys.backtalk.data.local.dao.ScheduledMessagesDao
 import off.kys.backtalk.data.local.database.converter.Converters
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
 
 /**
  * The Room database for the application, responsible for persisting message data.
@@ -13,8 +15,8 @@ import off.kys.backtalk.data.local.entity.MessageEntity
  * This database includes the [MessageEntity] and provides access to [MessagesDao].
  */
 @Database(
-    entities = [MessageEntity::class],
-    version = 4,
+    entities = [MessageEntity::class, ScheduledMessageEntity::class],
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -25,4 +27,11 @@ abstract class MessagesDatabase: RoomDatabase() {
      * @return An instance of [MessagesDao].
      */
     abstract fun messagesDao(): MessagesDao
+
+    /**
+     * Returns the Data Access Object (DAO) for the scheduled_messages table.
+     *
+     * @return An instance of [ScheduledMessagesDao].
+     */
+    abstract fun scheduledMessagesDao(): ScheduledMessagesDao
 }

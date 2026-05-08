@@ -1,12 +1,18 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.util.emptyString
 
 /**
  * Composable function that displays the messages content.
@@ -27,9 +33,27 @@ fun MessagesContent(
     onReply: (MessageEntity?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
     onSend: (String) -> Unit,
-    onSendVoice: (String, Long, List<Float>) -> Unit
+    onSendVoice: (String, Long, List<Float>) -> Unit,
+    onSchedule: (String, Long) -> Unit,
+    onDismissRationale: () -> Unit
 ) {
+    val context = LocalContext.current
     Column(modifier = modifier) {
+        if (state.showPermissionRationale) {
+            PermissionRationaleDialog(
+                onDismiss = onDismissRationale,
+                onConfirm = {
+                    onDismissRationale()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }
+                }
+            )
+        }
+
         MessagesList(
             messages = state.messages,
             selectedMessageIds = state.selectedMessageIds,
@@ -37,7 +61,7 @@ fun MessagesContent(
             onEditMessage = onEditMessage,
             onReply = onReply,
             onToggleSelect = onToggleSelect,
-            searchQuery = if (state.isSearchActive) state.searchQuery else ""
+            searchQuery = if (state.isSearchActive) state.searchQuery else emptyString()
         )
 
         InputBar(
@@ -47,7 +71,8 @@ fun MessagesContent(
             onCancelReply = { onReply(null) },
             onCancelEdit = { onEditMessage(null) },
             onMessageSend = onSend,
-            onVoiceSend = onSendVoice
+            onVoiceSend = onSendVoice,
+            onMessageSchedule = onSchedule
         )
     }
 }

@@ -11,6 +11,7 @@
     <string name="common_close">Close</string>
     <string name="common_clear">Clear</string>
     <string name="common_back">Back</string>
+    <string name="common_ok">OK</string>
     <string name="common_navigate_up">Navigate up</string>
     <string name="common_edit">Edit</string>
     <string name="common_search">Search</string>
@@ -161,5 +162,17 @@
     <string name="threads_at_you">\@you</string>
     <string name="threads_at_you_timestamp">\@you · %1$s</string>
     <string name="threads_share">Share</string>
+
+    <!-- Reminders -->
+    <string name="chat_reminder_tag">Reminder</string>
+    <string name="chat_reminder_notification_channel">Reminders</string>
+    <string name="chat_reminder_notification_title">Note to self</string>
+    <string name="chat_reminder_original_time">Original:</string>
+    <string name="chat_reminder_target_time">Target:</string>
+    <string name="chat_reminder_permission_rationale">To deliver your "future notes" at the right time, Backtalk needs permission to show notifications and schedule exact alarms. Would you like to grant these in settings?</string>
+    <string name="chat_reminder_open_settings">Open Settings</string>
+
+    <!-- Message Scheduling -->
+    <string name="message_scheduling_select_time">Select time</string>
 
 </resources>

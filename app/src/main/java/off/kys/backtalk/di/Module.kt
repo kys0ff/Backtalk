@@ -1,13 +1,16 @@
 package off.kys.backtalk.di
 
 import androidx.room.Room
+import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.manager.VibrationManager
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
+import off.kys.backtalk.data.local.dao.ScheduledMessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.local.migrations.MIGRATION_1_2
 import off.kys.backtalk.data.local.migrations.MIGRATION_2_3
 import off.kys.backtalk.data.local.migrations.MIGRATION_3_4
+import off.kys.backtalk.data.local.migrations.MIGRATION_4_5
 import off.kys.backtalk.data.repository.BackupRepositoryImpl
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.domain.repository.BackupRepository
@@ -20,6 +23,7 @@ import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.InsertMessage
+import off.kys.backtalk.domain.use_case.ScheduleMessageUseCase
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
@@ -61,11 +65,12 @@ private fun Module.databaseModule() {
             MessagesDatabase::class.java,
             "msgs_db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
 
     single<MessagesDao> { get<MessagesDatabase>().messagesDao() }
+    single<ScheduledMessagesDao> { get<MessagesDatabase>().scheduledMessagesDao() }
 }
 
 /**
@@ -74,7 +79,7 @@ private fun Module.databaseModule() {
  * Provides the [MessagesRepository] implementation used by the domain layer.
  */
 private fun Module.repositoryModule() {
-    single<MessagesRepository> { MessagesRepositoryImpl(get()) }
+    single<MessagesRepository> { MessagesRepositoryImpl(get(), get()) }
     single<BackupRepository> { BackupRepositoryImpl(get()) }
 }
 
@@ -90,6 +95,7 @@ private fun Module.useCaseModule() {
     single { InsertMessage(get()) }
     single { DeleteMessageById(get()) }
     single { CopyMessagesByIds(get(), get()) }
+    single { ScheduleMessageUseCase(get(), get()) }
     single { CheckAppUpdate() }
     single { ExportBackup(get(), get(), get()) }
     single { ImportBackup(get(), get(), get()) }
@@ -99,7 +105,8 @@ private fun Module.useCaseModule() {
             getMessageById = get(),
             insertMessage = get(),
             deleteMessageById = get(),
-            copyMessagesByIds = get()
+            copyMessagesByIds = get(),
+            scheduleMessage = get()
         )
     }
     single {
@@ -133,6 +140,7 @@ private fun Module.viewModelModule() {
 private fun Module.systemModule() {
     single { BacktalkPreferences(get()) }
     single { VibrationManager(get(), get()) }
+    single { AlarmScheduler(get()) }
 }
 
 

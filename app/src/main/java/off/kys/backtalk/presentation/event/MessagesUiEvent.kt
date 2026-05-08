@@ -84,4 +84,14 @@ sealed interface MessagesUiEvent {
      * @param up Whether to navigate to the previous result (up) or next result (down).
      */
     data class NavigateSearch(val up: Boolean) : MessagesUiEvent
+
+    /**
+     * UI event to schedule a message for the future.
+     */
+    data class ScheduleMessage(val text: String, val scheduledTime: Long) : MessagesUiEvent
+
+    /**
+     * UI event to dismiss the permission rationale dialog.
+     */
+    object DismissPermissionRationale : MessagesUiEvent
 }

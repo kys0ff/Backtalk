@@ -2,16 +2,20 @@ package off.kys.backtalk.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import off.kys.backtalk.data.local.dao.MessagesDao
+import off.kys.backtalk.data.local.dao.ScheduledMessagesDao
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.repository.MessagesRepository
 
 /**
- * Implementation of the [MessagesRepository] interface that uses a [MessagesDao] to interact with the database.
- * @param messagesDao The [MessagesDao] used to access the database.
+ * Implementation of the [MessagesRepository] interface that uses [MessagesDao] and [ScheduledMessagesDao] to interact with the database.
+ * @param messagesDao The [MessagesDao] used to access the messages table.
+ * @param scheduledMessagesDao The [ScheduledMessagesDao] used to access the scheduled_messages table.
  */
 class MessagesRepositoryImpl(
-    private val messagesDao: MessagesDao
+    private val messagesDao: MessagesDao,
+    private val scheduledMessagesDao: ScheduledMessagesDao
 ) : MessagesRepository {
 
     /**
@@ -43,4 +47,24 @@ class MessagesRepositoryImpl(
      * @param id The ID of the message to delete.
      */
     override suspend fun deleteMessageById(id: MessageId) = messagesDao.deleteMessageById(id)
+
+    override suspend fun insertScheduledMessage(scheduledMessageEntity: ScheduledMessageEntity) {
+        scheduledMessagesDao.insertScheduledMessage(scheduledMessageEntity)
+    }
+
+    override fun getAllScheduledMessages(): Flow<List<ScheduledMessageEntity>> {
+        return scheduledMessagesDao.getAllScheduledMessages()
+    }
+
+    override suspend fun getScheduledMessageById(id: MessageId): ScheduledMessageEntity? {
+        return scheduledMessagesDao.getScheduledMessage(id)
+    }
+
+    override suspend fun deleteScheduledMessageById(id: MessageId) {
+        scheduledMessagesDao.deleteScheduledMessageById(id)
+    }
+
+    override suspend fun getAllScheduledMessagesSync(): List<ScheduledMessageEntity> {
+        return scheduledMessagesDao.getAllScheduledMessagesSync()
+    }
 }
