@@ -21,7 +21,7 @@
 
 ---
 
-## 📱 Screenshots
+## Screenshots
 
 <p align="center">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%" alt="Screenshot 1">
@@ -30,30 +30,30 @@
 
 ---
 
-## ✨ Features
+## Features
 
-- 📝 **Self-Chat Interface**: Write messages and reply to yourself in a familiar layout.
-- 🧵 **Threaded Conversations**: Easily organize replies to specific thoughts.
-- 🔒 **Biometric Security**: Protect your notes with fingerprint or face unlock.
-- ⏱️ **Auto-Lock**: Configurable timeout to keep your data safe when you're away.
-- 🔄 **Secure Backups**: Periodic automatic backups with encryption support.
-- 🎨 **Material 3 Design**: Modern, clean UI that adapts to your device.
-- 📴 **Offline-First**: All data stays on your device, no internet required.
-- 👈 **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
+- **Self-Chat Interface**: Write messages and reply to yourself in a familiar layout.
+- **Threaded Conversations**: Easily organize replies to specific thoughts.
+- **Biometric Security**: Protect your notes with fingerprint or face unlock.
+- **Auto-Lock**: Configurable timeout to keep your data safe when you're away.
+- **Secure Backups**: Periodic automatic backups with encryption support.
+- **Material 3 Design**: Modern, clean UI that adapts to your device.
+- **Offline-First**: All data stays on your device, no internet required.
+- **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## 🚀 Recent Changes (v0.1.6)
+## Recent Changes (v0.1.6)
 
-- ⚙️ **Settings Redesign**: Cleaner, sectioned layout for better navigation.
-- 🔐 **Secure Auto-Export**: Encryption support for background backups.
-- 📜 **Licenses Screen**: Dedicated view for open source attributions.
-- 🛡️ **Improved Privacy**: Removed internet permission from the F-Droid flavor.
-- 🎨 **UX Refinement**: Updated dialogs and theme selection flow.
+- **Settings Redesign**: Cleaner, sectioned layout for better navigation.
+- **Secure Auto-Export**: Encryption support for background backups.
+- **Licenses Screen**: Dedicated view for open source attributions.
+- **Improved Privacy**: Removed internet permission from the F-Droid flavor.
+- **UX Refinement**: Updated dialogs and theme selection flow.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose) with Material 3.
 - **Navigation**: [Voyager](https://voyager.adriel.cafe/) for multiplatform-friendly navigation.
@@ -64,7 +64,7 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 
 ---
 
-## 📦 Getting Started
+## Getting Started
 
 ### Download
 <a href="https://f-droid.org/en/packages/off.kys.backtalk">
@@ -84,7 +84,7 @@ You can also find the latest APKs on the [Releases](../../releases/latest) page.
 
 ---
 
-## 🔐 Privacy & Security
+## Privacy & Security
 
 Backtalk is built on the principle of **Privacy by Design**:
 - **Local Only**: Your notes never leave your device unless you manually export them.
@@ -94,7 +94,7 @@ Backtalk is built on the principle of **Privacy by Design**:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! If you'd like to improve Backtalk:
 1. Fork the repository.
@@ -105,11 +105,11 @@ Contributions are welcome! If you'd like to improve Backtalk:
 
 ---
 
-## 💖 Support Development
+## Support Development
 
 If you find Backtalk useful, consider supporting its development via [Liberapay](https://liberapay.com/kys0ff). Every contribution helps keep the project alive and open source!
 
-## 📄 License
+## License
 
 Backtalk is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more information.
 
