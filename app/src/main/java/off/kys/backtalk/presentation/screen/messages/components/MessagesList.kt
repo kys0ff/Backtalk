@@ -93,7 +93,7 @@ fun ColumnScope.MessagesList(
 
             val oneHourInMillis = 3600000L
             val canEdit = current.editedAt == null &&
-                    (System.currentTimeMillis() - current.timestamp) < oneHourInMillis
+                    (System.currentTimeMillis() - current.timestamp) < oneHourInMillis && current.voicePath == null
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showTimestamp) {
