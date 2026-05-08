@@ -1,3 +1,10 @@
+> [!TIP]
+> **Enjoying the app?** Give it a **Star** to show your support! 
+> 
+> `[ ★ Star ]` ➔ `[ 🌟 Starred ]`
+
+---
+
 <p align="center">
   <img src="fastlane/metadata/android/en-US/images/featureGraphic.png" width="100%" alt="Backtalk Header">
 </p>
