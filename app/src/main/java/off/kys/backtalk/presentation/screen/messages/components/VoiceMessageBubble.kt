@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.util.AudioPlayer
+import org.koin.compose.koinInject
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -38,8 +38,13 @@ fun VoiceMessageBubble(
     waveformData: List<Float>,
     contentColor: Color
 ) {
-    val audioPlayer = remember { AudioPlayer() }
-    val isPlaying by audioPlayer.isPlaying.collectAsState()
+    val audioPlayer = koinInject<AudioPlayer>()
+    val isPlayingGlobal by audioPlayer.isPlaying.collectAsState()
+    val progressGlobal by audioPlayer.progress.collectAsState()
+    val currentPath by audioPlayer.currentPath.collectAsState()
+
+    val isThisPlaying = isPlayingGlobal && currentPath == voicePath
+    val progress = if (currentPath == voicePath) progressGlobal else 0f
 
     val barWidth = 2.dp
     val gapWidth = 2.dp
@@ -56,18 +61,25 @@ fun VoiceMessageBubble(
     ) {
         IconButton(
             onClick = {
-                if (isPlaying) audioPlayer.pause()
-                else {
+                if (isThisPlaying) {
+                    audioPlayer.pause()
+                } else {
                     val file = File(voicePath)
-                    if (file.exists()) audioPlayer.playFile(file)
+                    if (file.exists()) {
+                        if (currentPath == voicePath && progress > 0f && progress < 1f) {
+                            audioPlayer.resume()
+                        } else {
+                            audioPlayer.playFile(file)
+                        }
+                    }
                 }
             },
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
                 painter = painterResource(
-                    if (isPlaying) R.drawable.round_close_24
-                    else R.drawable.round_keyboard_voice_24
+                    if (isThisPlaying) R.drawable.round_pause_24
+                    else R.drawable.round_play_arrow_24
                 ),
                 contentDescription = null,
                 tint = contentColor
@@ -80,6 +92,7 @@ fun VoiceMessageBubble(
                 .height(32.dp)
                 .width(dynamicWidth),
             color = contentColor,
+            progress = progress,
             barWidth = barWidth,
             gapWidth = gapWidth
         )
@@ -97,6 +110,7 @@ fun WaveformVisualizer(
     waveformData: List<Float>,
     modifier: Modifier = Modifier,
     color: Color,
+    progress: Float = 1f,
     barWidth: Dp = 2.dp,
     gapWidth: Dp = 2.dp
 ) {
@@ -122,8 +136,11 @@ fun WaveformVisualizer(
             val barHeight = (amplitude * canvasHeight).coerceAtLeast(2.dp.toPx())
             val y = (canvasHeight - barHeight) / 2
 
+            val barProgress = index.toFloat() / (barsToDraw.size - 1).coerceAtLeast(1)
+            val barColor = if (barProgress <= progress) color else color.copy(alpha = 0.3f)
+
             drawRoundRect(
-                color = color,
+                color = barColor,
                 topLeft = Offset(x, y),
                 size = Size(barWidthPx, barHeight),
                 cornerRadius = CornerRadius(barWidthPx / 2)

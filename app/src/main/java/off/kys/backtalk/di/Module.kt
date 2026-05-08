@@ -30,6 +30,7 @@ import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
+import off.kys.backtalk.util.AudioPlayer
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -138,6 +139,7 @@ private fun Module.viewModelModule() {
  * low-level Android system interactions.
  */
 private fun Module.systemModule() {
+    single { AudioPlayer() }
     single { BacktalkPreferences(get()) }
     single { VibrationManager(get(), get()) }
     single { AlarmScheduler(get()) }

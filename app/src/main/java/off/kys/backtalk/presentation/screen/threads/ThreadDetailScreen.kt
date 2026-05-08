@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -20,8 +21,10 @@ import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.threads.components.ThreadDetailContent
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
+import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.copyToClipboard
 import off.kys.backtalk.util.shareText
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 class ThreadDetailScreen(val thread: Thread) : Screen {
@@ -32,6 +35,13 @@ class ThreadDetailScreen(val thread: Thread) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
         val viewModel = koinViewModel<ThreadsViewModel>()
+        val audioPlayer = koinInject<AudioPlayer>()
+
+        DisposableEffect(Unit) {
+            onDispose {
+                audioPlayer.stop()
+            }
+        }
 
         Scaffold(
             topBar = {

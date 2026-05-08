@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -25,6 +26,8 @@ import off.kys.backtalk.presentation.screen.messages.components.ScrollToBottomFa
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
 import off.kys.backtalk.presentation.screen.threads.ThreadsScreen
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
+import off.kys.backtalk.util.AudioPlayer
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 class MessagesScreen : Screen {
@@ -34,6 +37,14 @@ class MessagesScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinViewModel<MessagesViewModel>()
+        val audioPlayer = koinInject<AudioPlayer>()
+
+        DisposableEffect(Unit) {
+            onDispose {
+                audioPlayer.stop()
+            }
+        }
+
         val state by viewModel.uiState
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val listState = rememberLazyListState()
