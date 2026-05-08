@@ -41,6 +41,7 @@ class BacktalkPreferences(context: Context) {
     private val _autoExportEncrypted = mutableStateOf(prefs.getBoolean(KEY_AUTO_EXPORT_ENCRYPTED, false))
     private val _autoExportPassword = mutableStateOf(prefs.getString(KEY_AUTO_EXPORT_PASSWORD, null))
     private val _hapticFeedbackEnabled = mutableStateOf(prefs.getBoolean(KEY_HAPTIC_FEEDBACK, true))
+    private val _devModeEnabled = mutableStateOf(prefs.getBoolean(KEY_DEV_MODE_ENABLED, false))
 
     /**
      * Internal reference to the listener.
@@ -66,6 +67,7 @@ class BacktalkPreferences(context: Context) {
             KEY_AUTO_EXPORT_ENCRYPTED -> _autoExportEncrypted.value = p.getBoolean(key, false)
             KEY_AUTO_EXPORT_PASSWORD -> _autoExportPassword.value = p.getString(key, null)
             KEY_HAPTIC_FEEDBACK -> _hapticFeedbackEnabled.value = p.getBoolean(key, true)
+            KEY_DEV_MODE_ENABLED -> _devModeEnabled.value = p.getBoolean(key, false)
         }
         listener?.onSharedPreferenceChanged(p, key)
     }
@@ -109,26 +111,9 @@ class BacktalkPreferences(context: Context) {
 
         /** Preference key for enabling/disabling haptic feedback. */
         const val KEY_HAPTIC_FEEDBACK = "haptic_feedback"
-    }
 
-    /**
-     * Registers a callback to be notified of any changes to the preference keys.
-     *
-     * @param onChanged A lambda that receives the key string of the modified preference.
-     */
-    fun observeChanges(onChanged: (String) -> Unit) {
-        listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            key?.let { onChanged(it) }
-        }
-    }
-
-    /**
-     * Removes the change listener and clears the reference.
-     *
-     * Call this during lifecycle teardown (e.g., `onDestroy`) to avoid leaking resources.
-     */
-    fun unregisterObserver() {
-        listener = null
+        /** Preference key for enabling/disabling developer mode. */
+        const val KEY_DEV_MODE_ENABLED = "dev_mode_enabled"
     }
 
     /**
@@ -209,4 +194,18 @@ class BacktalkPreferences(context: Context) {
     var hapticFeedbackEnabled: Boolean
         get() = _hapticFeedbackEnabled.value
         set(value) = prefs.edit { putBoolean(KEY_HAPTIC_FEEDBACK, value) }
+
+    /**
+     * Whether developer mode is enabled, revealing hidden settings.
+     */
+    var devModeEnabled: Boolean
+        get() = _devModeEnabled.value
+        set(value) = prefs.edit { putBoolean(KEY_DEV_MODE_ENABLED, value) }
+
+    /**
+     * Clears all stored preferences and resets to defaults.
+     */
+    fun clearAll() {
+        prefs.edit { clear() }
+    }
 }

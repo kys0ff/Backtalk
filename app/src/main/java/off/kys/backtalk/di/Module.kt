@@ -24,6 +24,7 @@ import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.InsertMessage
 import off.kys.backtalk.domain.use_case.ScheduleMessageUseCase
+import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
@@ -98,6 +99,7 @@ private fun Module.useCaseModule() {
     single { CopyMessagesByIds(get(), get()) }
     single { ScheduleMessageUseCase(get(), get()) }
     single { CheckAppUpdate() }
+    single { WipeAppData(androidContext(), get(), get()) }
     single { ExportBackup(get(), get(), get()) }
     single { ImportBackup(get(), get(), get(), get()) }
     single {
@@ -129,7 +131,7 @@ private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get(), get()) }
     viewModel { MessagesViewModel(get()) }
     viewModel { ThreadsViewModel(get()) }
-    viewModel { SettingsViewModel(androidApplication(), get(), get()) }
+    viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
 }
 
 /**

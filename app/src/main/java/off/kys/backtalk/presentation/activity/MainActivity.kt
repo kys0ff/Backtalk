@@ -84,11 +84,6 @@ class MainActivity : BaseLockActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.preferences.unregisterObserver()
-    }
-
     fun checkForUpdates() {
         lifecycleScope.launch {
             viewModel.onEvent(MainUiEvent.CheckUpdate)

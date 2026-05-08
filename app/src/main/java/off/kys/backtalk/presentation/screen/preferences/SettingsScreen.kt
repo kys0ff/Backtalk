@@ -54,6 +54,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -112,9 +113,11 @@ class SettingsScreen : Screen {
         val showAutoExportPasswordDialog = remember { mutableStateOf(false) }
         val showThemeDialog = remember { mutableStateOf(false) }
         val showOldBackupWarning = remember { mutableStateOf(false) }
+        val showWipeDataDialog = remember { mutableStateOf(false) }
 
         var selectedUri by remember { mutableStateOf<Uri?>(null) }
         var isImporting by remember { mutableStateOf(false) }
+        var devClickCount by remember { mutableIntStateOf(0) }
 
         val exportLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.CreateDocument("application/octet-stream")
@@ -339,7 +342,11 @@ class SettingsScreen : Screen {
                                 icon = painterResource(R.drawable.round_lock_24),
                                 checked = state.autoExportEncrypted,
                                 onCheckedChange = {
-                                    viewModel.onEvent(SettingsUiEvent.OnAutoExportEncryptionToggle(it))
+                                    viewModel.onEvent(
+                                        SettingsUiEvent.OnAutoExportEncryptionToggle(
+                                            it
+                                        )
+                                    )
                                     if (it && state.autoExportPassword.isNullOrBlank()) {
                                         showAutoExportPasswordDialog.value = true
                                     }
@@ -410,8 +417,45 @@ class SettingsScreen : Screen {
                         label = stringResource(R.string.settings_developer),
                         value = stringResource(R.string.settings_dev_name),
                         icon = painterResource(R.drawable.round_person_24),
-                        onClick = { context.toast(R.string.settings_dev_click) }
+                        onClick = {
+                            if (!state.devModeEnabled) {
+                                devClickCount++
+                                if (devClickCount > 3) {
+                                    context.toast(R.string.settings_dev_click_fine)
+                                    viewModel.onEvent(SettingsUiEvent.OnDevModeToggle(true))
+                                    devClickCount = 0
+                                } else {
+                                    context.toast(R.string.settings_dev_click)
+                                }
+                            } else {
+                                context.toast(R.string.settings_dev_click)
+                            }
+                        }
                     )
+                }
+
+                // Secret Developer Section
+                AnimatedVisibility(state.devModeEnabled) {
+                    SettingsSection(title = stringResource(R.string.settings_secret_category)) {
+                        SettingsItem(
+                            label = stringResource(R.string.settings_wipe_data),
+                            value = stringResource(R.string.settings_wipe_data_desc),
+                            icon = painterResource(R.drawable.round_delete_sweep_24),
+                            onClick = { showWipeDataDialog.value = true }
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        SettingsToggle(
+                            label = stringResource(R.string.settings_show_secret_category),
+                            supportingText = stringResource(R.string.settings_show_secret_category_desc),
+                            icon = painterResource(R.drawable.round_visibility_off_24),
+                            checked = true,
+                            onCheckedChange = { viewModel.onEvent(SettingsUiEvent.OnDevModeToggle(it)) }
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -423,7 +467,10 @@ class SettingsScreen : Screen {
             ThemeSelectionDialog(
                 selected = state.themeMode,
                 onDismiss = { showThemeDialog.value = false },
-                onSelected = { viewModel.onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value = false }
+                onSelected = {
+                    viewModel.onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value =
+                    false
+                }
             )
         }
 
@@ -517,7 +564,7 @@ class SettingsScreen : Screen {
 
         if (showOldBackupWarning.value) {
             AlertDialog(
-                onDismissRequest = { 
+                onDismissRequest = {
                     showOldBackupWarning.value = false
                     viewModel.onEvent(SettingsUiEvent.ResetBackupState)
                 },
@@ -531,11 +578,42 @@ class SettingsScreen : Screen {
                 title = { Text(stringResource(R.string.backup_old_format_warning_title)) },
                 text = { Text(stringResource(R.string.backup_old_format_warning_message)) },
                 confirmButton = {
-                    Button(onClick = { 
+                    Button(onClick = {
                         showOldBackupWarning.value = false
                         viewModel.onEvent(SettingsUiEvent.ResetBackupState)
                     }) {
                         Text(stringResource(R.string.common_ok))
+                    }
+                }
+            )
+        }
+
+        if (showWipeDataDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showWipeDataDialog.value = false },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.round_warning_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                },
+                title = { Text(stringResource(R.string.settings_wipe_data_confirm_title)) },
+                text = { Text(stringResource(R.string.settings_wipe_data_confirm_message)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showWipeDataDialog.value = false
+                            viewModel.onEvent(SettingsUiEvent.WipeAppData)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text(stringResource(R.string.common_confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showWipeDataDialog.value = false }) {
+                        Text(stringResource(R.string.common_cancel))
                     }
                 }
             )
@@ -571,7 +649,9 @@ class SettingsScreen : Screen {
                             selected = isSelected,
                             onClick = { tempSelected = mode },
                             shape = MaterialTheme.shapes.medium,
-                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(
+                                alpha = 0.3f
+                            )
                             else Color.Transparent,
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -582,7 +662,8 @@ class SettingsScreen : Screen {
                             ) {
                                 RadioButton(selected = isSelected, onClick = null)
                                 Text(
-                                    text = mode.name.lowercase().replaceFirstChar { it.uppercase() },
+                                    text = mode.name.lowercase()
+                                        .replaceFirstChar { it.uppercase() },
                                     style = MaterialTheme.typography.bodyLarge,
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
@@ -603,6 +684,7 @@ class SettingsScreen : Screen {
             }
         )
     }
+
     @Composable
     private fun AutoExportPasswordDialog(
         onDismiss: () -> Unit,
@@ -691,7 +773,9 @@ class SettingsScreen : Screen {
                             selected = isSelected,
                             onClick = { tempSelected = interval },
                             shape = MaterialTheme.shapes.medium,
-                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(
+                                alpha = 0.3f
+                            )
                             else Color.Transparent,
                             modifier = Modifier.fillMaxWidth()
                         ) {

@@ -19,6 +19,7 @@ data class SettingsUiState(
     val autoExportEncrypted: Boolean = false,
     val autoExportPassword: String? = null,
     val hapticFeedbackEnabled: Boolean = true,
+    val devModeEnabled: Boolean = false,
     val backupLoading: Boolean = false,
     val isBackupEncrypted: Boolean? = null,
     val wrongPasswordError: Boolean = false,

@@ -103,6 +103,14 @@
     <string name="settings_developer">Developer</string>
     <string name="settings_dev_name">kys0ff</string>
     <string name="settings_dev_click">You found me. Now go away.</string>
+    <string name="settings_dev_click_fine">fine…</string>
+    <string name="settings_secret_category">Secret Developer Settings</string>
+    <string name="settings_wipe_data">Wipe all app data</string>
+    <string name="settings_wipe_data_desc">Clear database, cache, and all preferences</string>
+    <string name="settings_show_secret_category">Show developer options</string>
+    <string name="settings_show_secret_category_desc">Disable to hide this section</string>
+    <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
+    <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
     <string name="settings_license">Open source licenses</string>
     <string name="settings_license_desc">Libraries used in the application</string>
     <string name="settings_mit">MIT License</string>

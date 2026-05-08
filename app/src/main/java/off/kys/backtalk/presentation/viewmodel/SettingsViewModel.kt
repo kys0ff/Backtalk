@@ -19,6 +19,7 @@ import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.worker.AutoExportWorker
 import off.kys.backtalk.domain.use_case.ImportBackup
+import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
@@ -31,7 +32,8 @@ import javax.crypto.BadPaddingException
 class SettingsViewModel(
     private val application: Application,
     private val preferences: BacktalkPreferences,
-    private val backupUseCases: BackupUseCases
+    private val backupUseCases: BackupUseCases,
+    private val wipeAppData: WipeAppData
 ) : AndroidViewModel(application) {
 
     private val context: Context by lazy { application.applicationContext }
@@ -48,7 +50,8 @@ class SettingsViewModel(
             autoExportUri = preferences.autoExportUri,
             autoExportEncrypted = preferences.autoExportEncrypted,
             autoExportPassword = preferences.autoExportPassword,
-            hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
+            hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
+            devModeEnabled = preferences.devModeEnabled
         )
     )
     val state = _state.asStateFlow()
@@ -65,6 +68,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportEncryptionToggle -> onAutoExportEncryptionToggle(event.enabled)
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
         is SettingsUiEvent.OnHapticFeedbackToggle -> onHapticFeedbackToggle(event.enabled)
+        is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -76,6 +80,7 @@ class SettingsViewModel(
         SettingsUiEvent.ClearError -> clearError()
         SettingsUiEvent.ClearSuccess -> clearSuccess()
         SettingsUiEvent.ResetBackupState -> resetBackupState()
+        SettingsUiEvent.WipeAppData -> onWipeAppData()
     }
 
     private fun onThemeModeChange(themeMode: ThemeMode) {
@@ -150,6 +155,27 @@ class SettingsViewModel(
     private fun onHapticFeedbackToggle(enabled: Boolean) {
         preferences.hapticFeedbackEnabled = enabled
         _state.update { it.copy(hapticFeedbackEnabled = enabled) }
+    }
+
+    private fun onDevModeToggle(enabled: Boolean) {
+        preferences.devModeEnabled = enabled
+        _state.update { it.copy(devModeEnabled = enabled) }
+    }
+
+    private fun onWipeAppData() {
+        viewModelScope.launch {
+            _state.update { it.copy(backupLoading = true) }
+            wipeAppData()
+            // After wipe, state needs to be refreshed or app restarted.
+            // For now, update state with defaults from preferences (which were cleared)
+            _state.update {
+                SettingsUiState(
+                    themeMode = preferences.themeMode,
+                    dynamicColorEnabled = preferences.dynamicColorEnabled,
+                    devModeEnabled = preferences.devModeEnabled
+                )
+            }
+        }
     }
 
     private fun scheduleAutoExport() {
