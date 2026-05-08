@@ -56,7 +56,13 @@ class MessagesViewModel(
             is MessagesUiEvent.ToggleSelection -> toggleSelection(event.id)
             is MessagesUiEvent.ClearSelection -> clearSelection()
 
-            is MessagesUiEvent.DeleteSelected -> deleteSelected()
+            is MessagesUiEvent.DeleteSelected -> {
+                _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
+            }
+            is MessagesUiEvent.ConfirmDeleteSelected -> deleteSelected()
+            is MessagesUiEvent.DismissDeleteConfirmation -> {
+                _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
+            }
             is MessagesUiEvent.CopySelected -> copySelected()
 
             is MessagesUiEvent.ToggleSearch -> toggleSearch(event.active)
@@ -198,6 +204,7 @@ class MessagesViewModel(
         viewModelScope.launch {
             ids.forEach { useCases.deleteMessageById(it) }
         }
+        _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
         clearSelection()
     }
 

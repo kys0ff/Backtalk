@@ -48,6 +48,10 @@ class MessagesScreen : Screen {
             viewModel.onEvent(MessagesUiEvent.ClearSelection)
         }
 
+        BackHandler(state.showDeleteConfirmation) {
+            viewModel.onEvent(MessagesUiEvent.DismissDeleteConfirmation)
+        }
+
         BackHandler(state.replyingTo != null) {
             viewModel.onEvent(MessagesUiEvent.ReplyTo(null))
         }
@@ -115,7 +119,9 @@ class MessagesScreen : Screen {
                 onSchedule = { text, time ->
                     viewModel.onEvent(MessagesUiEvent.ScheduleMessage(text, time))
                 },
-                onDismissRationale = { viewModel.onEvent(MessagesUiEvent.DismissPermissionRationale) }
+                onDismissRationale = { viewModel.onEvent(MessagesUiEvent.DismissPermissionRationale) },
+                onConfirmDelete = { viewModel.onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
+                onDismissDelete = { viewModel.onEvent(MessagesUiEvent.DismissDeleteConfirmation) }
             )
         }
     }

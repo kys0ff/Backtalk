@@ -6,9 +6,14 @@ import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.state.MessagesUiState
@@ -35,7 +40,9 @@ fun MessagesContent(
     onSend: (String) -> Unit,
     onSendVoice: (String, Long, List<Float>) -> Unit,
     onSchedule: (String, Long) -> Unit,
-    onDismissRationale: () -> Unit
+    onDismissRationale: () -> Unit,
+    onConfirmDelete: () -> Unit,
+    onDismissDelete: () -> Unit
 ) {
     val context = LocalContext.current
     Column(modifier = modifier) {
@@ -51,6 +58,13 @@ fun MessagesContent(
                         context.startActivity(intent)
                     }
                 }
+            )
+        }
+
+        if (state.showDeleteConfirmation) {
+            DeleteConfirmationDialog(
+                onConfirm = onConfirmDelete,
+                onDismiss = onDismissDelete
             )
         }
 
@@ -75,4 +89,26 @@ fun MessagesContent(
             onMessageSchedule = onSchedule
         )
     }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.chat_delete_selected_title)) },
+        text = { Text(text = stringResource(R.string.chat_delete_selected_message)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(R.string.common_delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel))
+            }
+        }
+    )
 }

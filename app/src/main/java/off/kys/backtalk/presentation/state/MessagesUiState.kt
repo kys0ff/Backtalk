@@ -21,5 +21,6 @@ data class MessagesUiState(
     val searchQuery: String = emptyString(),
     val searchResults: List<MessageId> = emptyList(),
     val currentSearchResultIndex: Int = -1,
-    val showPermissionRationale: Boolean = false
+    val showPermissionRationale: Boolean = false,
+    val showDeleteConfirmation: Boolean = false
 )

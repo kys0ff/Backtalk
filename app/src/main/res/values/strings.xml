@@ -36,6 +36,7 @@
     <string name="chat_copy_success">Copied to clipboard</string>
     <string name="chat_copy_label">Copied text</string>
     <string name="chat_status_edited">edited</string>
+    <string name="chat_voice_message">[Voice Message]</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_sent_at">Sent at</string>
     <string name="chat_edited_at">Edited at %1$s</string>
@@ -47,6 +48,8 @@
     <string name="chat_input_format_underline">U</string>
     <string name="chat_input_format_strikethrough">S</string>
     <string name="chat_input_format_monospace">M</string>
+    <string name="chat_delete_selected_title">Delete messages?</string>
+    <string name="chat_delete_selected_message">Are you sure you want to delete the selected messages? This action cannot be undone.</string>
     <string name="link_safety_title">External Link</string>
     <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>    <string name="link_safety_open">Open</string>
     <string name="link_safety_cancel">Cancel</string>

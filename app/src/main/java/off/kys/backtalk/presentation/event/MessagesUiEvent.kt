@@ -60,6 +60,16 @@ sealed interface MessagesUiEvent {
     object DeleteSelected : MessagesUiEvent
 
     /**
+     * UI event to confirm the deletion of the currently selected messages.
+     */
+    object ConfirmDeleteSelected : MessagesUiEvent
+
+    /**
+     * UI event to dismiss the delete confirmation dialog.
+     */
+    object DismissDeleteConfirmation : MessagesUiEvent
+
+    /**
      * UI event to copy the currently selected messages to the clipboard.
      */
     object CopySelected : MessagesUiEvent
