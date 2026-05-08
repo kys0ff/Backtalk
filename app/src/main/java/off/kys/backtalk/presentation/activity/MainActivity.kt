@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.base.BaseLockActivity
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.activity.components.AppUpdateDialog
 import off.kys.backtalk.presentation.activity.components.LockedView
 import off.kys.backtalk.presentation.event.MainUiEvent
@@ -23,30 +22,34 @@ import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.state.MainUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : BaseLockActivity() {
 
     private val viewModel by viewModel<MainViewModel>()
-    private val preferences by inject<BacktalkPreferences>()
 
     override var autoLockTimeout: Long = 1.minutes.inWholeMilliseconds
-    override var isAuthRequired: Boolean = preferences.lockEnabled
-    override var isAnonymousMode: Boolean = preferences.secureScreenEnabled
+    override var isAuthRequired: Boolean = true
+    override var isAnonymousMode: Boolean = true
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        isAuthRequired = viewModel.preferences.lockEnabled
+        isAnonymousMode = viewModel.preferences.secureScreenEnabled
         super.onCreate(savedInstanceState)
-        observePreferences()
         enableEdgeToEdge()
         setContent {
             val isDarkTheme =
-                preferences.themeMode == ThemeMode.DARK || (preferences.themeMode == ThemeMode.AUTO && isSystemInDarkTheme())
-            val dynamicColor = preferences.dynamicColorEnabled
-            val autoUpdateEnabled = preferences.autoUpdateEnabled
+                viewModel.preferences.themeMode == ThemeMode.DARK || (viewModel.preferences.themeMode == ThemeMode.AUTO && isSystemInDarkTheme())
+            val dynamicColor = viewModel.preferences.dynamicColorEnabled
             val updateState by viewModel.mainUiState.collectAsState()
+
+            LaunchedEffect(viewModel.preferences.secureScreenEnabled) {
+                val enabled = viewModel.preferences.secureScreenEnabled
+                isAnonymousMode = enabled
+                updateSystemFlags(enabled)
+            }
 
             BacktalkTheme(
                 darkTheme = isDarkTheme,
@@ -57,12 +60,6 @@ class MainActivity : BaseLockActivity() {
                         SlideTransition(navigator)
                     } else {
                         LockedView()
-                    }
-
-                    LaunchedEffect(key1 = Unit) {
-                        if (autoUpdateEnabled) {
-                            viewModel.onEvent(MainUiEvent.CheckUpdate)
-                        }
                     }
 
                     if (updateState is MainUiState.UpdateAvailable) {
@@ -82,30 +79,12 @@ class MainActivity : BaseLockActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        preferences.unregisterObserver()
+        viewModel.preferences.unregisterObserver()
     }
 
     fun checkForUpdates() {
         lifecycleScope.launch {
             viewModel.onEvent(MainUiEvent.CheckUpdate)
-        }
-    }
-
-    private fun observePreferences() {
-        lifecycleScope.launch {
-            launch {
-                preferences.observeChanges { key ->
-                    when (key) {
-                        BacktalkPreferences.KEY_DYNAMIC_COLOR -> recreate()
-                        BacktalkPreferences.KEY_THEME_MODE -> recreate()
-                        BacktalkPreferences.KEY_SECURE_SCREEN -> {
-                            val enabled = preferences.secureScreenEnabled
-                            isAnonymousMode = enabled
-                            updateSystemFlags(enabled)
-                        }
-                    }
-                }
-            }
         }
     }
 

@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.screen.preferences
 
+import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -112,7 +113,7 @@ class SettingsScreen : Screen {
         val showThemeDialog = remember { mutableStateOf(false) }
         val showOldBackupWarning = remember { mutableStateOf(false) }
 
-        var selectedUri by remember { mutableStateOf<android.net.Uri?>(null) }
+        var selectedUri by remember { mutableStateOf<Uri?>(null) }
         var isImporting by remember { mutableStateOf(false) }
 
         val exportLauncher = rememberLauncherForActivityResult(

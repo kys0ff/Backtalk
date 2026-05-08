@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.state.MainUiState
@@ -22,7 +23,8 @@ import off.kys.backtalk.util.openUrl
  */
 class MainViewModel(
     private val application: Application,
-    private val checkAppUpdate: CheckAppUpdate
+    private val checkAppUpdate: CheckAppUpdate,
+    val preferences: BacktalkPreferences,
 ) : AndroidViewModel(application) {
 
     /**
@@ -35,6 +37,12 @@ class MainViewModel(
      * Observers can use this to react to changes in the UI state.
      */
     val mainUiState: StateFlow<MainUiState> = _mainUiState
+
+    init {
+        if (preferences.autoUpdateEnabled) {
+            onEvent(MainUiEvent.CheckUpdate)
+        }
+    }
 
     /**
      * Processes UI events originating from the main screen.
@@ -67,10 +75,9 @@ class MainViewModel(
                     onUpdateAvailable = { result ->
                         _mainUiState.value = MainUiState.UpdateAvailable(result)
                     },
-                    onUpToDate = {
-                        _mainUiState.value = MainUiState.UpToDate
-                    }
-                )
+                ) {
+                    _mainUiState.value = MainUiState.UpToDate
+                }
             } catch (e: Exception) {
                 _mainUiState.value = MainUiState.Error(e.message ?: "Unknown error")
             }

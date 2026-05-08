@@ -126,7 +126,7 @@ private fun Module.useCaseModule() {
  * scoped correctly to their respective lifecycles.
  */
 private fun Module.viewModelModule() {
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
     viewModel { MessagesViewModel(get()) }
     viewModel { ThreadsViewModel(get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get()) }
