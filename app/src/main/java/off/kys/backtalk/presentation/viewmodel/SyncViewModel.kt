@@ -6,25 +6,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.repository.SyncRepository
+import off.kys.backtalk.presentation.state.SyncUiState
+import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.sync.DeviceInfo
-
-enum class SyncStatus {
-    IDLE, CONNECTING, PAIRING, SYNCING, COMPLETED, FAILED
-}
-
-data class SyncUiState(
-    val discoveredDevices: List<DeviceInfo> = emptyList(),
-    val pairedDevices: List<DeviceInfo> = emptyList(),
-    val isDiscovering: Boolean = false,
-    val incomingRequest: DeviceInfo? = null,
-    val showPinDialog: Boolean = false,
-    val pinToShow: String? = null,
-    val syncStatus: SyncStatus = SyncStatus.IDLE,
-    val error: String? = null,
-    val deviceBeingPaired: DeviceInfo? = null,
-    val deviceToUnpair: DeviceInfo? = null,
-    val deviceToRePair: DeviceInfo? = null
-)
 
 class SyncViewModel(
     private val syncRepository: SyncRepository

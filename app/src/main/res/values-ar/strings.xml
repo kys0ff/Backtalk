@@ -1,0 +1,239 @@
+<resources>
+    <string name="app_name" translatable="false">Backtalk</string>
+
+    <!-- Common -->
+    <string name="common_send">إرسال</string>
+    <string name="common_cancel">إلغاء</string>
+    <string name="common_delete">حذف</string>
+    <string name="common_copy">نسخ</string>
+    <string name="common_exit">خروج</string>
+    <string name="common_later">لاحقاً</string>
+    <string name="common_close">إغلاق</string>
+    <string name="common_clear">مسح</string>
+    <string name="common_back">رجوع</string>
+    <string name="common_ok">موافق</string>
+    <string name="common_please_wait">يرجى الانتظار…</string>
+    <string name="common_navigate_up">التنقل إلى الأعلى</string>
+    <string name="common_edit">تعديل</string>
+    <string name="common_search">بحث</string>
+    <string name="common_daily">يومياً</string>
+    <string name="common_weekly">أسبوعياً</string>
+    <string name="common_monthly">شهرياً</string>
+    <string name="common_not_set">لم يتم التعيين</string>
+    <string name="common_submit">إرسال</string>
+    <string name="common_export">تصدير</string>
+    <string name="common_confirm">تأكيد</string>
+    <string name="common_error">خطأ</string>
+    <string name="common_hide_password">إخفاء كلمة المرور</string>
+    <string name="common_show_password">إظهار كلمة المرور</string>
+    <string name="common_password_set">••••••••</string>
+
+    <!-- Chat -->
+    <string name="chat_title">الرسائل</string>
+    <string name="chat_input_hint">اكتب رسالة…</string>
+    <string name="chat_selection_title">تم اختيار الرسالة</string>
+    <string name="chat_selection_count">%1$d تم اختيارها</string>
+    <string name="chat_action_reply">رد</string>
+    <string name="chat_replying_to">الرد على</string>
+    <string name="chat_copy_success">تم النسخ إلى الحافظة</string>
+    <string name="chat_copy_label">النص المنسوخ</string>
+    <string name="chat_status_edited">تم التعديل</string>
+    <string name="chat_voice_message">[رسالة صوتية]</string>
+    <string name="chat_scroll_to_bottom">التمرير إلى الأسفل</string>
+    <string name="chat_sent_at">أُرسلت في</string>
+    <string name="chat_edited_at">تم التعديل في %1$s</string>
+    <string name="chat_input_slide_to_cancel">&lt; اسحب للإلغاء</string>
+    <string name="chat_input_hold_to_record">استمر بالضغط للتسجيل</string>
+    <string name="chat_input_record_cd">تسجيل</string>
+    <string name="chat_input_format_bold">ع</string>
+    <string name="chat_input_format_italic">م</string>
+    <string name="chat_input_format_underline">خ</string>
+    <string name="chat_input_format_strikethrough">ط</string>
+    <string name="chat_input_format_monospace">ث</string>
+    <string name="chat_delete_selected_title">حذف الرسائل؟</string>
+    <plurals name="chat_delete_selected_count_confirmation">
+        <item quantity="zero">هل أنت متأكد أنك تريد حذف %1$d رسالة مختارة؟</item>
+        <item quantity="one">هل أنت متأكد أنك تريد حذف رسالة واحدة مختارة؟</item>
+        <item quantity="two">هل أنت متأكد أنك تريد حذف رسالتين مختارتين؟</item>
+        <item quantity="few">هل أنت متأكد أنك تريد حذف %1$d رسائل مختارة؟</item>
+        <item quantity="many">هل أنت متأكد أنك تريد حذف %1$d رسالة مختارة؟</item>
+        <item quantity="other">هل أنت متأكد أنك تريد حذف %1$d رسالة مختارة؟</item>
+    </plurals>
+    <string name="chat_delete_undone_warning">لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="link_safety_title">رابط خارجي</string>
+    <string name="link_safety_message">أنت تغادر التطبيق لزيارة موقع خارجي. تأكد من ثقتك في هذا المصدر قبل المتابعة.</string>
+    <string name="link_safety_open">فتح</string>
+    <string name="link_safety_cancel">إلغاء</string>
+
+    <!-- Search -->
+    <string name="search_hint">بحث في الرسائل…</string>
+    <string name="search_previous">النتيجة السابقة</string>
+    <string name="search_next">النتيجة التالية</string>
+    <string name="search_results_count">%1$d من %2$d</string>
+    <string name="search_no_results">0 من 0</string>
+
+    <!-- Auth -->
+    <string name="auth_title">تحقق من هويتك</string>
+    <string name="auth_subtitle">يرجى المصادقة للمتابعة</string>
+    <string name="auth_locked_title">Backtalk مقفل</string>
+    <string name="auth_biometric_unavailable">المصادقة الحيوية غير مدعومة على هذا الجهاز</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_general_title">عام</string>
+    <string name="settings_general_summary">تفضيلات التطبيق وسلوكه</string>
+    <string name="settings_security_title">الأمان</string>
+    <string name="settings_security_and_privacy">الأمان والخصوصية</string>
+    <string name="settings_security_summary">إعدادات الخصوصية والحماية</string>
+    <string name="settings_about_title">حول</string>
+    <string name="settings_about_summary">معلومات حول التطبيق</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_theme">المظهر</string>
+    <string name="settings_theme_language">المظهر واللغة</string>
+    <string name="settings_dark_mode">الوضع الداكن</string>
+    <string name="settings_use_dark_theme">تفعيل المظهر الداكن</string>
+    <string name="settings_use_dynamic_color">استخدام الألوان الديناميكية</string>
+    <string name="settings_version">الإصدار</string>
+    <string name="settings_app_lock">قفل التطبيق</string>
+    <string name="settings_app_lock_desc">طلب المصادقة الحيوية عند التشغيل</string>
+    <string name="settings_secure_screen">أمان الشاشة</string>
+    <string name="settings_enable_secure_screen">شاشة آمنة</string>
+    <string name="settings_secure_screen_summary">إخفاء المحتوى في التطبيقات الأخيرة ومنع لقطات الشاشة</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_dynamic_color">ألوان Material You الديناميكية</string>
+    <string name="settings_dynamic_color_desc">تطبيق ألوان النظام على واجهة التطبيق</string>
+    <string name="settings_privacy_security">الخصوصية والأمان</string>
+    <string name="settings_enable_app_lock">تفعيل قفل التطبيق</string>
+    <string name="settings_haptic_feedback">الاستجابة اللمسية</string>
+    <string name="settings_haptic_feedback_desc">الاهتزاز عند التفاعلات مثل السحب للرد أو الضغط المطول</string>
+    <string name="settings_restart_required">يتطلب إعادة التشغيل لتطبيق التغييرات</string>
+    <string name="settings_developer">المطور</string>
+    <string name="settings_dev_name">kys0ff</string>
+    <string name="settings_dev_click">لقد وجدتني. الآن اذهب بعيداً.</string>
+    <string name="settings_dev_click_fine">حسناً…</string>
+    <string name="settings_secret_category">خيارات المطور</string>
+    <string name="settings_wipe_data">مسح جميع بيانات التطبيق</string>
+    <string name="settings_wipe_data_desc">مسح قاعدة البيانات، وذاكرة التخزين المؤقت، وجميع التفضيلات</string>
+    <string name="settings_show_secret_category">إظهار خيارات المطور</string>
+    <string name="settings_show_secret_category_desc">قم بتعطيله لإخفاء هذا القسم</string>
+    <string name="settings_stay_awake">ابقاء الشاشة تعمل</string>
+    <string name="settings_stay_awake_desc">يمنع الشاشة من الدخول في وضع السكون أثناء الشحن النشط أو جلسات التطوير.</string>
+    <string name="settings_wipe_data_confirm_title">مسح جميع البيانات؟</string>
+    <string name="settings_wipe_data_confirm_message">سيؤدي هذا إلى حذف جميع رسائلك، والرسائل المجدولة، والملاحظات الصوتية بشكل دائم، وإعادة تعيين جميع الإعدادات. لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="settings_license">تراخيص البرمجيات مفتوحة المصدر</string>
+    <string name="settings_license_desc">المكتبات المستخدمة في التطبيق</string>
+    <string name="settings_mit">ترخيص MIT</string>
+    <string name="settings_apache">ترخيص Apache 2.0</string>
+    <string name="settings_bsd">ترخيص BSD</string>
+    <string name="settings_information">معلومات</string>
+    <string name="settings_choose_theme">اختر المظهر</string>
+
+    <!-- Updates -->
+    <string name="update_dialog_title">يتوفر تحديث</string>
+    <string name="update_dialog_message">الإصدار %1$s متاح الآن.\n\n%2$s</string>
+    <string name="update_dialog_action_now">تحديث الآن</string>
+    <string name="settings_updates_title">التحديثات</string>
+    <string name="settings_auto_check_updates">التحقق من التحديثات تلقائياً</string>
+    <string name="settings_auto_check_updates_desc">التحقق بشكل دوري مما إذا كان هناك إصدار أحدث متاحاً</string>
+    <string name="settings_check_updates_now">التحقق من التحديثات الآن</string>
+    <string name="settings_check_updates_desc">معرفة ما إذا كنت تستخدم أحدث إصدار</string>
+    <string name="settings_checking_updates">جاري التحقق من وجود تحديثات…</string>
+    <string name="settings_up_to_date">أنت تستخدم أحدث إصدار بالفعل</string>
+
+    <!-- Backup & Restore -->
+    <string name="backup_title">النسخ الاحتياطي والاستعادة</string>
+    <string name="backup_summary">إدارة بياناتك من خلال النسخ الاحتياطي اليدوي</string>
+    <string name="backup_export_title">تصدير النسخة الاحتياطية</string>
+    <string name="backup_export_desc">إنشاء نسخة احتياطية مشفرة أو عادية (.bkt)</string>
+    <string name="backup_import_title">استيراد نسخة احتياطية</string>
+    <string name="backup_import_desc">استعادة البيانات من ملف تم تصديره مسبقاً</string>
+    <string name="backup_enter_password">أدخل كلمة المرور</string>
+    <string name="backup_password_optional">كلمة المرور (اختياري)</string>
+    <string name="backup_password_required">كلمة المرور مطلوبة</string>
+    <string name="backup_merge_data">دمج البيانات</string>
+    <string name="backup_clear_and_import">مسح واستيراد</string>
+    <string name="backup_import_strategy">استراتيجية الاستيراد</string>
+    <string name="backup_import_strategy_desc">اختر كيفية التعامل مع الرسائل الموجودة.</string>
+    <string name="backup_password_prompt">هل تريد حماية نسختك الاحتياطية بكلمة مرور؟</string>
+    <string name="backup_import_success">تم استيراد النسخة الاحتياطية بنجاح</string>
+    <string name="backup_import_failed">فشل الاستيراد</string>
+    <string name="backup_check_failed">فشل التحقق من النسخة الاحتياطية</string>
+    <string name="backup_export_failed">فشل التصدير</string>
+    <string name="backup_export_success">تم تصدير النسخة الاحتياطية بنجاح</string>
+    <string name="backup_error_incorrect_password">كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.</string>
+    <string name="backup_encrypted_prompt">هذه النسخة الاحتياطية مشفرة. يرجى إدخال كلمة المرور للمتابعة.</string>
+    <string name="backup_old_format_warning_title">تنسيق نسخة احتياطية قديم</string>
+    <string name="backup_old_format_warning_message">لقد قمت باستيراد تنسيق نسخة احتياطية قديم (.json). هذا التنسيق لا يدعم الرسائل الصوتية وهو أقل أماناً. نوصي بتصدير نسخة احتياطية جديدة (.bkt) لضمان سلامة جميع بياناتك.</string>
+
+    <!-- Auto Export -->
+    <string name="auto_export_title">التصدير التلقائي</string>
+    <string name="auto_export_summary">نسخ بياناتك احتياطياً بشكل دوري في الخلفية</string>
+    <string name="auto_export_interval">فترات التصدير</string>
+    <string name="auto_export_folder">مجلد النسخ الاحتياطي</string>
+    <string name="auto_export_select_folder">اختر المجلد</string>
+    <string name="auto_export_password">كلمة مرور التصدير التلقائي</string>
+    <string name="auto_export_encrypt">تشفير التصدير التلقائي</string>
+    <string name="auto_export_no_folder">لم يتم اختيار مجلد</string>
+    <string name="auto_export_permission_required">إذن المجلد مطلوب للتصدير التلقائي</string>
+    <string name="auto_export_password_desc">سيتم استخدام كلمة المرور هذه لتشفير النسخ الاحتياطية المجدولة.</string>
+
+    <!-- Threads -->
+    <string name="threads_title">السلاسل</string>
+    <string name="threads_filter_replies">تضمين الردود</string>
+    <string name="threads_filter_time">تجميع حسب الفاصل الزمني</string>
+    <string name="threads_view_replies">عرض %1$d ردود</string>
+    <string name="threads_empty">لم يتم العثور على سلاسل</string>
+    <string name="threads_replies_count">الردود · %1$d</string>
+    <string name="threads_you">أنت</string>
+    <string name="threads_at_you">\@أنت</string>
+    <string name="threads_at_you_timestamp">\@أنت · %1$s</string>
+    <string name="threads_share">مشاركة</string>
+
+    <!-- Reminders -->
+    <string name="chat_reminder_tag">تذكير</string>
+    <string name="chat_reminder_notification_channel">التذكيرات</string>
+    <string name="chat_reminder_notification_title">ملاحظة لنفسي</string>
+    <string name="chat_reminder_original_time">الأصلي:</string>
+    <string name="chat_reminder_target_time">الهدف:</string>
+    <string name="chat_reminder_permission_rationale">لتسليم "ملاحظاتك المستقبلية" في الوقت المناسب، يحتاج Backtalk إلى إذن لإظهار الإشعارات وجدولة التنبيهات الدقيقة. هل ترغب في منح هذه الأذونات في الإعدادات؟</string>
+    <string name="chat_reminder_open_settings">فتح الإعدادات</string>
+
+    <!-- Message Scheduling -->
+    <string name="message_scheduling_select_time">اختر الوقت</string>
+
+    <!-- Sync & Devices -->
+    <string name="sync_title">المزامنة والأجهزة</string>
+    <string name="sync_summary">مزامنة الرسائل بين الأجهزة على نفس شبكة Wi-Fi</string>
+    <string name="sync_available_devices">الأجهزة المتاحة</string>
+    <string name="sync_paired_devices">الأجهزة المقترنة</string>
+    <string name="sync_discover_devices">اكتشاف الأجهزة</string>
+    <string name="sync_stop_discovery">إيقاف الاكتشاف</string>
+    <string name="sync_discovery_active">جاري البحث عن أجهزة…</string>
+    <string name="sync_no_devices_found">لم يتم العثور على أجهزة</string>
+    <string name="sync_request_pairing">طلب اقتران</string>
+    <string name="sync_pairing_request_title">طلب اقتران وارد</string>
+    <string name="sync_pairing_request_msg">تم استلام طلب اقتران من</string>
+    <string name="sync_show_pin">إظهار رمز PIN</string>
+    <string name="sync_enter_pin">أدخل رمز PIN</string>
+    <string name="sync_pin_label">أدخل رمز PIN المكون من 6 أرقام والموضح على الجهاز الآخر</string>
+    <string name="sync_pin_incorrect">رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.</string>
+    <string name="sync_pairing_success">تم الاقتران بنجاح</string>
+    <string name="sync_pairing_failed">فشل الاقتران</string>
+    <string name="sync_status_syncing">جاري المزامنة…</string>
+    <string name="sync_status_up_to_date">محدث</string>
+    <string name="sync_status_connection_lost">انقطع الاتصال</string>
+    <string name="sync_status_last_synced">آخر مزامنة: %1$s</string>
+    <string name="sync_now">المزامنة الآن</string>
+    <string name="sync_pull">مزامنة السحب</string>
+    <string name="sync_cleanup_invalid">تنظيف الأجهزة غير الصالحة</string>
+    <string name="sync_status_online">متصل</string>
+    <string name="sync_status_offline">غير متصل</string>
+    <string name="sync_disconnect">قطع الاتصال</string>
+    <string name="sync_disconnect_confirm">هل تريد قطع الاتصال من "%1$s"؟</string>
+    <string name="sync_pairing_pin_title">رمز PIN للاقتران</string>
+    <string name="sync_pairing_pin_msg">أدخل رمز PIN هذا على الجهاز الآخر:</string>
+    <string name="sync_already_paired_title">مقترن بالفعل</string>
+    <string name="sync_already_paired_msg">أنت مقترن بالفعل بـ "%1$s". هل تريد إلغاء الاقتران وبدء اقتران جديد؟</string>
+    <string name="sync_unpair_and_restart">إلغاء الاقتران والبدء من جديد</string>
+
+</resources>

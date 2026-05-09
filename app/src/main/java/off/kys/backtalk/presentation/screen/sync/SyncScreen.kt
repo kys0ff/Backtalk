@@ -66,7 +66,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncStatus
+import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.sync.DeviceInfo
 import off.kys.backtalk.util.emptyString
