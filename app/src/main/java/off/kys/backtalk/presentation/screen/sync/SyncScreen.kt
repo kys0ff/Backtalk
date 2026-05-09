@@ -103,6 +103,22 @@ class SyncScreen : Screen {
                             )
                         }
                     },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                if (state.isDiscovering) {
+                                    viewModel.stopDiscovery()
+                                } else {
+                                    viewModel.startDiscovery()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(if (state.isDiscovering) R.drawable.round_close_24 else R.drawable.round_refresh_24),
+                                contentDescription = stringResource(if (state.isDiscovering) R.string.sync_stop_discovery else R.string.common_search)
+                            )
+                        }
+                    }
                 )
             }
         ) { padding ->
