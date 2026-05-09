@@ -12,6 +12,7 @@
     <string name="common_clear">Clear</string>
     <string name="common_back">Back</string>
     <string name="common_ok">OK</string>
+    <string name="common_please_wait">Please wait…</string>
     <string name="common_navigate_up">Navigate up</string>
     <string name="common_edit">Edit</string>
     <string name="common_search">Search</string>
