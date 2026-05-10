@@ -18,13 +18,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.sync.DeviceInfo
 
 @Composable
-fun IncomingRequestDialog(device: DeviceInfo, viewModel: SyncViewModel) {
+fun IncomingRequestDialog(
+    device: DeviceInfo,
+    onAcceptPairingRequest: (DeviceInfo) -> Unit,
+    onRefusePairingRequest: (DeviceInfo) -> Unit,
+    onDismissRequest: () -> Unit
+) {
     AlertDialog(
-        onDismissRequest = { viewModel.dismissIncomingRequest() },
+        onDismissRequest = onDismissRequest,
         icon = {
             Icon(
                 painter = painterResource(R.drawable.round_sync_problem_24),
@@ -62,7 +66,7 @@ fun IncomingRequestDialog(device: DeviceInfo, viewModel: SyncViewModel) {
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.acceptRequest(device) },
+                onClick = { onAcceptPairingRequest(device) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium
             ) {
@@ -71,7 +75,7 @@ fun IncomingRequestDialog(device: DeviceInfo, viewModel: SyncViewModel) {
         },
         dismissButton = {
             TextButton(
-                onClick = { viewModel.refuseRequest(device) },
+                onClick = { onRefusePairingRequest(device) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(

@@ -19,12 +19,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 
 @Composable
-fun PinDisplayDialog(pin: String, viewModel: SyncViewModel) {
+fun PinDisplayDialog(
+    pin: String,
+    onDismissRequest: () -> Unit
+) {
     AlertDialog(
-        onDismissRequest = { viewModel.dismissPinDialog() },
+        onDismissRequest = { onDismissRequest() },
         title = {
             Text(
                 text = stringResource(R.string.sync_pairing_pin_title),
@@ -74,7 +76,7 @@ fun PinDisplayDialog(pin: String, viewModel: SyncViewModel) {
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.dismissPinDialog() },
+                onClick = { onDismissRequest() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.common_ok))

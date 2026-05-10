@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.screen.sync.components
 
 import androidx.compose.runtime.Composable
+import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.state.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
@@ -13,19 +14,35 @@ fun SyncDialogs(
     onPinInputChange: (String) -> Unit
 ) {
     state.deviceToUnpair?.let { device ->
-        UnpairDialog(device, viewModel)
+        UnpairDialog(
+            device = device,
+            onDisconnectDevice = { viewModel.onEvent(SyncEvent.Disconnect(it)) }
+        ) {
+            viewModel.onEvent(
+                SyncEvent.DismissUnpairDialog
+            )
+        }
     }
 
     state.deviceToRePair?.let { device ->
-        RePairDialog(device, viewModel)
+        RePairDialog(
+            device = device,
+            onConfirmRePair = { viewModel.onEvent(SyncEvent.ConfirmRePair(device)) },
+            onDismissRequest = { viewModel.onEvent(SyncEvent.DismissRePairDialog) }
+        )
     }
 
     state.incomingRequest?.let { device ->
-        IncomingRequestDialog(device, viewModel)
+        IncomingRequestDialog(
+            device = device,
+            onAcceptPairingRequest = { viewModel.onEvent(SyncEvent.AcceptPairingRequest(device)) },
+            onRefusePairingRequest = { viewModel.onEvent(SyncEvent.RefusePairingRequest(device)) },
+            onDismissRequest = { viewModel.onEvent(SyncEvent.DismissIncomingRequest) }
+        )
     }
 
     state.pinToShow?.let { pin ->
-        PinDisplayDialog(pin, viewModel)
+        PinDisplayDialog(pin) { viewModel.onEvent(SyncEvent.DismissPinDialog) }
     }
 
     if (state.showPinDialog) {
@@ -33,7 +50,12 @@ fun SyncDialogs(
             pinInput = pinInput,
             onPinInputChange = onPinInputChange,
             deviceBeingPaired = state.deviceBeingPaired,
-            viewModel = viewModel
+            onVerifyPin = { device, pin ->
+                device?.let {
+                    viewModel.onEvent(SyncEvent.VerifyPin(it, pin))
+                }
+            },
+            onDismissRequest = { viewModel.onEvent(SyncEvent.DismissPinDialog) }
         )
     }
 
@@ -42,6 +64,6 @@ fun SyncDialogs(
     }
 
     state.error?.let { error ->
-        ErrorDialog(error, viewModel)
+        ErrorDialog(error) { viewModel.onEvent(SyncEvent.ClearError) }
     }
 }

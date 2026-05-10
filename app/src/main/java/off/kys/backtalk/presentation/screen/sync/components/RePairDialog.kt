@@ -13,13 +13,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.sync.DeviceInfo
 
 @Composable
-fun RePairDialog(device: DeviceInfo, viewModel: SyncViewModel) {
+fun RePairDialog(
+    device: DeviceInfo,
+    onConfirmRePair: (DeviceInfo) -> Unit,
+    onDismissRequest: () -> Unit
+) {
     AlertDialog(
-        onDismissRequest = { viewModel.dismissRePairDialog() },
+        onDismissRequest = onDismissRequest,
         icon = {
             Icon(
                 painter = painterResource(R.drawable.round_sync_problem_24),
@@ -45,7 +48,7 @@ fun RePairDialog(device: DeviceInfo, viewModel: SyncViewModel) {
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.confirmRePair(device) },
+                onClick = { onConfirmRePair(device) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.sync_unpair_and_restart))
@@ -53,7 +56,7 @@ fun RePairDialog(device: DeviceInfo, viewModel: SyncViewModel) {
         },
         dismissButton = {
             TextButton(
-                onClick = { viewModel.dismissRePairDialog() },
+                onClick = onDismissRequest,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.common_cancel))

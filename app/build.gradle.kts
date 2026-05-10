@@ -13,9 +13,9 @@ android {
 
     defaultConfig {
         applicationId = "off.kys.backtalk"
-        minSdk = 24
+        minSdk = 23
         //noinspection OldTargetApi
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 11
         versionName = "0.1.6"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
@@ -54,6 +54,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -76,6 +77,8 @@ kotlin {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -98,12 +101,14 @@ dependencies {
     implementation(libs.androidx.concurrent.futures)
     implementation(libs.gau)
     ksp(libs.room.compiler)
+
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.koin.test)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

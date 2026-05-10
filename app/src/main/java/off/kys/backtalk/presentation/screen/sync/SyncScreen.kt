@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.screen.sync.components.SyncDeviceList
 import off.kys.backtalk.presentation.screen.sync.components.SyncDialogs
 import off.kys.backtalk.presentation.screen.sync.components.SyncTopBar
@@ -29,12 +30,12 @@ class SyncScreen : Screen {
         var pinInput by remember { mutableStateOf(emptyString()) }
 
         LaunchedEffect(Unit) {
-            viewModel.cleanupInvalidDevices()
-            viewModel.startDiscovery()
+            viewModel.onEvent(SyncEvent.CleanupInvalidDevices)
+            viewModel.onEvent(SyncEvent.StartDiscovery)
         }
 
         DisposableEffect(Unit) {
-            onDispose { viewModel.stopDiscovery() }
+            onDispose { viewModel.onEvent(SyncEvent.StopDiscovery) }
         }
 
         Scaffold(
@@ -44,9 +45,9 @@ class SyncScreen : Screen {
                     onBackClick = { navigator.pop() },
                     onDiscoveryClick = {
                         if (state.isDiscovering) {
-                            viewModel.stopDiscovery()
+                            viewModel.onEvent(SyncEvent.StopDiscovery)
                         } else {
-                            viewModel.startDiscovery()
+                            viewModel.onEvent(SyncEvent.StartDiscovery)
                         }
                     }
                 )
@@ -55,10 +56,10 @@ class SyncScreen : Screen {
             SyncDeviceList(
                 padding = padding,
                 state = state,
-                onPairClick = { viewModel.requestPairing(it) },
-                onPushClick = { viewModel.syncNow(it) },
-                onPullClick = { viewModel.pullSync(it) },
-                onDisconnectClick = { viewModel.confirmUnpair(it) }
+                onPairClick = { viewModel.onEvent(SyncEvent.RequestPairing(it)) },
+                onPushClick = { viewModel.onEvent(SyncEvent.SyncNow(it)) },
+                onPullClick = { viewModel.onEvent(SyncEvent.PullSync(it)) },
+                onDisconnectClick = { viewModel.onEvent(SyncEvent.ConfirmUnpair(it)) }
             )
 
             SyncDialogs(

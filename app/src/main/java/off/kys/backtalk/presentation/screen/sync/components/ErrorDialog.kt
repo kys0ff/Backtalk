@@ -13,12 +13,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 
 @Composable
-fun ErrorDialog(error: String, viewModel: SyncViewModel) {
+fun ErrorDialog(error: String, onClearError: () -> Unit) {
     AlertDialog(
-        onDismissRequest = { viewModel.clearError() },
+        onDismissRequest = { onClearError() },
         icon = {
             Icon(
                 painter = painterResource(R.drawable.round_warning_24),
@@ -44,7 +43,7 @@ fun ErrorDialog(error: String, viewModel: SyncViewModel) {
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.clearError() },
+                onClick = { onClearError() },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.onErrorContainer

@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.sync.DeviceInfo
 import off.kys.backtalk.util.emptyString
 
@@ -39,7 +38,8 @@ fun PinInputDialog(
     pinInput: String,
     onPinInputChange: (String) -> Unit,
     deviceBeingPaired: DeviceInfo?,
-    viewModel: SyncViewModel
+    onVerifyPin: (DeviceInfo?, String) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -49,7 +49,7 @@ fun PinInputDialog(
     }
 
     AlertDialog(
-        onDismissRequest = { viewModel.dismissPinDialog() },
+        onDismissRequest = onDismissRequest,
         title = {
             Text(
                 text = stringResource(R.string.sync_enter_pin),
@@ -120,11 +120,7 @@ fun PinInputDialog(
         },
         confirmButton = {
             Button(
-                onClick = {
-                    deviceBeingPaired?.let {
-                        viewModel.verifyPin(it, pinInput)
-                    }
-                },
+                onClick = { onVerifyPin(deviceBeingPaired, pinInput) },
                 enabled = pinInput.length == 6,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -133,7 +129,7 @@ fun PinInputDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = { viewModel.dismissPinDialog() },
+                onClick = onDismissRequest,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.common_cancel))

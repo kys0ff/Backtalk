@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.repository.SyncRepository
+import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.state.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.sync.DeviceInfo
@@ -47,18 +48,40 @@ class SyncViewModel(
         }
     }
 
-    fun startDiscovery() {
+    fun onEvent(event: SyncEvent) {
+        when (event) {
+            SyncEvent.StartDiscovery -> startDiscovery()
+            SyncEvent.StopDiscovery -> stopDiscovery()
+            is SyncEvent.RequestPairing -> requestPairing(event.device)
+            is SyncEvent.AcceptPairingRequest -> acceptRequest(event.device)
+            is SyncEvent.RefusePairingRequest -> refuseRequest(event.device)
+            is SyncEvent.VerifyPin -> verifyPin(event.device, event.pin)
+            is SyncEvent.SyncNow -> syncNow(event.device)
+            is SyncEvent.PullSync -> pullSync(event.device)
+            SyncEvent.CleanupInvalidDevices -> cleanupInvalidDevices()
+            is SyncEvent.ConfirmUnpair -> confirmUnpair(event.device)
+            is SyncEvent.ConfirmRePair -> confirmRePair(event.device)
+            SyncEvent.DismissUnpairDialog -> dismissUnpairDialog()
+            SyncEvent.DismissRePairDialog -> dismissRePairDialog()
+            is SyncEvent.Disconnect -> disconnect(event.device)
+            SyncEvent.DismissIncomingRequest -> dismissIncomingRequest()
+            SyncEvent.DismissPinDialog -> dismissPinDialog()
+            SyncEvent.ClearError -> clearError()
+        }
+    }
+
+    private fun startDiscovery() {
         _state.value = _state.value.copy(isDiscovering = true)
         syncRepository.startDiscovery()
         syncRepository.startServer()
     }
 
-    fun stopDiscovery() {
+    private fun stopDiscovery() {
         _state.value = _state.value.copy(isDiscovering = false)
         syncRepository.stopDiscovery()
     }
 
-    fun requestPairing(device: DeviceInfo) {
+    private fun requestPairing(device: DeviceInfo) {
         val isAlreadyPaired = _state.value.pairedDevices.any { it.id == device.id }
         if (isAlreadyPaired) {
             _state.value = _state.value.copy(deviceToRePair = device)
@@ -90,7 +113,7 @@ class SyncViewModel(
         }
     }
 
-    fun acceptRequest(device: DeviceInfo) {
+    private fun acceptRequest(device: DeviceInfo) {
         stopDiscovery()
         val pin = syncRepository.generatePin()
         _state.value = _state.value.copy(
@@ -102,12 +125,12 @@ class SyncViewModel(
         syncRepository.acceptPairingRequest(device, pin)
     }
 
-    fun refuseRequest(device: DeviceInfo) {
+    private fun refuseRequest(device: DeviceInfo) {
         _state.value = _state.value.copy(incomingRequest = null)
         syncRepository.refusePairingRequest(device)
     }
 
-    fun verifyPin(device: DeviceInfo, pin: String) {
+    private fun verifyPin(device: DeviceInfo, pin: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(syncStatus = SyncStatus.PAIRING)
             val result = syncRepository.verifyPin(device, pin)
@@ -125,7 +148,7 @@ class SyncViewModel(
         }
     }
 
-    fun syncNow(device: DeviceInfo) {
+    private fun syncNow(device: DeviceInfo) {
         viewModelScope.launch {
             _state.value = _state.value.copy(syncStatus = SyncStatus.SYNCING)
             val result = syncRepository.syncWithDevice(device)
@@ -140,7 +163,7 @@ class SyncViewModel(
         }
     }
 
-    fun pullSync(device: DeviceInfo) {
+    private fun pullSync(device: DeviceInfo) {
         viewModelScope.launch {
             _state.value = _state.value.copy(syncStatus = SyncStatus.SYNCING)
             val result = syncRepository.pullSync(device)
@@ -155,38 +178,38 @@ class SyncViewModel(
         }
     }
 
-    fun cleanupInvalidDevices() {
+    private fun cleanupInvalidDevices() {
         syncRepository.cleanupInvalidDevices()
     }
 
-    fun confirmUnpair(device: DeviceInfo) {
+    private fun confirmUnpair(device: DeviceInfo) {
         _state.value = _state.value.copy(deviceToUnpair = device)
     }
 
-    fun confirmRePair(device: DeviceInfo) {
+    private fun confirmRePair(device: DeviceInfo) {
         syncRepository.disconnectDevice(device)
         _state.value = _state.value.copy(deviceToRePair = null)
         performPairing(device)
     }
 
-    fun dismissUnpairDialog() {
+    private fun dismissUnpairDialog() {
         _state.value = _state.value.copy(deviceToUnpair = null)
     }
 
-    fun dismissRePairDialog() {
+    private fun dismissRePairDialog() {
         _state.value = _state.value.copy(deviceToRePair = null)
     }
 
-    fun disconnect(device: DeviceInfo) {
+    private fun disconnect(device: DeviceInfo) {
         syncRepository.disconnectDevice(device)
         _state.value = _state.value.copy(deviceToUnpair = null)
     }
 
-    fun dismissIncomingRequest() {
+    private fun dismissIncomingRequest() {
         _state.value = _state.value.copy(incomingRequest = null)
     }
 
-    fun dismissPinDialog() {
+    private fun dismissPinDialog() {
         _state.value = _state.value.copy(
             showPinDialog = false,
             pinToShow = null,
@@ -194,7 +217,7 @@ class SyncViewModel(
         )
     }
 
-    fun clearError() {
+    private fun clearError() {
         _state.value = _state.value.copy(error = null, syncStatus = SyncStatus.IDLE)
     }
 
