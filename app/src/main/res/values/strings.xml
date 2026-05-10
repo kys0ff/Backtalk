@@ -23,6 +23,7 @@
     <string name="common_submit">Submit</string>
     <string name="common_export">Export</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_experimental">Experimental</string>
     <string name="common_error">Error</string>
     <string name="common_hide_password">Hide password</string>
     <string name="common_show_password">Show password</string>
@@ -121,6 +122,8 @@
     <string name="settings_bsd">BSD License</string>
     <string name="settings_information">Information</string>
     <string name="settings_choose_theme">Choose Theme</string>
+    <string name="settings_experimental_sync_title">Experimental Feature</string>
+    <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
 
     <!-- Updates -->
     <string name="update_dialog_title">Update available</string>

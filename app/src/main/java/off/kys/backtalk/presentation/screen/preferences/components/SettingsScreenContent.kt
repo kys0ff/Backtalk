@@ -1,0 +1,644 @@
+package off.kys.backtalk.presentation.screen.preferences.components
+
+import android.net.Uri
+import android.provider.DocumentsContract
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
+import off.kys.backtalk.BuildConfig
+import off.kys.backtalk.R
+import off.kys.backtalk.presentation.event.SettingsUiEvent
+import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.util.isSecurityEnabled
+import off.kys.backtalk.util.toast
+
+/**
+ * Stateless content for the Settings screen.
+ * This allows the screen to be previewed without requiring a running Koin application.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreenContent(
+    state: SettingsUiState,
+    onEvent: (SettingsUiEvent) -> Unit,
+    onNavigateBack: () -> Unit,
+    onSyncClicked: () -> Unit,
+    onLicenseClicked: () -> Unit,
+    onCheckUpdates: () -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val context = LocalContext.current
+
+    val showExportDialog = remember { mutableStateOf(false) }
+    val showImportStrategyDialog = remember { mutableStateOf(false) }
+    val showPasswordDialog = remember { mutableStateOf(false) }
+    val showIntervalDialog = remember { mutableStateOf(false) }
+    val showAutoExportPasswordDialog = remember { mutableStateOf(false) }
+    val showThemeDialog = remember { mutableStateOf(false) }
+    val showOldBackupWarning = remember { mutableStateOf(false) }
+    val showWipeDataDialog = remember { mutableStateOf(false) }
+    val showExperimentalSyncDialog = remember { mutableStateOf(false) }
+
+    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    var isImporting by remember { mutableStateOf(false) }
+    var devClickCount by remember { mutableIntStateOf(0) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+        uri?.let {
+            selectedUri = it
+            showExportDialog.value = true
+        }
+    }
+
+    val folderLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            onEvent(SettingsUiEvent.OnAutoExportFolderChange(it))
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            onEvent(SettingsUiEvent.CheckBackupEncryption(it))
+        }
+    }
+
+    LaunchedEffect(state.isBackupEncrypted) {
+        if (state.isBackupEncrypted != null) {
+            showImportStrategyDialog.value = true
+        }
+    }
+
+    LaunchedEffect(state.showOldBackupWarning) {
+        if (state.showOldBackupWarning) {
+            showOldBackupWarning.value = true
+        }
+    }
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            context.toast(it)
+            onEvent(SettingsUiEvent.ClearError)
+        }
+    }
+
+    LaunchedEffect(state.successMessage) {
+        state.successMessage?.let {
+            context.toast(it)
+            onEvent(SettingsUiEvent.ClearSuccess)
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            Column {
+                SettingsTopAppBar(
+                    onNavigateBack = onNavigateBack,
+                    scrollBehavior = scrollBehavior
+                )
+                if (state.backupLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            // Appearance Section
+            SettingsSection(title = stringResource(R.string.settings_appearance)) {
+                SettingsItem(
+                    label = stringResource(R.string.settings_theme),
+                    value = state.themeMode.name.lowercase()
+                        .replaceFirstChar { it.uppercase() },
+                    icon = painterResource(R.drawable.round_brightness_6_24),
+                    onClick = { showThemeDialog.value = true }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_dynamic_color),
+                    supportingText = stringResource(R.string.settings_dynamic_color_desc),
+                    icon = painterResource(R.drawable.round_palette_24),
+                    checked = state.dynamicColorEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnDynamicColorToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+            }
+
+            // Security Section
+            SettingsSection(title = stringResource(R.string.settings_privacy_security)) {
+                if (context.isSecurityEnabled()) {
+                    SettingsToggle(
+                        label = stringResource(R.string.settings_enable_app_lock),
+                        supportingText = stringResource(R.string.settings_app_lock_desc),
+                        icon = painterResource(R.drawable.round_lock_24),
+                        checked = state.lockEnabled,
+                        onCheckedChange = { onEvent(SettingsUiEvent.OnLockToggle(it)) }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                }
+                SettingsToggle(
+                    label = stringResource(R.string.settings_secure_screen),
+                    supportingText = stringResource(R.string.settings_secure_screen_summary),
+                    icon = painterResource(R.drawable.round_screen_lock_portrait_24),
+                    checked = state.secureScreenEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnSecureScreenToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_haptic_feedback),
+                    supportingText = stringResource(R.string.settings_haptic_feedback_desc),
+                    icon = painterResource(R.drawable.round_vibration_24),
+                    checked = state.hapticFeedbackEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnHapticFeedbackToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+            }
+
+            // Backup Section
+            SettingsSection(title = stringResource(R.string.backup_title)) {
+                SettingsItem(
+                    label = stringResource(R.string.backup_export_title),
+                    value = stringResource(R.string.backup_export_desc),
+                    icon = painterResource(R.drawable.round_send_24),
+                    onClick = { exportLauncher.launch("backtalk_backup_${System.currentTimeMillis()}.bkt") }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.backup_import_title),
+                    value = stringResource(R.string.backup_import_desc),
+                    icon = painterResource(R.drawable.round_reply_24),
+                    onClick = {
+                        importLauncher.launch(
+                            arrayOf(
+                                "application/json",
+                                "application/octet-stream",
+                                "*/*"
+                            )
+                        )
+                    }
+                )
+            }
+
+            // Sync Section
+            SettingsSection(title = stringResource(R.string.sync_title)) {
+                SettingsItem(
+                    label = stringResource(R.string.sync_title),
+                    value = stringResource(R.string.sync_summary),
+                    icon = painterResource(R.drawable.round_refresh_24),
+                    onClick = onSyncClicked,
+                    badge = {
+                        Surface(
+                            onClick = { showExperimentalSyncDialog.value = true },
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.common_experimental),
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
+                )
+            }
+
+            // Auto Export Section
+            SettingsSection(title = stringResource(R.string.auto_export_title)) {
+                SettingsToggle(
+                    label = stringResource(R.string.auto_export_title),
+                    supportingText = stringResource(R.string.auto_export_summary),
+                    icon = painterResource(R.drawable.round_update_24),
+                    checked = state.autoExportEnabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled && state.autoExportUri == null) folderLauncher.launch(null)
+                        else onEvent(SettingsUiEvent.OnAutoExportToggle(enabled))
+                    }
+                )
+
+                AnimatedVisibility(visible = state.autoExportEnabled) {
+                    Column {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        val folderName = state.autoExportUri?.let {
+                            DocumentFile.fromTreeUri(
+                                context,
+                                it.toUri()
+                            )?.name
+                        } ?: stringResource(R.string.auto_export_no_folder)
+                        SettingsItem(
+                            label = stringResource(R.string.auto_export_folder),
+                            value = folderName,
+                            icon = painterResource(R.drawable.round_folder_24),
+                            onClick = { folderLauncher.launch(null) }
+                        )
+                        SettingsItem(
+                            label = stringResource(R.string.auto_export_interval),
+                            value = stringResource(state.autoExportInterval.titleResId),
+                            icon = painterResource(R.drawable.round_refresh_24),
+                            onClick = { showIntervalDialog.value = true }
+                        )
+                        SettingsToggle(
+                            label = stringResource(R.string.auto_export_encrypt),
+                            icon = painterResource(R.drawable.round_lock_24),
+                            checked = state.autoExportEncrypted,
+                            onCheckedChange = {
+                                onEvent(
+                                    SettingsUiEvent.OnAutoExportEncryptionToggle(
+                                        it
+                                    )
+                                )
+                                if (it && state.autoExportPassword.isNullOrBlank()) {
+                                    showAutoExportPasswordDialog.value = true
+                                }
+                            }
+                        )
+                        AnimatedVisibility(visible = state.autoExportEncrypted) {
+                            SettingsItem(
+                                label = stringResource(R.string.auto_export_password),
+                                value = if (state.autoExportPassword.isNullOrBlank())
+                                    stringResource(R.string.common_not_set)
+                                else stringResource(R.string.common_password_set),
+                                icon = painterResource(R.drawable.round_security_24),
+                                onClick = { showAutoExportPasswordDialog.value = true }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Updates & About
+            SettingsSection(title = stringResource(R.string.settings_information)) {
+                if (!BuildConfig.IS_FDROID) {
+                    SettingsToggle(
+                        label = stringResource(R.string.settings_auto_check_updates),
+                        supportingText = stringResource(R.string.settings_auto_check_updates_desc),
+                        icon = painterResource(R.drawable.round_update_24),
+                        checked = state.autoUpdateEnabled,
+                        onCheckedChange = {
+                            onEvent(
+                                SettingsUiEvent.OnAutoUpdateToggle(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                    SettingsItem(
+                        label = stringResource(R.string.settings_check_updates_now),
+                        value = stringResource(R.string.settings_check_updates_desc),
+                        icon = painterResource(R.drawable.round_refresh_24),
+                        onClick = {
+                            context.toast(R.string.settings_checking_updates)
+                            onCheckUpdates()
+                        }
+                    )
+                }
+                SettingsItem(
+                    label = stringResource(R.string.settings_version),
+                    value = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    icon = painterResource(R.drawable.round_info_24)
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_license),
+                    value = stringResource(R.string.settings_license_desc),
+                    icon = painterResource(R.drawable.round_info_24),
+                    onClick = onLicenseClicked
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_developer),
+                    value = stringResource(R.string.settings_dev_name),
+                    icon = painterResource(R.drawable.round_person_24),
+                    onClick = {
+                        if (!state.devModeEnabled) {
+                            devClickCount++
+                            if (devClickCount > 3) {
+                                context.toast(R.string.settings_dev_click_fine)
+                                onEvent(SettingsUiEvent.OnDevModeToggle(true))
+                                devClickCount = 0
+                            } else {
+                                context.toast(R.string.settings_dev_click)
+                            }
+                        } else {
+                            context.toast(R.string.settings_dev_click)
+                        }
+                    }
+                )
+            }
+
+            // Developer Options
+            AnimatedVisibility(state.devModeEnabled) {
+                SettingsSection(title = stringResource(R.string.settings_secret_category)) {
+                    SettingsToggle(
+                        label = stringResource(R.string.settings_show_secret_category),
+                        supportingText = stringResource(R.string.settings_show_secret_category_desc),
+                        icon = painterResource(R.drawable.round_visibility_off_24),
+                        checked = true,
+                        onCheckedChange = { onEvent(SettingsUiEvent.OnDevModeToggle(it)) }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                    SettingsToggle(
+                        label = stringResource(R.string.settings_stay_awake),
+                        supportingText = stringResource(R.string.settings_stay_awake_desc),
+                        icon = painterResource(R.drawable.round_visibility_24),
+                        checked = state.keepScreenOn,
+                        onCheckedChange = {
+                            onEvent(
+                                SettingsUiEvent.OnKeepScreenOnToggle(
+                                    it
+                                )
+                            )
+                        }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                    SettingsItem(
+                        label = stringResource(R.string.settings_wipe_data),
+                        value = stringResource(R.string.settings_wipe_data_desc),
+                        icon = painterResource(R.drawable.round_delete_sweep_24),
+                        onClick = { showWipeDataDialog.value = true }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+
+    // Dialogs
+    if (showThemeDialog.value) {
+        ThemeSelectionDialog(
+            selected = state.themeMode,
+            onDismiss = { showThemeDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value =
+                false
+            }
+        )
+    }
+
+    if (showExportDialog.value) {
+        ExportDialog(
+            onDismiss = {
+                showExportDialog.value = false
+                selectedUri?.let { uri ->
+                    runCatching {
+                        DocumentsContract.deleteDocument(context.contentResolver, uri)
+                    }
+                }
+                selectedUri = null
+            },
+            onConfirm = { exportPassword ->
+                showExportDialog.value = false
+                selectedUri?.let { uri ->
+                    onEvent(
+                        SettingsUiEvent.ExportBackup(uri, exportPassword)
+                    )
+                }
+                selectedUri = null
+            }
+        )
+    }
+
+    if (showImportStrategyDialog.value) {
+        ImportStrategyDialog(
+            onDismiss = {
+                showImportStrategyDialog.value = false
+                onEvent(SettingsUiEvent.ResetBackupState)
+            },
+            onConfirm = { clearAndImport ->
+                showImportStrategyDialog.value = false
+                isImporting = clearAndImport
+                if (state.isBackupEncrypted == true) {
+                    showPasswordDialog.value = true
+                } else {
+                    state.selectedBackupUri?.let { uri ->
+                        onEvent(
+                            SettingsUiEvent.ImportBackup(uri, null, clearAndImport)
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    if (showPasswordDialog.value || state.wrongPasswordError) {
+        PasswordDialog(
+            wrongPasswordError = state.wrongPasswordError,
+            onDismiss = {
+                showPasswordDialog.value = false
+                onEvent(SettingsUiEvent.ResetBackupState)
+            },
+            onConfirm = { enteredPassword ->
+                showPasswordDialog.value = false
+                state.selectedBackupUri?.let { uri ->
+                    onEvent(
+                        SettingsUiEvent.ImportBackup(
+                            uri,
+                            enteredPassword.ifBlank { null },
+                            isImporting
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+    if (showIntervalDialog.value) {
+        IntervalSelectionDialog(
+            selected = state.autoExportInterval,
+            onDismiss = { showIntervalDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnAutoExportIntervalChange(it))
+                showIntervalDialog.value = false
+            }
+        )
+    }
+
+    if (showAutoExportPasswordDialog.value) {
+        AutoExportPasswordDialog(
+            onDismiss = { showAutoExportPasswordDialog.value = false },
+            onConfirm = { password ->
+                onEvent(SettingsUiEvent.OnAutoExportPasswordChange(password))
+                showAutoExportPasswordDialog.value = false
+            }
+        )
+    }
+
+    if (showOldBackupWarning.value) {
+        AlertDialog(
+            onDismissRequest = {
+                showOldBackupWarning.value = false
+                onEvent(SettingsUiEvent.ResetBackupState)
+            },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.round_warning_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = { Text(stringResource(R.string.backup_old_format_warning_title)) },
+            text = { Text(stringResource(R.string.backup_old_format_warning_message)) },
+            confirmButton = {
+                Button(onClick = {
+                    showOldBackupWarning.value = false
+                    onEvent(SettingsUiEvent.ResetBackupState)
+                }) {
+                    Text(stringResource(R.string.common_ok))
+                }
+            }
+        )
+    }
+
+    if (showWipeDataDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showWipeDataDialog.value = false },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.round_warning_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = { Text(stringResource(R.string.settings_wipe_data_confirm_title)) },
+            text = { Text(stringResource(R.string.settings_wipe_data_confirm_message)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showWipeDataDialog.value = false
+                        onEvent(SettingsUiEvent.WipeAppData)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text(stringResource(R.string.common_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showWipeDataDialog.value = false }) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            }
+        )
+    }
+
+    if (showExperimentalSyncDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showExperimentalSyncDialog.value = false },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.round_warning_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            },
+            title = { Text(stringResource(R.string.settings_experimental_sync_title)) },
+            text = { Text(stringResource(R.string.settings_experimental_sync_message)) },
+            confirmButton = {
+                TextButton(onClick = { showExperimentalSyncDialog.value = false }) {
+                    Text(stringResource(R.string.common_ok))
+                }
+            }
+        )
+    }
+}

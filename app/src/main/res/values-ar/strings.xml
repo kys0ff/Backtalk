@@ -23,6 +23,7 @@
     <string name="common_submit">إرسال</string>
     <string name="common_export">تصدير</string>
     <string name="common_confirm">تأكيد</string>
+    <string name="common_experimental">تجريبي</string>
     <string name="common_error">خطأ</string>
     <string name="common_hide_password">إخفاء كلمة المرور</string>
     <string name="common_show_password">إظهار كلمة المرور</string>
@@ -127,6 +128,8 @@
     <string name="settings_bsd">ترخيص BSD</string>
     <string name="settings_information">معلومات</string>
     <string name="settings_choose_theme">اختر المظهر</string>
+    <string name="settings_experimental_sync_title">ميزة تجريبية</string>
+    <string name="settings_experimental_sync_message">ميزة المزامنة والأجهزة حاليًا في المرحلة التجريبية. قد تحتوي على أخطاء أو سلوكيات غير متوقعة. استخدمها على مسؤوليتك الخاصة. نوصي بشدة بنسخ بياناتك احتياطيًا قبل استخدام هذه الميزة.</string>
 
     <!-- Updates -->
     <string name="update_dialog_title">يتوفر تحديث</string>

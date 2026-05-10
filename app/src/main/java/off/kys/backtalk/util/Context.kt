@@ -103,20 +103,30 @@ fun Context.shareText(text: String) {
  * @return True if secure gatekeeping is enabled, false otherwise.
  */
 fun Context.isSecurityEnabled(): Boolean {
-    val biometricManager = BiometricManager.from(this)
-    val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    return try {
+        val biometricManager = BiometricManager.from(this)
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
 
-    // Check for "Strong" Biometrics (Fingerprint, Face, etc.)
-    // or Device Credentials (PIN, Pattern, Password)
-    val canAuthenticate =
-        biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+        // Check for "Strong" Biometrics (Fingerprint, Face, etc.)
+        // or Device Credentials (PIN, Pattern, Password)
+        val canAuthenticate =
+            biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
 
-    return when (canAuthenticate) {
-        BiometricManager.BIOMETRIC_SUCCESS -> true
-        else -> {
-            // Fallback for older APIs or specific edge cases where
-            // Keyguard might be set even if BiometricManager is being moody.
-            keyguardManager.isDeviceSecure
+        when (canAuthenticate) {
+            BiometricManager.BIOMETRIC_SUCCESS -> true
+            else -> {
+                // Fallback for older APIs or specific edge cases where
+                // Keyguard might be set even if BiometricManager is being moody.
+                keyguardManager.isDeviceSecure
+            }
+        }
+    } catch (_: Throwable) {
+        // Fallback for environments where BiometricManager is not supported (e.g., Layoutlib/Compose Preview)
+        try {
+            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+            keyguardManager?.isDeviceSecure ?: false
+        } catch (_: Throwable) {
+            false
         }
     }
 }

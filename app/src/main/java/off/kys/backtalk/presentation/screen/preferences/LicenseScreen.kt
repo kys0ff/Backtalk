@@ -115,7 +115,6 @@ class LicenseScreen : Screen {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Modern "Package" icon representation
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -140,7 +139,6 @@ class LicenseScreen : Screen {
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // The License "Tag"
                     Surface(
                         color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(8.dp)
@@ -154,7 +152,6 @@ class LicenseScreen : Screen {
                     }
                 }
 
-                // Version Badge
                 Text(
                     text = "v${library.version}",
                     style = MaterialTheme.typography.bodySmall,

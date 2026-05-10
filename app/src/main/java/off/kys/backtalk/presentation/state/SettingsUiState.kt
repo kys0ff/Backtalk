@@ -28,4 +28,8 @@ data class SettingsUiState(
     val error: String? = null,
     val successMessage: String? = null,
     val showOldBackupWarning: Boolean = false
-)
+) {
+    companion object {
+        fun empty(): SettingsUiState = SettingsUiState()
+    }
+}
