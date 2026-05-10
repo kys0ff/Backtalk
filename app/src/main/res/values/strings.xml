@@ -234,4 +234,37 @@
     <string name="sync_already_paired_msg">You are already paired with "%1$s". Do you want to unpair and start a fresh pairing?</string>
     <string name="sync_unpair_and_restart">Unpair and Start Fresh</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to Backtalk</string>
+    <string name="onboarding_welcome_desc">Your private, local-first note-taking and messaging app. Everything stays on your device.</string>
+    <string name="onboarding_messaging_title">Messaging yourself</string>
+    <string name="onboarding_messaging_desc">Organize your thoughts, tasks, and links in a familiar chat interface.</string>
+    <string name="onboarding_voice_title">Voice Notes</string>
+    <string name="onboarding_voice_desc">Record quick thoughts on the go with built-in voice messages and waveforms.</string>
+    <string name="onboarding_threads_title">Threads &amp; Replies</string>
+    <string name="onboarding_threads_desc">Keep your conversations organized. Reply to any message to start a focused thread of thoughts.</string>
+    <string name="onboarding_sync_title">Sync &amp; Backup</string>
+    <string name="onboarding_sync_desc">Keep your data safe with manual or automatic backups. Sync between devices on the same Wi-Fi.</string>
+    <string name="onboarding_security_title">Privacy First</string>
+    <string name="onboarding_security_desc">Protect your notes with App Lock, Secure Screen, and end-to-end local encryption.</string>
+    <string name="onboarding_permissions_title">Permissions</string>
+    <string name="onboarding_permissions_desc">To provide the best experience, Backtalk needs a few permissions. You can manage these later in settings.</string>
+    <string name="onboarding_permission_notifications">Notifications</string>
+    <string name="onboarding_permission_notifications_desc">Required to deliver reminders and scheduled notes.</string>
+    <string name="onboarding_permission_microphone">Microphone</string>
+    <string name="onboarding_permission_microphone_desc">Required to record and send voice messages.</string>
+    <string name="onboarding_permission_alarms">Exact Alarms</string>
+    <string name="onboarding_permission_alarms_desc">Required for precise delivery of your scheduled reminders.</string>
+    <string name="onboarding_permission_granted">Granted</string>
+    <string name="onboarding_permission_request">Enable</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+
+    <!-- Onboarding Mocks -->
+    <string name="onboarding_mock_message_1">Hello myself! I should remember to drink more water today.</string>
+    <string name="onboarding_mock_message_2">Good point. Stay hydrated! 💧</string>
+    <string name="onboarding_mock_reminder">Long press the send button to schedule a reminder like this one!</string>
+    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
+
 </resources>

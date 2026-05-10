@@ -32,6 +32,7 @@ import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
+import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
@@ -141,6 +142,7 @@ private fun Module.viewModelModule() {
     viewModel { ThreadsViewModel(get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { SyncViewModel(get()) }
+    viewModel { OnboardingViewModel(androidApplication(), get()) }
 }
 
 /**

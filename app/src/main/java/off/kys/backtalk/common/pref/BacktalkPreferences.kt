@@ -47,6 +47,7 @@ class BacktalkPreferences(context: Context) {
     private val _keepScreenOn = mutableStateOf(prefs.getBoolean(KEY_KEEP_SCREEN_ON, BuildConfig.DEBUG))
     private val _devModeEnabled = mutableStateOf(prefs.getBoolean(KEY_DEV_MODE_ENABLED, BuildConfig.DEBUG))
     private val _pairedDevicesJson = mutableStateOf(prefs.getString(KEY_PAIRED_DEVICES, "[]") ?: "[]")
+    private val _firstLaunch = mutableStateOf(prefs.getBoolean(KEY_FIRST_LAUNCH, true))
     private val _deviceId = mutableStateOf(getOrCreateDeviceId())
 
     @OptIn(ExperimentalUuidApi::class)
@@ -88,6 +89,7 @@ class BacktalkPreferences(context: Context) {
             KEY_KEEP_SCREEN_ON -> _keepScreenOn.value = p.getBoolean(key, BuildConfig.DEBUG)
             KEY_DEV_MODE_ENABLED -> _devModeEnabled.value = p.getBoolean(key, false)
             KEY_PAIRED_DEVICES -> _pairedDevicesJson.value = p.getString(key, "[]") ?: "[]"
+            KEY_FIRST_LAUNCH -> _firstLaunch.value = p.getBoolean(key, true)
         }
         listener?.onSharedPreferenceChanged(p, key)
     }
@@ -140,6 +142,9 @@ class BacktalkPreferences(context: Context) {
 
         /** Preference key for storing paired devices. */
         const val KEY_PAIRED_DEVICES = "paired_devices"
+
+        /** Preference key for first launch status. */
+        const val KEY_FIRST_LAUNCH = "first_launch"
 
         /** Preference key for the unique device ID. */
         const val KEY_DEVICE_ID = "device_id"
@@ -244,6 +249,13 @@ class BacktalkPreferences(context: Context) {
     var pairedDevicesJson: String
         get() = _pairedDevicesJson.value
         set(value) = prefs.edit { putString(KEY_PAIRED_DEVICES, value) }
+
+    /**
+     * Whether it's the first time the app is being launched.
+     */
+    var firstLaunch: Boolean
+        get() = _firstLaunch.value
+        set(value) = prefs.edit { putBoolean(KEY_FIRST_LAUNCH, value) }
 
     /**
      * The unique ID for this device used for sync pairing.

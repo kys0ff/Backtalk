@@ -240,4 +240,31 @@
     <string name="sync_already_paired_msg">أنت مقترن بالفعل بـ "%1$s". هل تريد إلغاء الاقتران وبدء اقتران جديد؟</string>
     <string name="sync_unpair_and_restart">إلغاء الاقتران والبدء من جديد</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">مرحباً بك في Backtalk</string>
+    <string name="onboarding_welcome_desc">تطبيقك الخاص والمحلي لتدوين الملاحظات والمراسلة. كل شيء يبقى على جهازك.</string>
+    <string name="onboarding_messaging_title">مراسلة نفسك</string>
+    <string name="onboarding_messaging_desc">نظم أفكارك ومهامك وروابطك في واجهة دردشة مألوفة.</string>
+    <string name="onboarding_voice_title">الملاحظات الصوتية</string>
+    <string name="onboarding_voice_desc">سجل أفكارك السريعة أثناء التنقل مع الرسائل الصوتية المدمجة والأشكال الموجية.</string>
+    <string name="onboarding_threads_title">السلاسل والردود</string>
+    <string name="onboarding_threads_desc">حافظ على تنظيم محادثاتك. قم بالرد على أي رسالة لبدء سلسلة مركزة من الأفكار.</string>
+    <string name="onboarding_sync_title">المزامنة والنسخ الاحتياطي</string>
+    <string name="onboarding_sync_desc">حافظ على أمان بياناتك من خلال النسخ الاحتياطي اليدوي أو التلقائي. المزامنة بين الأجهزة على نفس شبكة Wi-Fi.</string>
+    <string name="onboarding_security_title">الخصوصية أولاً</string>
+    <string name="onboarding_security_desc">احمِ ملاحظاتك باستخدام قفل التطبيق، والشاشة الآمنة، والتشفير المحلي من طرف إلى طرف.</string>
+    <string name="onboarding_permissions_title">الأذونات</string>
+    <string name="onboarding_permissions_desc">لتوفير أفضل تجربة، يحتاج Backtalk إلى بعض الأذونات. يمكنك إدارتها لاحقاً في الإعدادات.</string>
+    <string name="onboarding_permission_notifications">الإشعارات</string>
+    <string name="onboarding_permission_notifications_desc">مطلوب لتقديم التذكيرات والملاحظات المجدولة.</string>
+    <string name="onboarding_permission_microphone">الميكروفون</string>
+    <string name="onboarding_permission_microphone_desc">مطلوب لتسجيل وإرسال الرسائل الصوتية.</string>
+    <string name="onboarding_permission_alarms">التنبيهات الدقيقة</string>
+    <string name="onboarding_permission_alarms_desc">مطلوب للتسليم الدقيق لتذكيراتك المجدولة.</string>
+    <string name="onboarding_permission_granted">تم المنح</string>
+    <string name="onboarding_permission_request">تفعيل</string>
+    <string name="onboarding_get_started">ابدأ الآن</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_skip">تخطي</string>
+
 </resources>
