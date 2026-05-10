@@ -72,6 +72,7 @@
     <string name="auth_title">Verify your identity</string>
     <string name="auth_subtitle">Please authenticate to continue</string>
     <string name="auth_locked_title">Backtalk is locked</string>
+    <string name="auth_unlock">Unlock</string>
     <string name="auth_biometric_unavailable">Biometric authentication is not supported on this device</string>
 
     <!-- Settings -->

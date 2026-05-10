@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.base.BaseLockActivity
 import off.kys.backtalk.presentation.activity.components.AppUpdateDialog
+import off.kys.backtalk.presentation.activity.components.LockView
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.state.MainUiState
@@ -77,18 +79,25 @@ class MainActivity : BaseLockActivity() {
                 darkTheme = isDarkTheme,
                 dynamicColor = dynamicColor
             ) {
-                Navigator(MessagesScreen()) { navigator ->
-                    SlideTransition(navigator)
-                }
+                Crossfade(targetState = isLoggedIn, label = "LoginState") { loggedIn ->
+                    if (loggedIn) {
+                        Navigator(MessagesScreen()) { navigator ->
+                            SlideTransition(navigator)
+                        }
 
-                (updateState as? MainUiState.UpdateAvailable)?.let { state ->
-                    val url =
-                        state.result.downloadUrls.firstOrNull()?.browserDownloadUrl ?: return@let
-                    AppUpdateDialog(
-                        updateResult = state.result,
-                        onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
-                        onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(url)) }
-                    )
+                        (updateState as? MainUiState.UpdateAvailable)?.let { state ->
+                            val url =
+                                state.result.downloadUrls.firstOrNull()?.browserDownloadUrl
+                                    ?: return@let
+                            AppUpdateDialog(
+                                updateResult = state.result,
+                                onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
+                                onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(url)) }
+                            )
+                        }
+                    } else {
+                        LockView()
+                    }
                 }
             }
         }

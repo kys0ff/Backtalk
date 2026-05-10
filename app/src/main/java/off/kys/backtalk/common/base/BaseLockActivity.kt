@@ -149,7 +149,7 @@ abstract class BaseLockActivity : AppCompatActivity() {
      * Default implementation finishes the activity.
      */
     protected open fun onAuthenticationFailed(errorCode: Int, errString: CharSequence) {
-        finish()
+        finishAffinity()
     }
 
     /**
