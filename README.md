@@ -15,10 +15,10 @@
   <img src="https://img.shields.io/badge/Kotlin-1.9+-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin">
   <img src="https://img.shields.io/badge/Jetpack%20Compose-UI-4285F4?logo=android&logoColor=white" alt="Jetpack Compose">
   <img src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" alt="Platform">
-  <img src="https://img.shields.io/badge/Min%20SDK-24-green" alt="Min SDK">
+  <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.1.6-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.1.8-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -48,13 +48,14 @@
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.1.6)
+## Recent Changes (v0.1.8)
 
-- **Settings Redesign**: Cleaner, sectioned layout for better navigation.
-- **Secure Auto-Export**: Encryption support for background backups.
-- **Licenses Screen**: Dedicated view for open source attributions.
-- **Improved Privacy**: Removed internet permission from the F-Droid flavor.
-- **UX Refinement**: Updated dialogs and theme selection flow.
+- **Voice Messages**: Record and play back audio notes with waveform visualization.
+- **Thread View Mode**: View your conversations in a structured, thread-based layout.
+- **Message Search**: Powerful new search feature to find your notes instantly.
+- **Device Sync**: Keep your data in sync across multiple devices effortlessly.
+- **Markdown Support**: Rich text formatting and interactive links/mentions.
+- **Onboarding & Stats**: Brand-new user experience and detailed usage insights.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 

@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.8] - 2026-05-11
+
+### Added
+- **Voice Messages**: Full support for recording and playback with real-time waveform visualization.
+- **Message Search**: Powerful search functionality with result navigation and text highlighting.
+- **Device Synchronization**: Multi-device sync support with automated discovery and re-pairing.
+- **Markdown & Formatting**: Rich text support with Markdown and a dedicated message formatting toolbar.
+- **SmartText Enhancements**: Added support for interactive links, @mentions, and annotation handling.
+- **Thread View Mode**: Browse your messages organized as interactive threads for a cleaner overview.
+- **Onboarding Flow**: Comprehensive new user onboarding experience with parallax effects.
+- **Statistics Screen**: Detailed insights into chat habits with animated charts and tooltips.
+- **Message Scheduling**: Ability to schedule messages and set reminders.
+- **Arabic Localization**: Full support for Arabic language and RTL layouts.
+- **Developer Options**: New hidden menu for debugging, testing, and data management.
+- **UI Improvements**: Added "scroll to bottom" FAB and pull-to-refresh in threads.
+
+### Changed
+- **Backup Format**: Introduced new `.bkt` ZIP-based format to support media backups while maintaining backward compatibility with `.json`.
+- **Delete Confirmation**: Enhanced dialogs with icons and plural support for multiple message deletion.
+- **App Startup**: Integrated official SplashScreen API and optimized startup logic.
+- **Settings & Sync UI**: Modularized and redesigned UI components for better maintainability and UX.
+
+### Refactored
+- **Modularization**: Extracted `MainView`, `AppLifecycleHandler`, and onboarding components to simplify `MainActivity`.
+- **Reactive Preferences**: Implemented reactive preference states for more efficient UI updates.
+- **Thread Logic**: Optimized thread grouping and retrieval logic with nested thread support.
+- **Security**: Centralized authentication state handling and improved security check robustness.
+
+### Build
+- **Android Support**: Enabled JDK desugaring to support Android 6 (API 23).
+- **Maintenance**: Bumped AGP to 9.2.1 and updated various dependencies (Compose BOM, Mockk, etc.).
+- **Version**: Bumped `versionCode` to 18.
+
+---
+
 ## [0.1.6] - 2026-05-01
 
 ### Added
