@@ -1,6 +1,6 @@
 > [!TIP]
-> **Enjoying the app?** Give it a **Star** to show your support! 
-> 
+> **Enjoying the app?** Give it a **Star** to show your support!
+>
 > `[ ★ Star ]` ➔ `[ 🌟 Starred ]`
 
 ---
@@ -22,18 +22,22 @@
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
-**Backtalk** is a private, self-chat notes app built with **Kotlin** and **Jetpack Compose**. It provides a familiar chat interface to talk to yourself—reply, reflect, and organize your thoughts—with a strong focus on privacy and simplicity.
+**Backtalk** is a private, self-chat notes app built with **Kotlin** and **Jetpack Compose**. It
+provides a familiar chat interface to talk to yourself—reply, reflect, and organize your
+thoughts—with a strong focus on privacy and simplicity.
 
-> *Backtalk — because sometimes the most important conversation is the one where you talk back to yourself.*
+> *Backtalk — because sometimes the most important conversation is the one where you talk back to
+yourself.*
 
 ---
 
 ## Screenshots
 
-<p align="center">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="720" alt="Screenshot 1">
-  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="720" alt="Screenshot 2">
-</p>
+|                                                                                                          |                                                                                                          |
+|:--------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
+| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="360" alt="Screenshot 1"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="360" alt="Screenshot 2"> |
+| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="360" alt="Screenshot 3"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="360" alt="Screenshot 4"> |
+| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="360" alt="Screenshot 5"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="360" alt="Screenshot 6"> |
 
 ---
 
@@ -63,11 +67,14 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 
 ## Tech Stack
 
-- **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose) with Material 3.
+- **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose) with Material3.
 - **Navigation**: [Voyager](https://voyager.adriel.cafe/) for multiplatform-friendly navigation.
 - **Dependency Injection**: [Koin](https://insert-koin.io/) for lightweight DI.
-- **Database**: [Room](https://developer.android.com/training/data-storage/room) for local persistence.
-- **Background Work**: [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) for periodic backups.
+- **Database**: [Room](https://developer.android.com/training/data-storage/room) for local
+  persistence.
+- **Background Work
+  **: [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) for
+  periodic backups.
 - **Architecture**: Clean MVVM architecture.
 
 ---
@@ -75,6 +82,7 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 ## Getting Started
 
 ### Download
+
 <a href="https://f-droid.org/en/packages/off.kys.backtalk">
   <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">
 </a>
@@ -82,6 +90,7 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 You can also find the latest APKs on the [Releases](../../releases/latest) page.
 
 ### Building from Source
+
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/kys0ff/Backtalk.git
@@ -95,9 +104,11 @@ You can also find the latest APKs on the [Releases](../../releases/latest) page.
 ## Privacy & Security
 
 Backtalk is built on the principle of **Privacy by Design**:
+
 - **Local Only**: Your notes never leave your device unless you manually export them.
 - **No Analytics**: We don't track you. No telemetry, no logs, no trackers.
-- **No Internet Permission**: The F-Droid build has no internet permission, ensuring complete isolation.
+- **No Internet Permission**: The F-Droid build has no internet permission, ensuring complete
+  isolation.
 - **Encryption**: Manual and automatic exports can be encrypted for extra security.
 
 ---
@@ -105,6 +116,7 @@ Backtalk is built on the principle of **Privacy by Design**:
 ## Contributing
 
 Contributions are welcome! If you'd like to improve Backtalk:
+
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b feature/amazing-feature`).
 3. Commit your changes (`git commit -m 'Add some amazing feature'`).
@@ -115,10 +127,13 @@ Contributions are welcome! If you'd like to improve Backtalk:
 
 ## Support Development
 
-If you find Backtalk useful, consider supporting its development via [Liberapay](https://liberapay.com/kys0ff). Every contribution helps keep the project alive and open source!
+If you find Backtalk useful, consider supporting its development
+via [Liberapay](https://liberapay.com/kys0ff). Every contribution helps keep the project alive and
+open source!
 
 ## License
 
-Backtalk is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more information.
+Backtalk is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more
+information.
 
 Copyright © 2026 **kys0ff**
