@@ -62,4 +62,11 @@ interface MessagesDao {
      */
     @Query("DELETE FROM messages")
     suspend fun deleteAllMessages()
+
+    /**
+     * Retrieves all messages from the database as a simple list.
+     * Useful for statistics processing.
+     */
+    @Query("SELECT * FROM messages")
+    suspend fun getAllMessagesSync(): List<MessageEntity>
 }

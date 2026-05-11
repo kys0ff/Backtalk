@@ -34,6 +34,7 @@ import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
+import off.kys.backtalk.presentation.viewmodel.StatisticsViewModel
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
 import off.kys.backtalk.sync.NsdHelper
@@ -143,6 +144,7 @@ private fun Module.viewModelModule() {
     viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { SyncViewModel(get()) }
     viewModel { OnboardingViewModel(androidApplication(), get()) }
+    viewModel { StatisticsViewModel(get()) }
 }
 
 /**

@@ -67,4 +67,8 @@ class MessagesRepositoryImpl(
     override suspend fun getAllScheduledMessagesSync(): List<ScheduledMessageEntity> {
         return scheduledMessagesDao.getAllScheduledMessagesSync()
     }
+
+    override suspend fun getAllMessagesSync(): List<MessageEntity> {
+        return messagesDao.getAllMessagesSync()
+    }
 }

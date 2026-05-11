@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.HintTooltip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,19 +21,25 @@ fun SyncTopBar(
     TopAppBar(
         title = { Text(stringResource(R.string.sync_title)) },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    painterResource(R.drawable.round_arrow_back_24),
-                    stringResource(R.string.common_back)
-                )
+            HintTooltip(stringResource(R.string.common_back)) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        painterResource(R.drawable.round_arrow_back_24),
+                        stringResource(R.string.common_back)
+                    )
+                }
             }
         },
         actions = {
-            IconButton(onClick = onDiscoveryClick) {
-                Icon(
-                    painter = painterResource(if (isDiscovering) R.drawable.round_close_24 else R.drawable.round_refresh_24),
-                    contentDescription = stringResource(if (isDiscovering) R.string.sync_stop_discovery else R.string.common_search)
-                )
+            val discoveryTooltip =
+                stringResource(if (isDiscovering) R.string.sync_stop_discovery else R.string.sync_start_discovery)
+            HintTooltip(discoveryTooltip) {
+                IconButton(onClick = onDiscoveryClick) {
+                    Icon(
+                        painter = painterResource(if (isDiscovering) R.drawable.round_close_24 else R.drawable.round_refresh_24),
+                        contentDescription = discoveryTooltip
+                    )
+                }
             }
         }
     )

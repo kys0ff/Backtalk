@@ -68,4 +68,9 @@ interface MessagesRepository {
      * Retrieves all scheduled messages as a list.
      */
     suspend fun getAllScheduledMessagesSync(): List<ScheduledMessageEntity>
+
+    /**
+     * Retrieves all messages as a list.
+     */
+    suspend fun getAllMessagesSync(): List<MessageEntity>
 }

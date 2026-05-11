@@ -11,6 +11,7 @@
     <string name="common_close">Close</string>
     <string name="common_clear">Clear</string>
     <string name="common_back">Back</string>
+    <string name="common_more">More</string>
     <string name="common_ok">OK</string>
     <string name="common_please_wait">Please wait…</string>
     <string name="common_navigate_up">Navigate up</string>
@@ -126,6 +127,19 @@
     <string name="settings_experimental_sync_title">Experimental Feature</string>
     <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
 
+    <!-- Statistics -->
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_total_messages">Total Messages</string>
+    <string name="statistics_voice_duration">Voice Duration</string>
+    <string name="statistics_scheduled">Scheduled</string>
+    <string name="statistics_avg_length">Avg. Length</string>
+    <string name="statistics_activity_last_7_days">Activity (Last 7 Days)</string>
+    <string name="statistics_message_types">Message Types</string>
+    <string name="statistics_voice">Voice</string>
+    <string name="statistics_text">Text</string>
+    <string name="statistics_top_threads">Top Threads</string>
+    <string name="statistics_messages_count">%1$d messages</string>
+
     <!-- Updates -->
     <string name="update_dialog_title">Update available</string>
     <string name="update_dialog_message">Version %1$s is now available.\n\n%2$s</string>
@@ -205,6 +219,7 @@
     <string name="sync_available_devices">Available Devices</string>
     <string name="sync_paired_devices">Paired Devices</string>
     <string name="sync_discover_devices">Discover Devices</string>
+    <string name="sync_start_discovery">Start Discovery</string>
     <string name="sync_stop_discovery">Stop Discovery</string>
     <string name="sync_discovery_active">Searching for devices…</string>
     <string name="sync_no_devices_found">No devices found</string>

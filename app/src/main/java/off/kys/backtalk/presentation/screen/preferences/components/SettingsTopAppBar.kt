@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.HintTooltip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,11 +20,13 @@ fun SettingsTopAppBar(
 ) {
     LargeTopAppBar(
         navigationIcon = {
-            IconButton(onClick = onNavigateBack) {
-                Icon(
-                    painter = painterResource(R.drawable.round_arrow_back_24),
-                    contentDescription = stringResource(R.string.common_navigate_up)
-                )
+            HintTooltip(stringResource(R.string.common_navigate_up)) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_arrow_back_24),
+                        contentDescription = stringResource(R.string.common_navigate_up)
+                    )
+                }
             }
         },
         title = { Text(text = stringResource(R.string.settings_title)) },

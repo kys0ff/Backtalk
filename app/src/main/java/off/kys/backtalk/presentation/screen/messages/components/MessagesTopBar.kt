@@ -1,10 +1,20 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -15,17 +25,24 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.util.emptyString
 
 /**
@@ -59,6 +76,7 @@ fun MessagesTopBar(
     onCopy: () -> Unit,
     onSettings: () -> Unit,
     onThreads: () -> Unit,
+    onStatistics: () -> Unit,
     onToggleSearch: (Boolean) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onNavigateSearch: (Boolean) -> Unit
@@ -91,6 +109,7 @@ fun MessagesTopBar(
                 onToggleSearch = { onToggleSearch(true) },
                 onSettings = onSettings,
                 onThreads = onThreads,
+                onStatistics = onStatistics,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -144,11 +163,13 @@ private fun SearchTopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onCloseSearch) {
-                Icon(
-                    painter = painterResource(R.drawable.round_arrow_back_24),
-                    contentDescription = stringResource(R.string.common_back)
-                )
+            HintTooltip(stringResource(R.string.common_back)) {
+                IconButton(onClick = onCloseSearch) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_arrow_back_24),
+                        contentDescription = stringResource(R.string.common_back)
+                    )
+                }
             }
         },
         actions = {
@@ -180,11 +201,13 @@ private fun SearchActions(
     onNavigateSearch: (Boolean) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onClearQuery) {
-            Icon(
-                painter = painterResource(R.drawable.round_close_24),
-                contentDescription = stringResource(R.string.common_clear)
-            )
+        HintTooltip(stringResource(R.string.common_clear)) {
+            IconButton(onClick = onClearQuery) {
+                Icon(
+                    painter = painterResource(R.drawable.round_close_24),
+                    contentDescription = stringResource(R.string.common_clear)
+                )
+            }
         }
         Text(
             text = if (searchResultsCount > 0) {
@@ -199,17 +222,21 @@ private fun SearchActions(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        IconButton(onClick = { onNavigateSearch(true) }, enabled = searchResultsCount > 0) {
-            Icon(
-                painter = painterResource(R.drawable.round_expand_less_24),
-                contentDescription = stringResource(R.string.search_previous)
-            )
+        HintTooltip(stringResource(R.string.search_previous)) {
+            IconButton(onClick = { onNavigateSearch(true) }, enabled = searchResultsCount > 0) {
+                Icon(
+                    painter = painterResource(R.drawable.round_expand_less_24),
+                    contentDescription = stringResource(R.string.search_previous)
+                )
+            }
         }
-        IconButton(onClick = { onNavigateSearch(false) }, enabled = searchResultsCount > 0) {
-            Icon(
-                painter = painterResource(R.drawable.round_expand_more_24),
-                contentDescription = stringResource(R.string.search_next)
-            )
+        HintTooltip(stringResource(R.string.search_next)) {
+            IconButton(onClick = { onNavigateSearch(false) }, enabled = searchResultsCount > 0) {
+                Icon(
+                    painter = painterResource(R.drawable.round_expand_more_24),
+                    contentDescription = stringResource(R.string.search_next)
+                )
+            }
         }
     }
 }
@@ -234,26 +261,32 @@ private fun SelectionTopBar(
     TopAppBar(
         title = { Text(stringResource(R.string.chat_selection_count, selectedCount)) },
         navigationIcon = {
-            IconButton(onClick = onCloseSelection) {
-                Icon(
-                    painter = painterResource(R.drawable.round_close_24),
-                    contentDescription = stringResource(R.string.common_close)
-                )
+            HintTooltip(stringResource(R.string.common_close)) {
+                IconButton(onClick = onCloseSelection) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_close_24),
+                        contentDescription = stringResource(R.string.common_close)
+                    )
+                }
             }
         },
         actions = {
-            IconButton(onClick = onDelete) {
-                Icon(
-                    painter = painterResource(R.drawable.round_delete_24),
-                    contentDescription = stringResource(R.string.common_delete),
-                    tint = MaterialTheme.colorScheme.error
-                )
+            HintTooltip(stringResource(R.string.common_delete)) {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_delete_24),
+                        contentDescription = stringResource(R.string.common_delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
-            IconButton(onClick = onCopy) {
-                Icon(
-                    painter = painterResource(R.drawable.round_content_copy_24),
-                    contentDescription = stringResource(R.string.common_copy)
-                )
+            HintTooltip(stringResource(R.string.common_copy)) {
+                IconButton(onClick = onCopy) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_content_copy_24),
+                        contentDescription = stringResource(R.string.common_copy)
+                    )
+                }
             }
         },
         scrollBehavior = scrollBehavior,
@@ -275,30 +308,113 @@ private fun DefaultTopBar(
     onToggleSearch: () -> Unit,
     onSettings: () -> Unit,
     onThreads: () -> Unit,
+    onStatistics: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
-        title = { Text(stringResource(R.string.chat_title)) },
+        title = {
+            Text(
+                text = stringResource(R.string.chat_title),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         actions = {
-            IconButton(onClick = onToggleSearch) {
-                Icon(
-                    painter = painterResource(R.drawable.round_search_24),
-                    contentDescription = stringResource(R.string.common_search)
-                )
+            HintTooltip(stringResource(R.string.common_search)) {
+                IconButton(onClick = onToggleSearch) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_search_24),
+                        contentDescription = stringResource(R.string.common_search),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
-            IconButton(onClick = onThreads) {
-                Icon(
-                    painter = painterResource(R.drawable.thread_24px),
-                    contentDescription = stringResource(R.string.threads_title)
-                )
-            }
-            IconButton(onClick = onSettings) {
-                Icon(
-                    painter = painterResource(R.drawable.round_settings_24),
-                    contentDescription = stringResource(R.string.settings_title)
-                )
+
+            Box {
+                HintTooltip(stringResource(R.string.common_more)) {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_more_vert_24),
+                            contentDescription = stringResource(R.string.common_more),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                MaterialTheme(shapes = MaterialTheme.shapes.copy(extraSmall = RoundedCornerShape(24.dp))) {
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                            .widthIn(min = 180.dp)
+                            .graphicsLayer {
+                                transformOrigin =
+                                    TransformOrigin(pivotFractionX = 1f, pivotFractionY = 0f)
+                            },
+                    ) {
+                        MenuOption(
+                            label = stringResource(R.string.threads_title),
+                            icon = R.drawable.thread_24px,
+                            onClick = {
+                                showMenu = false
+                                onThreads()
+                            }
+                        )
+                        MenuOption(
+                            label = stringResource(R.string.statistics_title),
+                            icon = R.drawable.round_insert_chart_outlined_24,
+                            onClick = {
+                                showMenu = false
+                                onStatistics()
+                            }
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+
+                        MenuOption(
+                            label = stringResource(R.string.settings_title),
+                            icon = R.drawable.round_settings_24,
+                            onClick = {
+                                showMenu = false
+                                onSettings()
+                            }
+                        )
+                    }
+                }
             }
         },
         scrollBehavior = scrollBehavior
+    )
+}
+
+@Composable
+private fun MenuOption(
+    label: String,
+    @DrawableRes icon: Int,
+    onClick: () -> Unit
+) {
+    DropdownMenuItem(
+        text = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+        },
+        onClick = onClick,
+        leadingIcon = {
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
     )
 }

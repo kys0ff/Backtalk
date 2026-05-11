@@ -24,6 +24,7 @@ import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesTopBar
 import off.kys.backtalk.presentation.screen.messages.components.ScrollToBottomFab
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
+import off.kys.backtalk.presentation.screen.statistics.StatisticsScreen
 import off.kys.backtalk.presentation.screen.threads.ThreadsScreen
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.util.AudioPlayer
@@ -100,6 +101,7 @@ class MessagesScreen : Screen {
                     onCopy = { viewModel.onEvent(MessagesUiEvent.CopySelected) },
                     onSettings = { navigator += SettingsScreen() },
                     onThreads = { navigator += ThreadsScreen() },
+                    onStatistics = { navigator += StatisticsScreen() },
                     onToggleSearch = { active: Boolean -> viewModel.onEvent(MessagesUiEvent.ToggleSearch(active)) },
                     onSearchQueryChange = { query: String -> viewModel.onEvent(MessagesUiEvent.UpdateSearchQuery(query)) },
                     onNavigateSearch = { up: Boolean -> viewModel.onEvent(MessagesUiEvent.NavigateSearch(up)) }

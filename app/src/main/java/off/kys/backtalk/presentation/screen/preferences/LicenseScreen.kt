@@ -38,6 +38,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.data.util.LibraryProvider
 import off.kys.backtalk.domain.model.LibraryInfo
 
@@ -60,11 +61,13 @@ class LicenseScreen : Screen {
                 LargeTopAppBar(
                     title = { Text(text = stringResource(R.string.settings_license)) },
                     navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_arrow_back_24),
-                                contentDescription = null
-                            )
+                        HintTooltip(stringResource(R.string.common_back)) {
+                            IconButton(onClick = { navigator.pop() }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.round_arrow_back_24),
+                                    contentDescription = stringResource(R.string.common_back)
+                                )
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
