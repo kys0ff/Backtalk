@@ -72,8 +72,7 @@ See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 - **Dependency Injection**: [Koin](https://insert-koin.io/) for lightweight DI.
 - **Database**: [Room](https://developer.android.com/training/data-storage/room) for local
   persistence.
-- **Background Work
-  **: [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) for
+- **Background Work**: [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) for
   periodic backups.
 - **Architecture**: Clean MVVM architecture.
 
