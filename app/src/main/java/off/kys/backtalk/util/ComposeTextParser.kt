@@ -13,9 +13,22 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 
 /**
- * A Markdown-ish parser that handles styles, links, and mentions.
+ * A utility object responsible for parsing Markdown-like syntax into a Jetpack Compose [AnnotatedString].
+ *
+ * Supported syntax includes:
+ * - **Bold**: `**text**`
+ * - __Underline__: `__text__`
+ * - ~~Strikethrough~~: `~~text~~`
+ * - *Italic*: `*text*`
+ * - `Monospace`: `` `text` ``
+ * - Markdown Links: `[Display Name](https://example.com)`
+ * - Naked URLs: `https://example.com`
+ * - Mentions: `@username` (converted to a clickable [LinkAnnotation.Clickable])
+ *
+ * The parser handles nested styles recursively and allows for customization of link appearances
+ * and click behaviors via [TextLinkStyles] and [LinkAnnotation] listeners.
  */
-object MarkdownParser {
+object ComposeTextParser {
 
     private data class StyleDef(
         val delimiter: String,
@@ -61,7 +74,8 @@ object MarkdownParser {
         for (i in text.indices) {
             for (styleDef in STYLES) {
                 if (text.startsWith(styleDef.delimiter, i)) {
-                    val closingIndex = findClosingTag(text, i + styleDef.delimiter.length, styleDef.delimiter)
+                    val closingIndex =
+                        findClosingTag(text, i + styleDef.delimiter.length, styleDef.delimiter)
                     if (closingIndex != -1) {
                         earliestMatch = i
                         bestStyle = styleDef
@@ -113,10 +127,21 @@ object MarkdownParser {
             bestStyle != null -> {
                 val delimiter = bestStyle.delimiter
                 builder.withStyle(bestStyle.style) {
-                    parseRecursive(text.substring(earliestMatch + delimiter.length, bestClosingIndex), this, linkStyles, onAnnotationClicked)
+                    parseRecursive(
+                        text.substring(
+                            earliestMatch + delimiter.length,
+                            bestClosingIndex
+                        ), this, linkStyles, onAnnotationClicked
+                    )
                 }
-                parseRecursive(text.substring(bestClosingIndex + delimiter.length), builder, linkStyles, onAnnotationClicked)
+                parseRecursive(
+                    text.substring(bestClosingIndex + delimiter.length),
+                    builder,
+                    linkStyles,
+                    onAnnotationClicked
+                )
             }
+
             linkMatch != null -> {
                 val url = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[2]
                 val displayText = if (isNakedUrl) linkMatch.value else linkMatch.groupValues[1]
@@ -130,8 +155,14 @@ object MarkdownParser {
                 ) {
                     append(displayText)
                 }
-                parseRecursive(text.substring(linkMatch.range.last + 1), builder, linkStyles, onAnnotationClicked)
+                parseRecursive(
+                    text.substring(linkMatch.range.last + 1),
+                    builder,
+                    linkStyles,
+                    onAnnotationClicked
+                )
             }
+
             mentionMatch != null -> {
                 val username = mentionMatch.groupValues[1]
                 builder.withLink(
@@ -143,7 +174,12 @@ object MarkdownParser {
                 ) {
                     append("@$username")
                 }
-                parseRecursive(text.substring(mentionMatch.range.last + 1), builder, linkStyles, onAnnotationClicked)
+                parseRecursive(
+                    text.substring(mentionMatch.range.last + 1),
+                    builder,
+                    linkStyles,
+                    onAnnotationClicked
+                )
             }
         }
     }

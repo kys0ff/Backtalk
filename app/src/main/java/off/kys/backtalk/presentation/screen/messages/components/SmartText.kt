@@ -45,13 +45,26 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.util.MarkdownParser
+import off.kys.backtalk.util.ComposeTextParser
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.koinInject
 import kotlin.math.abs
 
 /**
- * A custom [Text] composable that handles Markdown, links, and mentions with Telegram-style rounded highlights.
+ * A highly customizable text component that supports Markdown formatting, interactive links,
+ * user mentions, and search result highlighting.
+ *
+ * It automatically parses the provided [text] using [ComposeTextParser], applies custom styles
+ * for links, and handles click events. It also features an optional safety dialog for
+ * external URLs based on user preferences.
+ *
+ * @param text The raw string content to be parsed and displayed.
+ * @param modifier The [Modifier] to be applied to the layout.
+ * @param clickableLink Whether URLs within the text should be interactive.
+ * @param fontSize The size of the glyphs to use when painting the text.
+ * @param color The color to be applied to the text.
+ * @param style Style configuration for the text such as color, font, line height etc.
+ * @param textDecoration The decorations to paint on the text (e.g., underline).
  */
 @Composable
 fun SmartText(
@@ -84,7 +97,7 @@ fun SmartText(
         )
     )
 
-    val annotatedString = MarkdownParser.toAnnotatedString(
+    val annotatedString = ComposeTextParser.toAnnotatedString(
         text = text,
         linkStyles = linkStyles,
         onAnnotationClicked = { annotation ->
@@ -134,7 +147,8 @@ fun SmartText(
 
                         for (line in startLine..endLine) {
                             val lineStartOffset = layout.getLineStart(line)
-                            val isLtr = layout.getParagraphDirection(lineStartOffset) == ResolvedTextDirection.Ltr
+                            val isLtr =
+                                layout.getParagraphDirection(lineStartOffset) == ResolvedTextDirection.Ltr
 
                             val left = if (line == startLine) {
                                 layout.getHorizontalPosition(start, usePrimaryDirection = true)
