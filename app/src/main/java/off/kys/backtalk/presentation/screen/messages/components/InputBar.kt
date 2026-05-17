@@ -33,7 +33,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
@@ -142,17 +142,6 @@ fun InputBar(
             )
         )
     }
-    // Use extracted Scheduling Dialogs
-    MessageSchedulingDialogs(
-        showDatePicker = showDatePicker,
-        showTimePicker = showTimePicker,
-        datePickerState = datePickerState,
-        timePickerState = timePickerState,
-        onSchedule = { time ->
-            onMessageSchedule(textValue.text, time)
-            textValue = TextFieldValue(emptyString())
-        }
-    )
 
     val showPermissionRationale = remember { mutableStateOf(false) }
 
@@ -177,6 +166,7 @@ fun InputBar(
         }
     }
 
+
     fun handleScheduleClick() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
@@ -190,13 +180,6 @@ fun InputBar(
             }
         } else {
             checkAndRequestExactAlarmPermission()
-        }
-    }
-
-    LaunchedEffect(showTapHint) {
-        if (showTapHint) {
-            delay(2000)
-            showTapHint = false
         }
     }
 
@@ -230,13 +213,6 @@ fun InputBar(
         }
     }
 
-    LaunchedEffect(key1 = messageInput) {
-        if (messageInput != textValue.text) {
-            textValue =
-                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
-        }
-    }
-
     fun applyStyle(startSym: String, endSym: String) {
         val selection = textValue.selection
         val text = textValue.text
@@ -246,6 +222,31 @@ fun InputBar(
         val newCursorPos = selection.start + startSym.length + selectedText.length + endSym.length
         textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
     }
+
+    LaunchedEffect(key1 = showTapHint) {
+        if (showTapHint) {
+            delay(2000)
+            showTapHint = false
+        }
+    }
+
+    LaunchedEffect(key1 = messageInput) {
+        if (messageInput != textValue.text) {
+            textValue =
+                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
+        }
+    }
+
+    MessageSchedulingDialogs(
+        showDatePicker = showDatePicker,
+        showTimePicker = showTimePicker,
+        datePickerState = datePickerState,
+        timePickerState = timePickerState,
+        onSchedule = { time ->
+            onMessageSchedule(textValue.text, time)
+            textValue = TextFieldValue(emptyString())
+        }
+    )
 
     Surface(
         modifier = Modifier.windowInsetsPadding(
@@ -270,7 +271,7 @@ fun InputBar(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp)
+                        .heightIn(min = 56.dp) // now we have fixed issue #13 user cant see what he is typing because rge text field height was fixed on 56
                 ) {
                     this@Row.AnimatedVisibility(
                         visible = !isRecording,
@@ -283,7 +284,7 @@ fun InputBar(
                             textStyle = TextStyle(textDirection = TextDirection.Content),
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = { Text(stringResource(R.string.chat_input_hint)) },
-                            maxLines = 4,
+                            maxLines = 5,
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                             colors = TextFieldDefaults.colors(
                                 focusedIndicatorColor = Color.Transparent,

@@ -43,13 +43,6 @@ class MessagesScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = koinViewModel<MessagesViewModel>()
         val audioPlayer = koinInject<AudioPlayer>()
-
-        DisposableEffect(Unit) {
-            onDispose {
-                audioPlayer.stop()
-            }
-        }
-
         val state by viewModel.uiState
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val messagesScrollState = rememberLazyListState()
@@ -83,6 +76,12 @@ class MessagesScreen : Screen {
                 if (targetIndex != -1) {
                     messagesScrollState.animateScrollToItem(targetIndex)
                 }
+            }
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                audioPlayer.stop()
             }
         }
 

@@ -60,6 +60,7 @@ fun InputBarReplyHeader(
                     text = (editingMessage ?: replyingTo)?.text ?: emptyString(),
                     clickableLink = false,
                     maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

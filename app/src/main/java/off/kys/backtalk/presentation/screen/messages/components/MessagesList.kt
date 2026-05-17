@@ -23,6 +23,7 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.util.emptyString
 
 /**
  * Composable function that displays the messages list.
@@ -42,12 +43,10 @@ fun ColumnScope.MessagesList(
     onEditMessage: (MessageEntity?) -> Unit,
     onReply: (MessageEntity?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
-    searchQuery: String = ""
+    searchQuery: String = emptyString()
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     var blinkMessageId by remember { mutableStateOf<MessageId?>(null) }
-
     val selectionMode = selectedMessageIds.isNotEmpty()
 
     LaunchedEffect(messages.size) {
