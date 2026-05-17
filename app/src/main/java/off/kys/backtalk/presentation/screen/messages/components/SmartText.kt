@@ -1,5 +1,8 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,14 +26,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -67,7 +73,9 @@ fun SmartText(
     var pendingUrl by remember { mutableStateOf(emptyString()) }
 
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    var pressedLink by remember { mutableStateOf<AnnotatedString.Range<LinkAnnotation>?>(null) }
     val highlightColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f)
+    val rippleColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)
 
     val linkStyles = TextLinkStyles(
         style = SpanStyle(
@@ -102,48 +110,80 @@ fun SmartText(
     Text(
         text = annotatedString,
         onTextLayout = { textLayoutResult = it },
-        modifier = modifier.drawBehind {
-            val layout = textLayoutResult ?: return@drawBehind
-            if (highlightQuery.isNullOrBlank()) return@drawBehind
+        modifier = modifier
+            .pointerInput(annotatedString) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val layout = textLayoutResult ?: return@awaitEachGesture
+                    val offset = layout.getOffsetForPosition(down.position)
+                    val link = annotatedString.getLinkAnnotations(offset, offset).firstOrNull()
+                    if (link != null) {
+                        pressedLink = link
+                        waitForUpOrCancellation()
+                        pressedLink = null
+                    }
+                }
+            }
+            .drawBehind {
+                val layout = textLayoutResult ?: return@drawBehind
 
-            val terms = highlightQuery.lowercase().split(" ").filter { it.isNotBlank() }
-            val lowerText = annotatedString.text.lowercase()
-
-            for (term in terms) {
-                var index = lowerText.indexOf(term)
-                while (index != -1) {
-                    val start = index
-                    val end = index + term.length
-
-                    // Guard clause against mismatched async rendering updates
+                fun drawHighlight(start: Int, end: Int, color: Color) {
                     if (end <= layout.layoutInput.text.length) {
                         val startLine = layout.getLineForOffset(start)
                         val endLine = layout.getLineForOffset(end)
 
                         for (line in startLine..endLine) {
-                            val lineStart =
-                                if (line == startLine) start else layout.getLineStart(line)
-                            val lineEnd = if (line == endLine) end else layout.getLineEnd(line)
+                            val lineStartOffset = layout.getLineStart(line)
+                            val isLtr = layout.getParagraphDirection(lineStartOffset) == ResolvedTextDirection.Ltr
 
-                            val left =
-                                layout.getHorizontalPosition(lineStart, usePrimaryDirection = true)
-                            val right =
-                                layout.getHorizontalPosition(lineEnd, usePrimaryDirection = true)
+                            val left = if (line == startLine) {
+                                layout.getHorizontalPosition(start, usePrimaryDirection = true)
+                            } else {
+                                if (isLtr) layout.getLineLeft(line) else layout.getLineRight(line)
+                            }
+
+                            val right = if (line == endLine) {
+                                layout.getHorizontalPosition(end, usePrimaryDirection = true)
+                            } else {
+                                if (isLtr) layout.getLineRight(line) else layout.getLineLeft(line)
+                            }
+
                             val top = layout.getLineTop(line)
                             val bottom = layout.getLineBottom(line)
 
                             drawRoundRect(
-                                color = highlightColor,
+                                color = color,
                                 topLeft = Offset(minOf(left, right), top),
                                 size = Size(abs(right - left), bottom - top),
                                 cornerRadius = CornerRadius(4.dp.toPx(), 4.dp.toPx())
                             )
                         }
                     }
-                    index = lowerText.indexOf(term, index + term.length)
                 }
-            }
-        },
+
+                // Draw pressed link ripple
+                pressedLink?.let {
+                    drawHighlight(
+                        it.start,
+                        it.end,
+                        rippleColor
+                    )
+                }
+
+                // Draw search highlights
+                if (!highlightQuery.isNullOrBlank()) {
+                    val terms = highlightQuery.lowercase().split(" ").filter { it.isNotBlank() }
+                    val lowerText = annotatedString.text.lowercase()
+
+                    for (term in terms) {
+                        var index = lowerText.indexOf(term)
+                        while (index != -1) {
+                            drawHighlight(index, index + term.length, highlightColor)
+                            index = lowerText.indexOf(term, index + term.length)
+                        }
+                    }
+                }
+            },
         maxLines = maxLines,
         lineHeight = lineHeight,
         style = style.copy(
