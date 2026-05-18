@@ -60,6 +60,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,6 +91,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.koinInject
+import java.util.Locale
 import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
@@ -114,12 +116,12 @@ fun InputBar(
     val preferences = koinInject<BacktalkPreferences>()
 
     var isRecording by remember { mutableStateOf(false) }
+    var secondsElapsed by remember { mutableIntStateOf(0) } // Tracks the timer ticking
     var showTapHint by remember { mutableStateOf(false) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     val amplitudes by audioRecorder.amplitudes.collectAsState()
     val shakeOffset = remember { Animatable(0f) }
 
-    // --- Modernized Scheduling State Integration ---
     val schedulingStage = remember { mutableStateOf(SchedulingStage.Hidden) }
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState()
@@ -143,6 +145,24 @@ fun InputBar(
     }
 
     val showPermissionRationale = remember { mutableStateOf(false) }
+
+    // Timer logic running in the background when recording
+    LaunchedEffect(key1 = isRecording) {
+        if (isRecording) {
+            secondsElapsed = 0
+            while (isRecording) {
+                delay(1000L)
+                secondsElapsed++
+            }
+        }
+    }
+
+    // Quick formatting tool for your duration string
+    val durationText = remember(secondsElapsed) {
+        val minutes = secondsElapsed / 60
+        val seconds = secondsElapsed % 60
+        String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+    }
 
     fun checkAndRequestExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -235,7 +255,6 @@ fun InputBar(
         }
     }
 
-    // Wiring up the freshly updated multi-stage picker logic cleanly
     MessageSchedulingDialogs(
         stage = schedulingStage.value,
         datePickerState = datePickerState,
@@ -298,7 +317,10 @@ fun InputBar(
                         enter = fadeIn() + expandHorizontally(),
                         exit = fadeOut() + shrinkHorizontally()
                     ) {
-                        VoiceRecordingIndicator(amplitudes = amplitudes)
+                        VoiceRecordingIndicator(
+                            amplitudes = amplitudes,
+                            durationText = durationText
+                        )
                     }
                 }
 
