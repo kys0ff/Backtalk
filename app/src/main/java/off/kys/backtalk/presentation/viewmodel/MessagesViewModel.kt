@@ -73,9 +73,9 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(showPermissionRationale = false)
             }
             is MessagesUiEvent.SelectTag -> {
-                _uiState.value = _uiState.value.copy(
-                    selectedTag = if (_uiState.value.selectedTag == event.tag) null else event.tag
-                )
+                val newTag = if (_uiState.value.selectedTag == event.tag) null else event.tag
+                _uiState.value = _uiState.value.copy(selectedTag = newTag)
+                updateFilteredMessages()
             }
             is MessagesUiEvent.TogglePinMessage -> togglePinMessage(event.id, event.isPinned)
             is MessagesUiEvent.NavigatePinned -> navigatePinned()
@@ -83,10 +83,20 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = event.show)
             }
             is MessagesUiEvent.ScrollToMessage -> {
-                // This event might be handled by the UI layer via a SideEffect if needed,
-                // but we can also just update state if we want to trigger a scroll.
-                // For now, if it's from the dialog, we might just need to ensure the dialog closes.
                 _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = false)
+            }
+            is MessagesUiEvent.BlinkMessage -> {
+                blinkMessage(event.id)
+            }
+        }
+    }
+
+    private fun blinkMessage(id: MessageId?) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(blinkMessageId = id)
+            if (id != null) {
+                kotlinx.coroutines.delay(1920) // Match the delay in previous implementation
+                _uiState.value = _uiState.value.copy(blinkMessageId = null)
             }
         }
     }
@@ -137,8 +147,22 @@ class MessagesViewModel(
                     isLoading = false,
                     activePinnedMessageIndex = if (pinnedMessages.isEmpty()) 0 else _uiState.value.activePinnedMessageIndex % pinnedMessages.size
                 )
+                updateFilteredMessages()
             }
         }
+    }
+
+    private fun updateFilteredMessages() {
+        val state = _uiState.value
+        val filtered = if (state.selectedTag == null) {
+            state.messages
+        } else {
+            state.messages.filter { message ->
+                val text = message.editedText ?: message.text
+                text.contains("#${state.selectedTag}", ignoreCase = true)
+            }.ifEmpty { state.messages }
+        }
+        _uiState.value = _uiState.value.copy(filteredMessages = filtered)
     }
 
     /**

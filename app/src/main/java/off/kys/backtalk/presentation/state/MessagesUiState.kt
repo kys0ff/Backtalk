@@ -27,5 +27,7 @@ data class MessagesUiState(
     val selectedTag: String? = null,
     val pinnedMessages: List<MessageEntity> = emptyList(),
     val activePinnedMessageIndex: Int = 0,
-    val showPinnedMessagesDialog: Boolean = false
+    val showPinnedMessagesDialog: Boolean = false,
+    val blinkMessageId: MessageId? = null,
+    val filteredMessages: List<MessageEntity> = emptyList()
 )

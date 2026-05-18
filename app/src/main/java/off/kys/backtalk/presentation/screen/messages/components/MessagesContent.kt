@@ -55,15 +55,16 @@ fun MessagesContent(
 
     Box(modifier = modifier.fillMaxSize()) {
         MessagesList(
-            messages = state.messages,
+            messages = state.filteredMessages,
             selectedMessageIds = state.selectedMessageIds,
             listState = listState,
             onEditMessage = onEditMessage,
             onReply = onReply,
             onToggleSelect = onToggleSelect,
             searchQuery = if (state.isSearchActive) state.searchQuery else emptyString(),
-            selectedTag = state.selectedTag,
             onTagClick = onTagClick,
+            blinkMessageId = state.blinkMessageId,
+            onScrollToMessage = onScrollToMessage,
             contentPadding = if (state.pinnedMessages.isNotEmpty()) PaddingValues(top = 48.dp) else PaddingValues(
                 0.dp
             )

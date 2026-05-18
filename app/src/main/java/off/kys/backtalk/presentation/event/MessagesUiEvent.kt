@@ -131,4 +131,9 @@ sealed interface MessagesUiEvent {
      * UI event to scroll to a specific message.
      */
     data class ScrollToMessage(val id: MessageId) : MessagesUiEvent
+
+    /**
+     * UI event to trigger a blink animation for a message.
+     */
+    data class BlinkMessage(val id: MessageId?) : MessagesUiEvent
 }

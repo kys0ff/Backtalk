@@ -21,6 +21,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.InputBar
 import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
@@ -52,6 +53,16 @@ class MessagesScreen : Screen {
         val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
         val tags = rememberHashtags(state.messages)
 
+        fun scrollToAndBlink(id: MessageId) {
+            scope.launch {
+                val targetIndex = state.filteredMessages.asReversed().indexOfFirst { it.id == id }
+                if (targetIndex != -1) {
+                    messagesScrollState.animateScrollToItem(targetIndex)
+                    viewModel.onEvent(MessagesUiEvent.BlinkMessage(id))
+                }
+            }
+        }
+
         BackHandler(state.selectedMessageIds.isNotEmpty()) {
             viewModel.onEvent(MessagesUiEvent.ClearSelection)
         }
@@ -79,20 +90,14 @@ class MessagesScreen : Screen {
         LaunchedEffect(state.currentSearchResultIndex) {
             if (state.isSearchActive && state.currentSearchResultIndex != -1) {
                 val targetId = state.searchResults[state.currentSearchResultIndex]
-                val targetIndex = state.messages.reversed().indexOfFirst { it.id == targetId }
-                if (targetIndex != -1) {
-                    messagesScrollState.animateScrollToItem(targetIndex)
-                }
+                scrollToAndBlink(targetId)
             }
         }
 
         LaunchedEffect(state.activePinnedMessageIndex) {
             val activePinned = state.pinnedMessages.getOrNull(state.activePinnedMessageIndex)
             if (activePinned != null) {
-                val targetIndex = state.messages.asReversed().indexOfFirst { it.id == activePinned.id }
-                if (targetIndex != -1) {
-                    messagesScrollState.animateScrollToItem(targetIndex)
-                }
+                scrollToAndBlink(activePinned.id)
             }
         }
 
@@ -204,12 +209,7 @@ class MessagesScreen : Screen {
                 onTogglePinnedDialog = { viewModel.onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
                 onTogglePin = { message, isPinned -> viewModel.onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned)) },
                 onScrollToMessage = { id ->
-                    scope.launch {
-                        val targetIndex = state.messages.asReversed().indexOfFirst { it.id == id }
-                        if (targetIndex != -1) {
-                            messagesScrollState.animateScrollToItem(targetIndex)
-                        }
-                    }
+                    scrollToAndBlink(id)
                     viewModel.onEvent(MessagesUiEvent.ScrollToMessage(id))
                 }
             )

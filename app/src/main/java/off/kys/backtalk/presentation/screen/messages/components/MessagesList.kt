@@ -9,16 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
@@ -35,26 +28,14 @@ fun MessagesList(
     onReply: (MessageEntity?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
     searchQuery: String = emptyString(),
-    selectedTag: String? = null,
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    blinkMessageId: MessageId? = null,
+    onScrollToMessage: (MessageId) -> Unit = {},
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var blinkMessageId by remember { mutableStateOf<MessageId?>(null) }
     val selectionMode = selectedMessageIds.isNotEmpty()
 
-    val filteredMessages = remember(messages, selectedTag) {
-        if (selectedTag == null) {
-            messages
-        } else {
-            messages.filter { message ->
-                val text = message.editedText ?: message.text
-                text.contains("#$selectedTag", ignoreCase = true)
-            }.ifEmpty { messages }
-        }
-    }
-
-    LaunchedEffect(filteredMessages.size) {
-        if (filteredMessages.isNotEmpty()) {
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
             listState.animateScrollToItem(0)
         }
     }
@@ -66,7 +47,7 @@ fun MessagesList(
         state = listState,
         reverseLayout = true
     ) {
-        val reversed = filteredMessages.reversed()
+        val reversed = messages.reversed()
 
         items(
             count = reversed.size,
@@ -130,16 +111,7 @@ fun MessagesList(
                         isSelected = isSelected,
                         onReplyPreviewClick = {
                             current.repliedToId?.let { id ->
-                                coroutineScope.launch {
-                                    val targetIndex =
-                                        reversed.indexOfFirst { it.id == id }
-                                    if (targetIndex != -1) {
-                                        listState.animateScrollToItem(targetIndex)
-                                        blinkMessageId = id
-                                        delay(1920)
-                                        blinkMessageId = null
-                                    }
-                                }
+                                onScrollToMessage(id)
                             }
                         },
                         onClick = {
