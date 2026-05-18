@@ -27,7 +27,9 @@ class BacktalkPreferences(context: Context) {
     // Observable states for Compose to react to changes automatically
     private val _lockEnabled = mutableStateOf(prefs.getBoolean(KEY_LOCK_ENABLED, false))
     private val _themeMode = mutableStateOf(
-        ThemeMode.valueOf(prefs.getString(KEY_THEME_MODE, ThemeMode.AUTO.name) ?: ThemeMode.AUTO.name)
+        runCatching {
+            ThemeMode.valueOf(prefs.getString(KEY_THEME_MODE, ThemeMode.AUTO.name) ?: ThemeMode.AUTO.name)
+        }.getOrDefault(ThemeMode.AUTO)
     )
     private val _dynamicColorEnabled = mutableStateOf(
         prefs.getBoolean(KEY_DYNAMIC_COLOR, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -37,9 +39,11 @@ class BacktalkPreferences(context: Context) {
     private val _autoExportEnabled = mutableStateOf(prefs.getBoolean(KEY_AUTO_EXPORT_ENABLED, false))
     private val _autoExportUri = mutableStateOf(prefs.getString(KEY_AUTO_EXPORT_URI, null))
     private val _autoExportInterval = mutableStateOf(
-        ExportInterval.valueOf(
-            prefs.getString(KEY_AUTO_EXPORT_INTERVAL, ExportInterval.DAILY.name) ?: ExportInterval.DAILY.name
-        )
+        runCatching {
+            ExportInterval.valueOf(
+                prefs.getString(KEY_AUTO_EXPORT_INTERVAL, ExportInterval.DAILY.name) ?: ExportInterval.DAILY.name
+            )
+        }.getOrDefault(ExportInterval.DAILY)
     )
     private val _autoExportEncrypted = mutableStateOf(prefs.getBoolean(KEY_AUTO_EXPORT_ENCRYPTED, false))
     private val _autoExportPassword = mutableStateOf(prefs.getString(KEY_AUTO_EXPORT_PASSWORD, null))
@@ -72,18 +76,20 @@ class BacktalkPreferences(context: Context) {
     private val internalListener = SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
         when (key) {
             KEY_LOCK_ENABLED -> _lockEnabled.value = p.getBoolean(key, false)
-            KEY_THEME_MODE -> _themeMode.value = ThemeMode.valueOf(
-                p.getString(key, ThemeMode.AUTO.name) ?: ThemeMode.AUTO.name
-            )
+            KEY_THEME_MODE -> _themeMode.value = runCatching {
+                ThemeMode.valueOf(p.getString(key, ThemeMode.AUTO.name) ?: ThemeMode.AUTO.name)
+            }.getOrDefault(ThemeMode.AUTO)
             KEY_DYNAMIC_COLOR -> _dynamicColorEnabled.value =
                 p.getBoolean(key, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             KEY_SECURE_SCREEN -> _secureScreenEnabled.value = p.getBoolean(key, false)
             KEY_AUTO_UPDATE -> _autoUpdateEnabled.value = p.getBoolean(key, false)
             KEY_AUTO_EXPORT_ENABLED -> _autoExportEnabled.value = p.getBoolean(key, false)
             KEY_AUTO_EXPORT_URI -> _autoExportUri.value = p.getString(key, null)
-            KEY_AUTO_EXPORT_INTERVAL -> _autoExportInterval.value = ExportInterval.valueOf(
-                p.getString(key, ExportInterval.DAILY.name) ?: ExportInterval.DAILY.name
-            )
+            KEY_AUTO_EXPORT_INTERVAL -> _autoExportInterval.value = runCatching {
+                ExportInterval.valueOf(
+                    p.getString(key, ExportInterval.DAILY.name) ?: ExportInterval.DAILY.name
+                )
+            }.getOrDefault(ExportInterval.DAILY)
             KEY_AUTO_EXPORT_ENCRYPTED -> _autoExportEncrypted.value = p.getBoolean(key, false)
             KEY_AUTO_EXPORT_PASSWORD -> _autoExportPassword.value = p.getString(key, null)
             KEY_HAPTIC_FEEDBACK -> _hapticFeedbackEnabled.value = p.getBoolean(key, true)
@@ -92,6 +98,7 @@ class BacktalkPreferences(context: Context) {
             KEY_EXTERNAL_LINK_WARNING -> _externalLinkWarningEnabled.value = p.getBoolean(key, true)
             KEY_PAIRED_DEVICES -> _pairedDevicesJson.value = p.getString(key, "[]") ?: "[]"
             KEY_FIRST_LAUNCH -> _firstLaunch.value = p.getBoolean(key, true)
+            null -> refreshAll() // Handle clear()
         }
         listener?.onSharedPreferenceChanged(p, key)
     }
@@ -100,6 +107,31 @@ class BacktalkPreferences(context: Context) {
 
     init {
         prefs.registerOnSharedPreferenceChangeListener(internalListener)
+    }
+
+    private fun refreshAll() {
+        _lockEnabled.value = prefs.getBoolean(KEY_LOCK_ENABLED, false)
+        _themeMode.value = runCatching {
+            ThemeMode.valueOf(prefs.getString(KEY_THEME_MODE, ThemeMode.AUTO.name) ?: ThemeMode.AUTO.name)
+        }.getOrDefault(ThemeMode.AUTO)
+        _dynamicColorEnabled.value = prefs.getBoolean(KEY_DYNAMIC_COLOR, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        _secureScreenEnabled.value = prefs.getBoolean(KEY_SECURE_SCREEN, false)
+        _autoUpdateEnabled.value = prefs.getBoolean(KEY_AUTO_UPDATE, false)
+        _autoExportEnabled.value = prefs.getBoolean(KEY_AUTO_EXPORT_ENABLED, false)
+        _autoExportUri.value = prefs.getString(KEY_AUTO_EXPORT_URI, null)
+        _autoExportInterval.value = runCatching {
+            ExportInterval.valueOf(
+                prefs.getString(KEY_AUTO_EXPORT_INTERVAL, ExportInterval.DAILY.name) ?: ExportInterval.DAILY.name
+            )
+        }.getOrDefault(ExportInterval.DAILY)
+        _autoExportEncrypted.value = prefs.getBoolean(KEY_AUTO_EXPORT_ENCRYPTED, false)
+        _autoExportPassword.value = prefs.getString(KEY_AUTO_EXPORT_PASSWORD, null)
+        _hapticFeedbackEnabled.value = prefs.getBoolean(KEY_HAPTIC_FEEDBACK, true)
+        _keepScreenOn.value = prefs.getBoolean(KEY_KEEP_SCREEN_ON, BuildConfig.DEBUG)
+        _devModeEnabled.value = prefs.getBoolean(KEY_DEV_MODE_ENABLED, BuildConfig.DEBUG)
+        _externalLinkWarningEnabled.value = prefs.getBoolean(KEY_EXTERNAL_LINK_WARNING, true)
+        _pairedDevicesJson.value = prefs.getString(KEY_PAIRED_DEVICES, "[]") ?: "[]"
+        _firstLaunch.value = prefs.getBoolean(KEY_FIRST_LAUNCH, true)
     }
 
     companion object {
@@ -160,14 +192,20 @@ class BacktalkPreferences(context: Context) {
      */
     var lockEnabled: Boolean
         get() = _lockEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_LOCK_ENABLED, value) }
+        set(value) {
+            _lockEnabled.value = value
+            prefs.edit { putBoolean(KEY_LOCK_ENABLED, value) }
+        }
 
     /**
      * The visual theme strategy for the application (Light, Dark, or System Auto).
      */
     var themeMode: ThemeMode
         get() = _themeMode.value
-        set(value) = prefs.edit { putString(KEY_THEME_MODE, value.name) }
+        set(value) {
+            _themeMode.value = value
+            prefs.edit { putString(KEY_THEME_MODE, value.name) }
+        }
 
     /**
      * Whether Material You dynamic color extraction is enabled.
@@ -176,98 +214,140 @@ class BacktalkPreferences(context: Context) {
      */
     var dynamicColorEnabled: Boolean
         get() = _dynamicColorEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_DYNAMIC_COLOR, value) }
+        set(value) {
+            _dynamicColorEnabled.value = value
+            prefs.edit { putBoolean(KEY_DYNAMIC_COLOR, value) }
+        }
 
     /**
      * If enabled, prevents the app's content from appearing in screenshots or the recent apps switcher.
      */
     var secureScreenEnabled: Boolean
         get() = _secureScreenEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_SECURE_SCREEN, value) }
+        set(value) {
+            _secureScreenEnabled.value = value
+            prefs.edit { putBoolean(KEY_SECURE_SCREEN, value) }
+        }
 
     /**
      * Whether the app should periodically poll for new versions in the background.
      */
     var autoUpdateEnabled: Boolean
         get() = _autoUpdateEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_AUTO_UPDATE, value) }
+        set(value) {
+            _autoUpdateEnabled.value = value
+            prefs.edit { putBoolean(KEY_AUTO_UPDATE, value) }
+        }
 
     /**
      * Whether the app should automatically export backups.
      */
     var autoExportEnabled: Boolean
         get() = _autoExportEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_AUTO_EXPORT_ENABLED, value) }
+        set(value) {
+            _autoExportEnabled.value = value
+            prefs.edit { putBoolean(KEY_AUTO_EXPORT_ENABLED, value) }
+        }
 
     /**
      * The persistable URI of the directory where auto-exports are saved.
      */
     var autoExportUri: String?
         get() = _autoExportUri.value
-        set(value) = prefs.edit { putString(KEY_AUTO_EXPORT_URI, value) }
+        set(value) {
+            _autoExportUri.value = value
+            prefs.edit { putString(KEY_AUTO_EXPORT_URI, value) }
+        }
 
     /**
      * The interval at which auto-exports should occur.
      */
     var autoExportInterval: ExportInterval
         get() = _autoExportInterval.value
-        set(value) = prefs.edit { putString(KEY_AUTO_EXPORT_INTERVAL, value.name) }
+        set(value) {
+            _autoExportInterval.value = value
+            prefs.edit { putString(KEY_AUTO_EXPORT_INTERVAL, value.name) }
+        }
 
     /**
      * Whether auto-exports should be encrypted.
      */
     var autoExportEncrypted: Boolean
         get() = _autoExportEncrypted.value
-        set(value) = prefs.edit { putBoolean(KEY_AUTO_EXPORT_ENCRYPTED, value) }
+        set(value) {
+            _autoExportEncrypted.value = value
+            prefs.edit { putBoolean(KEY_AUTO_EXPORT_ENCRYPTED, value) }
+        }
 
     /**
      * The password used for auto-export encryption.
      */
     var autoExportPassword: String?
         get() = _autoExportPassword.value
-        set(value) = prefs.edit { putString(KEY_AUTO_EXPORT_PASSWORD, value) }
+        set(value) {
+            _autoExportPassword.value = value
+            prefs.edit { putString(KEY_AUTO_EXPORT_PASSWORD, value) }
+        }
 
     /**
      * Whether haptic feedback (vibration) is enabled for user interactions.
      */
     var hapticFeedbackEnabled: Boolean
         get() = _hapticFeedbackEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_HAPTIC_FEEDBACK, value) }
+        set(value) {
+            _hapticFeedbackEnabled.value = value
+            prefs.edit { putBoolean(KEY_HAPTIC_FEEDBACK, value) }
+        }
 
     /**
      * Whether the screen should stay on while the app is in use.
      */
     var keepScreenOn: Boolean
         get() = _keepScreenOn.value
-        set(value) = prefs.edit { putBoolean(KEY_KEEP_SCREEN_ON, value) }
+        set(value) {
+            _keepScreenOn.value = value
+            prefs.edit { putBoolean(KEY_KEEP_SCREEN_ON, value) }
+        }
 
     /**
      * Whether developer mode is enabled, revealing hidden settings.
      */
     var devModeEnabled: Boolean
         get() = _devModeEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_DEV_MODE_ENABLED, value) }
+        set(value) {
+            _devModeEnabled.value = value
+            prefs.edit { putBoolean(KEY_DEV_MODE_ENABLED, value) }
+        }
 
     /**
      * Whether to show a warning before opening external links.
      */
     var externalLinkWarningEnabled: Boolean
         get() = _externalLinkWarningEnabled.value
-        set(value) = prefs.edit { putBoolean(KEY_EXTERNAL_LINK_WARNING, value) }
+        set(value) {
+            _externalLinkWarningEnabled.value = value
+            prefs.edit { putBoolean(KEY_EXTERNAL_LINK_WARNING, value) }
+        }
 
     /**
      * The serialized list of paired devices.
      */
     var pairedDevicesJson: String
         get() = _pairedDevicesJson.value
-        set(value) = prefs.edit { putString(KEY_PAIRED_DEVICES, value) }
+        set(value) {
+            _pairedDevicesJson.value = value
+            prefs.edit { putString(KEY_PAIRED_DEVICES, value) }
+        }
 
     /**
      * Whether it's the first time the app is being launched.
      */
     var firstLaunch: Boolean
         get() = _firstLaunch.value
-        set(value) = prefs.edit { putBoolean(KEY_FIRST_LAUNCH, value) }
+        set(value) {
+            _firstLaunch.value = value
+            prefs.edit { putBoolean(KEY_FIRST_LAUNCH, value) }
+        }
 
     /**
      * The unique ID for this device used for sync pairing.
@@ -280,5 +360,6 @@ class BacktalkPreferences(context: Context) {
      */
     fun clearAll() {
         prefs.edit { clear() }
+        refreshAll()
     }
 }
