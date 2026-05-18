@@ -17,11 +17,13 @@ import off.kys.backtalk.data.repository.SyncRepositoryImpl
 import off.kys.backtalk.domain.repository.BackupRepository
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.domain.repository.SyncRepository
+import off.kys.backtalk.domain.use_case.CancelScheduledMessage
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.domain.use_case.CopyMessagesByIds
 import off.kys.backtalk.domain.use_case.DeleteMessageById
 import off.kys.backtalk.domain.use_case.ExportBackup
 import off.kys.backtalk.domain.use_case.GetAllMessages
+import off.kys.backtalk.domain.use_case.GetAllScheduledMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.InsertMessage
@@ -33,6 +35,7 @@ import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
+import off.kys.backtalk.presentation.viewmodel.RemindersViewModel
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
 import off.kys.backtalk.presentation.viewmodel.StatisticsViewModel
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
@@ -107,6 +110,8 @@ private fun Module.useCaseModule() {
     single { DeleteMessageById(get()) }
     single { CopyMessagesByIds(get(), get()) }
     single { ScheduleMessageUseCase(get(), get()) }
+    single { GetAllScheduledMessages(get()) }
+    single { CancelScheduledMessage(get(), get()) }
     single { CheckAppUpdate() }
     single { WipeAppData(androidContext(), get(), get(), get()) }
     single { ExportBackup(get(), get(), get()) }
@@ -119,7 +124,9 @@ private fun Module.useCaseModule() {
             insertMessage = get(),
             deleteMessageById = get(),
             copyMessagesByIds = get(),
-            scheduleMessage = get()
+            scheduleMessage = get(),
+            getAllScheduledMessages = get(),
+            cancelScheduledMessage = get()
         )
     }
     single {
@@ -145,6 +152,7 @@ private fun Module.viewModelModule() {
     viewModel { SyncViewModel(get()) }
     viewModel { OnboardingViewModel(androidApplication(), get()) }
     viewModel { StatisticsViewModel(get()) }
+    viewModel { RemindersViewModel(get()) }
 }
 
 /**

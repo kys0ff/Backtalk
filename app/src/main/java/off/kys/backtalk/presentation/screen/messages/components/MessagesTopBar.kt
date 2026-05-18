@@ -84,6 +84,7 @@ fun MessagesTopBar(
     onCopy: () -> Unit,
     onSettings: () -> Unit,
     onThreads: () -> Unit,
+    onReminders: () -> Unit,
     onStatistics: () -> Unit,
     onToggleSearch: (Boolean) -> Unit,
     onSearchQueryChange: (String) -> Unit,
@@ -138,6 +139,7 @@ fun MessagesTopBar(
                     onToggleSearch = { onToggleSearch(true) },
                     onSettings = onSettings,
                     onThreads = onThreads,
+                    onReminders = onReminders,
                     onStatistics = onStatistics,
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors
@@ -346,6 +348,7 @@ private fun DefaultTopBar(
     onToggleSearch: () -> Unit,
     onSettings: () -> Unit,
     onThreads: () -> Unit,
+    onReminders: () -> Unit,
     onStatistics: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors
@@ -399,6 +402,14 @@ private fun DefaultTopBar(
                             onClick = {
                                 showMenu = false
                                 onThreads()
+                            }
+                        )
+                        MenuOption(
+                            label = stringResource(R.string.reminders_title),
+                            icon = R.drawable.round_access_alarm_24,
+                            onClick = {
+                                showMenu = false
+                                onReminders()
                             }
                         )
                         MenuOption(

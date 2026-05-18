@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
+import off.kys.backtalk.domain.model.MessageId
 
 private const val TAG = "AlarmScheduler"
 
@@ -56,6 +57,20 @@ class AlarmScheduler(private val context: Context) {
                 pendingIntent
             )
         }
+    }
+
+    /**
+     * Cancels the alarm for the given [id].
+     */
+    fun cancel(id: MessageId) {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            id.value.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
     }
 
     /**

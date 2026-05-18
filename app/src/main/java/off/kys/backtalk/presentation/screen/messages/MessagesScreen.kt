@@ -27,6 +27,7 @@ import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesTopBar
 import off.kys.backtalk.presentation.screen.messages.components.ScrollToBottomFab
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
+import off.kys.backtalk.presentation.screen.reminders.RemindersScreen
 import off.kys.backtalk.presentation.screen.statistics.StatisticsScreen
 import off.kys.backtalk.presentation.screen.threads.ThreadsScreen
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
@@ -103,6 +104,7 @@ class MessagesScreen : Screen {
                     onCopy = { viewModel.onEvent(MessagesUiEvent.CopySelected) },
                     onSettings = { navigator += SettingsScreen() },
                     onThreads = { navigator += ThreadsScreen() },
+                    onReminders = { navigator += RemindersScreen() },
                     onStatistics = { navigator += StatisticsScreen() },
                     onToggleSearch = { active: Boolean ->
                         viewModel.onEvent(

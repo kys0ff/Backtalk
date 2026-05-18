@@ -171,6 +171,10 @@
     <string name="threads_share">Share</string>
 
     <!-- Reminders -->
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_empty">No scheduled reminders</string>
+    <string name="reminders_cancel_confirm_title">Cancel reminder?</string>
+    <string name="reminders_cancel_confirm_msg">Are you sure you want to cancel this scheduled reminder?</string>
     <string name="chat_reminder_tag">Reminder</string>
     <string name="chat_reminder_notification_channel">Reminders</string>
     <string name="chat_reminder_notification_title">Note to self</string>
