@@ -29,7 +29,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import off.kys.backtalk.presentation.state.DayActivity
 
 @Composable
@@ -118,7 +120,7 @@ fun MessageTypePieChart(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -145,7 +147,7 @@ fun MessageTypePieChart(
         Spacer(modifier = Modifier.width(32.dp))
 
         Column {
-            slices.forEach { slice ->
+            slices.fastForEach { slice ->
                 val percentage = (slice.count.toFloat() / total) * 100f
                 ChartLegendItem(
                     color = slice.color,
@@ -173,6 +175,8 @@ private fun ChartLegendItem(color: Color, label: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Visible
         )
     }
 }
