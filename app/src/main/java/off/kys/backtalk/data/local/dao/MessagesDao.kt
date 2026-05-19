@@ -78,4 +78,13 @@ interface MessagesDao {
      */
     @Query("UPDATE messages SET isPinned = :isPinned WHERE id = :id")
     suspend fun updatePinnedStatus(id: MessageId, isPinned: Boolean)
+
+    /**
+     * Counts how many messages use a specific media path.
+     *
+     * @param path The path to check.
+     * @return The number of messages referencing this path.
+     */
+    @Query("SELECT COUNT(*) FROM messages WHERE voicePath = :path OR mediaPath = :path OR mediaPaths LIKE '%\"' || :path || '\"%'")
+    suspend fun getPathUsageCount(path: String): Int
 }

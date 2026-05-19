@@ -81,4 +81,12 @@ interface MessagesRepository {
      * @param isPinned The new pinned status.
      */
     suspend fun updatePinnedStatus(id: MessageId, isPinned: Boolean)
+
+    /**
+     * Checks if a media path is referenced by any message or scheduled message.
+     *
+     * @param path The path to check.
+     * @return True if the path is referenced, false otherwise.
+     */
+    suspend fun isPathReferenced(path: String): Boolean
 }

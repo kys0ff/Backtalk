@@ -46,7 +46,10 @@ class AlarmReceiver : BroadcastReceiver(), KoinComponent {
                 repliedToId = scheduledMessage.repliedToId,
                 isReminder = true,
                 originalCreationTimestamp = scheduledMessage.creationTimestamp,
-                scheduledTimestamp = scheduledMessage.scheduledTimestamp
+                scheduledTimestamp = scheduledMessage.scheduledTimestamp,
+                mediaPath = scheduledMessage.mediaPath,
+                mediaPaths = scheduledMessage.mediaPaths,
+                mediaType = scheduledMessage.mediaType
             )
 
             // Insert into messages and delete from scheduled

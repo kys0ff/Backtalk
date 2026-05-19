@@ -42,4 +42,13 @@ interface ScheduledMessagesDao {
      */
     @Query("SELECT * FROM scheduled_messages")
     suspend fun getAllScheduledMessagesSync(): List<ScheduledMessageEntity>
+
+    /**
+     * Counts how many scheduled messages use a specific media path.
+     *
+     * @param path The path to check.
+     * @return The number of scheduled messages referencing this path.
+     */
+    @Query("SELECT COUNT(*) FROM scheduled_messages WHERE mediaPath = :path OR mediaPaths LIKE '%\"' || :path || '\"%'")
+    suspend fun getPathUsageCount(path: String): Int
 }

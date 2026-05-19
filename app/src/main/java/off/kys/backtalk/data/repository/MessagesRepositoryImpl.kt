@@ -75,4 +75,10 @@ class MessagesRepositoryImpl(
     override suspend fun updatePinnedStatus(id: MessageId, isPinned: Boolean) {
         messagesDao.updatePinnedStatus(id, isPinned)
     }
+
+    override suspend fun isPathReferenced(path: String): Boolean {
+        val countInMessages = messagesDao.getPathUsageCount(path)
+        val countInScheduled = scheduledMessagesDao.getPathUsageCount(path)
+        return (countInMessages + countInScheduled) > 0
+    }
 }
