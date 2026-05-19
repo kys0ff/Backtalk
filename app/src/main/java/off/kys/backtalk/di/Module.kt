@@ -12,6 +12,8 @@ import off.kys.backtalk.data.local.migrations.MIGRATION_2_3
 import off.kys.backtalk.data.local.migrations.MIGRATION_3_4
 import off.kys.backtalk.data.local.migrations.MIGRATION_4_5
 import off.kys.backtalk.data.local.migrations.MIGRATION_5_6
+import off.kys.backtalk.data.local.migrations.MIGRATION_6_7
+import off.kys.backtalk.data.local.migrations.MIGRATION_7_8
 import off.kys.backtalk.data.repository.BackupRepositoryImpl
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.data.repository.SyncRepositoryImpl
@@ -80,7 +82,7 @@ private fun Module.databaseModule() {
             MessagesDatabase::class.java,
             "msgs_db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
             .build()
     }
 
@@ -150,7 +152,7 @@ private fun Module.useCaseModule() {
  */
 private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get(), get()) }
-    viewModel { MessagesViewModel(get()) }
+    viewModel { MessagesViewModel(get(), androidApplication()) }
     viewModel { ThreadsViewModel(get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { SyncViewModel(get()) }

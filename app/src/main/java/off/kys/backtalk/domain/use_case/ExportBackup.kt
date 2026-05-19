@@ -48,7 +48,8 @@ class ExportBackup(
                 zos.closeEntry()
 
                 messages.forEach { message ->
-                    message.voicePath?.let { path ->
+                    val paths = listOfNotNull(message.voicePath, message.mediaPath)
+                    paths.forEach { path ->
                         val file = File(path)
                         if (file.exists()) {
                             zos.putNextEntry(ZipEntry("media/${file.name}"))

@@ -13,4 +13,14 @@ class Converters {
     fun toFloatList(value: String?): List<Float>? {
         return value?.let { Json.decodeFromString<List<Float>>(it) }
     }
+
+    @TypeConverter
+    fun fromStringList(value: List<String>?): String? {
+        return value?.let { Json.encodeToString(it) }
+    }
+
+    @TypeConverter
+    fun toStringList(value: String?): List<String>? {
+        return value?.let { Json.decodeFromString<List<String>>(it) }
+    }
 }

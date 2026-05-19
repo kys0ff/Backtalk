@@ -111,7 +111,7 @@ fun ThreadItem(
                     )
                     ActionIcon(
                         iconRes = R.drawable.round_share_24,
-                        count = stringResource(R.string.threads_share),
+                        count = stringResource(R.string.common_share),
                         onClick = {
                             onThreadShare(text)
                         }

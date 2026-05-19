@@ -28,7 +28,12 @@ class WipeAppData(
         // Clear Preferences
         preferences.clearAll()
 
-        // Clear Files (Voice Messages)
+        // Clear Files (Media)
+        val mediaDir = File(context.filesDir, "media")
+        if (mediaDir.exists()) {
+            mediaDir.deleteRecursively()
+        }
+
         val voiceMessagesDir = File(context.filesDir, "voice_messages")
         if (voiceMessagesDir.exists()) {
             voiceMessagesDir.deleteRecursively()

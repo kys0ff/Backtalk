@@ -16,8 +16,8 @@ import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
  */
 @Database(
     entities = [MessageEntity::class, ScheduledMessageEntity::class],
-    version = 6,
-    exportSchema = false
+    version = 8,
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class MessagesDatabase: RoomDatabase() {

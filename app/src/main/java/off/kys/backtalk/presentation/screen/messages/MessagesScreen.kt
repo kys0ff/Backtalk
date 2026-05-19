@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.InputBar
+import off.kys.backtalk.presentation.screen.messages.components.MediaPickerSheet
 import off.kys.backtalk.presentation.screen.messages.components.MessagesContent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesTopBar
 import off.kys.backtalk.presentation.screen.messages.components.ScrollToBottomFab
@@ -85,6 +86,10 @@ class MessagesScreen : Screen {
 
         BackHandler(state.showPinnedMessagesDialog) {
             viewModel.onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(false))
+        }
+
+        BackHandler(state.showMediaPicker) {
+            viewModel.onEvent(MessagesUiEvent.ToggleMediaPicker(false))
         }
 
         LaunchedEffect(state.currentSearchResultIndex) {
@@ -178,6 +183,9 @@ class MessagesScreen : Screen {
                     },
                     onMessageSchedule = { text, time ->
                         viewModel.onEvent(MessagesUiEvent.ScheduleMessage(text, time))
+                    },
+                    onAttachClick = {
+                        viewModel.onEvent(MessagesUiEvent.ToggleMediaPicker(true))
                     }
                 )
             },
@@ -192,6 +200,17 @@ class MessagesScreen : Screen {
                 )
             }
         ) { scaffoldPadding ->
+            if (state.showMediaPicker) {
+                MediaPickerSheet(
+                    onMediaSelected = { uris, type ->
+                        viewModel.onEvent(MessagesUiEvent.SendMediaMessages(uris.map { it.toString() }, type))
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(MessagesUiEvent.ToggleMediaPicker(false))
+                    }
+                )
+            }
+
             MessagesContent(
                 modifier = Modifier.padding(scaffoldPadding),
                 state = state,

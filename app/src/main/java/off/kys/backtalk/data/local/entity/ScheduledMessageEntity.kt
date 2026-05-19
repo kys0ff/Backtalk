@@ -26,5 +26,9 @@ data class ScheduledMessageEntity(
     val creationTimestamp: Long,
     val scheduledTimestamp: Long,
     @Embedded
-    val repliedToId: MessageId? = null
+    val repliedToId: MessageId? = null,
+    val mediaPath: String? = null,
+    val mediaPaths: List<String>? = null,
+    val mediaType: String? = null
 )
+

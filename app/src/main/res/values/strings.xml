@@ -11,10 +11,12 @@
     <string name="common_clear">Clear</string>
     <string name="common_back">Back</string>
     <string name="common_more">More</string>
+    <string name="common_share">Share</string>
     <string name="common_ok">OK</string>
     <string name="common_please_wait">Please wait…</string>
     <string name="common_navigate_up">Navigate up</string>
     <string name="common_edit">Edit</string>
+    <string name="common_attach">Attach</string>
     <string name="common_search">Search</string>
     <string name="common_daily">Daily</string>
     <string name="common_weekly">Weekly</string>
@@ -35,8 +37,8 @@
     <string name="chat_copy_label">Copied text</string>
     <string name="chat_status_edited">edited</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
-    <string name="chat_sent_at">Sent at</string>
-    <string name="chat_edited_at">Edited at %1$s</string>
+    <string name="chat_sent_at">sent at</string>
+    <string name="chat_edited_at">edited at %1$s</string>
     <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
     <string name="chat_input_hold_to_record">Hold to record</string>
     <string name="chat_input_record_cd">Record</string>
@@ -168,7 +170,6 @@
     <string name="threads_you">You</string>
     <string name="threads_at_you">\@you</string>
     <string name="threads_at_you_timestamp">\@you · %1$s</string>
-    <string name="threads_share">Share</string>
 
     <!-- Reminders -->
     <string name="reminders_title">Reminders</string>
@@ -178,8 +179,8 @@
     <string name="chat_reminder_tag">Reminder</string>
     <string name="chat_reminder_notification_channel">Reminders</string>
     <string name="chat_reminder_notification_title">Note to self</string>
-    <string name="chat_reminder_original_time">Original:</string>
-    <string name="chat_reminder_target_time">Target:</string>
+    <string name="chat_reminder_original_time">original:</string>
+    <string name="chat_reminder_target_time">target:</string>
     <string name="chat_reminder_permission_rationale">To deliver your "future notes" at the right time, Backtalk needs permission to show notifications and schedule exact alarms. Would you like to grant these in settings?</string>
     <string name="chat_reminder_open_settings">Open Settings</string>
 

@@ -1,5 +1,7 @@
 package off.kys.backtalk.presentation.viewmodel
 
+import android.app.Application
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,7 @@ import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.File
 
 /**
  * ViewModel for the Messages screen.
@@ -23,7 +26,8 @@ import org.koin.core.component.inject
  * @param useCases The bundle of use cases related to messages.
  */
 class MessagesViewModel(
-    private val useCases: MessagesUseCases
+    private val useCases: MessagesUseCases,
+    private val application: Application
 ) : ViewModel(), KoinComponent {
 
     private val alarmScheduler: AlarmScheduler by inject()
@@ -88,7 +92,53 @@ class MessagesViewModel(
             is MessagesUiEvent.BlinkMessage -> {
                 blinkMessage(event.id)
             }
+            is MessagesUiEvent.ToggleMediaPicker -> {
+                _uiState.value = _uiState.value.copy(showMediaPicker = event.show)
+            }
+            is MessagesUiEvent.SendMediaMessages -> {
+                sendMediaMessages(event.uris, event.type)
+            }
         }
+    }
+
+    private fun sendMediaMessages(uris: List<String>, type: String) {
+        val replyTo = _uiState.value.replyingTo
+        viewModelScope.launch {
+            runCatching {
+                val mediaPaths = uris.mapNotNull { uri ->
+                    val sourceUri = Uri.parse(uri)
+                    val extension = if (type.contains("video")) "mp4" else "jpg"
+                    val fileName = "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
+                    val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
+                    val destFile = File(mediaDir, fileName)
+
+                    application.contentResolver.openInputStream(sourceUri)?.use { input ->
+                        destFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    destFile.absolutePath
+                }
+
+                if (mediaPaths.isNotEmpty()) {
+                    // Split into multiple messages if more than 4 images
+                    mediaPaths.chunked(4).forEachIndexed { index, chunk ->
+                        useCases.insertMessage(
+                            MessageEntity(
+                                id = MessageId.generate(),
+                                text = "", // No redundant [Image] text
+                                timestamp = System.currentTimeMillis() + index,
+                                repliedToId = replyTo?.id,
+                                mediaPaths = chunk,
+                                mediaType = type
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        updateReply(null)
+        _uiState.value = _uiState.value.copy(showMediaPicker = false)
     }
 
     private fun blinkMessage(id: MessageId?) {

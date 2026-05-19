@@ -38,5 +38,8 @@ data class MessageEntity(
     val isReminder: Boolean = false,
     val originalCreationTimestamp: Long? = null,
     val scheduledTimestamp: Long? = null,
-    val isPinned: Boolean = false
+    val isPinned: Boolean = false,
+    val mediaPath: String? = null,
+    val mediaPaths: List<String>? = null,
+    val mediaType: String? = null
 )

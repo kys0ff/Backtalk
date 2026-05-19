@@ -12,7 +12,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
  */
 @Serializable
 data class BackupData(
-    val version: Int = 2,
+    val version: Int = 3,
     val messages: List<MessageEntity>,
     val preferences: Map<String, String>
 )

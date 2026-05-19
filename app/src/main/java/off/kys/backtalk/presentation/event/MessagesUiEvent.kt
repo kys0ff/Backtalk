@@ -136,4 +136,14 @@ sealed interface MessagesUiEvent {
      * UI event to trigger a blink animation for a message.
      */
     data class BlinkMessage(val id: MessageId?) : MessagesUiEvent
+
+    /**
+     * UI event to toggle the media picker bottom sheet.
+     */
+    data class ToggleMediaPicker(val show: Boolean) : MessagesUiEvent
+
+    /**
+     * UI event to send media messages.
+     */
+    data class SendMediaMessages(val uris: List<String>, val type: String) : MessagesUiEvent
 }

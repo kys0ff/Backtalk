@@ -106,19 +106,30 @@ class ImportBackup(
             }
 
             // Restore Media and Messages
-            val voiceMessagesDir = File(context.filesDir, "voice_messages").apply { mkdirs() }
-            
+            val mediaDir = File(context.filesDir, "media").apply { mkdirs() }
             backupData.messages.forEach { message ->
                 var updatedMessage = message
+                
                 message.voicePath?.let { oldPath ->
                     val fileName = File(oldPath).name
                     val mediaBytes = mediaMap[fileName]
                     if (mediaBytes != null) {
-                        val newFile = File(voiceMessagesDir, fileName)
+                        val newFile = File(mediaDir, fileName)
                         newFile.writeBytes(mediaBytes)
-                        updatedMessage = message.copy(voicePath = newFile.absolutePath)
+                        updatedMessage = updatedMessage.copy(voicePath = newFile.absolutePath)
                     }
                 }
+
+                message.mediaPath?.let { oldPath ->
+                    val fileName = File(oldPath).name
+                    val mediaBytes = mediaMap[fileName]
+                    if (mediaBytes != null) {
+                        val newFile = File(mediaDir, fileName)
+                        newFile.writeBytes(mediaBytes)
+                        updatedMessage = updatedMessage.copy(mediaPath = newFile.absolutePath)
+                    }
+                }
+
                 messagesDao.insertMessage(updatedMessage)
             }
 

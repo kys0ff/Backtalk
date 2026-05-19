@@ -9,17 +9,23 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,9 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,13 +52,18 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.koinInject
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,17 +71,6 @@ import java.util.Locale
 /**
  * A message bubble component that displays a message and its related metadata.
  * Supports replying, editing history, selection, and blinking animation.
- *
- * @param messageEntity The message entity to be displayed.
- * @param repliedMessageEntity The message entity that this message is replying to, if any.
- * @param blinkMessageId The ID of the message that should perform a blink animation.
- * @param isTop Whether this message is the first one in a consecutive group of messages from the same sender.
- * @param isBottom Whether this message is the last one in a consecutive group of messages from the same sender.
- * @param selectMode Whether the UI is currently in message selection mode.
- * @param isSelected Whether this specific message is currently selected.
- * @param onReplyPreviewClick Callback invoked when the replied message preview is clicked.
- * @param onClick Callback invoked when the message bubble is clicked.
- * @param onLongClick Callback invoked when the message bubble is long-pressed.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -119,20 +121,22 @@ fun MessageBubble(
             isReminder = messageEntity.isReminder,
             blinkAlpha = blinkAlpha.value,
             scale = scale.value,
-            modifier = Modifier.combinedClickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    if (!selectMode) showExtraInfo = !showExtraInfo
-                    onClick()
-                },
-                onLongClick = {
-                    if (preferences.hapticFeedbackEnabled) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            modifier = Modifier
+                .wrapContentWidth()
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {
+                        if (!selectMode) showExtraInfo = !showExtraInfo
+                        onClick()
+                    },
+                    onLongClick = {
+                        if (preferences.hapticFeedbackEnabled) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                        onLongClick()
                     }
-                    onLongClick()
-                }
-            )
+                )
         ) {
             MessageContent(
                 message = messageEntity,
@@ -155,17 +159,6 @@ fun MessageBubble(
     }
 }
 
-/**
- * The outer surface of the message bubble, handling background color, shape, and animations.
- *
- * @param isSelected Whether the message is selected, affecting the bubble color.
- * @param isTop Used to determine the corner radius of the top-end.
- * @param isBottom Used to determine the corner radius of the bottom-end.
- * @param blinkAlpha The current alpha value for the highlight/blink effect.
- * @param scale The current scale value for the bubble animation.
- * @param modifier The modifier to be applied to the surface.
- * @param content The composable content to be displayed inside the bubble.
- */
 @Composable
 private fun MessageSurface(
     isSelected: Boolean,
@@ -175,7 +168,7 @@ private fun MessageSurface(
     blinkAlpha: Float,
     scale: Float,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val baseColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
     else MaterialTheme.colorScheme.primary
@@ -218,15 +211,6 @@ private fun MessageSurface(
     }
 }
 
-/**
- * Displays the main content of the message, including replied message preview,
- * original text (if edited and expanded), the current text, and an "edited" tag.
- *
- * @param message The message entity containing the text and edit status.
- * @param repliedMessage The message being replied to, if any.
- * @param onReplyClick Callback when the reply preview is clicked.
- * @param showOriginal Whether to show the original message text if it has been edited.
- */
 @Composable
 private fun MessageContent(
     message: MessageEntity,
@@ -236,6 +220,7 @@ private fun MessageContent(
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {}
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
 
     if (message.isReminder || message.isPinned) {
@@ -255,10 +240,22 @@ private fun MessageContent(
 
     if (repliedMessage != null) {
         ReplyPreview(
-            text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else repliedMessage.text,
+            text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) "[Image]" else repliedMessage.text,
             voicePath = repliedMessage.voicePath,
             onPreviewClick = onReplyClick
         )
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+
+    val images = remember(message) {
+        val list = mutableListOf<String>()
+        message.mediaPath?.let { list.add(it) }
+        message.mediaPaths?.let { list.addAll(it) }
+        list
+    }
+
+    if (images.isNotEmpty()) {
+        ImageGrid(images) { imagePath -> navigator += ImagePreviewScreen(imagePath) }
         Spacer(modifier = Modifier.height(4.dp))
     }
 
@@ -270,24 +267,27 @@ private fun MessageContent(
             contentColor = contentColor
         )
     } else {
-        if (message.editedText != null && showOriginal) {
+        val messageText = message.editedText ?: message.text
+        if (messageText.isNotEmpty()) {
+            if (message.editedText != null && showOriginal) {
+                SmartText(
+                    text = message.text,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = contentColor.copy(alpha = 0.6f),
+                    textDecoration = TextDecoration.LineThrough,
+                    highlightQuery = highlightQuery,
+                    onMentionClicked = onTagClick
+                )
+            }
+
             SmartText(
-                text = message.text,
-                style = MaterialTheme.typography.bodySmall,
-                color = contentColor.copy(alpha = 0.6f),
-                textDecoration = TextDecoration.LineThrough,
+                text = messageText,
+                color = contentColor,
+                style = MaterialTheme.typography.bodyLarge,
                 highlightQuery = highlightQuery,
                 onMentionClicked = onTagClick
             )
         }
-
-        SmartText(
-            text = message.editedText ?: message.text,
-            color = contentColor,
-            style = MaterialTheme.typography.bodyLarge,
-            highlightQuery = highlightQuery,
-            onMentionClicked = onTagClick
-        )
 
         if (message.editedText != null) {
             Text(
@@ -297,6 +297,105 @@ private fun MessageContent(
                 color = contentColor.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 2.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun ImageGrid(images: List<String>, onImageClick: (String) -> Unit) {
+    val containerModifier = Modifier
+        .clip(MaterialTheme.shapes.medium)
+
+    when (images.size) {
+        1 -> {
+            val path = images[0]
+            AsyncImage(
+                model = File(path),
+                contentDescription = null,
+                modifier = containerModifier
+                    .sizeIn(
+                        minWidth = 120.dp,
+                        maxWidth = 260.dp,
+                        minHeight = 120.dp,
+                        maxHeight = 320.dp
+                    )
+                    .aspectRatio(4f / 3f)
+                    .clickable { onImageClick(path) },
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        2 -> {
+            Row(
+                modifier = containerModifier.width(260.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                images.forEach { path ->
+                    AsyncImage(
+                        model = File(path),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .clickable { onImageClick(path) },
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
+
+        3 -> {
+            Column(
+                modifier = containerModifier.width(260.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                val firstPath = images[0]
+                AsyncImage(
+                    model = File(firstPath),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .clickable { onImageClick(firstPath) },
+                    contentScale = ContentScale.Crop
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    images.drop(1).forEach { path ->
+                        AsyncImage(
+                            model = File(path),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clickable { onImageClick(path) },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+        }
+
+        else -> {
+            Column(
+                modifier = containerModifier.width(260.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                images.take(4).chunked(2).forEach { rowImages ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        rowImages.forEach { path ->
+                            AsyncImage(
+                                model = File(path),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1f)
+                                    .clickable { onImageClick(path) },
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -355,14 +454,6 @@ private fun PinTag(contentColor: Color) {
     }
 }
 
-/**
- * Displays the message metadata such as timestamp and edit time.
- * This footer is typically toggled by clicking the message bubble.
- *
- * @param isVisible Whether the footer is currently visible.
- * @param timestamp The original timestamp of the message.
- * @param editedAt The timestamp of when the message was last edited, if applicable.
- */
 @Composable
 private fun MessageFooter(
     isVisible: Boolean,
@@ -385,12 +476,20 @@ private fun MessageFooter(
         ) {
             if (isReminder && originalTimestamp != null && targetTimestamp != null) {
                 Text(
-                    text = "${stringResource(R.string.chat_reminder_original_time)} ${timeFormat.format(Date(originalTimestamp))}",
+                    text = "${stringResource(R.string.chat_reminder_original_time)} ${
+                        timeFormat.format(
+                            Date(originalTimestamp)
+                        )
+                    }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
-                    text = "${stringResource(R.string.chat_reminder_target_time)} ${timeFormat.format(Date(targetTimestamp))}",
+                    text = "${stringResource(R.string.chat_reminder_target_time)} ${
+                        timeFormat.format(
+                            Date(targetTimestamp)
+                        )
+                    }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )

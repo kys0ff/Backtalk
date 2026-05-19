@@ -107,7 +107,8 @@ fun InputBar(
     onCancelEdit: () -> Unit,
     onMessageSend: (String) -> Unit,
     onVoiceSend: (String, Long, List<Float>) -> Unit,
-    onMessageSchedule: (String, Long) -> Unit
+    onMessageSchedule: (String, Long) -> Unit,
+    onAttachClick: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -286,6 +287,14 @@ fun InputBar(
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = onAttachClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_add_link_24),
+                        contentDescription = stringResource(R.string.common_attach),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
                 Box(
                     modifier = Modifier
                         .weight(1f)

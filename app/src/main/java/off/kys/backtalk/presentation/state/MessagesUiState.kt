@@ -29,5 +29,6 @@ data class MessagesUiState(
     val activePinnedMessageIndex: Int = 0,
     val showPinnedMessagesDialog: Boolean = false,
     val blinkMessageId: MessageId? = null,
-    val filteredMessages: List<MessageEntity> = emptyList()
+    val filteredMessages: List<MessageEntity> = emptyList(),
+    val showMediaPicker: Boolean = false
 )

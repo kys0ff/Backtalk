@@ -156,7 +156,7 @@
     <string name="threads_you">أنت</string>
     <string name="threads_at_you">\@أنت</string>
     <string name="threads_at_you_timestamp">\@أنت · %1$s</string>
-    <string name="threads_share">مشاركة</string>
+    <string name="common_share">مشاركة</string>
 
     <!-- Reminders -->
     <string name="chat_reminder_tag">تذكير</string>

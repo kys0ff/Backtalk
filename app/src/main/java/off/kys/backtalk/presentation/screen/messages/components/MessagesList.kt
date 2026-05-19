@@ -75,7 +75,8 @@ fun MessagesList(
 
             val oneHourInMillis = 3600000L
             val canEdit = current.editedAt == null &&
-                    (System.currentTimeMillis() - current.timestamp) < oneHourInMillis && current.voicePath == null
+                    (System.currentTimeMillis() - current.timestamp) < oneHourInMillis && 
+                    current.voicePath == null && current.mediaPaths.isNullOrEmpty() && current.mediaPath == null
 
             Column(
                 modifier = Modifier.animateItem(),
