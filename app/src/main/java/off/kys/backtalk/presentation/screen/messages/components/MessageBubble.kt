@@ -68,10 +68,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * A message bubble component that displays a message and its related metadata.
- * Supports replying, editing history, selection, and blinking animation.
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(
@@ -107,6 +103,14 @@ fun MessageBubble(
         }
     }
 
+    // Determine if the content only consists of images (no text, no voice, no replies, no active metadata tags)
+    val hasImages = !messageEntity.mediaPath.isNullOrEmpty() || !messageEntity.mediaPaths.isNullOrEmpty()
+    val hasText = (messageEntity.editedText ?: messageEntity.text).isNotEmpty()
+    val hasVoice = messageEntity.voicePath != null
+    val hasRepliedMessage = repliedMessageEntity != null
+    val hasTags = messageEntity.isReminder || messageEntity.isPinned
+    val isImageOnly = hasImages && !hasText && !hasVoice && !hasRepliedMessage && !hasTags
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,6 +125,7 @@ fun MessageBubble(
             isReminder = messageEntity.isReminder,
             blinkAlpha = blinkAlpha.value,
             scale = scale.value,
+            isImageOnly = isImageOnly,
             modifier = Modifier
                 .wrapContentWidth()
                 .combinedClickable(
@@ -167,6 +172,7 @@ private fun MessageSurface(
     isReminder: Boolean,
     blinkAlpha: Float,
     scale: Float,
+    isImageOnly: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -188,10 +194,13 @@ private fun MessageSurface(
 
     val border = if (isReminder) {
         BorderStroke(
-            1.dp,
-            contentColorFor(baseColor).copy(alpha = 0.5f)
+            width = 1.dp,
+            color = contentColorFor(baseColor).copy(alpha = 0.5f)
         )
     } else null
+
+    val horizontalPadding = if (isImageOnly) 4.dp else 12.dp
+    val verticalPadding = if (isImageOnly) 4.dp else 8.dp
 
     Surface(
         modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale },
@@ -204,7 +213,7 @@ private fun MessageSurface(
                 color = Color.White.copy(alpha = 0.3f * blinkAlpha),
                 modifier = Modifier.matchParentSize()
             ) {}
-            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Column(modifier = Modifier.padding(horizontal = horizontalPadding, vertical = verticalPadding)) {
                 content()
             }
         }
@@ -256,7 +265,10 @@ private fun MessageContent(
 
     if (images.isNotEmpty()) {
         ImageGrid(images) { imagePath -> navigator += ImagePreviewScreen(imagePath) }
-        Spacer(modifier = Modifier.height(4.dp))
+        val messageText = message.editedText ?: message.text
+        if (messageText.isNotEmpty() || message.voicePath != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+        }
     }
 
     if (message.voicePath != null) {
