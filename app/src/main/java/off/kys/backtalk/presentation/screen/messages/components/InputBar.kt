@@ -117,7 +117,7 @@ fun InputBar(
     val preferences = koinInject<BacktalkPreferences>()
 
     var isRecording by remember { mutableStateOf(false) }
-    var secondsElapsed by remember { mutableIntStateOf(0) } // Tracks the timer ticking
+    var secondsElapsed by remember { mutableIntStateOf(0) }
     var showTapHint by remember { mutableStateOf(false) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     val amplitudes by audioRecorder.amplitudes.collectAsState()
@@ -147,7 +147,6 @@ fun InputBar(
 
     val showPermissionRationale = remember { mutableStateOf(false) }
 
-    // Timer logic running in the background when recording
     LaunchedEffect(key1 = isRecording) {
         if (isRecording) {
             secondsElapsed = 0
@@ -158,7 +157,6 @@ fun InputBar(
         }
     }
 
-    // Quick formatting tool for your duration string
     val durationText = remember(secondsElapsed) {
         val minutes = secondsElapsed / 60
         val seconds = secondsElapsed % 60
@@ -287,12 +285,18 @@ fun InputBar(
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onAttachClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_add_link_24),
-                        contentDescription = stringResource(R.string.common_attach),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                AnimatedVisibility(
+                    visible = !isRecording,
+                    enter = expandHorizontally() + fadeIn(),
+                    exit = shrinkHorizontally() + fadeOut()
+                ) {
+                    IconButton(onClick = onAttachClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_add_link_24),
+                            contentDescription = stringResource(R.string.common_attach),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
 
                 Box(
