@@ -11,8 +11,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -81,9 +79,12 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.MediaItem
+import off.kys.backtalk.presentation.screen.camera.CameraCaptureScreen
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,6 +94,7 @@ fun MediaPickerSheet(
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
     var selectedUris by remember { mutableStateOf(emptySet<Uri>()) }
     var selectedType by remember { mutableStateOf("image/jpeg") }
@@ -182,11 +184,14 @@ fun MediaPickerSheet(
                         ) {
                             if (hasCameraPermission) {
                                 CameraPreviewItem(
-                                    onCapture = { uri ->
-                                        onMediaSelected(
-                                            listOf(uri),
-                                            "image/jpeg"
-                                        )
+                                    onClick = {
+                                        onDismiss()
+                                        navigator.push(CameraCaptureScreen { uri ->
+                                            onMediaSelected(
+                                                listOf(uri),
+                                                "image/jpeg"
+                                            )
+                                        })
                                     }
                                 )
                             } else {
@@ -308,13 +313,12 @@ fun MediaPickerSheet(
 
 @Composable
 private fun CameraPreviewItem(
-    onCapture: (Uri) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
-    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -330,25 +334,7 @@ private fun CameraPreviewItem(
         modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(4.dp))
-            .clickable {
-                val capture = imageCapture ?: return@clickable
-                val file = File(context.cacheDir, "capture_${System.currentTimeMillis()}.jpg")
-                val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-
-                capture.takePicture(
-                    outputOptions,
-                    ContextCompat.getMainExecutor(context),
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            onCapture(Uri.fromFile(file))
-                        }
-
-                        override fun onError(exception: ImageCaptureException) {
-                            Log.e("CameraPreview", "Capture failed", exception)
-                        }
-                    }
-                )
-            },
+            .clickable { onClick() },
         color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
         AndroidView(
@@ -362,16 +348,12 @@ private fun CameraPreviewItem(
                             val preview = Preview.Builder().build().also {
                                 it.surfaceProvider = this.surfaceProvider
                             }
-                            imageCapture = ImageCapture.Builder()
-                                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                                .build()
 
                             cameraProvider.unbindAll()
                             cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 CameraSelector.DEFAULT_BACK_CAMERA,
-                                preview,
-                                imageCapture
+                                preview
                             )
                         } catch (e: Exception) {
                             Log.e("CameraPreview", "Use case binding failed", e)

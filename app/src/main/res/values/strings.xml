@@ -187,6 +187,14 @@
     <!-- Message Scheduling -->
     <string name="message_scheduling_select_time">Select time</string>
 
+    <!-- Camera -->
+    <string name="camera_capture">Capture</string>
+    <string name="camera_switch">Switch camera</string>
+    <string name="camera_flash">Flash</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_send">Send photo</string>
+    <string name="camera_preview_cd">Camera preview</string>
+
     <!-- Sync & Devices -->
     <string name="sync_title">Sync &amp; Devices</string>
     <string name="sync_summary">Sync messages between devices on the same Wi-Fi</string>
