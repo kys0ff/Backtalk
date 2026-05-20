@@ -35,7 +35,7 @@ fun MessagesList(
     val selectionMode = selectedMessageIds.isNotEmpty()
 
     LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
+        if (messages.isNotEmpty() && !listState.isScrollInProgress && listState.firstVisibleItemIndex <= 1) {
             listState.animateScrollToItem(0)
         }
     }

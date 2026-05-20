@@ -14,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import cafe.adriel.voyager.core.screen.Screen
@@ -53,6 +56,7 @@ class MessagesScreen : Screen {
         val scope = rememberCoroutineScope()
         val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
         val tags = rememberHashtags(state.messages)
+        var shouldScrollToSearch by remember { mutableStateOf(false) }
 
         fun scrollToAndBlink(id: MessageId) {
             scope.launch {
@@ -93,9 +97,10 @@ class MessagesScreen : Screen {
         }
 
         LaunchedEffect(state.currentSearchResultIndex) {
-            if (state.isSearchActive && state.currentSearchResultIndex != -1) {
+            if (state.isSearchActive && state.currentSearchResultIndex != -1 && shouldScrollToSearch) {
                 val targetId = state.searchResults[state.currentSearchResultIndex]
                 scrollToAndBlink(targetId)
+                shouldScrollToSearch = false
             }
         }
 
@@ -158,6 +163,7 @@ class MessagesScreen : Screen {
                                 up
                             )
                         )
+                        shouldScrollToSearch = true
                     },
                     tags = tags,
                     selectedTag = state.selectedTag,
@@ -171,7 +177,12 @@ class MessagesScreen : Screen {
                     editingMessage = state.editingMessage,
                     onCancelReply = { viewModel.onEvent(MessagesUiEvent.ReplyTo(null)) },
                     onCancelEdit = { viewModel.onEvent(MessagesUiEvent.EditMessage(null)) },
-                    onMessageSend = { viewModel.onEvent(MessagesUiEvent.SendMessage(it)) },
+                    onMessageSend = {
+                        viewModel.onEvent(MessagesUiEvent.SendMessage(it))
+                        scope.launch {
+                            messagesScrollState.animateScrollToItem(0)
+                        }
+                    },
                     onVoiceSend = { path, duration, waveform ->
                         viewModel.onEvent(
                             MessagesUiEvent.SendVoiceMessage(

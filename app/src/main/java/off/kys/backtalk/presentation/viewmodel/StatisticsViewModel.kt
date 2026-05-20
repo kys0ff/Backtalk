@@ -11,6 +11,7 @@ import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.presentation.state.DayActivity
 import off.kys.backtalk.presentation.state.StatisticsUiState
 import off.kys.backtalk.presentation.state.ThreadStat
+import off.kys.backtalk.util.emptyString
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -98,23 +99,17 @@ class StatisticsViewModel(
     }
 
     private fun calculateTopThreads(messages: List<MessageEntity>): List<ThreadStat> {
-        // A thread starts with a message that has repliedToId == null
-        // Replies have repliedToId pointing to the root message (or another message in the chain)
-        // For simplicity, let's group by rootId. If repliedToId is null, it's a root.
-        // If not null, we'd need to trace back, but let's assume repliedToId is the rootId for now
-        // based on how the app seems to handle threads (one level deep or direct replies).
-        
         val threadGroups = messages.groupBy { it.repliedToId?.value ?: it.id.value }
         val sortedThreads = threadGroups.map { (rootId, msgs) ->
             val rootMsg = messages.find { it.id.value == rootId }
-            val title = rootMsg?.text?.take(20)?.plus(if (rootMsg.text.length > 20) "..." else "") 
+            val title = rootMsg?.text?.take(20)?.plus(if (rootMsg.text.length > 20) "..." else emptyString())
                 ?: "Unknown Thread"
             
             ThreadStat(
                 threadId = rootMsg?.id ?: msgs.first().id,
                 threadTitle = title,
                 messageCount = msgs.size,
-                ratio = 0f // will calculate after
+                ratio = 0f
             )
         }.sortedByDescending { it.messageCount }.take(5)
 

@@ -31,6 +31,7 @@ class MessagesViewModelTest : KoinTest {
     private lateinit var viewModel: MessagesViewModel
     private val useCases: MessagesUseCases = mockk(relaxed = true)
     private val alarmScheduler: AlarmScheduler = mockk(relaxed = true)
+    private val application: android.app.Application = mockk(relaxed = true)
 
     @Before
     fun setup() {
@@ -44,7 +45,7 @@ class MessagesViewModelTest : KoinTest {
             })
         }
 
-        viewModel = MessagesViewModel(useCases)
+        viewModel = MessagesViewModel(useCases, application)
     }
 
     @After

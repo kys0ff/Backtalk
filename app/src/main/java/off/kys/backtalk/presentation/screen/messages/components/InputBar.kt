@@ -32,8 +32,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
@@ -299,11 +299,7 @@ fun InputBar(
                     }
                 }
 
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 56.dp)
-                ) {
+                Box(modifier = Modifier.weight(1f)) {
                     this@Row.AnimatedVisibility(
                         visible = !isRecording,
                         enter = fadeIn() + slideInHorizontally(),
@@ -312,8 +308,10 @@ fun InputBar(
                         TextField(
                             value = textValue,
                             onValueChange = { textValue = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 60.dp),
                             textStyle = TextStyle(textDirection = TextDirection.Content),
-                            modifier = Modifier.fillMaxWidth(),
                             placeholder = { Text(stringResource(R.string.chat_input_hint)) },
                             maxLines = 5,
                             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
