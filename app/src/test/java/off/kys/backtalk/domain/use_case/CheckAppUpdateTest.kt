@@ -13,8 +13,12 @@ class CheckAppUpdateTest {
         useCase(
             onUpdateAvailable = {
                 updateAvailable = true
+                println("SUCCESS: $it")
             },
-            onUpToDate = {  }
+            onUpToDate = {
+                updateAvailable = false
+                println("FAILED")
+            }
         )
         
         assert(updateAvailable)

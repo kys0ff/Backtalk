@@ -68,6 +68,8 @@ class MainViewModel(
      * - [MainUiState.Error]: If an exception occurs during the check.
      */
     private fun checkForUpdate() {
+        if (_mainUiState.value is MainUiState.Checking) return
+
         viewModelScope.launch {
             _mainUiState.value = MainUiState.Checking
             try {
