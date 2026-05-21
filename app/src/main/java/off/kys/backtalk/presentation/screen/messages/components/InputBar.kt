@@ -14,6 +14,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
@@ -27,6 +28,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,6 +70,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -146,6 +149,18 @@ fun InputBar(
     }
 
     val showPermissionRationale = remember { mutableStateOf(false) }
+
+    val sendButtonInteractionSource = remember { MutableInteractionSource() }
+    val isPressed by sendButtonInteractionSource.collectIsPressedAsState()
+
+    val sendButtonScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.88f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "SendButtonScale"
+    )
 
     LaunchedEffect(key1 = isRecording) {
         if (isRecording) {
@@ -337,11 +352,15 @@ fun InputBar(
 
                 val showSend = textValue.text.isNotBlank() && !isRecording
 
-                AnimatedContent(targetState = showSend, label = emptyString()) { targetShowSend ->
+                AnimatedContent(
+                    targetState = showSend,
+                    label = "SendVoiceToggle"
+                ) { targetShowSend ->
                     if (targetShowSend) {
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
+                                .scale(sendButtonScale)
                                 .combinedClickable(
                                     onClick = {
                                         if (textValue.text.isNotBlank()) {
@@ -357,8 +376,11 @@ fun InputBar(
                                             handleScheduleClick()
                                         }
                                     },
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = ripple(bounded = false)
+                                    interactionSource = sendButtonInteractionSource,
+                                    indication = ripple(
+                                        bounded = false,
+                                        radius = 24.dp
+                                    )
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
