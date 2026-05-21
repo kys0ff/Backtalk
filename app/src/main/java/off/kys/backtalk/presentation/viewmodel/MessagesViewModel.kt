@@ -1,11 +1,12 @@
 package off.kys.backtalk.presentation.viewmodel
 
 import android.app.Application
-import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.core.net.toUri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.data.local.entity.MessageEntity
@@ -13,6 +14,7 @@ import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.util.emptyString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -28,7 +30,7 @@ import java.io.File
 class MessagesViewModel(
     private val useCases: MessagesUseCases,
     private val application: Application
-) : ViewModel(), KoinComponent {
+) : AndroidViewModel(application), KoinComponent {
 
     private val alarmScheduler: AlarmScheduler by inject()
 
@@ -53,7 +55,12 @@ class MessagesViewModel(
         when (event) {
             is MessagesUiEvent.LoadMessages -> loadMessages()
             is MessagesUiEvent.SendMessage -> sendMessage(event.text)
-            is MessagesUiEvent.SendVoiceMessage -> sendVoiceMessage(event.path, event.duration, event.waveform)
+            is MessagesUiEvent.SendVoiceMessage -> sendVoiceMessage(
+                event.path,
+                event.duration,
+                event.waveform
+            )
+
             is MessagesUiEvent.ReplyTo -> updateReply(event.message)
             is MessagesUiEvent.EditMessage -> updateEditingMessage(event.message)
 
@@ -63,10 +70,12 @@ class MessagesViewModel(
             is MessagesUiEvent.DeleteSelected -> {
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
             }
+
             is MessagesUiEvent.ConfirmDeleteSelected -> deleteSelected()
             is MessagesUiEvent.DismissDeleteConfirmation -> {
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
             }
+
             is MessagesUiEvent.CopySelected -> copySelected()
 
             is MessagesUiEvent.ToggleSearch -> toggleSearch(event.active)
@@ -76,27 +85,37 @@ class MessagesViewModel(
             MessagesUiEvent.DismissPermissionRationale -> {
                 _uiState.value = _uiState.value.copy(showPermissionRationale = false)
             }
+
             is MessagesUiEvent.SelectTag -> {
                 val newTag = if (_uiState.value.selectedTag == event.tag) null else event.tag
                 _uiState.value = _uiState.value.copy(selectedTag = newTag)
                 updateFilteredMessages()
             }
+
             is MessagesUiEvent.TogglePinMessage -> togglePinMessage(event.id, event.isPinned)
             is MessagesUiEvent.NavigatePinned -> navigatePinned()
             is MessagesUiEvent.TogglePinnedMessagesDialog -> {
                 _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = event.show)
             }
+
             is MessagesUiEvent.ScrollToMessage -> {
                 _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = false)
             }
+
             is MessagesUiEvent.BlinkMessage -> {
                 blinkMessage(event.id)
             }
+
             is MessagesUiEvent.ToggleMediaPicker -> {
                 _uiState.value = _uiState.value.copy(showMediaPicker = event.show)
             }
+
             is MessagesUiEvent.SendMediaMessages -> {
                 sendMediaMessages(event.uris, event.type)
+            }
+
+            MessagesUiEvent.ConsumedScrollToBottom -> {
+                _uiState.value = _uiState.value.copy(shouldScrollToBottom = false)
             }
         }
     }
@@ -106,9 +125,10 @@ class MessagesViewModel(
         viewModelScope.launch {
             runCatching {
                 val mediaPaths = uris.mapNotNull { uri ->
-                    val sourceUri = Uri.parse(uri)
+                    val sourceUri = uri.toUri()
                     val extension = if (type.contains("video")) "mp4" else "jpg"
-                    val fileName = "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
+                    val fileName =
+                        "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
                     val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
                     val destFile = File(mediaDir, fileName)
 
@@ -121,12 +141,11 @@ class MessagesViewModel(
                 }
 
                 if (mediaPaths.isNotEmpty()) {
-                    // Split into multiple messages if more than 4 images
                     mediaPaths.chunked(4).forEachIndexed { index, chunk ->
                         useCases.insertMessage(
                             MessageEntity(
                                 id = MessageId.generate(),
-                                text = "", // No redundant [Image] text
+                                text = emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
                                 mediaPaths = chunk,
@@ -135,6 +154,7 @@ class MessagesViewModel(
                         )
                     }
                 }
+                _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
             }
         }
         updateReply(null)
@@ -145,7 +165,7 @@ class MessagesViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(blinkMessageId = id)
             if (id != null) {
-                kotlinx.coroutines.delay(1920) // Match the delay in previous implementation
+                delay(1920)
                 _uiState.value = _uiState.value.copy(blinkMessageId = null)
             }
         }
@@ -160,7 +180,7 @@ class MessagesViewModel(
     private fun navigatePinned() {
         val state = _uiState.value
         if (state.pinnedMessages.isEmpty()) return
-        
+
         val nextIndex = (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
         _uiState.value = state.copy(activePinnedMessageIndex = nextIndex)
     }
@@ -173,7 +193,7 @@ class MessagesViewModel(
             _uiState.value = _uiState.value.copy(showPermissionRationale = true)
             return
         }
-        
+
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
             useCases.scheduleMessage(
@@ -189,8 +209,8 @@ class MessagesViewModel(
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
                 val sortedMessages = messages.sortedBy { it.timestamp }
-                val pinnedMessages = sortedMessages.filter { it.isPinned }.reversed() // Newest pinned first for the bar
-                
+                val pinnedMessages = sortedMessages.filter { it.isPinned }.reversed()
+
                 _uiState.value = _uiState.value.copy(
                     messages = sortedMessages,
                     pinnedMessages = pinnedMessages,
@@ -246,6 +266,7 @@ class MessagesViewModel(
                     repliedToId = replyTo?.id
                 )
             )
+            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
         }
         updateReply(null)
     }
@@ -264,6 +285,7 @@ class MessagesViewModel(
                     waveformData = waveform
                 )
             )
+            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
         }
         updateReply(null)
     }
@@ -337,7 +359,7 @@ class MessagesViewModel(
     private fun toggleSearch(active: Boolean) {
         _uiState.value = _uiState.value.copy(
             isSearchActive = active,
-            searchQuery = if (active) _uiState.value.searchQuery else "",
+            searchQuery = if (active) _uiState.value.searchQuery else emptyString(),
             searchResults = if (active) _uiState.value.searchResults else emptyList(),
             currentSearchResultIndex = if (active) _uiState.value.currentSearchResultIndex else -1
         )

@@ -146,4 +146,9 @@ sealed interface MessagesUiEvent {
      * UI event to send media messages.
      */
     data class SendMediaMessages(val uris: List<String>, val type: String) : MessagesUiEvent
+
+    /**
+     * UI event to notify that the scroll to bottom has been consumed.
+     */
+    data object ConsumedScrollToBottom : MessagesUiEvent
 }

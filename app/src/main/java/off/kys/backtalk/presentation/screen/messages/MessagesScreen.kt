@@ -111,6 +111,13 @@ class MessagesScreen : Screen {
             }
         }
 
+        LaunchedEffect(state.shouldScrollToBottom) {
+            if (state.shouldScrollToBottom) {
+                messagesScrollState.scrollToItem(0)
+                viewModel.onEvent(MessagesUiEvent.ConsumedScrollToBottom)
+            }
+        }
+
         DisposableEffect(Unit) {
             onDispose {
                 audioPlayer.stop()
@@ -179,9 +186,6 @@ class MessagesScreen : Screen {
                     onCancelEdit = { viewModel.onEvent(MessagesUiEvent.EditMessage(null)) },
                     onMessageSend = {
                         viewModel.onEvent(MessagesUiEvent.SendMessage(it))
-                        scope.launch {
-                            messagesScrollState.animateScrollToItem(0)
-                        }
                     },
                     onVoiceSend = { path, duration, waveform ->
                         viewModel.onEvent(
