@@ -1,5 +1,6 @@
 package off.kys.backtalk.util
 
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -44,11 +45,18 @@ fun Context.toast(@StringRes message: Int, duration: Int = Toast.LENGTH_SHORT) =
 /**
  * Opens the given URL in the default browser.
  *
- * @param url The URL to open.
- * @receiver The Context used to access system services and resources.
+ * This function converts the [url] string into a URI and starts an activity
+ * with [Intent.ACTION_VIEW].
+ *
+ * @param url The string representation of the URL to open.
+ * @receiver The Context used to start the activity.
  */
 fun Context.openUrl(url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
+        if (this@openUrl !is Activity) {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    }
     startActivity(intent)
 }
 

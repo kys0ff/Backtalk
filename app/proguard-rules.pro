@@ -24,3 +24,6 @@
 -keepclassmembers class * extends androidx.room.RoomDatabase {
    <init>(...);
 }
+
+# Keep Gau library models for JSON parsing
+-keep class off.kys.github_app_updater_lib.model.** { *; }
