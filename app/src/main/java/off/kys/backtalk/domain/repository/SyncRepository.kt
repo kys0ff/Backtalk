@@ -21,7 +21,7 @@ interface SyncRepository {
     fun cleanupInvalidDevices()
 
     fun onIncomingPairingRequest(callback: (DeviceInfo) -> Unit)
-    fun acceptPairingRequest(device: DeviceInfo, pin: String)
-    fun refusePairingRequest(device: DeviceInfo)
+    fun acceptPairingRequest(pin: String)
+    fun refusePairingRequest()
     fun generatePin(): String
 }

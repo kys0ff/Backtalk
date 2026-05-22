@@ -125,12 +125,12 @@ class SyncViewModel(
             syncStatus = SyncStatus.PAIRING,
             deviceBeingPaired = device
         )
-        syncRepository.acceptPairingRequest(device, pin)
+        syncRepository.acceptPairingRequest(pin)
     }
 
     private fun refuseRequest(device: DeviceInfo) {
         _state.value = _state.value.copy(incomingRequest = null)
-        syncRepository.refusePairingRequest(device)
+        syncRepository.refusePairingRequest()
     }
 
     private fun verifyPin(device: DeviceInfo, pin: String) {

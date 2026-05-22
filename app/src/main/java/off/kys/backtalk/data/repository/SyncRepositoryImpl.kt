@@ -371,7 +371,7 @@ class SyncRepositoryImpl(
         incomingRequestCallback = callback
     }
 
-    override fun acceptPairingRequest(device: DeviceInfo, pin: String) {
+    override fun acceptPairingRequest(pin: String) {
         pendingPairingPin = pin
         pairingResponseDeferred?.complete(true)
     }

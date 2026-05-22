@@ -180,7 +180,7 @@
     <string name="reminders_title">التذكيرات</string>
     <string name="reminders_empty">لا توجد تذكيرات مجدولة</string>
     <string name="reminders_cancel_confirm_title">إلغاء التذكير؟</string>
-    <string name="reminders_cancel_confirm_msg">هل أنت متأكد من أنك تريد إلغاء هذا التذكير المجدول؟</string>
+    <string name="reminders_cancel_confirm_msg">هل أنت متحقِّق من أنك تريد إلغاء هذا التذكير المجدول؟</string>
     <string name="chat_reminder_tag">تذكير</string>
     <string name="chat_reminder_notification_channel">التذكيرات</string>
     <string name="chat_reminder_notification_title">ملاحظة لنفسي</string>
@@ -227,7 +227,7 @@
 
     <!-- Sync Errors -->
     <string name="sync_error_unknown">حدث خطأ غير معروف</string>
-    <string name="sync_error_connection_failed">فشل الاتصال. تأكد من اتصال كلا الجهازين بنفس شبكة الـ Wi-Fi.</string>
+    <string name="sync_error_connection_failed">فشل الاتصال. تيقن من اتصال كلا الجهازين بنفس شبكة الـ Wi-Fi.</string>
     <string name="sync_error_timeout">انتهت مهلة الاتصال</string>
     <string name="sync_error_pairing_refused">تم رفض طلب الاقتران من قِبل الجهاز الآخر</string>
     <string name="sync_error_invalid_pin">رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.</string>
@@ -258,7 +258,7 @@
     <string name="onboarding_permission_alarms">التنبيهات الدقيقة</string>
     <string name="onboarding_permission_alarms_desc">مطلوبة لضمان تسليم التذكيرات المجدولة بدقة في وقتها.</string>
     <string name="onboarding_permission_camera">الكاميرا</string>
-    <string name="onboarding_permission_camera_desc">مطلوبة لالتقاط وإرسال الصور مباشرة من التطبيق.</string>
+    <string name="onboarding_permission_camera_desc">مطلوبة لالتقاط وإرسال الصور قاصدًا من التطبيق.</string>
     <string name="onboarding_permission_media">مكتبة الوسائط</string>
     <string name="onboarding_permission_media_desc">مطلوبة لاختيار وإرسال الصور من المَعْرِض الخاص بك.</string>
     <string name="onboarding_permission_request">تفعيل</string>

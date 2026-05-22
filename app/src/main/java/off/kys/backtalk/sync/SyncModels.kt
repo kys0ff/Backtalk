@@ -9,13 +9,13 @@ sealed class SyncPacket {
     data class PairingRequest(val deviceName: String, val deviceId: String) : SyncPacket()
 
     @Serializable
-    data class PairingResponse(val accepted: Boolean, val pinRequired: Boolean = false, val pin: String? = null) : SyncPacket()
+    data class PairingResponse(val accepted: Boolean) : SyncPacket()
 
     @Serializable
     data class PinVerification(val pin: String) : SyncPacket()
 
     @Serializable
-    data class PinVerificationResponse(val success: Boolean, val sessionKey: String? = null) : SyncPacket()
+    data class PinVerificationResponse(val success: Boolean) : SyncPacket()
 
     @Serializable
     data class DataUpdate(val backupData: BackupData) : SyncPacket()
