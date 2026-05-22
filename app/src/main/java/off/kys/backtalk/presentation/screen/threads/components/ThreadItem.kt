@@ -1,15 +1,18 @@
 package off.kys.backtalk.presentation.screen.threads.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.util.stripMarkdown
 import java.text.SimpleDateFormat
@@ -91,6 +95,13 @@ fun ThreadItem(
                     maxLines = 5,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                thread.repliedTo?.let { repliedTo ->
+                    QuotedMessage(
+                        message = repliedTo,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
 
                 Row(
                     modifier = Modifier

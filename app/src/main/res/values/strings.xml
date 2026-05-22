@@ -81,7 +81,7 @@
     <string name="settings_dynamic_color">Material You Dynamic Color</string>
     <string name="settings_dynamic_color_desc">Apply system colors to the app interface</string>
     <string name="settings_privacy_security">Privacy &amp; Security</string>
-    <string name="settings_enable_app_lock">Enable App Lock</string>
+    <string name="settings_enable_app_lock">Enable app lock</string>
     <string name="settings_haptic_feedback">Haptic feedback</string>
     <string name="settings_haptic_feedback_desc">Vibrate on interactions like swipe-to-reply or long-press</string>
     <string name="settings_external_link_warning">External link warning</string>

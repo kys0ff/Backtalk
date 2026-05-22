@@ -68,7 +68,8 @@ fun ThreadDetailContent(
                     message = message,
                     repliesCount = threadsSize,
                     onCopy = onCopy,
-                    onShare = onShare
+                    onShare = onShare,
+                    repliedTo = thread.repliedTo
                 )
             } else {
                 ThreadMessageItem(
@@ -89,7 +90,8 @@ private fun MainThreadItem(
     message: MessageEntity,
     repliesCount: Int,
     onCopy: (String) -> Unit,
-    onShare: (String) -> Unit
+    onShare: (String) -> Unit,
+    repliedTo: MessageEntity? = null
 ) {
     val fullDateFormat =
         SimpleDateFormat("h:mm a · MMM d, yyyy", LocalLocale.current.platformLocale)
@@ -137,6 +139,13 @@ private fun MainThreadItem(
             lineHeight = MaterialTheme.typography.headlineSmall.lineHeight,
             color = MaterialTheme.colorScheme.onSurface
         )
+
+        repliedTo?.let {
+            QuotedMessage(
+                message = it,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

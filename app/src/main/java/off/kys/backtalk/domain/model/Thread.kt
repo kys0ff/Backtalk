@@ -11,6 +11,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 data class Thread(
     val root: MessageEntity,
     val replies: List<MessageEntity>,
+    val repliedTo: MessageEntity? = null
 ) {
     /**
      * The total number of messages in the thread.

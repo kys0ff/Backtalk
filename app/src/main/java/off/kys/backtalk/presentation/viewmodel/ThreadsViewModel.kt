@@ -77,6 +77,7 @@ class ThreadsViewModel(
         if (messages.isEmpty()) return emptyList()
 
         val sorted = messages.sortedBy { it.timestamp }
+        val messageMap = sorted.associateBy { it.id }
         val groups = mutableListOf<MutableList<MessageEntity>>()
 
         sorted.forEach { message ->
@@ -109,7 +110,9 @@ class ThreadsViewModel(
         }
 
         return groups.map { group ->
-            Thread(root = group.first(), replies = group.drop(1))
+            val root = group.first()
+            val repliedTo = root.repliedToId?.let { messageMap[it] }
+            Thread(root = root, replies = group.drop(1), repliedTo = repliedTo)
         }.reversed()
     }
 }
