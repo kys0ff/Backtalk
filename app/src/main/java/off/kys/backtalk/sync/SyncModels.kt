@@ -30,7 +30,20 @@ sealed class SyncPacket {
     data class Disconnect(val deviceId: String) : SyncPacket()
 
     @Serializable
-    data class Error(val message: String) : SyncPacket()
+    data class Error(val errorCode: SyncErrorCode, val message: String? = null) : SyncPacket()
+}
+
+@Serializable
+enum class SyncErrorCode {
+    UNKNOWN,
+    CONNECTION_FAILED,
+    TIMEOUT,
+    PAIRING_REFUSED,
+    INVALID_PIN,
+    DEVICE_NOT_FOUND,
+    SYNC_FAILED,
+    UNAUTHORIZED,
+    PROTOCOL_ERROR
 }
 
 @Serializable

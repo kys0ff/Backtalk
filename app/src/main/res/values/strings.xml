@@ -224,6 +224,17 @@
     <string name="sync_already_paired_msg">You are already paired with "%1$s". Do you want to unpair and start a fresh pairing?</string>
     <string name="sync_unpair_and_restart">Unpair and Start Fresh</string>
 
+    <!-- Sync Errors -->
+    <string name="sync_error_unknown">An unknown error occurred</string>
+    <string name="sync_error_connection_failed">Connection failed. Make sure both devices are on the same Wi-Fi.</string>
+    <string name="sync_error_timeout">The connection timed out</string>
+    <string name="sync_error_pairing_refused">Pairing request was refused by the other device</string>
+    <string name="sync_error_invalid_pin">Invalid PIN. Please try again.</string>
+    <string name="sync_error_device_not_found">Device not found</string>
+    <string name="sync_error_sync_failed">Sync failed</string>
+    <string name="sync_error_unauthorized">Unauthorized access</string>
+    <string name="sync_error_protocol_error">Protocol error</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Welcome to Backtalk</string>
     <string name="onboarding_welcome_desc">Your private, local-first note-taking and messaging app. Everything stays on your device.</string>

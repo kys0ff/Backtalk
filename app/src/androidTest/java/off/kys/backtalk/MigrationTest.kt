@@ -9,10 +9,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+private const val TEST_DB = "migration-test"
+
 @RunWith(AndroidJUnit4::class)
 class MigrationTest {
-    private val TEST_DB = "migration-test"
-
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),

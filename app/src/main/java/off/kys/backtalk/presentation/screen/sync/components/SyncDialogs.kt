@@ -63,7 +63,12 @@ fun SyncDialogs(
         SyncingProgressDialog()
     }
 
-    state.error?.let { error ->
-        ErrorDialog(error) { viewModel.onEvent(SyncEvent.ClearError) }
+    if (state.error != null || state.errorRes != null) {
+        ErrorDialog(
+            error = state.error,
+            errorRes = state.errorRes
+        ) {
+            viewModel.onEvent(SyncEvent.ClearError)
+        }
     }
 }

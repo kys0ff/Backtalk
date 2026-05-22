@@ -12,6 +12,7 @@ data class SyncUiState(
     val pinToShow: String? = null,
     val syncStatus: SyncStatus = SyncStatus.IDLE,
     val error: String? = null,
+    val errorRes: Int? = null,
     val deviceBeingPaired: DeviceInfo? = null,
     val deviceToUnpair: DeviceInfo? = null,
     val deviceToRePair: DeviceInfo? = null

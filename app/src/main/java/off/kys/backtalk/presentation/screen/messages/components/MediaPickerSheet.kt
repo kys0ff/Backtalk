@@ -85,7 +85,6 @@ import coil.compose.rememberAsyncImagePainter
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.MediaItem
 import off.kys.backtalk.presentation.screen.camera.CameraCaptureScreen
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

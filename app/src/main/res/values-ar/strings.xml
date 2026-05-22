@@ -228,6 +228,17 @@
     <string name="sync_already_paired_msg">أنت مقترن مسبقًا بـ "%1$s". هل تريد إلغاء الاقتران الحالي والبدء من جديد؟</string>
     <string name="sync_unpair_and_restart">إلغاء الاقتران والبدء مجدداً</string>
 
+    <!-- Sync Errors -->
+    <string name="sync_error_unknown">حدث خطأ غير معروف</string>
+    <string name="sync_error_connection_failed">فشل الاتصال. تأكد من اتصال كلا الجهازين بنفس شبكة الـ Wi-Fi.</string>
+    <string name="sync_error_timeout">انتهت مهلة الاتصال</string>
+    <string name="sync_error_pairing_refused">تم رفض طلب الاقتران من قِبل الجهاز الآخر</string>
+    <string name="sync_error_invalid_pin">رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.</string>
+    <string name="sync_error_device_not_found">لم يتم العثور على الجهاز</string>
+    <string name="sync_error_sync_failed">فشلت المزامنة</string>
+    <string name="sync_error_unauthorized">وصول غير مصرح به</string>
+    <string name="sync_error_protocol_error">خطأ في البروتوكول</string>
+
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">مرحباً بك في Backtalk</string>
     <string name="onboarding_welcome_desc">مساحتك الخاصة والمحلية لتدوين الملاحظات والمراسلة. كل بياناتك تبقى على جهازك فقط.</string>

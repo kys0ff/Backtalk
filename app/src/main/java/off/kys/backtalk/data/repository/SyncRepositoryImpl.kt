@@ -18,6 +18,8 @@ import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.domain.use_case.SyncData
 import off.kys.backtalk.sync.DeviceInfo
 import off.kys.backtalk.sync.NsdHelper
+import off.kys.backtalk.sync.SyncErrorCode
+import off.kys.backtalk.sync.SyncException
 import off.kys.backtalk.sync.SyncPacket
 import off.kys.backtalk.sync.SyncSocketManager
 
@@ -195,28 +197,48 @@ class SyncRepositoryImpl(
             deviceId = preferences.deviceId
         )
         val response = socketManager.sendPacketWithRetry(device.address!!, device.port, request)
-        return if (response is SyncPacket.PairingResponse && response.accepted) {
-            updateDeviceStatus(device, true)
-            Result.success(true)
-        } else {
-            Result.failure(Exception("Pairing refused or failed"))
+        return when (response) {
+            is SyncPacket.PairingResponse -> {
+                if (response.accepted) {
+                    updateDeviceStatus(device, true)
+                    Result.success(true)
+                } else {
+                    Result.failure(SyncException(SyncErrorCode.PAIRING_REFUSED))
+                }
+            }
+            is SyncPacket.Error -> {
+                Result.failure(SyncException(response.errorCode, response.message))
+            }
+            else -> {
+                Result.failure(SyncException(SyncErrorCode.CONNECTION_FAILED))
+            }
         }
     }
 
     override suspend fun verifyPin(device: DeviceInfo, pin: String): Result<Boolean> {
         val request = SyncPacket.PinVerification(pin)
         val response = socketManager.sendPacketWithRetry(device.address!!, device.port, request)
-        return if (response is SyncPacket.PinVerificationResponse && response.success) {
-            val pairedDevice = device.copy(
-                isPaired = true,
-                isOnline = true,
-                lastSeenTimestamp = System.currentTimeMillis()
-            )
-            val currentPaired = _pairedDevices.value
-            savePairedDevices(currentPaired.filter { it.id != pairedDevice.id } + pairedDevice)
-            Result.success(true)
-        } else {
-            Result.failure(Exception("PIN verification failed"))
+        return when (response) {
+            is SyncPacket.PinVerificationResponse -> {
+                if (response.success) {
+                    val pairedDevice = device.copy(
+                        isPaired = true,
+                        isOnline = true,
+                        lastSeenTimestamp = System.currentTimeMillis()
+                    )
+                    val currentPaired = _pairedDevices.value
+                    savePairedDevices(currentPaired.filter { it.id != pairedDevice.id } + pairedDevice)
+                    Result.success(true)
+                } else {
+                    Result.failure(SyncException(SyncErrorCode.INVALID_PIN))
+                }
+            }
+            is SyncPacket.Error -> {
+                Result.failure(SyncException(response.errorCode, response.message))
+            }
+            else -> {
+                Result.failure(SyncException(SyncErrorCode.CONNECTION_FAILED))
+            }
         }
     }
 
@@ -227,12 +249,24 @@ class SyncRepositoryImpl(
             val packet = SyncPacket.DataUpdate(backupData)
 
             val response = socketManager.sendPacketWithRetry(device.address!!, device.port, packet)
-            if (response is SyncPacket.Ack && response.success) {
-                updateDeviceStatus(device, true)
-                Result.success(Unit)
-            } else {
-                updateDeviceStatus(device, false)
-                Result.failure(Exception("Sync failed: No acknowledgment from device"))
+            when (response) {
+                is SyncPacket.Ack -> {
+                    if (response.success) {
+                        updateDeviceStatus(device, true)
+                        Result.success(Unit)
+                    } else {
+                        updateDeviceStatus(device, false)
+                        Result.failure(SyncException(SyncErrorCode.SYNC_FAILED))
+                    }
+                }
+                is SyncPacket.Error -> {
+                    updateDeviceStatus(device, false)
+                    Result.failure(SyncException(response.errorCode, response.message))
+                }
+                else -> {
+                    updateDeviceStatus(device, false)
+                    Result.failure(SyncException(SyncErrorCode.CONNECTION_FAILED))
+                }
             }
         } catch (e: Exception) {
             updateDeviceStatus(device, false)
@@ -243,13 +277,20 @@ class SyncRepositoryImpl(
     override suspend fun pullSync(device: DeviceInfo): Result<Unit> = try {
         val request = SyncPacket.SyncRequest(requesterId = preferences.deviceId)
         val response = socketManager.sendPacketWithRetry(device.address!!, device.port, request)
-        if (response is SyncPacket.DataUpdate) {
-            syncData(response.backupData)
-            updateDeviceStatus(device, true)
-            Result.success(Unit)
-        } else {
-            updateDeviceStatus(device, false)
-            Result.failure(Exception("Pull sync failed: No data received"))
+        when (response) {
+            is SyncPacket.DataUpdate -> {
+                syncData(response.backupData)
+                updateDeviceStatus(device, true)
+                Result.success(Unit)
+            }
+            is SyncPacket.Error -> {
+                updateDeviceStatus(device, false)
+                Result.failure(SyncException(response.errorCode, response.message))
+            }
+            else -> {
+                updateDeviceStatus(device, false)
+                Result.failure(SyncException(SyncErrorCode.CONNECTION_FAILED))
+            }
         }
     } catch (e: Exception) {
         updateDeviceStatus(device, false)

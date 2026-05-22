@@ -15,7 +15,11 @@ import androidx.compose.ui.text.style.TextAlign
 import off.kys.backtalk.R
 
 @Composable
-fun ErrorDialog(error: String, onClearError: () -> Unit) {
+fun ErrorDialog(
+    error: String?,
+    errorRes: Int? = null,
+    onClearError: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = { onClearError() },
         icon = {
@@ -35,7 +39,7 @@ fun ErrorDialog(error: String, onClearError: () -> Unit) {
         },
         text = {
             Text(
-                text = error,
+                text = errorRes?.let { stringResource(it) } ?: error ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
