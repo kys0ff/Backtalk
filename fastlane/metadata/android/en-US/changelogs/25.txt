@@ -1,0 +1,12 @@
+- Support for attaching images from gallery or capturing directly via a new full-screen camera with flash and lens switching.
+- Ability to pin important messages with a dedicated pinning bar for quick navigation.
+- New management screen for creating and tracking message-based reminders.
+- Support for clickable hashtags and filtering messages by tags.
+- Enhanced statistics screen with media counts and dynamic pie chart slices.
+- Added expressive scale animations to the send button and smooth transitions for attachment controls.
+- Support for quoted threads in both the main threads and detail views.
+- Implemented state-driven auto-scroll and directional visibility logic for the "scroll to bottom" button.
+- Optimized the input bar layout and integration with the message list.
+- Integrated camera and media permissions into the onboarding flow.
+- Improved preference state synchronization and parsing safety.
+- Fixed issues with copying edited messages and handling voice message previews in replies.
