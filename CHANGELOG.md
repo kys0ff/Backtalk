@@ -14,7 +14,6 @@ All notable changes to this project will be documented in this file.
 - **Quoted Threads**: Support for quoted threads in both the main threads and detail views.
 
 ### Changed
-- **UI Refinements**: Redesigned the pinned message bar with transparency and rounded icons, and removed message bubble shadows for a cleaner look.
 - **Improved Scrolling**: Implemented state-driven auto-scroll and directional visibility logic for the "scroll to bottom" button.
 - **Input Bar**: Optimized the input bar layout and integration with the message list.
 - **Onboarding**: Integrated camera and media permissions into the onboarding flow.
