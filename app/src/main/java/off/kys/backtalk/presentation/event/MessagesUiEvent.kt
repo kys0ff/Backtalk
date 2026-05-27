@@ -151,4 +151,9 @@ sealed interface MessagesUiEvent {
      * UI event to notify that the scroll to bottom has been consumed.
      */
     data object ConsumedScrollToBottom : MessagesUiEvent
+
+    /**
+     * UI event to notify that the scroll to a pinned message has been consumed.
+     */
+    data object ConsumedScrollToPinned : MessagesUiEvent
 }

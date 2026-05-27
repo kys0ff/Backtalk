@@ -142,10 +142,13 @@ fun MessagesScreenContent(
         }
     }
 
-    LaunchedEffect(state.activePinnedMessageIndex) {
-        val activePinned = state.pinnedMessages.getOrNull(state.activePinnedMessageIndex)
-        if (activePinned != null) {
-            scrollToAndBlink(activePinned.id)
+    LaunchedEffect(state.shouldScrollToPinned) {
+        if (state.shouldScrollToPinned) {
+            val activePinned = state.pinnedMessages.getOrNull(state.activePinnedMessageIndex)
+            if (activePinned != null) {
+                scrollToAndBlink(activePinned.id)
+            }
+            onEvent(MessagesUiEvent.ConsumedScrollToPinned)
         }
     }
 

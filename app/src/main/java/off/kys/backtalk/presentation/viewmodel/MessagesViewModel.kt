@@ -117,6 +117,10 @@ class MessagesViewModel(
             MessagesUiEvent.ConsumedScrollToBottom -> {
                 _uiState.value = _uiState.value.copy(shouldScrollToBottom = false)
             }
+
+            MessagesUiEvent.ConsumedScrollToPinned -> {
+                _uiState.value = _uiState.value.copy(shouldScrollToPinned = false)
+            }
         }
     }
 
@@ -182,7 +186,10 @@ class MessagesViewModel(
         if (state.pinnedMessages.isEmpty()) return
 
         val nextIndex = (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
-        _uiState.value = state.copy(activePinnedMessageIndex = nextIndex)
+        _uiState.value = state.copy(
+            activePinnedMessageIndex = nextIndex,
+            shouldScrollToPinned = true
+        )
     }
 
     /**
