@@ -94,7 +94,7 @@ import off.kys.backtalk.util.emptyString
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaPickerSheet(
-    onMediaSelected: (List<Uri>, String, String?) -> Unit,
+    onMediaSelected: (selectedMedia: List<Uri>, mediaType: String, captionText: String?) -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 ) {

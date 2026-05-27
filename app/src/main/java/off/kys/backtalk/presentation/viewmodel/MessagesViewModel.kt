@@ -99,7 +99,14 @@ class MessagesViewModel(
             }
 
             is MessagesUiEvent.ScrollToMessage -> {
-                _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = false)
+                val state = _uiState.value
+                val pinnedIndex = state.pinnedMessages.indexOfFirst { it.id == event.id }
+                _uiState.value = state.copy(
+                    showPinnedMessagesDialog = false,
+                    selectedTag = null,
+                    activePinnedMessageIndex = if (pinnedIndex != -1) pinnedIndex else state.activePinnedMessageIndex
+                )
+                updateFilteredMessages()
             }
 
             is MessagesUiEvent.BlinkMessage -> {
@@ -187,11 +194,18 @@ class MessagesViewModel(
         val state = _uiState.value
         if (state.pinnedMessages.isEmpty()) return
 
-        val nextIndex = (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
+        val nextIndex = if (state.pinnedMessages.size > 1) {
+            (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
+        } else {
+            0
+        }
+
         _uiState.value = state.copy(
             activePinnedMessageIndex = nextIndex,
-            shouldScrollToPinned = true
+            shouldScrollToPinned = true,
+            selectedTag = null
         )
+        updateFilteredMessages()
     }
 
     /**
@@ -224,6 +238,7 @@ class MessagesViewModel(
                     messages = sortedMessages,
                     pinnedMessages = pinnedMessages,
                     isLoading = false,
+                    shouldScrollToPinned = false,
                     activePinnedMessageIndex = if (pinnedMessages.isEmpty()) 0 else _uiState.value.activePinnedMessageIndex % pinnedMessages.size
                 )
                 updateFilteredMessages()

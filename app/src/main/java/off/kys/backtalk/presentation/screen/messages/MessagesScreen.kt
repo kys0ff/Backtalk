@@ -81,7 +81,7 @@ class MessagesScreen : Screen {
 @Composable
 fun MessagesScreenContent(
     state: MessagesUiState,
-    onEvent: (MessagesUiEvent) -> Unit,
+    onEvent: (event: MessagesUiEvent) -> Unit,
     onSettingsClick: () -> Unit,
     onThreadsClick: () -> Unit,
     onRemindersClick: () -> Unit,
@@ -242,11 +242,15 @@ fun MessagesScreenContent(
         if (state.showMediaPicker) {
             MediaPickerSheet(
                 onMediaSelected = { uris, type, description ->
-                    onEvent(MessagesUiEvent.SendMediaMessages(uris.map { it.toString() }, type, description))
+                    onEvent(
+                        MessagesUiEvent.SendMediaMessages(
+                            uris = uris.map { it.toString() },
+                            type = type,
+                            description = description
+                        )
+                    )
                 },
-                onDismiss = {
-                    onEvent(MessagesUiEvent.ToggleMediaPicker(false))
-                }
+                onDismiss = { onEvent(MessagesUiEvent.ToggleMediaPicker(false)) }
             )
         }
 
