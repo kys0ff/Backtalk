@@ -241,8 +241,8 @@ fun MessagesScreenContent(
     ) { scaffoldPadding ->
         if (state.showMediaPicker) {
             MediaPickerSheet(
-                onMediaSelected = { uris, type ->
-                    onEvent(MessagesUiEvent.SendMediaMessages(uris.map { it.toString() }, type))
+                onMediaSelected = { uris, type, description ->
+                    onEvent(MessagesUiEvent.SendMediaMessages(uris.map { it.toString() }, type, description))
                 },
                 onDismiss = {
                     onEvent(MessagesUiEvent.ToggleMediaPicker(false))

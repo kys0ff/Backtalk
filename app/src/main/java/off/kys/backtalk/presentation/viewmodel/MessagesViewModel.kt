@@ -111,7 +111,7 @@ class MessagesViewModel(
             }
 
             is MessagesUiEvent.SendMediaMessages -> {
-                sendMediaMessages(event.uris, event.type)
+                sendMediaMessages(event.uris, event.type, event.description)
             }
 
             MessagesUiEvent.ConsumedScrollToBottom -> {
@@ -124,7 +124,7 @@ class MessagesViewModel(
         }
     }
 
-    private fun sendMediaMessages(uris: List<String>, type: String) {
+    private fun sendMediaMessages(uris: List<String>, type: String, description: String?) {
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
             runCatching {
@@ -145,11 +145,13 @@ class MessagesViewModel(
                 }
 
                 if (mediaPaths.isNotEmpty()) {
-                    mediaPaths.chunked(4).forEachIndexed { index, chunk ->
+                    val chunks = mediaPaths.chunked(4)
+                    chunks.forEachIndexed { index, chunk ->
+                        val isLastChunk = index == chunks.size - 1
                         useCases.insertMessage(
                             MessageEntity(
                                 id = MessageId.generate(),
-                                text = emptyString(),
+                                text = if (isLastChunk) description ?: emptyString() else emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
                                 mediaPaths = chunk,

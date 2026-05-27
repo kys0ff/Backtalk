@@ -53,6 +53,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -85,11 +86,12 @@ import coil.compose.rememberAsyncImagePainter
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.MediaItem
 import off.kys.backtalk.presentation.screen.camera.CameraCaptureScreen
+import off.kys.backtalk.util.emptyString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaPickerSheet(
-    onMediaSelected: (List<Uri>, String) -> Unit,
+    onMediaSelected: (List<Uri>, String, String?) -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 ) {
@@ -97,6 +99,7 @@ fun MediaPickerSheet(
     val context = LocalContext.current
     var selectedUris by remember { mutableStateOf(emptySet<Uri>()) }
     var selectedType by remember { mutableStateOf("image/jpeg") }
+    var captionText by remember { mutableStateOf(emptyString()) }
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -185,12 +188,15 @@ fun MediaPickerSheet(
                                 CameraPreviewItem(
                                     onClick = {
                                         onDismiss()
-                                        navigator.push(CameraCaptureScreen { uri ->
-                                            onMediaSelected(
-                                                listOf(uri),
-                                                "image/jpeg"
-                                            )
-                                        })
+                                        navigator.push(
+                                            CameraCaptureScreen { uri ->
+                                                onMediaSelected(
+                                                    listOf(uri),
+                                                    "image/jpeg",
+                                                    null
+                                                )
+                                            }
+                                        )
                                     }
                                 )
                             } else {
@@ -262,47 +268,72 @@ fun MediaPickerSheet(
                 enter = fadeIn() + scaleIn(initialScale = 0.8f),
                 exit = fadeOut() + scaleOut(targetScale = 0.8f),
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.BottomCenter)
                     .padding(16.dp)
             ) {
-                Button(
-                    onClick = { onMediaSelected(selectedUris.toList(), selectedType) },
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    TextField(
+                        value = captionText,
+                        onValueChange = { captionText = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text(stringResource(R.string.chat_input_hint)) },
+                        colors = androidx.compose.material3.TextFieldDefaults.colors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                        ),
+                        shape = RoundedCornerShape(24.dp),
+                        maxLines = 3
+                    )
+
+                    Button(
+                        onClick = {
+                            onMediaSelected(
+                                selectedUris.toList(),
+                                selectedType,
+                                captionText.ifBlank { null })
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.common_send),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-
-                        Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = CircleShape,
-                            modifier = Modifier.size(22.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = selectedUris.size.toString(),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            }
-                        }
+                            Text(
+                                text = stringResource(R.string.common_send),
+                                style = MaterialTheme.typography.labelLarge
+                            )
 
-                        Icon(
-                            painter = painterResource(R.drawable.round_send_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = CircleShape,
+                                modifier = Modifier.size(22.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = selectedUris.size.toString(),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                }
+                            }
+
+                            Icon(
+                                painter = painterResource(R.drawable.round_send_24),
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 }
             }
