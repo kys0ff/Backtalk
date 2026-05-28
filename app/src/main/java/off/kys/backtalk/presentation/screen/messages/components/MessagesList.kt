@@ -31,6 +31,7 @@ fun MessagesList(
     onTagClick: (String) -> Unit = {},
     blinkMessageId: MessageId? = null,
     onScrollToMessage: (MessageId) -> Unit = {},
+    onImageDelete: ((MessageId, String) -> Unit)? = null,
 ) {
     val selectionMode = selectedMessageIds.isNotEmpty()
 
@@ -75,8 +76,8 @@ fun MessagesList(
 
             val oneHourInMillis = 3600000L
             val canEdit = current.editedAt == null &&
-                    (System.currentTimeMillis() - current.timestamp) < oneHourInMillis && 
-                    current.voicePath == null
+            (System.currentTimeMillis() - current.timestamp) < oneHourInMillis &&
+            current.voicePath == null
 
             Column(
                 modifier = Modifier.animateItem(),
@@ -124,7 +125,8 @@ fun MessagesList(
                             onToggleSelect(current.id)
                         },
                         highlightQuery = searchQuery,
-                        onTagClick = onTagClick
+                        onTagClick = onTagClick,
+                        onImageDelete = onImageDelete?.let { cb -> { path -> cb(current.id, path) } }
                     )
                 }
             }
