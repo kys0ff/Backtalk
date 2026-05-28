@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,8 +28,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -82,7 +85,8 @@ fun MessageBubble(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     highlightQuery: String? = null,
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    onImageDelete: ((String) -> Unit)? = null
 ) {
     var showExtraInfo by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
@@ -150,7 +154,8 @@ fun MessageBubble(
                 onReplyClick = onReplyPreviewClick,
                 showOriginal = showExtraInfo,
                 highlightQuery = highlightQuery,
-                onTagClick = onTagClick
+                onTagClick = onTagClick,
+                onImageDelete = onImageDelete
             )
         }
 
@@ -233,7 +238,8 @@ private fun MessageContent(
     onReplyClick: () -> Unit,
     showOriginal: Boolean,
     highlightQuery: String? = null,
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    onImageDelete: ((String) -> Unit)? = null
 ) {
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
@@ -270,7 +276,11 @@ private fun MessageContent(
     }
 
     if (images.isNotEmpty()) {
-        StaggeredImageGrid(images) { imagePath -> navigator?.push(ImagePreviewScreen(imagePath)) }
+        StaggeredImageGrid(
+            images = images,
+            onImageClick = { imagePath -> navigator?.push(ImagePreviewScreen(imagePath)) },
+            onImageDelete = onImageDelete
+        )
         val messageText = message.editedText ?: message.text
         if (messageText.isNotEmpty() || message.voicePath != null) {
             Spacer(modifier = Modifier.height(4.dp))
@@ -323,7 +333,8 @@ private fun MessageContent(
 fun StaggeredImageGrid(
     images: List<String>,
     modifier: Modifier = Modifier,
-    onImageClick: (String) -> Unit
+    onImageClick: (String) -> Unit,
+    onImageDelete: ((String) -> Unit)? = null
 ) {
     if (images.isEmpty()) return
 
@@ -335,17 +346,16 @@ fun StaggeredImageGrid(
 
     when (images.size) {
         1 -> {
-            val path = images[0]
-            AsyncImage(
-                model = File(path),
-                contentDescription = null,
+            GridImage(
+                path = images[0],
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.large)
                     .sizeIn(
                         minWidth = 140.dp, maxWidth = gridWidth,
                         minHeight = 140.dp, maxHeight = 360.dp
-                    )
-                    .clickable { onImageClick(path) },
+                    ),
+                onClick = onImageClick,
+                onDelete = onImageDelete,
                 contentScale = ContentScale.Fit
             )
         }
@@ -361,7 +371,8 @@ fun StaggeredImageGrid(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(0.75f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                 }
             }
@@ -377,7 +388,8 @@ fun StaggeredImageGrid(
                     modifier = Modifier
                         .weight(1f)
                         .aspectRatio(0.75f),
-                    onClick = onImageClick
+                    onClick = onImageClick,
+                    onDelete = onImageDelete
                 )
                 Column(
                     modifier = Modifier.weight(1f),
@@ -389,7 +401,8 @@ fun StaggeredImageGrid(
                             .fillMaxWidth()
                             .weight(1f)
                             .aspectRatio(1.5f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                     GridImage(
                         path = images[2],
@@ -397,7 +410,8 @@ fun StaggeredImageGrid(
                             .fillMaxWidth()
                             .weight(1f)
                             .aspectRatio(1.5f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                 }
             }
@@ -417,14 +431,16 @@ fun StaggeredImageGrid(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                     GridImage(
                         path = images[2],
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1.5f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                 }
                 Column(
@@ -436,14 +452,16 @@ fun StaggeredImageGrid(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1.5f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                     GridImage(
                         path = images[3],
                         modifier = Modifier
                             .fillMaxSize()
                             .aspectRatio(1f),
-                        onClick = onImageClick
+                        onClick = onImageClick,
+                        onDelete = onImageDelete
                     )
                 }
             }
@@ -455,14 +473,40 @@ fun StaggeredImageGrid(
 private fun GridImage(
     path: String,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    onDelete: ((String) -> Unit)? = null,
+    contentScale: ContentScale = ContentScale.Crop
 ) {
-    AsyncImage(
-        model = File(path),
-        contentDescription = null,
-        modifier = modifier.clickable { onClick(path) },
-        contentScale = ContentScale.Crop
-    )
+    Box(modifier = modifier) {
+        AsyncImage(
+            model = File(path),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { onClick(path) },
+            contentScale = contentScale
+        )
+        if (onDelete != null) {
+            IconButton(
+                onClick = { onDelete(path) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .size(28.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.85f),
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.round_delete_24),
+                    contentDescription = stringResource(R.string.common_delete),
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
