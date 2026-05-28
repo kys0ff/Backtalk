@@ -204,7 +204,9 @@ fun MessagesScreenContent(
         },
         bottomBar = {
             InputBar(
-                messageInput = state.editingMessage?.let { it.editedText ?: it.text }.orEmpty(),
+                messageInput = state.editingMessage?.editedText.orEmpty().ifEmpty {
+                    state.editingMessage?.text.orEmpty()
+                },
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
                 onCancelReply = { onEvent(MessagesUiEvent.ReplyTo(null)) },
@@ -275,6 +277,9 @@ fun MessagesScreenContent(
             onScrollToMessage = { id ->
                 scrollToAndBlink(id)
                 onEvent(MessagesUiEvent.ScrollToMessage(id))
+            },
+            onImageDelete = { messageId, imagePath ->
+                onEvent(MessagesUiEvent.RemoveImageFromMessage(messageId, imagePath))
             }
         )
     }
