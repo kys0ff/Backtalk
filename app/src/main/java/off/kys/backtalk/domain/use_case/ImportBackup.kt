@@ -130,6 +130,21 @@ class ImportBackup(
                     }
                 }
 
+                message.mediaPaths?.let { oldPaths ->
+                    val newPaths = oldPaths.map { oldPath ->
+                        val fileName = File(oldPath).name
+                        val mediaBytes = mediaMap[fileName]
+                        if (mediaBytes != null) {
+                            val newFile = File(mediaDir, fileName)
+                            newFile.writeBytes(mediaBytes)
+                            newFile.absolutePath
+                        } else {
+                            oldPath
+                        }
+                    }
+                    updatedMessage = updatedMessage.copy(mediaPaths = newPaths)
+                }
+
                 messagesDao.insertMessage(updatedMessage)
             }
 

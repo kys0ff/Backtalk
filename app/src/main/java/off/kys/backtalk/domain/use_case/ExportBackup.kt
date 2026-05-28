@@ -47,14 +47,19 @@ class ExportBackup(
                 zos.write(json.toByteArray())
                 zos.closeEntry()
 
-                messages.forEach { message ->
-                    val paths = listOfNotNull(message.voicePath, message.mediaPath)
-                    paths.forEach { path ->
-                        val file = File(path)
-                        if (file.exists()) {
+                val allMediaPaths = messages.flatMap { message ->
+                    listOfNotNull(message.voicePath, message.mediaPath) + (message.mediaPaths ?: emptyList())
+                }.filter { it.isNotBlank() }.distinct()
+
+                allMediaPaths.forEach { path ->
+                    val file = File(path)
+                    if (file.exists()) {
+                        try {
                             zos.putNextEntry(ZipEntry("media/${file.name}"))
                             zos.write(file.readBytes())
                             zos.closeEntry()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
                 }
