@@ -477,6 +477,9 @@ private fun GridImage(
     onDelete: ((String) -> Unit)? = null,
     contentScale: ContentScale = ContentScale.Crop
 ) {
+    val haptic = LocalHapticFeedback.current
+    val preferences = koinInject<BacktalkPreferences>()
+
     Box(modifier = modifier) {
         AsyncImage(
             model = File(path),
@@ -488,7 +491,12 @@ private fun GridImage(
         )
         if (onDelete != null) {
             IconButton(
-                onClick = { onDelete(path) },
+                onClick = {
+                    if (preferences.hapticFeedbackEnabled) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                    onDelete(path)
+                },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
