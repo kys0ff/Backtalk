@@ -27,53 +27,51 @@ class ExportBackup(
      * @param uri The destination Uri.
      * @param password Optional password for encryption.
      */
-    suspend operator fun invoke(uri: Uri, password: String?): Result<Unit> {
-        return runCatching {
-            val messages = messagesRepository.getAllMessages().first()
-            val prefsMap = mapOf(
-                BacktalkPreferences.KEY_THEME_MODE to preferences.themeMode.name,
-                BacktalkPreferences.KEY_DYNAMIC_COLOR to preferences.dynamicColorEnabled.toString(),
-                BacktalkPreferences.KEY_LOCK_ENABLED to preferences.lockEnabled.toString(),
-                BacktalkPreferences.KEY_SECURE_SCREEN to preferences.secureScreenEnabled.toString(),
-                BacktalkPreferences.KEY_AUTO_UPDATE to preferences.autoUpdateEnabled.toString()
-            )
+    suspend operator fun invoke(uri: Uri, password: String?): Result<Unit> = runCatching {
+        val messages = messagesRepository.getAllMessages().first()
+        val prefsMap = mapOf(
+            BacktalkPreferences.KEY_THEME_MODE to preferences.themeMode.name,
+            BacktalkPreferences.KEY_DYNAMIC_COLOR to preferences.dynamicColorEnabled.toString(),
+            BacktalkPreferences.KEY_LOCK_ENABLED to preferences.lockEnabled.toString(),
+            BacktalkPreferences.KEY_SECURE_SCREEN to preferences.secureScreenEnabled.toString(),
+            BacktalkPreferences.KEY_AUTO_UPDATE to preferences.autoUpdateEnabled.toString()
+        )
 
-            val backupData = BackupData(messages = messages, preferences = prefsMap)
-            val json = Json.encodeToString(backupData)
+        val backupData = BackupData(messages = messages, preferences = prefsMap)
+        val json = Json.encodeToString(backupData)
 
-            val bays = ByteArrayOutputStream()
-            ZipOutputStream(bays).use { zos ->
-                zos.putNextEntry(ZipEntry("backup.json"))
-                zos.write(json.toByteArray())
-                zos.closeEntry()
+        val bays = ByteArrayOutputStream()
+        ZipOutputStream(bays).use { zos ->
+            zos.putNextEntry(ZipEntry("backup.json"))
+            zos.write(json.toByteArray())
+            zos.closeEntry()
 
-                val allMediaPaths = messages.flatMap { message ->
-                    listOfNotNull(message.voicePath, message.mediaPath) + (message.mediaPaths ?: emptyList())
-                }.filter { it.isNotBlank() }.distinct()
+            val allMediaPaths = messages.flatMap { message ->
+                listOfNotNull(message.voicePath, message.mediaPath) + (message.mediaPaths ?: emptyList())
+            }.filter { it.isNotBlank() }.distinct()
 
-                allMediaPaths.forEach { path ->
-                    val file = File(path)
-                    if (file.exists()) {
-                        try {
-                            zos.putNextEntry(ZipEntry("media/${file.name}"))
-                            zos.write(file.readBytes())
-                            zos.closeEntry()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+            allMediaPaths.forEach { path ->
+                val file = File(path)
+                if (file.exists()) {
+                    try {
+                        zos.putNextEntry(ZipEntry("media/${file.name}"))
+                        zos.write(file.readBytes())
+                        zos.closeEntry()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }
-
-            val zipBytes = bays.toByteArray()
-
-            val finalContent = if (!password.isNullOrBlank()) {
-                CryptoUtils.encrypt(zipBytes, password.toCharArray())
-            } else {
-                zipBytes
-            }
-
-            backupRepository.writeBackup(uri, finalContent).getOrThrow()
         }
+
+        val zipBytes = bays.toByteArray()
+
+        val finalContent = if (!password.isNullOrBlank()) {
+            CryptoUtils.encrypt(zipBytes, password.toCharArray())
+        } else {
+            zipBytes
+        }
+
+        backupRepository.writeBackup(uri, finalContent).getOrThrow()
     }
 }
