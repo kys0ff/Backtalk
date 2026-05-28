@@ -132,6 +132,8 @@ class MessagesViewModel(
             MessagesUiEvent.ConsumedScrollToSearch -> {
                 _uiState.value = _uiState.value.copy(shouldScrollToSearch = false)
             }
+
+            is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(event.messageId, event.imagePath)
         }
     }
 
@@ -297,6 +299,43 @@ class MessagesViewModel(
             _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
         }
         updateReply(null)
+    }
+
+    private fun removeImageFromMessage(messageId: MessageId, imagePath: String) {
+        viewModelScope.launch {
+            val message = useCases.getMessageById(messageId) ?: return@launch
+
+            val newMediaPath = if (message.mediaPath == imagePath) null else message.mediaPath
+            val newMediaPaths = message.mediaPaths
+                ?.filter { it != imagePath }
+                ?.ifEmpty { null }
+
+            val hasNoMediaLeft = newMediaPath == null && newMediaPaths.isNullOrEmpty()
+            val hasNoContent = hasNoMediaLeft &&
+                    message.text.isBlank() &&
+                    message.voicePath == null
+
+            if (hasNoContent) {
+                // Delegate to existing use case — it handles DB delete + disk cleanup
+                useCases.deleteMessageById(messageId)
+            } else {
+                useCases.insertMessage(
+                    message.copy(
+                        mediaPath = newMediaPath,
+                        mediaPaths = newMediaPaths
+                    )
+                )
+                // Delete file from disk only if no other message still references this path
+                val allMessages = _uiState.value.messages
+                val isStillReferenced = allMessages.any { m ->
+                    m.id != messageId &&
+                            (m.mediaPath == imagePath || m.mediaPaths?.contains(imagePath) == true)
+                }
+                if (!isStillReferenced) {
+                    File(imagePath).let { if (it.exists()) it.delete() }
+                }
+            }
+        }
     }
 
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>) {
