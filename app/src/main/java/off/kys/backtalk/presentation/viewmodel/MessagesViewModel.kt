@@ -275,9 +275,13 @@ class MessagesViewModel(
 
         if (editingMessage != null) {
             viewModelScope.launch {
+                // editedText stores the previous visible text (shown strikethrough in UI).
+                // The previous visible text is editedText ?: text (same logic as UI rendering).
+                val previousVisibleText = editingMessage.editedText ?: editingMessage.text
                 useCases.insertMessage(
                     editingMessage.copy(
                         editedText = text,
+                        text = previousVisibleText,
                         editedAt = System.currentTimeMillis()
                     )
                 )
@@ -311,9 +315,9 @@ class MessagesViewModel(
                 ?.ifEmpty { null }
 
             val hasNoMediaLeft = newMediaPath == null && newMediaPaths.isNullOrEmpty()
-            val hasNoContent = hasNoMediaLeft &&
-                    message.text.isBlank() &&
-                    message.voicePath == null
+            // If all media is gone and there's no voice, delete the whole message.
+            // Text in a media message is a caption — it has no meaning without the media.
+            val hasNoContent = hasNoMediaLeft && message.voicePath == null
 
             if (hasNoContent) {
                 // Delegate to existing use case — it handles DB delete + disk cleanup
