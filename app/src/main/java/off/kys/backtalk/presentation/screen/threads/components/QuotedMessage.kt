@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
-import off.kys.backtalk.util.stripMarkdown
+import off.kys.backtalk.presentation.screen.messages.components.SmartText
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -75,8 +75,8 @@ fun QuotedMessage(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = text.stripMarkdown(),
+            SmartText(
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis

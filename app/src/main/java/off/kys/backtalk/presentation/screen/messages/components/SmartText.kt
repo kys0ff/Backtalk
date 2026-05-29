@@ -72,7 +72,7 @@ fun SmartText(
     modifier: Modifier = Modifier,
     clickableLink: Boolean = true,
     fontSize: TextUnit = TextUnit.Unspecified,
-    color: Color = MaterialTheme.colorScheme.background,
+    color: Color = MaterialTheme.colorScheme.onBackground,
     style: TextStyle = LocalTextStyle.current,
     textDecoration: TextDecoration = TextDecoration.None,
     maxLines: Int = Int.MAX_VALUE,

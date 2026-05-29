@@ -137,7 +137,6 @@ private fun MainThreadItem(
             text = textToCopyOrShare,
             style = MaterialTheme.typography.headlineSmall,
             lineHeight = MaterialTheme.typography.headlineSmall.lineHeight,
-            color = MaterialTheme.colorScheme.onSurface
         )
 
         repliedTo?.let {
