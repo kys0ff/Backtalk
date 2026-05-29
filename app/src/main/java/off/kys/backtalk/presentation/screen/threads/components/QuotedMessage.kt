@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.screen.threads.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,14 +35,24 @@ import java.util.Date
 @Composable
 fun QuotedMessage(
     message: MessageEntity,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    replyCount: Int = 0,
+    onClick: (() -> Unit)? = null
 ) {
     val timeFormat = SimpleDateFormat("MMM d", LocalLocale.current.platformLocale)
     val text = message.editedText ?: message.text
     val shape = RoundedCornerShape(12.dp)
+    val isVoice = message.voicePath != null
+    val hasMedia = message.mediaPath != null || !message.mediaPaths.isNullOrEmpty()
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .then(
+                if (onClick != null) Modifier.clickable { onClick() }
+                else Modifier
+            ),
         shape = shape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         color = MaterialTheme.colorScheme.surface
@@ -75,12 +86,54 @@ fun QuotedMessage(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            SmartText(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (isVoice) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_keyboard_voice_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.chat_voice_message),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else if (hasMedia) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_image_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.statistics_images),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else {
+                SmartText(
+                    text = text,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (replyCount > 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.threads_replies_count, replyCount),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }

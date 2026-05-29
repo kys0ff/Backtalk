@@ -69,7 +69,9 @@ fun ThreadDetailContent(
                     repliesCount = threadsSize,
                     onCopy = onCopy,
                     onShare = onShare,
-                    repliedTo = thread.repliedTo
+                    repliedTo = thread.repliedTo,
+                    onReplyClick = onReplyClick,
+                    getReplyCount = getReplyCount
                 )
             } else {
                 ThreadMessageItem(
@@ -91,7 +93,9 @@ private fun MainThreadItem(
     repliesCount: Int,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    repliedTo: MessageEntity? = null
+    repliedTo: MessageEntity? = null,
+    onReplyClick: (MessageEntity) -> Unit,
+    getReplyCount: (MessageEntity) -> Int
 ) {
     val fullDateFormat =
         SimpleDateFormat("h:mm a · MMM d, yyyy", LocalLocale.current.platformLocale)
@@ -142,7 +146,9 @@ private fun MainThreadItem(
         repliedTo?.let {
             QuotedMessage(
                 message = it,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
+                replyCount = getReplyCount(it),
+                onClick = { onReplyClick(it) }
             )
         }
 

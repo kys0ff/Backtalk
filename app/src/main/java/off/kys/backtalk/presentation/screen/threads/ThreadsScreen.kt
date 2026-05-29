@@ -90,6 +90,13 @@ class ThreadsScreen : Screen {
                                     },
                                     onThreadShare = { text ->
                                         context.shareText(text)
+                                    },
+                                    onQuoteClick = { message ->
+                                        val subThread = viewModel.getSubThread(message)
+                                        navigator.push(ThreadDetailScreen(subThread))
+                                    },
+                                    getReplyCount = { message ->
+                                        viewModel.getSubThread(message).size - 1
                                     }
                                 )
                             }

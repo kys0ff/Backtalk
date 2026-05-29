@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
 import java.text.SimpleDateFormat
@@ -37,7 +38,9 @@ fun ThreadItem(
     onClick: () -> Unit,
     onThreadCopy: (String) -> Unit,
     onThreadShare: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onQuoteClick: ((MessageEntity) -> Unit)? = null,
+    getReplyCount: ((MessageEntity) -> Int)? = null
 ) {
     val timeFormat = SimpleDateFormat("MMM d", LocalLocale.current.platformLocale)
     val text = thread.root.editedText ?: thread.root.text
@@ -95,7 +98,9 @@ fun ThreadItem(
                 thread.repliedTo?.let { repliedTo ->
                     QuotedMessage(
                         message = repliedTo,
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(top = 12.dp),
+                        replyCount = getReplyCount?.invoke(repliedTo) ?: 0,
+                        onClick = onQuoteClick?.let { { it(repliedTo) } }
                     )
                 }
 
