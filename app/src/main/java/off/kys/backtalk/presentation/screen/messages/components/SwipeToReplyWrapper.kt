@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import off.kys.backtalk.common.manager.VibrationManager
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import org.koin.compose.koinInject
 import kotlin.math.abs
@@ -55,7 +54,6 @@ fun SwipeToReplyWrapper(
     @DrawableRes rightIconRes: Int,
     content: @Composable () -> Unit
 ) {
-    val vibrationManager = koinInject<VibrationManager>()
     val preferences = koinInject<BacktalkPreferences>()
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
@@ -122,20 +120,23 @@ fun SwipeToReplyWrapper(
                         val rawNewOffset = currentX + resistedDrag
 
                         val newOffset = when {
-                            onSwipeRight != null && onSwipeLeft != null -> rawNewOffset.coerceIn(-maxDrag, maxDrag)
+                            onSwipeRight != null && onSwipeLeft != null -> rawNewOffset.coerceIn(
+                                -maxDrag,
+                                maxDrag
+                            )
+
                             onSwipeRight != null -> rawNewOffset.coerceIn(0f, maxDrag)
                             onSwipeLeft != null -> rawNewOffset.coerceIn(-maxDrag, 0f)
                             else -> 0f
                         }
 
-                        if (abs(newOffset) >= actionThreshold && !hasVibratedThreshold) {
-                            if (preferences.hapticFeedbackEnabled) {
+                        if (preferences.hapticFeedbackEnabled) {
+                            if (abs(newOffset) >= actionThreshold && !hasVibratedThreshold) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                hasVibratedThreshold = true
+                            } else if (abs(newOffset) < actionThreshold) {
+                                hasVibratedThreshold = false
                             }
-                            vibrationManager.vibrate(50L)
-                            hasVibratedThreshold = true
-                        } else if (abs(newOffset) < actionThreshold) {
-                            hasVibratedThreshold = false
                         }
 
                         scope.launch { offsetX.snapTo(newOffset) }

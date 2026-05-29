@@ -2,7 +2,6 @@ package off.kys.backtalk.di
 
 import androidx.room.Room
 import off.kys.backtalk.common.manager.AlarmScheduler
-import off.kys.backtalk.common.manager.VibrationManager
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.dao.ScheduledMessagesDao
@@ -176,7 +175,6 @@ private fun Module.viewModelModule() {
 private fun Module.systemModule() {
     single { AudioPlayer() }
     single { BacktalkPreferences(get()) }
-    single { VibrationManager(get(), get()) }
     single { AlarmScheduler(get()) }
     single { NsdHelper(get()) }
     single { SyncSocketManager() }

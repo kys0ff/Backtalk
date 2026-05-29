@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat.enableEdgeToEdge
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
-import off.kys.backtalk.common.manager.VibrationManager
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
@@ -270,7 +269,6 @@ private fun MessagesScreenPreview() {
                 modules(
                     module {
                         single { BacktalkPreferences(context) }
-                        single { VibrationManager(context, get()) }
                         single { AudioPlayer() }
                     }
                 )
