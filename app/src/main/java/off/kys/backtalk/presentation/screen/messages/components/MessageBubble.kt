@@ -6,11 +6,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -23,15 +25,15 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +61,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -81,12 +85,13 @@ fun MessageBubble(
     isBottom: Boolean,
     selectMode: Boolean,
     isSelected: Boolean,
+    selectedImagePaths: Set<String> = emptySet(),
     onReplyPreviewClick: () -> Unit,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
-    onTagClick: (String) -> Unit = {},
-    onImageDelete: ((String) -> Unit)? = null
+    onTagClick: (String) -> Unit = {}
 ) {
     var showExtraInfo by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
@@ -155,7 +160,8 @@ fun MessageBubble(
                 showOriginal = showExtraInfo,
                 highlightQuery = highlightQuery,
                 onTagClick = onTagClick,
-                onImageDelete = onImageDelete
+                selectedImagePaths = selectedImagePaths,
+                onToggleImageSelect = onToggleImageSelect
             )
         }
 
@@ -237,9 +243,10 @@ private fun MessageContent(
     repliedMessage: MessageEntity?,
     onReplyClick: () -> Unit,
     showOriginal: Boolean,
+    selectedImagePaths: Set<String>,
+    onToggleImageSelect: (String) -> Unit,
     highlightQuery: String? = null,
-    onTagClick: (String) -> Unit = {},
-    onImageDelete: ((String) -> Unit)? = null
+    onTagClick: (String) -> Unit = {}
 ) {
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
@@ -278,8 +285,15 @@ private fun MessageContent(
     if (images.isNotEmpty()) {
         StaggeredImageGrid(
             images = images,
-            onImageClick = { imagePath -> navigator?.push(ImagePreviewScreen(imagePath)) },
-            onImageDelete = onImageDelete
+            selectedImages = selectedImagePaths,
+            onImageClick = { imagePath ->
+                if (selectedImagePaths.isNotEmpty()) {
+                    onToggleImageSelect(imagePath)
+                } else {
+                    navigator?.push(ImagePreviewScreen(imagePath))
+                }
+            },
+            onImageLongClick = { imagePath -> onToggleImageSelect(imagePath) }
         )
         val messageText = message.editedText ?: message.text
         if (messageText.isNotEmpty() || message.voicePath != null) {
@@ -331,10 +345,11 @@ private fun MessageContent(
 
 @Composable
 fun StaggeredImageGrid(
-    images: List<String>,
     modifier: Modifier = Modifier,
+    images: List<String>,
+    selectedImages: Set<String> = emptySet(),
     onImageClick: (String) -> Unit,
-    onImageDelete: ((String) -> Unit)? = null
+    onImageLongClick: (String) -> Unit = {}
 ) {
     if (images.isEmpty()) return
 
@@ -344,173 +359,198 @@ fun StaggeredImageGrid(
         .width(gridWidth)
         .clip(MaterialTheme.shapes.large)
 
-    when (images.size) {
-        1 -> {
-            GridImage(
-                path = images[0],
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.large)
-                    .sizeIn(
-                        minWidth = 140.dp, maxWidth = gridWidth,
-                        minHeight = 140.dp, maxHeight = 360.dp
-                    ),
-                onClick = onImageClick,
-                onDelete = onImageDelete,
-                contentScale = ContentScale.Fit
-            )
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
+        when (images.size) {
+            1 -> {
+                GridImage(
+                    path = images[0],
+                    isSelected = images[0] in selectedImages,
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.large)
+                        .widthIn(max = gridWidth)
+                        .heightIn(max = 360.dp),
+                    imageModifier = Modifier,
+                    onClick = onImageClick,
+                    onLongClick = onImageLongClick,
+                    contentScale = ContentScale.Fit
+                )
+            }
 
-        2 -> {
-            Row(
-                modifier = containerModifier,
-                horizontalArrangement = Arrangement.spacedBy(spacing)
-            ) {
-                images.forEach { path ->
+            2 -> {
+                Row(
+                    modifier = containerModifier,
+                    horizontalArrangement = Arrangement.spacedBy(spacing)
+                ) {
+                    images.forEach { path ->
+                        GridImage(
+                            path = path,
+                            isSelected = path in selectedImages,
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(0.75f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                    }
+                }
+            }
+
+            3 -> {
+                Row(
+                    modifier = containerModifier,
+                    horizontalArrangement = Arrangement.spacedBy(spacing)
+                ) {
                     GridImage(
-                        path = path,
+                        path = images[0],
+                        isSelected = images[0] in selectedImages,
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(0.75f),
                         onClick = onImageClick,
-                        onDelete = onImageDelete
+                        onLongClick = onImageLongClick
                     )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(spacing)
+                    ) {
+                        GridImage(
+                            path = images[1],
+                            isSelected = images[1] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .aspectRatio(1.5f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                        GridImage(
+                            path = images[2],
+                            isSelected = images[2] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .aspectRatio(1.5f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                    }
                 }
             }
-        }
 
-        3 -> {
-            Row(
-                modifier = containerModifier,
-                horizontalArrangement = Arrangement.spacedBy(spacing)
-            ) {
-                GridImage(
-                    path = images[0],
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(0.75f),
-                    onClick = onImageClick,
-                    onDelete = onImageDelete
-                )
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(spacing)
+            else -> {
+                Row(
+                    modifier = containerModifier,
+                    horizontalArrangement = Arrangement.spacedBy(spacing)
                 ) {
-                    GridImage(
-                        path = images[1],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .aspectRatio(1.5f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
-                    GridImage(
-                        path = images[2],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .aspectRatio(1.5f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
-                }
-            }
-        }
-
-        else -> {
-            Row(
-                modifier = containerModifier,
-                horizontalArrangement = Arrangement.spacedBy(spacing)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(spacing)
-                ) {
-                    GridImage(
-                        path = images[0],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
-                    GridImage(
-                        path = images[2],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1.5f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(spacing)
-                ) {
-                    GridImage(
-                        path = images[1],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1.5f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
-                    GridImage(
-                        path = images[3],
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .aspectRatio(1f),
-                        onClick = onImageClick,
-                        onDelete = onImageDelete
-                    )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(spacing)
+                    ) {
+                        GridImage(
+                            path = images[0],
+                            isSelected = images[0] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                        GridImage(
+                            path = images[2],
+                            isSelected = images[2] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.5f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(spacing)
+                    ) {
+                        GridImage(
+                            path = images[1],
+                            isSelected = images[1] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.5f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                        GridImage(
+                            path = images[3],
+                            isSelected = images[3] in selectedImages,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(1f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GridImage(
-    path: String,
     modifier: Modifier = Modifier,
+    imageModifier: Modifier = Modifier.fillMaxSize(),
+    path: String,
+    isSelected: Boolean = false,
     onClick: (String) -> Unit,
-    onDelete: ((String) -> Unit)? = null,
+    onLongClick: (String) -> Unit = {},
     contentScale: ContentScale = ContentScale.Crop
 ) {
     val haptic = LocalHapticFeedback.current
     val preferences = koinInject<BacktalkPreferences>()
+    val context = LocalContext.current
 
-    Box(modifier = modifier) {
-        AsyncImage(
-            model = File(path),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick(path) },
-            contentScale = contentScale
-        )
-        if (onDelete != null) {
-            IconButton(
-                onClick = {
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .combinedClickable(
+                onClick = { onClick(path) },
+                onLongClick = {
                     if (preferences.hapticFeedbackEnabled) {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
-                    onDelete(path)
-                },
+                    onLongClick(path)
+                }
+            )
+    ) {
+        AsyncImage(
+            modifier = imageModifier,
+            model = ImageRequest.Builder(context)
+                .data(File(path))
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            placeholder = painterResource(R.drawable.round_progress_activity_24px),
+            error = painterResource(R.drawable.round_broken_image_24px),
+            contentScale = contentScale,
+        )
+
+        AnimatedVisibility(
+            visible = isSelected,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut(),
+            modifier = Modifier.align(Alignment.TopEnd)
+        ) {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp)
-                    .size(28.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.85f),
-                        shape = CircleShape
-                    )
+                    .padding(8.dp)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    .border(width = 1.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.round_delete_24),
-                    contentDescription = stringResource(R.string.common_delete),
-                    tint = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.size(14.dp)
+                    painter = painterResource(R.drawable.round_check_24),
+                    contentDescription = "Selected",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }

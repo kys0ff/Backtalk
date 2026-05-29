@@ -72,7 +72,11 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
             }
 
-            is MessagesUiEvent.ConfirmDeleteSelected -> deleteSelected()
+            is MessagesUiEvent.ConfirmDeleteSelected -> {
+                deleteSelected()
+                deleteSelectedImages()
+                _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
+            }
             is MessagesUiEvent.DismissDeleteConfirmation -> {
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
             }
@@ -134,6 +138,11 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(shouldScrollToSearch = false)
             }
             is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(event.messageId, event.imagePath)
+            is MessagesUiEvent.ToggleImageSelection -> toggleImageSelection(event.messageId, event.imagePath)
+            is MessagesUiEvent.DeleteSelectedImages -> {
+                _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
+            }
+            is MessagesUiEvent.ClearImageSelection -> clearImageSelection()
         }
     }
 
@@ -312,6 +321,45 @@ class MessagesViewModel(
         }
     }
 
+    private fun toggleImageSelection(messageId: MessageId, imagePath: String) {
+        val currentMap = _uiState.value.selectedImagePaths
+        val currentSet = currentMap[messageId] ?: emptySet()
+        val newSet = if (imagePath in currentSet) currentSet - imagePath else currentSet + imagePath
+        
+        _uiState.value = _uiState.value.copy(
+            selectedImagePaths = if (newSet.isEmpty()) currentMap - messageId else currentMap + (messageId to newSet)
+        )
+    }
+
+    private fun deleteSelected() {
+        val ids = _uiState.value.selectedMessageIds
+        viewModelScope.launch {
+            ids.forEach { useCases.deleteMessageById(it) }
+        }
+        _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
+    }
+
+    private fun deleteSelectedImages() {
+        val selectedImagePaths = _uiState.value.selectedImagePaths
+        val selectedMessageIds = _uiState.value.selectedMessageIds
+        
+        viewModelScope.launch {
+            selectedImagePaths.forEach { (messageId, paths) ->
+                // Only delete images if the message itself is NOT being deleted
+                if (messageId !in selectedMessageIds) {
+                    useCases.removeImagesFromMessage(messageId, paths)
+                }
+            }
+        }
+        _uiState.value = _uiState.value.copy(selectedImagePaths = emptyMap())
+    }
+
+    private fun clearImageSelection() {
+        _uiState.value = _uiState.value.copy(
+            selectedImagePaths = emptyMap()
+        )
+    }
+
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>) {
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
@@ -363,22 +411,13 @@ class MessagesViewModel(
     }
 
     /**
-     * Clears the selection of all messages.
+     * Clears the selection of all messages and images.
      */
     private fun clearSelection() {
-        _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
-    }
-
-    /**
-     * Deletes the selected messages.
-     */
-    private fun deleteSelected() {
-        val ids = _uiState.value.selectedMessageIds
-        viewModelScope.launch {
-            ids.forEach { useCases.deleteMessageById(it) }
-        }
-        _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
-        clearSelection()
+        _uiState.value = _uiState.value.copy(
+            selectedMessageIds = emptySet(),
+            selectedImagePaths = emptyMap()
+        )
     }
 
     /**

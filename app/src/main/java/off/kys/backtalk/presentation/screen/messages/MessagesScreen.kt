@@ -92,6 +92,16 @@ fun MessagesScreenContent(
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
     val tags = rememberHashtags(state.messages)
 
+    val selectedMessagesCount = state.selectedMessageIds.size
+    val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
+    
+    // We want to count:
+    // 1. All selected messages.
+    // 2. All selected images, EXCEPT those that are part of an already selected message (to avoid double counting).
+    val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys { 
+        it !in state.selectedMessageIds 
+    }.values.sumOf { it.size }
+
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
             val targetIndex = state.filteredMessages.asReversed().indexOfFirst { it.id == id }
@@ -102,7 +112,7 @@ fun MessagesScreenContent(
         }
     }
 
-    BackHandler(state.selectedMessageIds.isNotEmpty()) {
+    BackHandler(state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty()) {
         onEvent(MessagesUiEvent.ClearSelection)
     }
 
@@ -167,7 +177,7 @@ fun MessagesScreenContent(
         topBar = {
             MessagesTopBar(
                 scrollBehavior = scrollBehavior,
-                selectedCount = state.selectedMessageIds.size,
+                selectedCount = totalSelectedCount,
                 isSearchActive = state.isSearchActive,
                 searchQuery = state.searchQuery,
                 searchResultsCount = state.searchResults.size,
@@ -199,7 +209,8 @@ fun MessagesScreenContent(
                 },
                 tags = tags,
                 selectedTag = state.selectedTag,
-                onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) }
+                onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
+                isImageSelectionOnly = selectedMessagesCount == 0 && selectedImagesCount > 0
             )
         },
         bottomBar = {
@@ -280,6 +291,15 @@ fun MessagesScreenContent(
             },
             onImageDelete = { messageId, imagePath ->
                 onEvent(MessagesUiEvent.RemoveImageFromMessage(messageId, imagePath))
+            },
+            onToggleImageSelect = { messageId, imagePath ->
+                onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
+            },
+            onDeleteSelectedImages = { _ ->
+                onEvent(MessagesUiEvent.DeleteSelectedImages)
+            },
+            onClearImageSelection = { _ ->
+                onEvent(MessagesUiEvent.ClearImageSelection)
             }
         )
     }

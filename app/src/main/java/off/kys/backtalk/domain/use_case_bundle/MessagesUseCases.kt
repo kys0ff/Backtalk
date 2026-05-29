@@ -8,6 +8,7 @@ import off.kys.backtalk.domain.use_case.GetAllScheduledMessages
 import off.kys.backtalk.domain.use_case.GetMessageById
 import off.kys.backtalk.domain.use_case.InsertMessage
 import off.kys.backtalk.domain.use_case.RemoveImageFromMessage
+import off.kys.backtalk.domain.use_case.RemoveImagesFromMessage
 import off.kys.backtalk.domain.use_case.ScheduleMessageUseCase
 import off.kys.backtalk.domain.use_case.TogglePinMessage
 
@@ -27,5 +28,6 @@ data class MessagesUseCases(
     val getAllScheduledMessages: GetAllScheduledMessages,
     val cancelScheduledMessage: CancelScheduledMessage,
     val togglePinMessage: TogglePinMessage,
-    val removeImageFromMessage: RemoveImageFromMessage
+    val removeImageFromMessage: RemoveImageFromMessage,
+    val removeImagesFromMessage: RemoveImagesFromMessage
 )

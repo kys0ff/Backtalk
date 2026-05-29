@@ -94,7 +94,8 @@ fun MessagesTopBar(
     onNavigateSearch: (Boolean) -> Unit,
     tags: List<String>,
     selectedTag: String?,
-    onTagClick: (String) -> Unit
+    onTagClick: (String) -> Unit,
+    isImageSelectionOnly: Boolean = false
 ) {
     val appBarColors = TopAppBarDefaults.topAppBarColors()
     val colorTransitionFraction = scrollBehavior.state.overlappedFraction
@@ -132,7 +133,9 @@ fun MessagesTopBar(
                     onCopy = onCopy,
                     onPin = onPin,
                     scrollBehavior = scrollBehavior,
-                    colors = transparentTopAppBarColors
+                    colors = transparentTopAppBarColors,
+                    showPin = !isImageSelectionOnly && selectedCount == 1,
+                    showCopy = !isImageSelectionOnly
                 )
             }
 
@@ -306,7 +309,9 @@ private fun SelectionTopBar(
     onCopy: () -> Unit,
     onPin: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
-    colors: androidx.compose.material3.TopAppBarColors
+    colors: androidx.compose.material3.TopAppBarColors,
+    showPin: Boolean,
+    showCopy: Boolean
 ) {
     TopAppBar(
         title = { Text(stringResource(R.string.chat_selection_count, selectedCount)) },
@@ -321,7 +326,7 @@ private fun SelectionTopBar(
             }
         },
         actions = {
-            if (selectedCount == 1) {
+            if (showPin) {
                 HintTooltip("Pin") {
                     IconButton(onClick = onPin) {
                         Icon(
@@ -341,12 +346,14 @@ private fun SelectionTopBar(
                     )
                 }
             }
-            HintTooltip(stringResource(R.string.common_copy)) {
-                IconButton(onClick = onCopy) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_content_copy_24),
-                        contentDescription = stringResource(R.string.common_copy)
-                    )
+            if (showCopy) {
+                HintTooltip(stringResource(R.string.common_copy)) {
+                    IconButton(onClick = onCopy) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_content_copy_24),
+                            contentDescription = stringResource(R.string.common_copy)
+                        )
+                    }
                 }
             }
         },

@@ -49,6 +49,9 @@ fun MessagesContent(
     onTogglePin: (MessageEntity, Boolean) -> Unit,
     onScrollToMessage: (MessageId) -> Unit,
     onImageDelete: ((MessageId, String) -> Unit)? = null,
+    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
+    onDeleteSelectedImages: (MessageId) -> Unit = {},
+    onClearImageSelection: (MessageId) -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -65,6 +68,10 @@ fun MessagesContent(
             blinkMessageId = state.blinkMessageId,
             onScrollToMessage = onScrollToMessage,
             onImageDelete = onImageDelete,
+            selectedImagePaths = state.selectedImagePaths,
+            onToggleImageSelect = onToggleImageSelect,
+            onDeleteSelectedImages = onDeleteSelectedImages,
+            onClearImageSelection = onClearImageSelection,
             contentPadding = if (state.pinnedMessages.isNotEmpty()) PaddingValues(top = 48.dp) else PaddingValues(
                 0.dp
             )
@@ -105,9 +112,15 @@ fun MessagesContent(
         }
 
         if (state.showDeleteConfirmation) {
-            val selectedCount = state.selectedMessageIds.size
+            val selectedMessagesCount = state.selectedMessageIds.size
+            
+            // Re-calculate the actual items being deleted, same as in MessagesScreen
+            val totalToDelete = selectedMessagesCount + state.selectedImagePaths.filterKeys { 
+                it !in state.selectedMessageIds 
+            }.values.sumOf { it.size }
+
             DeleteConfirmationDialog(
-                selectedCount = selectedCount,
+                selectedCount = totalToDelete,
                 onConfirm = onConfirmDelete,
                 onDismiss = onDismissDelete
             )

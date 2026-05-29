@@ -96,4 +96,58 @@ class MessagesViewModelTest : KoinTest {
         assertFalse(viewModel.uiState.value.showDeleteConfirmation)
         assertTrue(viewModel.uiState.value.selectedMessageIds.isEmpty())
     }
+
+    @Test
+    fun `ToggleImageSelection event should update selectedImagePaths`() {
+        // Given
+        val messageId = MessageId.generate()
+        val path = "/path/to/image.jpg"
+
+        // When
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path))
+
+        // Then
+        val selected = viewModel.uiState.value.selectedImagePaths[messageId]
+        assertTrue(selected?.contains(path) == true)
+
+        // When toggle again
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path))
+
+        // Then
+        assertFalse(viewModel.uiState.value.selectedImagePaths.containsKey(messageId))
+    }
+
+    @Test
+    fun `DeleteSelectedImages event should call use case and clear selection`() {
+        // Given
+        val messageId = MessageId.generate()
+        val path1 = "/path/to/image1.jpg"
+        val path2 = "/path/to/image2.jpg"
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path1))
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path2))
+
+        // When - Should show confirmation first
+        viewModel.onEvent(MessagesUiEvent.DeleteSelectedImages)
+
+        // Then confirm
+        viewModel.onEvent(MessagesUiEvent.ConfirmDeleteSelected)
+
+        // Then verify
+        coVerify(timeout = 2000) { useCases.removeImagesFromMessage(messageId, match { it.contains(path1) && it.contains(path2) }) }
+    }
+
+    @Test
+    fun `ClearImageSelection event should clear all image selections`() {
+        // Given
+        val m1 = MessageId.generate()
+        val m2 = MessageId.generate()
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(m1, "/p1"))
+        viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(m2, "/p2"))
+
+        // When
+        viewModel.onEvent(MessagesUiEvent.ClearImageSelection)
+
+        // Then
+        assertTrue(viewModel.uiState.value.selectedImagePaths.isEmpty())
+    }
 }

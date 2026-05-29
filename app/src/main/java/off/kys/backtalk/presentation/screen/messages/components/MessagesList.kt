@@ -32,8 +32,12 @@ fun MessagesList(
     blinkMessageId: MessageId? = null,
     onScrollToMessage: (MessageId) -> Unit = {},
     onImageDelete: ((MessageId, String) -> Unit)? = null,
+    selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
+    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
+    onDeleteSelectedImages: (MessageId) -> Unit = {},
+    onClearImageSelection: (MessageId) -> Unit = {}
 ) {
-    val selectionMode = selectedMessageIds.isNotEmpty()
+    val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty() && listState.firstVisibleItemIndex <= 1) {
@@ -126,7 +130,8 @@ fun MessagesList(
                         },
                         highlightQuery = searchQuery,
                         onTagClick = onTagClick,
-                        onImageDelete = onImageDelete?.let { cb -> { path -> cb(current.id, path) } }
+                        selectedImagePaths = selectedImagePaths[current.id] ?: emptySet(),
+                        onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) }
                     )
                 }
             }

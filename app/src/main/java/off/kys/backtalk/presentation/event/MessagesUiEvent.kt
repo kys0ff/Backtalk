@@ -169,4 +169,19 @@ sealed interface MessagesUiEvent {
      * @param imagePath The file path of the image to remove.
      */
     data class RemoveImageFromMessage(val messageId: MessageId, val imagePath: String) : MessagesUiEvent
+
+    /**
+     * UI event to toggle selection of a specific image within a message.
+     */
+    data class ToggleImageSelection(val messageId: MessageId, val imagePath: String) : MessagesUiEvent
+
+    /**
+     * UI event to delete all selected images from across all messages.
+     */
+    data object DeleteSelectedImages : MessagesUiEvent
+
+    /**
+     * UI event to clear image selection for all messages.
+     */
+    data object ClearImageSelection : MessagesUiEvent
 }
