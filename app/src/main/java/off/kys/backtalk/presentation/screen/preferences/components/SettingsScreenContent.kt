@@ -604,6 +604,7 @@ fun SettingsScreenContent(
 
     if (showIntervalDialog.value) {
         IntervalSelectionDialog(
+            title = stringResource(R.string.auto_export_interval),
             selected = state.autoExportInterval,
             onDismiss = { showIntervalDialog.value = false },
             onSelected = {
@@ -650,6 +651,7 @@ fun SettingsScreenContent(
 
     if (showReminderIntervalDialog.value) {
         IntervalSelectionDialog(
+            title = stringResource(R.string.settings_reminder_interval),
             selected = state.reminderInterval,
             onDismiss = { showReminderIntervalDialog.value = false },
             onSelected = {

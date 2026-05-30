@@ -30,6 +30,7 @@ import off.kys.backtalk.common.ExportInterval
 
 @Composable
 fun IntervalSelectionDialog(
+    title: String,
     selected: ExportInterval,
     onDismiss: () -> Unit,
     onSelected: (ExportInterval) -> Unit
@@ -45,7 +46,7 @@ fun IntervalSelectionDialog(
                 tint = MaterialTheme.colorScheme.primary
             )
         },
-        title = { Text(stringResource(R.string.auto_export_interval)) },
+        title = { Text(text = title) },
         text = {
             Column(
                 modifier = Modifier.selectableGroup(),
