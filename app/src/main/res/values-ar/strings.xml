@@ -17,6 +17,7 @@
     <string name="common_edit">تعديل</string>
     <string name="common_attach">إرفاق</string>
     <string name="common_search">بحث</string>
+    <string name="common_selected">محدد</string>
     <string name="common_daily">يومياً</string>
     <string name="common_weekly">أسبوعياً</string>
     <string name="common_monthly">شهرياً</string>
@@ -35,9 +36,11 @@
     <string name="chat_copy_success">تم النسخ إلى الحافظة</string>
     <string name="chat_copy_label">النص المنسوخ</string>
     <string name="chat_status_edited">مُعدّلة</string>
+    <string name="chat_editing_locked">التعديل مغلق</string>
     <string name="chat_scroll_to_bottom">انتقال للأسفل</string>
     <string name="chat_sent_at">أُرسلت في</string>
     <string name="chat_edited_at">عُدّلت في %1$s</string>
+    <string name="chat_reply_image_preview">[صورة]</string>
     <string name="chat_input_slide_to_cancel">&lt; اسحب للإلغاء</string>
     <string name="chat_input_hold_to_record">استمر في الضغط للتسجيل</string>
     <string name="chat_input_record_cd">تسجيل</string>
@@ -208,6 +211,7 @@
     <string name="reminders_cancel_confirm_title">إلغاء التذكير؟</string>
     <string name="reminders_cancel_confirm_msg">هل أنت متحقِّق من أنك تريد إلغاء هذا التذكير المجدول؟</string>
     <string name="chat_reminder_tag">تذكير</string>
+    <string name="chat_pinned_tag">مثبتة</string>
     <string name="chat_reminder_notification_channel">التذكيرات</string>
     <string name="chat_reminder_notification_title">ملاحظة لنفسي</string>
     <string name="chat_reminder_original_time">الوقت الأصلي:</string>

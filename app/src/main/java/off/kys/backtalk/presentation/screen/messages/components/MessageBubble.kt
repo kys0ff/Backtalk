@@ -297,7 +297,7 @@ private fun MessageContent(
 
     if (repliedMessage != null) {
         ReplyPreview(
-            text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) "[Image]" else repliedMessage.text,
+            text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) stringResource(R.string.chat_reply_image_preview) else repliedMessage.text,
             voicePath = repliedMessage.voicePath,
             onPreviewClick = onReplyClick
         )
@@ -577,7 +577,7 @@ private fun GridImage(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.round_check_24),
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(R.string.common_selected),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -631,7 +631,7 @@ private fun PinTag(contentColor: Color) {
                 tint = contentColor
             )
             Text(
-                text = "Pinned",
+                text = stringResource(R.string.chat_pinned_tag),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = contentColor
@@ -667,7 +667,7 @@ private fun MessageFooter(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "History locked",
+                        text = stringResource(R.string.chat_editing_locked),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline,
                         fontStyle = FontStyle.Italic

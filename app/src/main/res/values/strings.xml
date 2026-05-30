@@ -18,6 +18,7 @@
     <string name="common_edit">Edit</string>
     <string name="common_attach">Attach</string>
     <string name="common_search">Search</string>
+    <string name="common_selected">Selected</string>
     <string name="common_daily">Daily</string>
     <string name="common_weekly">Weekly</string>
     <string name="common_monthly">Monthly</string>
@@ -36,9 +37,11 @@
     <string name="chat_copy_success">Copied to clipboard</string>
     <string name="chat_copy_label">Copied text</string>
     <string name="chat_status_edited">edited</string>
+    <string name="chat_editing_locked">Editing is locked</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_sent_at">sent at</string>
     <string name="chat_edited_at">edited at %1$s</string>
+    <string name="chat_reply_image_preview">[Image]</string>
     <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
     <string name="chat_input_hold_to_record">Hold to record</string>
     <string name="chat_input_record_cd">Record</string>
@@ -204,6 +207,7 @@
     <string name="reminders_cancel_confirm_title">Cancel reminder?</string>
     <string name="reminders_cancel_confirm_msg">Are you sure you want to cancel this scheduled reminder?</string>
     <string name="chat_reminder_tag">Reminder</string>
+    <string name="chat_pinned_tag">Pinned</string>
     <string name="chat_reminder_notification_channel">Reminders</string>
     <string name="chat_reminder_notification_title">Note to self</string>
     <string name="chat_reminder_original_time">original:</string>
