@@ -268,4 +268,13 @@
     <string name="onboarding_mock_reminder">Long press the send button to schedule a reminder like this one!</string>
     <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
+    <!-- Pinned Messages -->
+    <string name="pinned_message">Pinned Message</string>
+    <string name="pinned_message_with_index">Pinned Message (%1$d/%2$d)</string>
+    <string name="pinned_message_jump_label">Jump to pinned message</string>
+    <plurals name="pinned_message_view_all">
+        <item quantity="one">View pinned message</item>
+        <item quantity="other">View all %1$d pinned messages</item>
+    </plurals>
+
 </resources>

@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,9 +62,9 @@ fun PinnedMessageBar(
 
     val currentPinned = pinnedMessages.getOrNull(activeIndex) ?: return
     val labelText = if (pinnedMessages.size > 1) {
-        "Pinned Message (${activeIndex + 1}/${pinnedMessages.size})"
+        stringResource(R.string.pinned_message_with_index, activeIndex + 1, pinnedMessages.size)
     } else {
-        "Pinned Message"
+        stringResource(R.string.pinned_message)
     }
 
     Surface(
@@ -79,7 +81,7 @@ fun PinnedMessageBar(
                 .clickable(
                     onClick = onClick,
                     role = Role.Button,
-                    onClickLabel = "Jump to pinned message"
+                    onClickLabel = stringResource(R.string.pinned_message_jump_label)
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -87,7 +89,7 @@ fun PinnedMessageBar(
                 count = pinnedMessages.size,
                 activeIndex = activeIndex,
                 reverseDirection = true,
-                dotSize = 6.dp, // Slightly optimized for a sleek 56.dp bar look
+                dotSize = 6.dp,
                 maxVisibleItems = 5,
                 modifier = Modifier.padding(start = 16.dp)
             )
@@ -138,7 +140,11 @@ fun PinnedMessageBar(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.round_pinboard_24px),
-                    contentDescription = "View all ${pinnedMessages.size} pinned messages",
+                    contentDescription = pluralStringResource(
+                        R.plurals.pinned_message_view_all,
+                        pinnedMessages.size,
+                        pinnedMessages.size
+                    ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
