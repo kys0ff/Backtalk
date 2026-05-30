@@ -151,7 +151,7 @@
     <!-- Backup & Restore -->
     <string name="backup_title">النسخ الاحتياطي والاستعادة</string>
     <string name="backup_export_title">تصدير نسخة احتياطية</string>
-    <string name="backup_export_desc">إنشاء نسخة احتياطية مشفرة أو عادية بصيغة (.bkt)</string>
+    <string name="backup_export_desc">إنشاء نسخة احتياطية مشفرة أو عادية بصيغة</string>
     <string name="backup_import_title">استيراد نسخة احتياطية</string>
     <string name="backup_import_desc">استعادة بياناتك من مِلَفّ تم تصديره سابقاً</string>
     <string name="backup_enter_password">أدخل كلمة المرور</string>

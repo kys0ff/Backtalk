@@ -147,7 +147,7 @@
     <!-- Backup & Restore -->
     <string name="backup_title">Backup &amp; Restore</string>
     <string name="backup_export_title">Export backup</string>
-    <string name="backup_export_desc">Create an encrypted or plain backup (.bkt)</string>
+    <string name="backup_export_desc">Create an encrypted or plain backup</string>
     <string name="backup_import_title">Import backup</string>
     <string name="backup_import_desc">Restore data from a previously exported file</string>
     <string name="backup_enter_password">Enter password</string>
