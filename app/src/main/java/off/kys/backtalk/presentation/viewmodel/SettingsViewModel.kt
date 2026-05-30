@@ -53,7 +53,10 @@ class SettingsViewModel(
             hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
             keepScreenOn = preferences.keepScreenOn,
             devModeEnabled = preferences.devModeEnabled,
-            externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+            externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
+            trimMessagesEnabled = preferences.trimMessagesEnabled,
+            removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
+            smartImagePointingEnabled = preferences.smartImagePointingEnabled
         )
     )
     val state = _state.asStateFlow()
@@ -73,6 +76,9 @@ class SettingsViewModel(
         is SettingsUiEvent.OnKeepScreenOnToggle -> onKeepScreenOnToggle(event.enabled)
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
         is SettingsUiEvent.OnExternalLinkWarningToggle -> onExternalLinkWarningToggle(event.enabled)
+        is SettingsUiEvent.OnTrimMessagesToggle -> onTrimMessagesToggle(event.enabled)
+        is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
+        is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -174,6 +180,21 @@ class SettingsViewModel(
     private fun onExternalLinkWarningToggle(enabled: Boolean) {
         preferences.externalLinkWarningEnabled = enabled
         _state.update { it.copy(externalLinkWarningEnabled = enabled) }
+    }
+
+    private fun onTrimMessagesToggle(enabled: Boolean) {
+        preferences.trimMessagesEnabled = enabled
+        _state.update { it.copy(trimMessagesEnabled = enabled) }
+    }
+
+    private fun onRemoveImageMetadataToggle(enabled: Boolean) {
+        preferences.removeImageMetadataEnabled = enabled
+        _state.update { it.copy(removeImageMetadataEnabled = enabled) }
+    }
+
+    private fun onSmartImagePointingToggle(enabled: Boolean) {
+        preferences.smartImagePointingEnabled = enabled
+        _state.update { it.copy(smartImagePointingEnabled = enabled) }
     }
 
     private fun onWipeAppData() {

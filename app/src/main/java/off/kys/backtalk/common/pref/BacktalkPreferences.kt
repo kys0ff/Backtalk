@@ -51,6 +51,9 @@ class BacktalkPreferences(context: Context) {
     private val _keepScreenOn = mutableStateOf(prefs.getBoolean(KEY_KEEP_SCREEN_ON, BuildConfig.DEBUG))
     private val _devModeEnabled = mutableStateOf(prefs.getBoolean(KEY_DEV_MODE_ENABLED, BuildConfig.DEBUG))
     private val _externalLinkWarningEnabled = mutableStateOf(prefs.getBoolean(KEY_EXTERNAL_LINK_WARNING, true))
+    private val _trimMessagesEnabled = mutableStateOf(prefs.getBoolean(KEY_TRIM_MESSAGES, false))
+    private val _removeImageMetadataEnabled = mutableStateOf(prefs.getBoolean(KEY_REMOVE_IMAGE_METADATA, false))
+    private val _smartImagePointingEnabled = mutableStateOf(prefs.getBoolean(KEY_SMART_IMAGE_POINTING, false))
     private val _pairedDevicesJson = mutableStateOf(prefs.getString(KEY_PAIRED_DEVICES, "[]") ?: "[]")
     private val _firstLaunch = mutableStateOf(prefs.getBoolean(KEY_FIRST_LAUNCH, true))
     private val _deviceId = mutableStateOf(getOrCreateDeviceId())
@@ -96,6 +99,9 @@ class BacktalkPreferences(context: Context) {
             KEY_KEEP_SCREEN_ON -> _keepScreenOn.value = p.getBoolean(key, BuildConfig.DEBUG)
             KEY_DEV_MODE_ENABLED -> _devModeEnabled.value = p.getBoolean(key, false)
             KEY_EXTERNAL_LINK_WARNING -> _externalLinkWarningEnabled.value = p.getBoolean(key, true)
+            KEY_TRIM_MESSAGES -> _trimMessagesEnabled.value = p.getBoolean(key, false)
+            KEY_REMOVE_IMAGE_METADATA -> _removeImageMetadataEnabled.value = p.getBoolean(key, false)
+            KEY_SMART_IMAGE_POINTING -> _smartImagePointingEnabled.value = p.getBoolean(key, false)
             KEY_PAIRED_DEVICES -> _pairedDevicesJson.value = p.getString(key, "[]") ?: "[]"
             KEY_FIRST_LAUNCH -> _firstLaunch.value = p.getBoolean(key, true)
             null -> refreshAll() // Handle clear()
@@ -130,6 +136,9 @@ class BacktalkPreferences(context: Context) {
         _keepScreenOn.value = prefs.getBoolean(KEY_KEEP_SCREEN_ON, BuildConfig.DEBUG)
         _devModeEnabled.value = prefs.getBoolean(KEY_DEV_MODE_ENABLED, BuildConfig.DEBUG)
         _externalLinkWarningEnabled.value = prefs.getBoolean(KEY_EXTERNAL_LINK_WARNING, true)
+        _trimMessagesEnabled.value = prefs.getBoolean(KEY_TRIM_MESSAGES, false)
+        _removeImageMetadataEnabled.value = prefs.getBoolean(KEY_REMOVE_IMAGE_METADATA, false)
+        _smartImagePointingEnabled.value = prefs.getBoolean(KEY_SMART_IMAGE_POINTING, false)
         _pairedDevicesJson.value = prefs.getString(KEY_PAIRED_DEVICES, "[]") ?: "[]"
         _firstLaunch.value = prefs.getBoolean(KEY_FIRST_LAUNCH, true)
     }
@@ -176,6 +185,15 @@ class BacktalkPreferences(context: Context) {
 
         /** Preference key for enabling/disabling external link warning. */
         const val KEY_EXTERNAL_LINK_WARNING = "external_link_warning"
+
+        /** Preference key for trimming sent messages by default. */
+        const val KEY_TRIM_MESSAGES = "trim_messages"
+
+        /** Preference key for removing metadata from sent images. */
+        const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
+
+        /** Preference key for smart pointing image paths. */
+        const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
 
         /** Preference key for storing paired devices. */
         const val KEY_PAIRED_DEVICES = "paired_devices"
@@ -327,6 +345,36 @@ class BacktalkPreferences(context: Context) {
         set(value) {
             _externalLinkWarningEnabled.value = value
             prefs.edit { putBoolean(KEY_EXTERNAL_LINK_WARNING, value) }
+        }
+
+    /**
+     * Whether to trim sent messages by default.
+     */
+    var trimMessagesEnabled: Boolean
+        get() = _trimMessagesEnabled.value
+        set(value) {
+            _trimMessagesEnabled.value = value
+            prefs.edit { putBoolean(KEY_TRIM_MESSAGES, value) }
+        }
+
+    /**
+     * Whether to remove metadata from sent images.
+     */
+    var removeImageMetadataEnabled: Boolean
+        get() = _removeImageMetadataEnabled.value
+        set(value) {
+            _removeImageMetadataEnabled.value = value
+            prefs.edit { putBoolean(KEY_REMOVE_IMAGE_METADATA, value) }
+        }
+
+    /**
+     * Whether to use smart pointing for image paths instead of duplicating them.
+     */
+    var smartImagePointingEnabled: Boolean
+        get() = _smartImagePointingEnabled.value
+        set(value) {
+            _smartImagePointingEnabled.value = value
+            prefs.edit { putBoolean(KEY_SMART_IMAGE_POINTING, value) }
         }
 
     /**

@@ -157,7 +157,7 @@ private fun Module.useCaseModule() {
  */
 private fun Module.viewModelModule() {
     viewModel { MainViewModel(get(), get(), get()) }
-    viewModel { MessagesViewModel(get(), androidApplication()) }
+    viewModel { MessagesViewModel(get(), get(), androidApplication()) }
     viewModel { ThreadsViewModel(get()) }
     viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { SyncViewModel(get()) }

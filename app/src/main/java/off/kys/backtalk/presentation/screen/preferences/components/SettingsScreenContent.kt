@@ -182,6 +182,59 @@ fun SettingsScreenContent(
                 )
             }
 
+            // Chat Section
+            SettingsSection(title = stringResource(R.string.settings_chat)) {
+                SettingsToggle(
+                    label = stringResource(R.string.settings_trim_messages),
+                    supportingText = stringResource(R.string.settings_trim_messages_desc),
+                    icon = painterResource(R.drawable.round_content_cut_24px),
+                    checked = state.trimMessagesEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnTrimMessagesToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_remove_image_metadata),
+                    supportingText = stringResource(R.string.settings_remove_image_metadata_desc),
+                    icon = painterResource(R.drawable.round_description_24px),
+                    checked = state.removeImageMetadataEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnRemoveImageMetadataToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_smart_pointing_images),
+                    supportingText = stringResource(R.string.settings_smart_pointing_images_desc),
+                    icon = painterResource(R.drawable.round_arrow_or_edge_24px),
+                    checked = state.smartImagePointingEnabled,
+                    onCheckedChange = {
+                        onEvent(
+                            SettingsUiEvent.OnSmartImagePointingToggle(
+                                it
+                            )
+                        )
+                    }
+                )
+            }
+
             // Security Section
             SettingsSection(title = stringResource(R.string.settings_privacy_security)) {
                 if (context.isSecurityEnabled()) {

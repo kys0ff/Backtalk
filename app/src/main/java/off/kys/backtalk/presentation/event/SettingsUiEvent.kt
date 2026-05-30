@@ -21,6 +21,9 @@ sealed class SettingsUiEvent {
     data class OnKeepScreenOnToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnDevModeToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnExternalLinkWarningToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnTrimMessagesToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnRemoveImageMetadataToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnSmartImagePointingToggle(val enabled: Boolean) : SettingsUiEvent()
 
     data class ExportBackup(val uri: Uri, val password: String?) : SettingsUiEvent()
     data class CheckBackupEncryption(val uri: Uri) : SettingsUiEvent()

@@ -7,15 +7,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.manager.AlarmScheduler
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.util.HashUtils
+import off.kys.backtalk.util.MediaUtils
 import off.kys.backtalk.util.emptyString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -31,6 +36,7 @@ import java.io.File
  */
 class MessagesViewModel(
     private val useCases: MessagesUseCases,
+    private val preferences: BacktalkPreferences,
     private val application: Application
 ) : AndroidViewModel(application), KoinComponent {
 
@@ -149,22 +155,44 @@ class MessagesViewModel(
 
     private fun sendMediaMessages(uris: List<String>, type: String, description: String?) {
         val replyTo = _uiState.value.replyingTo
-        viewModelScope.launch {
+        val removeMetadata = preferences.removeImageMetadataEnabled && type.startsWith("image/")
+        val smartPointing = preferences.smartImagePointingEnabled
+
+        viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val mediaPaths = uris.mapNotNull { uri ->
                     val sourceUri = uri.toUri()
                     val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
                         ?: if (type.contains("video")) "mp4" else "jpg"
-                    val fileName =
-                        "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
+
                     val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
+
+                    val fileName = if (smartPointing) {
+                        val hash = application.contentResolver.openInputStream(sourceUri)?.use {
+                            HashUtils.calculateSha256(it)
+                        } ?: System.currentTimeMillis().toString()
+                        "media_$hash.$extension"
+                    } else {
+                        "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
+                    }
+
                     val destFile = File(mediaDir, fileName)
+
+                    // If smart pointing and file exists, reuse it
+                    if (smartPointing && destFile.exists()) {
+                        return@mapNotNull destFile.absolutePath
+                    }
 
                     application.contentResolver.openInputStream(sourceUri)?.use { input ->
                         destFile.outputStream().use { output ->
                             input.copyTo(output)
                         }
                     }
+
+                    if (removeMetadata) {
+                        MediaUtils.stripImageMetadata(destFile)
+                    }
+
                     destFile.absolutePath
                 }
 
@@ -184,7 +212,9 @@ class MessagesViewModel(
                         )
                     }
                 }
-                _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+                withContext(Dispatchers.Main) {
+                    _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+                }
             }
         }
         updateReply(null)
@@ -234,10 +264,11 @@ class MessagesViewModel(
             return
         }
 
+        val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
             useCases.scheduleMessage(
-                text = text,
+                text = trimmedText,
                 scheduledTime = scheduledTime,
                 repliedToId = replyTo?.id
             )
@@ -283,6 +314,7 @@ class MessagesViewModel(
      */
     private fun sendMessage(text: String) {
         val editingMessage = _uiState.value.editingMessage
+        val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
 
         if (editingMessage != null) {
             val currentTime = System.currentTimeMillis()
@@ -294,7 +326,7 @@ class MessagesViewModel(
                 val previousVisibleText = editingMessage.editedText ?: editingMessage.text
                 useCases.insertMessage(
                     editingMessage.copy(
-                        editedText = text,
+                        editedText = trimmedText,
                         text = previousVisibleText,
                         editedAt = System.currentTimeMillis()
                     )
@@ -309,7 +341,7 @@ class MessagesViewModel(
             useCases.insertMessage(
                 MessageEntity(
                     id = MessageId.generate(),
-                    text = text,
+                    text = trimmedText,
                     timestamp = System.currentTimeMillis(),
                     repliedToId = replyTo?.id
                 )
@@ -347,8 +379,11 @@ class MessagesViewModel(
         viewModelScope.launch {
             ids.forEach { id ->
                 val message = messages.find { it.id == id }
-                if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-                    useCases.deleteMessageById(id)
+                if (message != null) {
+                    val isWithinWindow = (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+                    if (isWithinWindow) {
+                        useCases.deleteMessageById(id)
+                    }
                 }
             }
         }
@@ -364,10 +399,11 @@ class MessagesViewModel(
         viewModelScope.launch {
             selectedImagePaths.forEach { (messageId, paths) ->
                 val message = messages.find { it.id == messageId }
-                if (messageId !in selectedMessageIds &&
-                    message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
-                ) {
-                    useCases.removeImagesFromMessage(messageId, paths)
+                if (messageId !in selectedMessageIds && message != null) {
+                    val isWithinWindow = (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+                    if (isWithinWindow) {
+                        useCases.removeImagesFromMessage(messageId, paths)
+                    }
                 }
             }
         }
