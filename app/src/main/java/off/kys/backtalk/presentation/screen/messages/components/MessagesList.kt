@@ -91,20 +91,20 @@ fun MessagesList(
                 }
 
                 SwipeToReplyWrapper(
-                    onSwipeRight = if (canEdit) {
+                    startIconRes = R.drawable.round_reply_24,
+                    onSwipeStart = {
+                        if (!selectionMode) {
+                            onReply(current)
+                        }
+                    },
+                    endIconRes = R.drawable.round_edit_24,
+                    onSwipeEnd = if (canEdit) {
                         {
                             if (!selectionMode) {
                                 onEditMessage(current)
                             }
                         }
-                    } else null,
-                    onSwipeLeft = {
-                        if (!selectionMode) {
-                            onReply(current)
-                        }
-                    },
-                    leftIconRes = R.drawable.round_reply_24,
-                    rightIconRes = R.drawable.round_edit_24
+                    } else null
                 ) {
                     MessageBubble(
                         messageEntity = current,

@@ -26,8 +26,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -37,42 +39,42 @@ import kotlin.math.roundToInt
 
 /**
  * A wrapper component that enables swipe-to-action (e.g., swipe-to-reply) functionality
- * for its content. It supports both left and right swipes with customizable icons,
- * resistance effects, and haptic feedback upon reaching the activation threshold.
+ * for its content. It dynamically adjusts to LTR and RTL layouts natively.
  *
- * @param onSwipeLeft Optional callback triggered when the user swipes left beyond the threshold.
- * @param onSwipeRight Optional callback triggered when the user swipes right beyond the threshold.
- * @param leftIconRes The drawable resource ID for the icon displayed during a left swipe.
- * @param rightIconRes The drawable resource ID for the icon displayed during a right swipe.
+ * @param onSwipeStart Optional callback triggered when swiping from Start-to-End (reveals start action).
+ * @param onSwipeEnd Optional callback triggered when swiping from End-to-Start (reveals end action).
+ * @param startIconRes The drawable resource ID for the icon displayed during a start-to-end swipe.
+ * @param endIconRes The drawable resource ID for the icon displayed during an end-to-start swipe.
  * @param content The composable content to be wrapped and made swipeable.
  */
 @Composable
 fun SwipeToReplyWrapper(
-    onSwipeLeft: (() -> Unit)? = null,
-    onSwipeRight: (() -> Unit)? = null,
-    @DrawableRes leftIconRes: Int,
-    @DrawableRes rightIconRes: Int,
+    onSwipeStart: (() -> Unit)? = null,
+    onSwipeEnd: (() -> Unit)? = null,
+    @DrawableRes startIconRes: Int,
+    @DrawableRes endIconRes: Int,
     content: @Composable () -> Unit
 ) {
     val preferences = koinInject<BacktalkPreferences>()
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     val actionThreshold = remember(density) { with(density) { 60.dp.toPx() } }
     val maxDrag = remember(density) { with(density) { 100.dp.toPx() } }
 
-    val offsetX = remember { Animatable(0f) }
+    val directionalOffset = remember { Animatable(0f) }
 
     val isPastThreshold by remember {
-        derivedStateOf { abs(offsetX.value) >= actionThreshold }
+        derivedStateOf { abs(directionalOffset.value) >= actionThreshold }
     }
 
     val currentSwipeDirection by remember {
         derivedStateOf {
             when {
-                offsetX.value > 0 -> SwipeDirection.RIGHT
-                offsetX.value < 0 -> SwipeDirection.LEFT
+                directionalOffset.value > 0 -> SwipeDirection.START
+                directionalOffset.value < 0 -> SwipeDirection.END
                 else -> null
             }
         }
@@ -97,36 +99,38 @@ fun SwipeToReplyWrapper(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(onSwipeLeft, onSwipeRight) {
+            .pointerInput(onSwipeStart, onSwipeEnd) {
                 detectHorizontalDragGestures(
                     onDragStart = { hasVibratedThreshold = false },
                     onDragEnd = {
                         scope.launch {
                             if (isPastThreshold) {
-                                if (offsetX.value > 0) onSwipeRight?.invoke()
-                                else onSwipeLeft?.invoke()
+                                if (directionalOffset.value > 0) onSwipeStart?.invoke()
+                                else onSwipeEnd?.invoke()
                             }
-                            offsetX.animateTo(
+                            directionalOffset.animateTo(
                                 0f,
                                 spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMediumLow)
                             )
                         }
                     },
-                    onDragCancel = { scope.launch { offsetX.animateTo(0f) } },
+                    onDragCancel = { scope.launch { directionalOffset.animateTo(0f) } },
                     onHorizontalDrag = { change, dragAmount ->
-                        val currentX = offsetX.value
+                        val directionalDrag = if (isRtl) -dragAmount else dragAmount
+
+                        val currentX = directionalOffset.value
                         val dragFactor = 1f - (abs(currentX) / (maxDrag * 1.5f))
-                        val resistedDrag = dragAmount * dragFactor.coerceIn(0.2f, 1f)
+                        val resistedDrag = directionalDrag * dragFactor.coerceIn(0.2f, 1f)
                         val rawNewOffset = currentX + resistedDrag
 
                         val newOffset = when {
-                            onSwipeRight != null && onSwipeLeft != null -> rawNewOffset.coerceIn(
+                            onSwipeStart != null && onSwipeEnd != null -> rawNewOffset.coerceIn(
                                 -maxDrag,
                                 maxDrag
                             )
 
-                            onSwipeRight != null -> rawNewOffset.coerceIn(0f, maxDrag)
-                            onSwipeLeft != null -> rawNewOffset.coerceIn(-maxDrag, 0f)
+                            onSwipeStart != null -> rawNewOffset.coerceIn(0f, maxDrag)
+                            onSwipeEnd != null -> rawNewOffset.coerceIn(-maxDrag, 0f)
                             else -> 0f
                         }
 
@@ -139,29 +143,33 @@ fun SwipeToReplyWrapper(
                             }
                         }
 
-                        scope.launch { offsetX.snapTo(newOffset) }
+                        scope.launch { directionalOffset.snapTo(newOffset) }
                         change.consume()
                     }
                 )
             }
     ) {
         if (currentSwipeDirection != null) {
-            val isRightSwipe = currentSwipeDirection == SwipeDirection.RIGHT
-            val currentIcon = if (isRightSwipe) rightIconRes else leftIconRes
+            val isStartSwipe = currentSwipeDirection == SwipeDirection.START
+            val currentIcon = if (isStartSwipe) startIconRes else endIconRes
+            val alignment = if (isStartSwipe) Alignment.CenterStart else Alignment.CenterEnd
 
             Box(
                 modifier = Modifier
-                    .align(if (isRightSwipe) Alignment.CenterStart else Alignment.CenterEnd)
+                    .align(alignment)
                     .padding(horizontal = 16.dp)
+                    .offset {
+                        val xOffset = if (isStartSwipe) {
+                            (directionalOffset.value - actionThreshold).coerceAtMost(0f) / 2f
+                        } else {
+                            (directionalOffset.value + actionThreshold).coerceAtLeast(0f) / 2f
+                        }
+                        IntOffset(xOffset.roundToInt(), 0)
+                    }
                     .graphicsLayer {
-                        alpha = (abs(offsetX.value) / actionThreshold).coerceIn(0f, 1f)
+                        alpha = (abs(directionalOffset.value) / actionThreshold).coerceIn(0f, 1f)
                         scaleX = iconScale
                         scaleY = iconScale
-                        translationX = if (isRightSwipe) {
-                            (offsetX.value - actionThreshold).coerceAtMost(0f) / 2f
-                        } else {
-                            (offsetX.value + actionThreshold).coerceAtLeast(0f) / 2f
-                        }
                     }
             ) {
                 Icon(
@@ -169,9 +177,7 @@ fun SwipeToReplyWrapper(
                     contentDescription = null,
                     modifier = Modifier
                         .size(24.dp)
-                        .graphicsLayer {
-                            rotationY = if (isRightSwipe) 0f else 180f
-                        },
+                        .graphicsLayer { rotationY = if (isStartSwipe) 0f else 180f },
                     tint = iconTint
                 )
             }
@@ -179,7 +185,7 @@ fun SwipeToReplyWrapper(
 
         Box(
             modifier = Modifier.offset {
-                IntOffset(offsetX.value.roundToInt(), 0)
+                IntOffset(directionalOffset.value.roundToInt(), 0)
             }
         ) {
             content()
@@ -187,9 +193,6 @@ fun SwipeToReplyWrapper(
     }
 }
 
-/**
- * Internal enum to track the direction of the current swipe gesture.
- */
 private enum class SwipeDirection {
-    LEFT, RIGHT
+    START, END
 }
