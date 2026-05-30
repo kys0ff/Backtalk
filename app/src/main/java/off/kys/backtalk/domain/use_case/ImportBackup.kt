@@ -3,7 +3,6 @@ package off.kys.backtalk.domain.use_case
 import android.content.Context
 import android.net.Uri
 import kotlinx.serialization.json.Json
-import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.domain.model.BackupData
@@ -89,21 +88,7 @@ class ImportBackup(
             }
 
             // Restore Preferences
-            backupData.preferences.forEach { (key, value) ->
-                when (key) {
-                    BacktalkPreferences.KEY_THEME_MODE -> preferences.themeMode =
-                        ThemeMode.valueOf(value)
-                    BacktalkPreferences.KEY_DYNAMIC_COLOR -> preferences.dynamicColorEnabled =
-                        value.toBoolean()
-                    BacktalkPreferences.KEY_LOCK_ENABLED -> preferences.lockEnabled =
-                        value.toBoolean()
-                    BacktalkPreferences.KEY_SECURE_SCREEN -> preferences.secureScreenEnabled =
-                        value.toBoolean()
-                    BacktalkPreferences.KEY_AUTO_UPDATE -> preferences.autoUpdateEnabled =
-                        value.toBoolean()
-
-                }
-            }
+            preferences.importPreferences(backupData.preferences)
 
             // Restore Media and Messages
             val mediaDir = File(context.filesDir, "media").apply { mkdirs() }

@@ -29,13 +29,7 @@ class ExportBackup(
      */
     suspend operator fun invoke(uri: Uri, password: String?): Result<Unit> = runCatching {
         val messages = messagesRepository.getAllMessages().first()
-        val prefsMap = mapOf(
-            BacktalkPreferences.KEY_THEME_MODE to preferences.themeMode.name,
-            BacktalkPreferences.KEY_DYNAMIC_COLOR to preferences.dynamicColorEnabled.toString(),
-            BacktalkPreferences.KEY_LOCK_ENABLED to preferences.lockEnabled.toString(),
-            BacktalkPreferences.KEY_SECURE_SCREEN to preferences.secureScreenEnabled.toString(),
-            BacktalkPreferences.KEY_AUTO_UPDATE to preferences.autoUpdateEnabled.toString()
-        )
+        val prefsMap = preferences.getExportablePreferences()
 
         val backupData = BackupData(messages = messages, preferences = prefsMap)
         val json = Json.encodeToString(backupData)
