@@ -48,7 +48,9 @@ fun MessagesContent(
     onTogglePinnedDialog: (Boolean) -> Unit,
     onTogglePin: (MessageEntity, Boolean) -> Unit,
     onScrollToMessage: (MessageId) -> Unit,
-    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> }
+    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
+    totalDeletableCount: Int = 0,
+    totalSelectedCount: Int = 0
 ) {
     val context = LocalContext.current
 
@@ -106,15 +108,9 @@ fun MessagesContent(
         }
 
         if (state.showDeleteConfirmation) {
-            val selectedMessagesCount = state.selectedMessageIds.size
-            
-            // Re-calculate the actual items being deleted, same as in MessagesScreen
-            val totalToDelete = selectedMessagesCount + state.selectedImagePaths.filterKeys { 
-                it !in state.selectedMessageIds 
-            }.values.sumOf { it.size }
-
             DeleteConfirmationDialog(
-                selectedCount = totalToDelete,
+                selectedCount = totalDeletableCount,
+                totalSelectedCount = totalSelectedCount,
                 onConfirm = onConfirmDelete,
                 onDismiss = onDismissDelete
             )

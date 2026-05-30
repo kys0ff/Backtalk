@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat.enableEdgeToEdge
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
@@ -60,6 +61,20 @@ fun MessagesScreenContent(
     val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
         it !in state.selectedMessageIds
     }.values.sumOf { it.size }
+
+    val currentTime = System.currentTimeMillis()
+    val deletableMessagesCount = state.messages.count {
+        it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+    }
+
+    val deletableImagesCount = state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
+        val message = state.messages.find { it.id == messageId }
+        if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+            paths.size
+        } else 0
+    }
+
+    val totalDeletableCount = deletableMessagesCount + deletableImagesCount
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
@@ -169,7 +184,8 @@ fun MessagesScreenContent(
                 tags = tags,
                 selectedTag = state.selectedTag,
                 onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
-                isImageSelectionOnly = selectedMessagesCount == 0 && selectedImagesCount > 0
+                isImageSelectionOnly = selectedMessagesCount == 0 && selectedImagesCount > 0,
+                canDelete = totalDeletableCount > 0
             )
         },
         bottomBar = {
@@ -250,7 +266,9 @@ fun MessagesScreenContent(
             },
             onToggleImageSelect = { messageId, imagePath ->
                 onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
-            }
+            },
+            totalDeletableCount = totalDeletableCount,
+            totalSelectedCount = totalSelectedCount
         )
     }
 }

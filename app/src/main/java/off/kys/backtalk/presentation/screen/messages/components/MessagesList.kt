@@ -75,9 +75,10 @@ fun MessagesList(
 
             val isSelected = current.id in selectedMessageIds
 
-            val oneHourInMillis = 3600000L
+            val isLocked = (System.currentTimeMillis() - current.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW
+
             val canEdit = current.editedAt == null &&
-            (System.currentTimeMillis() - current.timestamp) < oneHourInMillis &&
+            !isLocked &&
             current.voicePath == null
 
             Column(
@@ -128,7 +129,8 @@ fun MessagesList(
                         highlightQuery = searchQuery,
                         onTagClick = onTagClick,
                         selectedImagePaths = selectedImagePaths[current.id] ?: emptySet(),
-                        onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) }
+                        onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) },
+                        isLocked = isLocked
                     )
                 }
             }

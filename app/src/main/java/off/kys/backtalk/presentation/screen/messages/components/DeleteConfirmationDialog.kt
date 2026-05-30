@@ -20,8 +20,11 @@ import off.kys.backtalk.R
 fun DeleteConfirmationDialog(
     selectedCount: Int,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    totalSelectedCount: Int = selectedCount
 ) {
+    val skippedCount = totalSelectedCount - selectedCount
+
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
@@ -45,6 +48,13 @@ fun DeleteConfirmationDialog(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+                if (skippedCount > 0) {
+                    Text(
+                        text = "Note: $skippedCount messages older than 1 hour will not be deleted.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
                 Text(
                     text = stringResource(R.string.chat_delete_undone_warning),
                     style = MaterialTheme.typography.bodyMedium,

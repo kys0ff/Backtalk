@@ -95,7 +95,8 @@ fun MessagesTopBar(
     tags: List<String>,
     selectedTag: String?,
     onTagClick: (String) -> Unit,
-    isImageSelectionOnly: Boolean = false
+    isImageSelectionOnly: Boolean = false,
+    canDelete: Boolean = true
 ) {
     val appBarColors = TopAppBarDefaults.topAppBarColors()
     val colorTransitionFraction = scrollBehavior.state.overlappedFraction
@@ -135,7 +136,8 @@ fun MessagesTopBar(
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors,
                     showPin = !isImageSelectionOnly && selectedCount == 1,
-                    showCopy = !isImageSelectionOnly
+                    showCopy = !isImageSelectionOnly,
+                    canDelete = canDelete
                 )
             }
 
@@ -311,7 +313,8 @@ private fun SelectionTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors,
     showPin: Boolean,
-    showCopy: Boolean
+    showCopy: Boolean,
+    canDelete: Boolean = true
 ) {
     TopAppBar(
         title = { Text(stringResource(R.string.chat_selection_count, selectedCount)) },
@@ -337,12 +340,12 @@ private fun SelectionTopBar(
                     }
                 }
             }
-            HintTooltip(stringResource(R.string.common_delete)) {
-                IconButton(onClick = onDelete) {
+            HintTooltip(if (canDelete) stringResource(R.string.common_delete) else "Cannot delete messages older than 1 hour") {
+                IconButton(onClick = onDelete, enabled = canDelete) {
                     Icon(
                         painter = painterResource(R.drawable.round_delete_24),
                         contentDescription = stringResource(R.string.common_delete),
-                        tint = MaterialTheme.colorScheme.error
+                        tint = if (canDelete) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
                     )
                 }
             }

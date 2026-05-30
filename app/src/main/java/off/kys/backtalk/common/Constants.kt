@@ -17,4 +17,9 @@ object Constants {
      */
     val TIME_GAP_FOR_GROUPING = TimeUnit.MINUTES.toMillis(1)
 
+    /**
+     * The time window during which a message can be edited or deleted.
+     */
+    val MESSAGE_EDIT_DELETE_WINDOW = TimeUnit.HOURS.toMillis(1)
+
 }

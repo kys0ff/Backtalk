@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
@@ -284,9 +285,12 @@ class MessagesViewModel(
         val editingMessage = _uiState.value.editingMessage
 
         if (editingMessage != null) {
+            val currentTime = System.currentTimeMillis()
+            if ((currentTime - editingMessage.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+                updateEditingMessage(null)
+                return
+            }
             viewModelScope.launch {
-                // editedText stores the previous visible text (shown strikethrough in UI).
-                // The previous visible text is editedText ?: text (same logic as UI rendering).
                 val previousVisibleText = editingMessage.editedText ?: editingMessage.text
                 useCases.insertMessage(
                     editingMessage.copy(
@@ -316,8 +320,12 @@ class MessagesViewModel(
     }
 
     private fun removeImageFromMessage(messageId: MessageId, imagePath: String) {
-        viewModelScope.launch {
-            useCases.removeImageFromMessage(messageId, imagePath)
+        val message = _uiState.value.messages.find { it.id == messageId }
+        val currentTime = System.currentTimeMillis()
+        if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+            viewModelScope.launch {
+                useCases.removeImageFromMessage(messageId, imagePath)
+            }
         }
     }
 
@@ -333,8 +341,16 @@ class MessagesViewModel(
 
     private fun deleteSelected() {
         val ids = _uiState.value.selectedMessageIds
+        val messages = _uiState.value.messages
+        val currentTime = System.currentTimeMillis()
+
         viewModelScope.launch {
-            ids.forEach { useCases.deleteMessageById(it) }
+            ids.forEach { id ->
+                val message = messages.find { it.id == id }
+                if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+                    useCases.deleteMessageById(id)
+                }
+            }
         }
         _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
     }
@@ -342,11 +358,15 @@ class MessagesViewModel(
     private fun deleteSelectedImages() {
         val selectedImagePaths = _uiState.value.selectedImagePaths
         val selectedMessageIds = _uiState.value.selectedMessageIds
-        
+        val messages = _uiState.value.messages
+        val currentTime = System.currentTimeMillis()
+
         viewModelScope.launch {
             selectedImagePaths.forEach { (messageId, paths) ->
-                // Only delete images if the message itself is NOT being deleted
-                if (messageId !in selectedMessageIds) {
+                val message = messages.find { it.id == messageId }
+                if (messageId !in selectedMessageIds &&
+                    message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+                ) {
                     useCases.removeImagesFromMessage(messageId, paths)
                 }
             }
