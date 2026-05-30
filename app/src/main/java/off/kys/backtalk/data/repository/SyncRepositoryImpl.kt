@@ -44,13 +44,11 @@ class SyncRepositoryImpl(
     private var pendingPairingDevice: DeviceInfo? = null
     private var pairingResponseDeferred: CompletableDeferred<Boolean>? = null
 
-    private fun loadPairedDevices(): List<DeviceInfo> {
-        return try {
-            json.decodeFromString<List<DeviceInfo>>(preferences.pairedDevicesJson)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
+    private fun loadPairedDevices(): List<DeviceInfo> = try {
+        json.decodeFromString<List<DeviceInfo>>(preferences.pairedDevicesJson ?: "[]")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        emptyList()
     }
 
     private fun savePairedDevices(devices: List<DeviceInfo>) {
