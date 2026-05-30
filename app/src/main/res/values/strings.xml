@@ -282,6 +282,9 @@
 
     <!-- Pinned Messages -->
     <string name="pinned_message">Pinned Message</string>
+    <string name="pinned_messages_title">Pinned Messages</string>
+    <string name="pinned_messages_empty">No pinned messages</string>
+    <string name="pinned_messages_unpin_cd">Unpin message</string>
     <string name="pinned_message_with_index">Pinned Message (%1$d/%2$d)</string>
     <string name="pinned_message_jump_label">Jump to pinned message</string>
     <plurals name="pinned_message_view_all">

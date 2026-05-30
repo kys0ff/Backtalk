@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -31,7 +31,7 @@ import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
 
 /**
- * A dialog that displays a list of all pinned messages using Material 3 specifications.
+ * A refined, compact dialog displaying pinned messages using modern Material 3 spacing.
  */
 @Composable
 fun PinnedMessagesDialog(
@@ -46,13 +46,14 @@ fun PinnedMessagesDialog(
             Icon(
                 painter = painterResource(R.drawable.round_push_pin_24),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
             )
         },
         title = {
             Text(
-                text = "Pinned Messages",
-                style = MaterialTheme.typography.headlineSmall
+                text = stringResource(R.string.pinned_messages_title),
+                style = MaterialTheme.typography.titleMedium
             )
         },
         text = {
@@ -60,11 +61,11 @@ fun PinnedMessagesDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp),
+                        .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No pinned messages",
+                        text = stringResource(R.string.pinned_messages_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -72,8 +73,8 @@ fun PinnedMessagesDialog(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     items(pinnedMessages, key = { it.id() }) { message ->
                         PinnedMessageItem(
@@ -87,7 +88,10 @@ fun PinnedMessagesDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.common_close))
+                Text(
+                    text = stringResource(R.string.common_close),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     )
@@ -102,38 +106,37 @@ private fun PinnedMessageItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
             .clickable(
                 onClick = onClick,
                 role = Role.Button
             )
-            .padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+            .padding(start = 12.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(min = 40.dp),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             SmartText(
                 text = message.editedText ?: message.text,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
         IconButton(
             onClick = onUnpinClick,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.size(36.dp)
         ) {
             Icon(
                 painter = painterResource(R.drawable.round_keep_off_24),
-                contentDescription = "Unpin message",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                contentDescription = stringResource(R.string.pinned_messages_unpin_cd),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(18.dp)
             )
         }
     }

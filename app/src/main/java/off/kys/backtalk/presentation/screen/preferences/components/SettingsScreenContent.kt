@@ -14,18 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,10 +44,6 @@ import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.isSecurityEnabled
 import off.kys.backtalk.util.toast
 
-/**
- * Stateless content for the Settings screen.
- * This allows the screen to be previewed without requiring a running Koin application.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
@@ -158,8 +149,7 @@ fun SettingsScreenContent(
             SettingsSection(title = stringResource(R.string.settings_appearance)) {
                 SettingsItem(
                     label = stringResource(R.string.settings_theme),
-                    value = state.themeMode.name.lowercase()
-                        .replaceFirstChar { it.uppercase() },
+                    value = state.themeMode.name.lowercase().replaceFirstChar { it.uppercase() },
                     icon = painterResource(R.drawable.round_brightness_6_24),
                     onClick = { showThemeDialog.value = true }
                 )
@@ -184,13 +174,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_dynamic_color_desc),
                     icon = painterResource(R.drawable.round_palette_24),
                     checked = state.dynamicColorEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnDynamicColorToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnDynamicColorToggle(it)) }
                 )
             }
 
@@ -201,13 +185,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_trim_messages_desc),
                     icon = painterResource(R.drawable.round_content_cut_24px),
                     checked = state.trimMessagesEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnTrimMessagesToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnTrimMessagesToggle(it)) }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -219,13 +197,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_remove_image_metadata_desc),
                     icon = painterResource(R.drawable.round_description_24),
                     checked = state.removeImageMetadataEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnRemoveImageMetadataToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnRemoveImageMetadataToggle(it)) }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -237,13 +209,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_smart_pointing_images_desc),
                     icon = painterResource(R.drawable.round_arrow_or_edge_24),
                     checked = state.smartImagePointingEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnSmartImagePointingToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnSmartImagePointingToggle(it)) }
                 )
             }
 
@@ -268,13 +234,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_secure_screen_summary),
                     icon = painterResource(R.drawable.round_screen_lock_portrait_24),
                     checked = state.secureScreenEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnSecureScreenToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnSecureScreenToggle(it)) }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -286,13 +246,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_external_link_warning_desc),
                     icon = painterResource(R.drawable.round_warning_24),
                     checked = state.externalLinkWarningEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnExternalLinkWarningToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnExternalLinkWarningToggle(it)) }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -304,13 +258,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_haptic_feedback_desc),
                     icon = painterResource(R.drawable.round_vibration_24),
                     checked = state.hapticFeedbackEnabled,
-                    onCheckedChange = {
-                        onEvent(
-                            SettingsUiEvent.OnHapticFeedbackToggle(
-                                it
-                            )
-                        )
-                    }
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnHapticFeedbackToggle(it)) }
                 )
             }
 
@@ -333,11 +281,7 @@ fun SettingsScreenContent(
                     icon = painterResource(R.drawable.round_reply_24),
                     onClick = {
                         importLauncher.launch(
-                            arrayOf(
-                                "application/json",
-                                "application/octet-stream",
-                                "*/*"
-                            )
+                            arrayOf("application/json", "application/octet-stream", "*/*")
                         )
                     }
                 )
@@ -388,10 +332,7 @@ fun SettingsScreenContent(
                             color = MaterialTheme.colorScheme.outlineVariant
                         )
                         val folderName = state.autoExportUri?.let {
-                            DocumentFile.fromTreeUri(
-                                context,
-                                it.toUri()
-                            )?.name
+                            DocumentFile.fromTreeUri(context, it.toUri())?.name
                         } ?: stringResource(R.string.auto_export_no_folder)
                         SettingsItem(
                             label = stringResource(R.string.auto_export_folder),
@@ -410,11 +351,7 @@ fun SettingsScreenContent(
                             icon = painterResource(R.drawable.round_lock_24),
                             checked = state.autoExportEncrypted,
                             onCheckedChange = {
-                                onEvent(
-                                    SettingsUiEvent.OnAutoExportEncryptionToggle(
-                                        it
-                                    )
-                                )
+                                onEvent(SettingsUiEvent.OnAutoExportEncryptionToggle(it))
                                 if (it && state.autoExportPassword.isNullOrBlank()) {
                                     showAutoExportPasswordDialog.value = true
                                 }
@@ -442,13 +379,7 @@ fun SettingsScreenContent(
                         supportingText = stringResource(R.string.settings_auto_check_updates_desc),
                         icon = painterResource(R.drawable.round_update_24),
                         checked = state.autoUpdateEnabled,
-                        onCheckedChange = {
-                            onEvent(
-                                SettingsUiEvent.OnAutoUpdateToggle(
-                                    it
-                                )
-                            )
-                        }
+                        onCheckedChange = { onEvent(SettingsUiEvent.OnAutoUpdateToggle(it)) }
                     )
                     SettingsItem(
                         label = stringResource(R.string.settings_check_updates_now),
@@ -522,13 +453,7 @@ fun SettingsScreenContent(
                         supportingText = stringResource(R.string.settings_stay_awake_desc),
                         icon = painterResource(R.drawable.round_visibility_24),
                         checked = state.keepScreenOn,
-                        onCheckedChange = {
-                            onEvent(
-                                SettingsUiEvent.OnKeepScreenOnToggle(
-                                    it
-                                )
-                            )
-                        }
+                        onCheckedChange = { onEvent(SettingsUiEvent.OnKeepScreenOnToggle(it)) }
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -548,14 +473,14 @@ fun SettingsScreenContent(
         }
     }
 
-    // Dialogs
+    // Extracted & External Custom Dialog Handlers
     if (showThemeDialog.value) {
         ThemeSelectionDialog(
             selected = state.themeMode,
             onDismiss = { showThemeDialog.value = false },
             onSelected = {
-                onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value =
-                false
+                onEvent(SettingsUiEvent.OnThemeModeChange(it))
+                showThemeDialog.value = false
             }
         )
     }
@@ -576,18 +501,14 @@ fun SettingsScreenContent(
             onDismiss = {
                 showExportDialog.value = false
                 selectedUri?.let { uri ->
-                    runCatching {
-                        DocumentsContract.deleteDocument(context.contentResolver, uri)
-                    }
+                    runCatching { DocumentsContract.deleteDocument(context.contentResolver, uri) }
                 }
                 selectedUri = null
             },
             onConfirm = { exportPassword ->
                 showExportDialog.value = false
                 selectedUri?.let { uri ->
-                    onEvent(
-                        SettingsUiEvent.ExportBackup(uri, exportPassword)
-                    )
+                    onEvent(SettingsUiEvent.ExportBackup(uri, exportPassword))
                 }
                 selectedUri = null
             }
@@ -607,9 +528,7 @@ fun SettingsScreenContent(
                     showPasswordDialog.value = true
                 } else {
                     state.selectedBackupUri?.let { uri ->
-                        onEvent(
-                            SettingsUiEvent.ImportBackup(uri, null, clearAndImport)
-                        )
+                        onEvent(SettingsUiEvent.ImportBackup(uri, null, clearAndImport))
                     }
                 }
             }
@@ -660,79 +579,27 @@ fun SettingsScreenContent(
     }
 
     if (showOldBackupWarning.value) {
-        AlertDialog(
-            onDismissRequest = {
+        OldBackupWarningDialog(
+            onDismiss = {
                 showOldBackupWarning.value = false
                 onEvent(SettingsUiEvent.ResetBackupState)
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(R.drawable.round_warning_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            title = { Text(stringResource(R.string.backup_old_format_warning_title)) },
-            text = { Text(stringResource(R.string.backup_old_format_warning_message)) },
-            confirmButton = {
-                Button(onClick = {
-                    showOldBackupWarning.value = false
-                    onEvent(SettingsUiEvent.ResetBackupState)
-                }) {
-                    Text(stringResource(R.string.common_ok))
-                }
             }
         )
     }
 
     if (showWipeDataDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showWipeDataDialog.value = false },
-            icon = {
-                Icon(
-                    painter = painterResource(R.drawable.round_warning_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-            },
-            title = { Text(stringResource(R.string.settings_wipe_data_confirm_title)) },
-            text = { Text(stringResource(R.string.settings_wipe_data_confirm_message)) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showWipeDataDialog.value = false
-                        onEvent(SettingsUiEvent.WipeAppData)
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.common_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showWipeDataDialog.value = false }) {
-                    Text(stringResource(R.string.common_cancel))
-                }
+        WipeDataDialog(
+            onDismiss = { showWipeDataDialog.value = false },
+            onConfirm = {
+                showWipeDataDialog.value = false
+                onEvent(SettingsUiEvent.WipeAppData)
             }
         )
     }
 
     if (showExperimentalSyncDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showExperimentalSyncDialog.value = false },
-            icon = {
-                Icon(
-                    painter = painterResource(R.drawable.round_warning_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-            },
-            title = { Text(stringResource(R.string.settings_experimental_sync_title)) },
-            text = { Text(stringResource(R.string.settings_experimental_sync_message)) },
-            confirmButton = {
-                TextButton(onClick = { showExperimentalSyncDialog.value = false }) {
-                    Text(stringResource(R.string.common_ok))
-                }
-            }
+        ExperimentalSyncDialog(
+            onDismiss = { showExperimentalSyncDialog.value = false }
         )
     }
 }

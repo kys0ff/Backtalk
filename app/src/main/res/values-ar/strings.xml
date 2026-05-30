@@ -285,6 +285,9 @@
 
     <!-- Pinned Messages -->
     <string name="pinned_message">رسالة مثبتة</string>
+    <string name="pinned_messages_title">الرسائل المثبتة</string>
+    <string name="pinned_messages_empty">لا توجد رسائل مثبتة</string>
+    <string name="pinned_messages_unpin_cd">إلغاء تثبيت الرسالة</string>
     <string name="pinned_message_with_index">رسالة مثبتة (%1$d/%2$d)</string>
     <string name="pinned_message_jump_label">انتقال للرسالة المثبتة</string>
     <plurals name="pinned_message_view_all">
