@@ -139,7 +139,7 @@ fun PinnedMessageBar(
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.round_pinboard_24px),
+                    painter = painterResource(R.drawable.round_pinboard_24),
                     contentDescription = pluralStringResource(
                         R.plurals.pinned_message_view_all,
                         pinnedMessages.size,

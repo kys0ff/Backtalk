@@ -558,8 +558,8 @@ private fun GridImage(
                 .crossfade(true)
                 .build(),
             contentDescription = null,
-            placeholder = painterResource(R.drawable.round_progress_activity_24px),
-            error = painterResource(R.drawable.round_broken_image_24px),
+            placeholder = painterResource(R.drawable.round_progress_activity_24),
+            error = painterResource(R.drawable.round_broken_image_24),
             contentScale = contentScale,
         )
 

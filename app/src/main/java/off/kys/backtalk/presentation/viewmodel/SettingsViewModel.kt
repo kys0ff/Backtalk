@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.worker.AutoExportWorker
@@ -41,6 +44,9 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(
         SettingsUiState(
             themeMode = preferences.themeMode,
+            appLanguage = AppLanguage.fromTag(
+                AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            ),
             dynamicColorEnabled = preferences.dynamicColorEnabled,
             lockEnabled = preferences.lockEnabled,
             secureScreenEnabled = preferences.secureScreenEnabled,
@@ -63,6 +69,7 @@ class SettingsViewModel(
 
     fun onEvent(event: SettingsUiEvent) = when (event) {
         is SettingsUiEvent.OnThemeModeChange -> onThemeModeChange(event.themeMode)
+        is SettingsUiEvent.OnLanguageChange -> onLanguageChange(event.language)
         is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
         is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
         is SettingsUiEvent.OnSecureScreenToggle -> onSecureScreenToggle(event.enabled)
@@ -96,6 +103,16 @@ class SettingsViewModel(
     private fun onThemeModeChange(themeMode: ThemeMode) {
         preferences.themeMode = themeMode
         _state.update { it.copy(themeMode = themeMode) }
+    }
+
+    private fun onLanguageChange(language: AppLanguage) {
+        val appLocale: LocaleListCompat = if (language == AppLanguage.SYSTEM) {
+            LocaleListCompat.getEmptyLocaleList()
+        } else {
+            LocaleListCompat.forLanguageTags(language.tag)
+        }
+        AppCompatDelegate.setApplicationLocales(appLocale)
+        _state.update { it.copy(appLanguage = language) }
     }
 
     private fun onDynamicColorToggle(enabled: Boolean) {

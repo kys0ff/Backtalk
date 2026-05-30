@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.state
 
 import android.net.Uri
+import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.ThemeMode
 
@@ -9,6 +10,7 @@ import off.kys.backtalk.common.ThemeMode
  */
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.AUTO,
+    val appLanguage: AppLanguage = AppLanguage.SYSTEM,
     val dynamicColorEnabled: Boolean = false,
     val lockEnabled: Boolean = false,
     val secureScreenEnabled: Boolean = false,

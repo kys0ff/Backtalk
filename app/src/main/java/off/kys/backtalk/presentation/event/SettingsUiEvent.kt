@@ -8,6 +8,7 @@ import off.kys.backtalk.common.ThemeMode
  */
 sealed class SettingsUiEvent {
     data class OnThemeModeChange(val themeMode: ThemeMode) : SettingsUiEvent()
+    data class OnLanguageChange(val language: off.kys.backtalk.common.AppLanguage) : SettingsUiEvent()
     data class OnDynamicColorToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnLockToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSecureScreenToggle(val enabled: Boolean) : SettingsUiEvent()

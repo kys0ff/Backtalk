@@ -114,6 +114,10 @@
     <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
     <string name="settings_information">معلومات</string>
     <string name="settings_choose_theme">اختر المظهر</string>
+    <string name="settings_language">اللغة</string>
+    <string name="language_system">تلقائي (لغة النظام)</string>
+    <string name="language_english">الإنجليزية (English)</string>
+    <string name="language_arabic">العربية</string>
     <string name="settings_experimental_sync_title">ميزة تجريبية</string>
     <string name="settings_experimental_sync_message">ميزة المزامنة بين الأجهزة لا تزل في مرحلتها التجريبية. قد تواجه بعض الأخطاء أو السلوكيات غير المتوقعة. استخدمها على مسؤوليتك الخاصة، وننصح بشدة بأخذ نسخة احتياطية لبياناتك أولًا.</string>
 

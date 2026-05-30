@@ -110,6 +110,10 @@
     <string name="settings_license_desc">Libraries used in the application</string>
     <string name="settings_information">Information</string>
     <string name="settings_choose_theme">Choose Theme</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System Default</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">Arabic (العربية)</string>
     <string name="settings_experimental_sync_title">Experimental Feature</string>
     <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
 

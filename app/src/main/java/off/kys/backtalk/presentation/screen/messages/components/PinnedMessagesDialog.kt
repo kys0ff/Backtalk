@@ -131,7 +131,7 @@ private fun PinnedMessageItem(
             modifier = Modifier.padding(start = 8.dp)
         ) {
             Icon(
-                painter = painterResource(R.drawable.round_keep_off_24px),
+                painter = painterResource(R.drawable.round_keep_off_24),
                 contentDescription = "Unpin message",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

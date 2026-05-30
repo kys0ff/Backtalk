@@ -72,6 +72,7 @@ fun SettingsScreenContent(
     val showIntervalDialog = remember { mutableStateOf(false) }
     val showAutoExportPasswordDialog = remember { mutableStateOf(false) }
     val showThemeDialog = remember { mutableStateOf(false) }
+    val showLanguageDialog = remember { mutableStateOf(false) }
     val showOldBackupWarning = remember { mutableStateOf(false) }
     val showWipeDataDialog = remember { mutableStateOf(false) }
     val showExperimentalSyncDialog = remember { mutableStateOf(false) }
@@ -167,6 +168,17 @@ fun SettingsScreenContent(
                     thickness = 0.5.dp,
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
+                SettingsItem(
+                    label = stringResource(R.string.settings_language),
+                    value = stringResource(state.appLanguage.displayNameRes),
+                    icon = painterResource(R.drawable.round_language_24),
+                    onClick = { showLanguageDialog.value = true }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
                 SettingsToggle(
                     label = stringResource(R.string.settings_dynamic_color),
                     supportingText = stringResource(R.string.settings_dynamic_color_desc),
@@ -205,7 +217,7 @@ fun SettingsScreenContent(
                 SettingsToggle(
                     label = stringResource(R.string.settings_remove_image_metadata),
                     supportingText = stringResource(R.string.settings_remove_image_metadata_desc),
-                    icon = painterResource(R.drawable.round_description_24px),
+                    icon = painterResource(R.drawable.round_description_24),
                     checked = state.removeImageMetadataEnabled,
                     onCheckedChange = {
                         onEvent(
@@ -223,7 +235,7 @@ fun SettingsScreenContent(
                 SettingsToggle(
                     label = stringResource(R.string.settings_smart_pointing_images),
                     supportingText = stringResource(R.string.settings_smart_pointing_images_desc),
-                    icon = painterResource(R.drawable.round_arrow_or_edge_24px),
+                    icon = painterResource(R.drawable.round_arrow_or_edge_24),
                     checked = state.smartImagePointingEnabled,
                     onCheckedChange = {
                         onEvent(
@@ -461,7 +473,7 @@ fun SettingsScreenContent(
                 SettingsItem(
                     label = stringResource(R.string.settings_license),
                     value = stringResource(R.string.settings_license_desc),
-                    icon = painterResource(R.drawable.round_code_xml_24px),
+                    icon = painterResource(R.drawable.round_code_xml_24),
                     onClick = onLicenseClicked
                 )
                 HorizontalDivider(
@@ -544,6 +556,17 @@ fun SettingsScreenContent(
             onSelected = {
                 onEvent(SettingsUiEvent.OnThemeModeChange(it)); showThemeDialog.value =
                 false
+            }
+        )
+    }
+
+    if (showLanguageDialog.value) {
+        LanguageSelectionDialog(
+            selected = state.appLanguage,
+            onDismiss = { showLanguageDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnLanguageChange(it))
+                showLanguageDialog.value = false
             }
         )
     }
