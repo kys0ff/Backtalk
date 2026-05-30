@@ -88,6 +88,7 @@ fun MessageBubble(
     selectedImagePaths: Set<String> = emptySet(),
     onReplyPreviewClick: () -> Unit,
     onClick: () -> Unit,
+    onDoubleClick: () -> Unit = {},
     onLongClick: () -> Unit,
     onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
@@ -145,6 +146,11 @@ fun MessageBubble(
                     onClick = {
                         if (!selectMode) showExtraInfo = !showExtraInfo
                         onClick()
+                    },
+                    onDoubleClick = {
+                        if (!selectMode) {
+                            onDoubleClick()
+                        }
                     },
                     onLongClick = {
                         if (preferences.hapticFeedbackEnabled) {

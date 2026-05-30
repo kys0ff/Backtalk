@@ -32,7 +32,8 @@ fun MessagesList(
     blinkMessageId: MessageId? = null,
     onScrollToMessage: (MessageId) -> Unit = {},
     selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
-    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> }
+    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
+    onTogglePin: (MessageEntity, Boolean) -> Unit = { _, _ -> }
 ) {
     val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
 
@@ -125,6 +126,11 @@ fun MessagesList(
                         },
                         onLongClick = {
                             onToggleSelect(current.id)
+                        },
+                        onDoubleClick = {
+                            if (!selectionMode) {
+                                onTogglePin(current, !current.isPinned)
+                            }
                         },
                         highlightQuery = searchQuery,
                         onTagClick = onTagClick,

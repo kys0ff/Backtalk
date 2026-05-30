@@ -68,6 +68,7 @@ fun MessagesContent(
             onScrollToMessage = onScrollToMessage,
             selectedImagePaths = state.selectedImagePaths,
             onToggleImageSelect = onToggleImageSelect,
+            onTogglePin = onTogglePin,
             contentPadding = if (state.pinnedMessages.isNotEmpty()) PaddingValues(top = 48.dp) else PaddingValues(
                 0.dp
             )
