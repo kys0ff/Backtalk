@@ -97,8 +97,6 @@
     <string name="settings_show_secret_category_desc">Disable to hide this section</string>
     <string name="settings_stay_awake">Stay awake</string>
     <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
-
-    <!-- Chat Settings -->
     <string name="settings_chat">Chat</string>
     <string name="settings_trim_messages">Trim sent messages</string>
     <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
@@ -106,7 +104,6 @@
     <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
     <string name="settings_smart_pointing_images">Smart pointing for images</string>
     <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
-
     <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
     <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
     <string name="settings_license">Open source licenses</string>

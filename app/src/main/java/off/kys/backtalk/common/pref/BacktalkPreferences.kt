@@ -45,8 +45,6 @@ class BacktalkPreferences(context: Context) {
         }
     }
 
-    // --- Clean delegated properties (No underscores, no custom getters/setters) ---
-
     /** Whether the application-level biometric or PIN lock is active. */
     var lockEnabled by preference(BooleanPreferenceItem(prefs, KEY_LOCK_ENABLED, false))
 
