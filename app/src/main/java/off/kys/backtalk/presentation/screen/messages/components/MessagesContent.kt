@@ -4,6 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,9 +79,13 @@ fun MessagesContent(
             )
         )
 
-        if (state.pinnedMessages.isNotEmpty()) {
+        AnimatedVisibility(
+            visible = state.pinnedMessages.isNotEmpty(),
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
             PinnedMessageBar(
-                modifier = Modifier.align(Alignment.TopCenter),
                 pinnedMessages = state.pinnedMessages,
                 activeIndex = state.activePinnedMessageIndex,
                 onClick = onNavigatePinned,

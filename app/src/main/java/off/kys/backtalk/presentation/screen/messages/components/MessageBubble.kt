@@ -2,6 +2,8 @@ package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -43,6 +45,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,6 +102,7 @@ fun MessageBubble(
     val haptic = LocalHapticFeedback.current
     val preferences = koinInject<BacktalkPreferences>()
     val interactionSource = remember { MutableInteractionSource() }
+    val scope = rememberCoroutineScope()
 
     val isBlinking = blinkMessageId == messageEntity.id
     val scale = remember { Animatable(1f) }
@@ -149,6 +153,13 @@ fun MessageBubble(
                     },
                     onDoubleClick = {
                         if (!selectMode) {
+                            scope.launch {
+                                scale.animateTo(0.92f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium))
+                                scale.animateTo(1f, spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium))
+                            }
+                            if (preferences.hapticFeedbackEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
                             onDoubleClick()
                         }
                     },
@@ -259,19 +270,29 @@ private fun MessageContent(
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
 
-    if (message.isReminder || message.isPinned) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (message.isReminder) {
-                ReminderTag(contentColor)
+    AnimatedVisibility(
+        visible = message.isReminder || message.isPinned,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut()
+    ) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (message.isReminder) {
+                    ReminderTag(contentColor)
+                }
+                AnimatedVisibility(
+                    visible = message.isPinned,
+                    enter = fadeIn() + scaleIn(initialScale = 0.7f, animationSpec = spring(Spring.DampingRatioMediumBouncy)),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    PinTag(contentColor)
+                }
             }
-            if (message.isPinned) {
-                PinTag(contentColor)
-            }
+            Spacer(modifier = Modifier.height(4.dp))
         }
-        Spacer(modifier = Modifier.height(4.dp))
     }
 
     if (repliedMessage != null) {
