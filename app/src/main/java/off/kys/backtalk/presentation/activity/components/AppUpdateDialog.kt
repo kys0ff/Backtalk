@@ -1,3 +1,5 @@
+@file:Suppress("SameParameterValue", "SameParameterValue")
+
 package off.kys.backtalk.presentation.activity.components
 
 import androidx.compose.foundation.layout.Box

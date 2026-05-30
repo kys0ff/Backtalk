@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,13 +31,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.data.local.entity.MessageEntity
+import kotlin.math.abs
 
 /**
  * An expressive, floating bar displaying the currently active pinned message
@@ -83,10 +87,9 @@ fun PinnedMessageBar(
                 count = pinnedMessages.size,
                 activeIndex = activeIndex,
                 reverseDirection = true,
-                modifier = Modifier
-                    .padding(start = 12.dp, top = 8.dp, bottom = 8.dp)
-                    .width(3.dp)
-                    .fillMaxHeight()
+                dotSize = 6.dp, // Slightly optimized for a sleek 56.dp bar look
+                maxVisibleItems = 5,
+                modifier = Modifier.padding(start = 16.dp)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -144,51 +147,78 @@ fun PinnedMessageBar(
 }
 
 @Composable
-private fun VerticalPinnedIndicator(
+fun VerticalPinnedIndicator(
     count: Int,
     activeIndex: Int,
     reverseDirection: Boolean,
     modifier: Modifier = Modifier,
+    maxVisibleItems: Int = 5,
+    dotSize: Dp = 6.dp,
     activeColor: Color = MaterialTheme.colorScheme.primary,
-    trackColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+    trackColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
 ) {
-    val visualIndex = if (reverseDirection) {
-        (count - 1) - activeIndex
-    } else {
-        activeIndex
-    }
+    if (count <= 1) return
 
-    val animatedIndexOffset by animateFloatAsState(
+    val visualIndex = if (reverseDirection) (count - 1) - activeIndex else activeIndex
+
+    val animatedIndex by animateFloatAsState(
         targetValue = visualIndex.coerceIn(0, maxOf(0, count - 1)).toFloat(),
-        label = "VerticalIndicatorAnimation"
+        label = "ActiveIndexAnimation"
     )
 
-    Canvas(modifier = modifier) {
-        val canvasHeight = size.height
-        val canvasWidth = size.width
-        val cornerRadius = CornerRadius(canvasWidth / 2, canvasWidth / 2)
+    val density = LocalDensity.current
+    val dotSizePx = with(density) { dotSize.toPx() }
+    val spacingPx = dotSizePx * 0.7f
+    val itemSpacePx = dotSizePx + spacingPx
 
-        if (count <= 1) {
-            drawRoundRect(
-                color = activeColor,
-                size = size,
-                cornerRadius = cornerRadius
-            )
-        } else {
-            drawRoundRect(
-                color = trackColor,
-                size = size,
-                cornerRadius = cornerRadius
-            )
+    val totalVisibleHeightPx = (maxVisibleItems * itemSpacePx) - spacingPx
+    val totalVisibleHeightDp = with(density) { totalVisibleHeightPx.toDp() }
 
-            val segmentHeight = canvasHeight / count
-            val topOffset = animatedIndexOffset * segmentHeight
+    val halfVisible = (maxVisibleItems - 1) / 2f
+    val maxScrollOffset = maxOf(0f, (count - maxVisibleItems).toFloat())
+    val scrollOffset = (animatedIndex - halfVisible).coerceIn(0f, maxScrollOffset)
+
+    Canvas(
+        modifier = modifier.size(width = dotSize, height = totalVisibleHeightDp)
+    ) {
+        val viewportCenter = scrollOffset + halfVisible
+
+        for (i in 0 until count) {
+            val distanceFromCenter = abs(i - viewportCenter)
+            val viewportScale = when {
+                distanceFromCenter <= (maxVisibleItems - 3) / 2f -> 1f
+                distanceFromCenter <= (maxVisibleItems - 1) / 2f -> {
+                    1f - (distanceFromCenter - (maxVisibleItems - 3) / 2f) * 0.5f
+                }
+                distanceFromCenter <= (maxVisibleItems + 1) / 2f -> {
+                    0.5f - (distanceFromCenter - (maxVisibleItems - 1) / 2f) * 0.5f
+                }
+                else -> 0f
+            }.coerceIn(0f, 1f)
+
+            val activeFraction = (1f - abs(i - animatedIndex)).coerceIn(0f, 1f)
+            val scale = maxOf(viewportScale, activeFraction)
+
+            if (scale <= 0f) continue
+
+            val currentDotHeight = dotSizePx * (1f + 0.6f * activeFraction)
+
+            val finalWidth = dotSizePx * scale
+            val finalHeight = currentDotHeight * scale
+
+            val centerX = size.width / 2f
+            val centerY = (i * itemSpacePx) + (dotSizePx / 2f) - (scrollOffset * itemSpacePx)
+
+            val color = lerp(trackColor, activeColor, activeFraction)
 
             drawRoundRect(
-                color = activeColor,
-                topLeft = Offset(x = 0f, y = topOffset),
-                size = Size(width = canvasWidth, height = segmentHeight),
-                cornerRadius = cornerRadius
+                color = color,
+                topLeft = Offset(
+                    x = centerX - (finalWidth / 2f),
+                    y = centerY - (finalHeight / 2f)
+                ),
+                size = Size(width = finalWidth, height = finalHeight),
+                cornerRadius = CornerRadius(finalWidth / 2f, finalWidth / 2f)
             )
         }
     }
