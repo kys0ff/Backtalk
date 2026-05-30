@@ -67,6 +67,14 @@ class BacktalkPreferences(context: Context) {
     /** Whether the app should automatically export backups. */
     var autoExportEnabled by preference(BooleanPreferenceItem(prefs, KEY_AUTO_EXPORT_ENABLED, false))
 
+    /** Whether reminders are enabled. */
+    var remindersEnabled by preference(BooleanPreferenceItem(prefs, KEY_REMINDERS_ENABLED, false))
+
+    /** The interval at which reminders should occur. */
+    var reminderInterval by preference(
+        EnumPreferenceItem(prefs, KEY_REMINDER_INTERVAL, ExportInterval.DAILY, ExportInterval::class.java)
+    )
+
     /** The persistable URI of the directory where auto-exports are saved. */
     var autoExportUri by preference(StringPreferenceItem(prefs, KEY_AUTO_EXPORT_URI, null))
 
@@ -154,6 +162,8 @@ class BacktalkPreferences(context: Context) {
         const val KEY_SECURE_SCREEN = "secure_screen"
         const val KEY_AUTO_UPDATE = "auto_update"
         const val KEY_AUTO_EXPORT_ENABLED = "auto_export_enabled"
+        const val KEY_REMINDERS_ENABLED = "reminders_enabled"
+        const val KEY_REMINDER_INTERVAL = "reminder_interval"
         const val KEY_AUTO_EXPORT_URI = "auto_export_uri"
         const val KEY_AUTO_EXPORT_INTERVAL = "auto_export_interval"
         const val KEY_AUTO_EXPORT_ENCRYPTED = "auto_export_encrypted"

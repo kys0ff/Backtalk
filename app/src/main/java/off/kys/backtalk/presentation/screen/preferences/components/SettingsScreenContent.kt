@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.screen.preferences.components
 
+import android.Manifest
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,6 +69,7 @@ fun SettingsScreenContent(
     val showOldBackupWarning = remember { mutableStateOf(false) }
     val showWipeDataDialog = remember { mutableStateOf(false) }
     val showExperimentalSyncDialog = remember { mutableStateOf(false) }
+    val showReminderIntervalDialog = remember { mutableStateOf(false) }
 
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
     var isImporting by remember { mutableStateOf(false) }
@@ -94,6 +97,16 @@ fun SettingsScreenContent(
     ) { uri ->
         uri?.let {
             onEvent(SettingsUiEvent.CheckBackupEncryption(it))
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            onEvent(SettingsUiEvent.OnRemindersToggle(true))
+        } else {
+            context.toast(R.string.onboarding_permission_notifications_desc)
         }
     }
 
@@ -211,6 +224,38 @@ fun SettingsScreenContent(
                     checked = state.smartImagePointingEnabled,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnSmartImagePointingToggle(it)) }
                 )
+            }
+
+            // Reminders Section
+            SettingsSection(title = stringResource(R.string.settings_reminders)) {
+                SettingsToggle(
+                    label = stringResource(R.string.settings_reminders),
+                    supportingText = stringResource(R.string.settings_reminders_desc),
+                    icon = painterResource(R.drawable.round_notifications_24),
+                    checked = state.remindersEnabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            onEvent(SettingsUiEvent.OnRemindersToggle(enabled))
+                        }
+                    }
+                )
+                AnimatedVisibility(visible = state.remindersEnabled) {
+                    Column {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        SettingsItem(
+                            label = stringResource(R.string.settings_reminder_interval),
+                            value = stringResource(state.reminderInterval.titleResId),
+                            icon = painterResource(R.drawable.round_refresh_24),
+                            onClick = { showReminderIntervalDialog.value = true }
+                        )
+                    }
+                }
             }
 
             // Security Section
@@ -600,6 +645,17 @@ fun SettingsScreenContent(
     if (showExperimentalSyncDialog.value) {
         ExperimentalSyncDialog(
             onDismiss = { showExperimentalSyncDialog.value = false }
+        )
+    }
+
+    if (showReminderIntervalDialog.value) {
+        IntervalSelectionDialog(
+            selected = state.reminderInterval,
+            onDismiss = { showReminderIntervalDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnReminderIntervalChange(it))
+                showReminderIntervalDialog.value = false
+            }
         )
     }
 }

@@ -56,6 +56,8 @@ class SettingsViewModel(
             autoExportUri = preferences.autoExportUri,
             autoExportEncrypted = preferences.autoExportEncrypted,
             autoExportPassword = preferences.autoExportPassword,
+            remindersEnabled = preferences.remindersEnabled,
+            reminderInterval = preferences.reminderInterval,
             hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
             keepScreenOn = preferences.keepScreenOn,
             devModeEnabled = preferences.devModeEnabled,
@@ -79,6 +81,8 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportFolderChange -> onAutoExportFolderChange(event.uri)
         is SettingsUiEvent.OnAutoExportEncryptionToggle -> onAutoExportEncryptionToggle(event.enabled)
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
+        is SettingsUiEvent.OnRemindersToggle -> onRemindersToggle(event.enabled)
+        is SettingsUiEvent.OnReminderIntervalChange -> onReminderIntervalChange(event.interval)
         is SettingsUiEvent.OnHapticFeedbackToggle -> onHapticFeedbackToggle(event.enabled)
         is SettingsUiEvent.OnKeepScreenOnToggle -> onKeepScreenOnToggle(event.enabled)
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
@@ -179,6 +183,24 @@ class SettingsViewModel(
         _state.update { it.copy(autoExportPassword = password) }
     }
 
+    private fun onRemindersToggle(enabled: Boolean) {
+        preferences.remindersEnabled = enabled
+        _state.update { it.copy(remindersEnabled = enabled) }
+        if (enabled) {
+            scheduleReminders()
+        } else {
+            cancelReminders()
+        }
+    }
+
+    private fun onReminderIntervalChange(interval: off.kys.backtalk.common.ExportInterval) {
+        preferences.reminderInterval = interval
+        _state.update { it.copy(reminderInterval = interval) }
+        if (preferences.remindersEnabled) {
+            scheduleReminders()
+        }
+    }
+
     private fun onHapticFeedbackToggle(enabled: Boolean) {
         preferences.hapticFeedbackEnabled = enabled
         _state.update { it.copy(hapticFeedbackEnabled = enabled) }
@@ -252,6 +274,30 @@ class SettingsViewModel(
 
     private fun cancelAutoExport() {
         WorkManager.getInstance(context).cancelUniqueWork("auto_export_work")
+    }
+
+    private fun scheduleReminders() {
+        val interval = preferences.reminderInterval
+        val workRequest = PeriodicWorkRequestBuilder<off.kys.backtalk.data.worker.ReminderWorker>(
+            interval.days.toLong(), TimeUnit.DAYS
+        )
+            .setInitialDelay(interval.days.toLong(), TimeUnit.DAYS)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiresBatteryNotLow(true)
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "daily_reminders_work",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+    }
+
+    private fun cancelReminders() {
+        WorkManager.getInstance(context).cancelUniqueWork("daily_reminders_work")
     }
 
     private fun exportBackup(uri: Uri, password: String?) {

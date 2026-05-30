@@ -98,6 +98,20 @@
     <string name="settings_stay_awake">Stay awake</string>
     <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
     <string name="settings_chat">Chat</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_reminders_desc">Get notified to write about your day</string>
+    <string name="settings_reminder_interval">Frequency</string>
+
+    <!-- Reminder Messages -->
+    <string name="reminder_message_1">How was your day? Take a moment to talk to yourself.</string>
+    <string name="reminder_message_2">Got something on your mind? Write it down.</string>
+    <string name="reminder_message_3">Your future self will thank you for today\'s notes.</string>
+    <string name="reminder_message_4">Time for a quick check-in with yourself.</string>
+    <string name="reminder_message_5">What\'s the highlight of your day so far?</string>
+    <string name="reminder_message_6">Don\'t forget to capture your thoughts today.</string>
+    <string name="reminder_message_7">Take a deep breath and write a few lines.</string>
+    <string name="reminder_message_title">Reflection Time</string>
+    <string name="reminder_notification_channel">Daily Reminders</string>
     <string name="settings_trim_messages">Trim sent messages</string>
     <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
     <string name="settings_remove_image_metadata">Remove image metadata</string>

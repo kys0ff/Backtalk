@@ -102,6 +102,20 @@
     <string name="settings_stay_awake">إبقاء الشاشة قيد التشغيل</string>
     <string name="settings_stay_awake_desc">منع الشاشة من الإغلاق التلقائي في أثناء الشحن أو جلسات التطوير</string>
     <string name="settings_chat">المحادثة</string>
+    <string name="settings_reminders">التذكيرات</string>
+    <string name="settings_reminders_desc">تلقي إشعارات لتذكيرك بالكتابة عن يومك</string>
+    <string name="settings_reminder_interval">التكرار</string>
+
+    <!-- Reminder Messages -->
+    <string name="reminder_message_1">كيف كان يومك؟ خذ لحظة للتحدث مع نفسك.</string>
+    <string name="reminder_message_2">هل يدور شيء في ذهنك؟ دوّنه الآن.</string>
+    <string name="reminder_message_3">ستشكرك نفسك المستقبلية على ملاحظات اليوم.</string>
+    <string name="reminder_message_4">حان وقت مراجعة سريعة مع نفسك.</string>
+    <string name="reminder_message_5">ما هو أبرز حدث في يومك حتى الآن؟</string>
+    <string name="reminder_message_6">لا تنسَ تسجيل أفكارك اليوم.</string>
+    <string name="reminder_message_7">خذ نفساً عميقاً واكتب بضعة أسطر.</string>
+    <string name="reminder_message_title">وقت التأمل</string>
+    <string name="reminder_notification_channel">التذكيرات اليومية</string>
     <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
     <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
     <string name="settings_remove_image_metadata">إزالة بيانات الصور الوصفية</string>

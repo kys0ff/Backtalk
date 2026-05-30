@@ -20,6 +20,8 @@ data class SettingsUiState(
     val autoExportUri: String? = null,
     val autoExportEncrypted: Boolean = false,
     val autoExportPassword: String? = null,
+    val remindersEnabled: Boolean = false,
+    val reminderInterval: ExportInterval = ExportInterval.DAILY,
     val hapticFeedbackEnabled: Boolean = true,
     val keepScreenOn: Boolean = false,
     val devModeEnabled: Boolean = false,
