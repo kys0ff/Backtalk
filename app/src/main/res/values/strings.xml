@@ -145,6 +145,7 @@
     <string name="statistics_voice">Voice</string>
     <string name="statistics_text">Text</string>
     <string name="statistics_images">Images</string>
+    <string name="statistics_current_streak">Current Streak</string>
     <string name="statistics_top_threads">Top Threads</string>
     <string name="statistics_messages_count">%1$d messages</string>
     <string name="statistics_total_activity_percentage">%1$d%% of total activity</string>

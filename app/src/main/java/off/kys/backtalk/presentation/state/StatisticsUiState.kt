@@ -15,6 +15,7 @@ data class StatisticsUiState(
     val avgMessageLength: Int = 0,
     val imageCount: Int = 0,
     val videoCount: Int = 0,
+    val currentStreak: Int = 0,
     val isLoading: Boolean = true
 )
 

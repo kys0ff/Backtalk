@@ -13,6 +13,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +29,7 @@ fun StatCard(
     icon: Painter,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface
+    contentColor: Color = contentColorFor(containerColor)
 ) {
     ElevatedCard(
         modifier = modifier.height(140.dp),

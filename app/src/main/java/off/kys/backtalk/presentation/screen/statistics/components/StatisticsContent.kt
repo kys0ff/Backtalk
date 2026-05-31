@@ -44,15 +44,33 @@ fun StatisticsContent(
                 value = state.totalMessages.toString(),
                 icon = painterResource(R.drawable.round_chat_bubble_outline_24),
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.weight(1f)
             )
+            StatCard(
+                label = stringResource(R.string.statistics_current_streak),
+                value = state.currentStreak.toString(),
+                icon = painterResource(R.drawable.round_mode_heat_24),
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             StatCard(
                 label = stringResource(R.string.statistics_scheduled),
                 value = state.scheduledMessagesCount.toString(),
                 icon = painterResource(R.drawable.round_access_alarm_24),
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                label = stringResource(R.string.statistics_avg_length),
+                value = state.avgMessageLength.toString(),
+                icon = painterResource(R.drawable.round_abc_24),
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -66,16 +84,16 @@ fun StatisticsContent(
                 label = stringResource(R.string.statistics_voice_duration),
                 value = voiceTime,
                 icon = painterResource(R.drawable.round_keyboard_voice_24),
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                containerColor = MaterialTheme.colorScheme.inverseOnSurface,
                 modifier = Modifier.weight(1f)
             )
+
+            val imageCount = state.imageCount.toString()
             StatCard(
-                label = stringResource(R.string.statistics_avg_length),
-                value = state.avgMessageLength.toString(),
-                icon = painterResource(R.drawable.round_abc_24),
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                label = stringResource(R.string.statistics_images),
+                value = imageCount,
+                icon = painterResource(R.drawable.round_image_24),
+                containerColor = MaterialTheme.colorScheme.surfaceTint,
                 modifier = Modifier.weight(1f)
             )
         }

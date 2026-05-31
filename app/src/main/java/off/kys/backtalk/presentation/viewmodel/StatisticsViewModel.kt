@@ -50,6 +50,7 @@ class StatisticsViewModel(
             } else 0
 
             val activity = calculateLast7DaysActivity(allMessages)
+            val currentStreak = calculateCurrentStreak(allMessages)
 
             val topThreads = calculateTopThreads(allMessages)
 
@@ -65,10 +66,52 @@ class StatisticsViewModel(
                     avgMessageLength = avgLen,
                     imageCount = imageCount,
                     videoCount = videoCount,
+                    currentStreak = currentStreak,
                     isLoading = false
                 )
             }
         }
+    }
+
+    private fun calculateCurrentStreak(messages: List<MessageEntity>): Int {
+        if (messages.isEmpty()) return 0
+
+        val messageDays = messages.map {
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = it.timestamp
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }.distinct().sortedDescending()
+
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        val yesterday = today - 24 * 60 * 60 * 1000
+
+        if (messageDays.isEmpty() || (messageDays[0] < today && messageDays[0] < yesterday)) {
+            return 0
+        }
+
+        var streak = 0
+        var currentExpectedDay = if (messageDays[0] == today) today else yesterday
+
+        for (day in messageDays) {
+            if (day == currentExpectedDay) {
+                streak++
+                currentExpectedDay -= 24 * 60 * 60 * 1000
+            } else if (day < currentExpectedDay) {
+                break
+            }
+        }
+
+        return streak
     }
 
     private fun calculateLast7DaysActivity(messages: List<MessageEntity>): List<DayActivity> {
