@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,67 +32,71 @@ fun StatisticsContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             StatCard(
                 label = stringResource(R.string.statistics_total_messages),
                 value = state.totalMessages.toString(),
                 icon = painterResource(R.drawable.round_chat_bubble_outline_24),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 label = stringResource(R.string.statistics_scheduled),
                 value = state.scheduledMessagesCount.toString(),
                 icon = painterResource(R.drawable.round_access_alarm_24),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.weight(1f)
             )
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             val voiceTime = formatDuration(state.totalVoiceDurationMs)
             StatCard(
                 label = stringResource(R.string.statistics_voice_duration),
                 value = voiceTime,
                 icon = painterResource(R.drawable.round_keyboard_voice_24),
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 label = stringResource(R.string.statistics_avg_length),
                 value = state.avgMessageLength.toString(),
                 icon = painterResource(R.drawable.round_abc_24),
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            StatCard(
-                label = stringResource(R.string.statistics_images),
-                value = state.imageCount.toString(),
-                icon = painterResource(R.drawable.round_image_24),
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 modifier = Modifier.weight(1f)
             )
         }
 
         SectionTitle(stringResource(R.string.statistics_activity_last_7_days))
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier.padding(8.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        ) {
+            Box(modifier = Modifier.padding(16.dp)) {
                 ActivityBarChart(data = state.activityLast7Days)
             }
         }
 
         SectionTitle(stringResource(R.string.statistics_message_types))
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        ) {
             MessageTypePieChart(
                 slices = listOf(
                     PieSlice(
@@ -114,11 +120,13 @@ fun StatisticsContent(
         }
 
         SectionTitle(stringResource(R.string.statistics_top_threads))
-        state.topThreads.forEach { thread ->
-            ThreadStatItem(thread)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            state.topThreads.forEach { thread ->
+                ThreadStatItem(thread)
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 

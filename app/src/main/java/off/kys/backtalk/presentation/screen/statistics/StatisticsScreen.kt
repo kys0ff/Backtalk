@@ -8,16 +8,19 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -35,11 +38,18 @@ class StatisticsScreen : Screen {
         val viewModel = koinViewModel<StatisticsViewModel>()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
         Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.statistics_title)) },
+                LargeTopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.statistics_title),
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    },
                     navigationIcon = {
                         HintTooltip(stringResource(R.string.common_back)) {
                             IconButton(onClick = { navigator.pop() }) {
@@ -49,7 +59,8 @@ class StatisticsScreen : Screen {
                                 )
                             }
                         }
-                    }
+                    },
+                    scrollBehavior = scrollBehavior
                 )
             }
         ) { padding ->
