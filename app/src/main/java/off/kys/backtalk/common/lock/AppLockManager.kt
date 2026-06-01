@@ -1,5 +1,10 @@
 package off.kys.backtalk.common.lock
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -12,7 +17,10 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 /**
  * Tracks unlocked states by key and enforces timeouts using the global app lifecycle.
  */
-class AppLockManager(private val preferences: BacktalkPreferences) {
+class AppLockManager(
+    private val context: Context,
+    private val preferences: BacktalkPreferences
+) {
     // Maps lock keys to their expiration timestamps in milliseconds
     private val _unlockedKeys = MutableStateFlow<Map<String, Long>>(emptyMap())
     val unlockedKeys: StateFlow<Map<String, Long>> = _unlockedKeys.asStateFlow()
@@ -24,7 +32,23 @@ class AppLockManager(private val preferences: BacktalkPreferences) {
         const val SENSITIVE = "sensitive_action_lock"
     }
 
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF && preferences.lockOnScreenOff) {
+                lock(Keys.MAIN)
+            }
+        }
+    }
+
     init {
+        val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+        ContextCompat.registerReceiver(
+            context,
+            screenOffReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+
         // Watch the global app lifecycle. When the app comes to the foreground, purge expired locks.
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             object : DefaultLifecycleObserver {

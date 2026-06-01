@@ -51,6 +51,7 @@ class SettingsViewModel(
             ),
             dynamicColorEnabled = preferences.dynamicColorEnabled,
             lockEnabled = preferences.lockEnabled,
+            lockOnScreenOff = preferences.lockOnScreenOff,
             lockTimeoutMillis = preferences.lockTimeoutMillis,
             secureScreenEnabled = preferences.secureScreenEnabled,
             autoUpdateEnabled = preferences.autoUpdateEnabled,
@@ -78,6 +79,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnLanguageChange -> onLanguageChange(event.language)
         is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
         is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
+        is SettingsUiEvent.OnLockOnScreenOffToggle -> onLockOnScreenOffToggle(event.enabled)
         is SettingsUiEvent.OnLockTimeoutChange -> onLockTimeoutChange(event.timeoutMillis)
         is SettingsUiEvent.OnSecureScreenToggle -> onSecureScreenToggle(event.enabled)
         is SettingsUiEvent.OnAutoUpdateToggle -> onAutoUpdateToggle(event.enabled)
@@ -133,6 +135,11 @@ class SettingsViewModel(
     private fun onLockToggle(enabled: Boolean) {
         preferences.lockEnabled = enabled
         _state.update { it.copy(lockEnabled = enabled) }
+    }
+
+    private fun onLockOnScreenOffToggle(enabled: Boolean) {
+        preferences.lockOnScreenOff = enabled
+        _state.update { it.copy(lockOnScreenOff = enabled) }
     }
 
     private fun onLockTimeoutChange(timeoutMillis: Long) {
@@ -410,6 +417,7 @@ class SettingsViewModel(
                             themeMode = preferences.themeMode,
                             dynamicColorEnabled = preferences.dynamicColorEnabled,
                             lockEnabled = preferences.lockEnabled,
+                            lockOnScreenOff = preferences.lockOnScreenOff,
                             secureScreenEnabled = preferences.secureScreenEnabled,
                             autoUpdateEnabled = preferences.autoUpdateEnabled,
                             isBackupEncrypted = null,

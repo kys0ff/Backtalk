@@ -79,6 +79,8 @@
     <!-- Lock Timeout -->
     <string name="settings_lock_timeout">Lock timeout</string>
     <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
+    <string name="settings_lock_on_screen_off">Lock on screen off</string>
+    <string name="settings_lock_on_screen_off_desc">Lock the app immediately when the phone screen is turned off</string>
     <string name="lock_timeout_immediately">Immediately</string>
     <string name="lock_timeout_15s">15 seconds</string>
     <string name="lock_timeout_30s">30 seconds</string>

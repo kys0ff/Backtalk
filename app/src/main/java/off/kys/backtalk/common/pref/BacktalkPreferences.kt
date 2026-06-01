@@ -51,6 +51,9 @@ class BacktalkPreferences(context: Context) {
     /** The number of milliseconds the app can remain in the background before locking. */
     var lockTimeoutMillis by preference(LongPreferenceItem(prefs, KEY_LOCK_TIMEOUT_MILLIS, 0L))
 
+    /** Whether the app should lock immediately when the screen is turned off. */
+    var lockOnScreenOff by preference(BooleanPreferenceItem(prefs, KEY_LOCK_ON_SCREEN_OFF, false))
+
     /** Whether the application-level biometric or PIN lock is active. */
     var lockEnabled by preference(BooleanPreferenceItem(prefs, KEY_LOCK_ENABLED, false))
 
@@ -185,6 +188,7 @@ class BacktalkPreferences(context: Context) {
         const val KEY_THEME_MODE = "theme_mode"
         const val KEY_DYNAMIC_COLOR = "dynamic_color"
         const val KEY_LOCK_ENABLED = "lock_enabled"
+        const val KEY_LOCK_ON_SCREEN_OFF = "lock_on_screen_off"
         const val KEY_LOCK_TIMEOUT_MILLIS = "lock_timeout_millis"
         const val KEY_SECURE_SCREEN = "secure_screen"
         const val KEY_AUTO_UPDATE = "auto_update"

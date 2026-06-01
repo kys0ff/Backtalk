@@ -77,6 +77,12 @@
     <string name="auth_subtitle">يرجى المصادقة للمتابعة</string>
     <string name="auth_locked_title">Backtalk مقفل</string>
 
+    <!-- Lock Timeout -->
+    <string name="settings_lock_timeout">مهلة القفل</string>
+    <string name="settings_lock_timeout_desc">المدة التي يظل فيها التطبيق مفتوحاً في الخلفية</string>
+    <string name="settings_lock_on_screen_off">القفل عند إيقاف الشاشة</string>
+    <string name="settings_lock_on_screen_off_desc">قفل التطبيق فوراً عند إيقاف تشغيل شاشة الهاتف</string>
+
     <!-- Settings -->
     <string name="settings_title">الإعدادات</string>
     <string name="settings_security_title">الأمان</string>

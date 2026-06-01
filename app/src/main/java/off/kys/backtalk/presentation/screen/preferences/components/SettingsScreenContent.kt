@@ -327,6 +327,20 @@ fun SettingsScreenContent(
                                 icon = painterResource(R.drawable.round_access_alarm_24),
                                 onClick = { showLockTimeoutDialog.value = true }
                             )
+                            AnimatedVisibility(visible = state.lockTimeoutMillis != 0L) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    thickness = 0.5.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant
+                                )
+                                SettingsToggle(
+                                    label = stringResource(R.string.settings_lock_on_screen_off),
+                                    supportingText = stringResource(R.string.settings_lock_on_screen_off_desc),
+                                    icon = painterResource(R.drawable.round_screen_lock_portrait_24),
+                                    checked = state.lockOnScreenOff,
+                                    onCheckedChange = { onEvent(SettingsUiEvent.OnLockOnScreenOffToggle(it)) }
+                                )
+                            }
                         }
                     }
                     HorizontalDivider(

@@ -14,6 +14,7 @@ data class SettingsUiState(
     val appLanguage: AppLanguage = AppLanguage.SYSTEM,
     val dynamicColorEnabled: Boolean = false,
     val lockEnabled: Boolean = false,
+    val lockOnScreenOff: Boolean = false,
     val lockTimeoutMillis: Long = 0L,
     val secureScreenEnabled: Boolean = false,
     val autoUpdateEnabled: Boolean = false,

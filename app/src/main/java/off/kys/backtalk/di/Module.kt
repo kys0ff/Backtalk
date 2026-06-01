@@ -176,7 +176,7 @@ private fun Module.viewModelModule() {
 private fun Module.systemModule() {
     single { AudioPlayer() }
     single { BacktalkPreferences(get()) }
-    single { AppLockManager(get()) }
+    single { AppLockManager(androidContext(), get()) }
     single { AlarmScheduler(get()) }
     single { NsdHelper(get()) }
     single { SyncSocketManager() }
