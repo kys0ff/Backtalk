@@ -11,6 +11,7 @@ sealed class SettingsUiEvent {
     data class OnLanguageChange(val language: off.kys.backtalk.common.AppLanguage) : SettingsUiEvent()
     data class OnDynamicColorToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnLockToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnLockTimeoutChange(val timeoutMillis: Long) : SettingsUiEvent()
     data class OnSecureScreenToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnAutoUpdateToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnAutoExportToggle(val enabled: Boolean) : SettingsUiEvent()

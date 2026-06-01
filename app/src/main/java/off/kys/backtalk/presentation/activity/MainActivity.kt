@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.LocalBiometricManager
@@ -50,12 +51,10 @@ class MainActivity : AppCompatActivity() {
             val biometricManager = LocalBiometricManager.current
             val appLockManager = LocalAppLockManager.current
 
-            val lockKey = "MAIN_APP_LOCK"
-            val unlockedStates by appLockManager.unlockedKeys.collectAsState()
-            val isCurrentlyUnlocked = !preferences.lockEnabled ||
-                    (unlockedStates.containsKey(lockKey) && appLockManager.isUnlocked(lockKey))
+            val unlockedKeys by appLockManager.unlockedKeys.collectAsState()
+            val isCurrentlyUnlocked = !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
 
-            LaunchedEffect(isCurrentlyUnlocked) {
+            LaunchedEffect(isCurrentlyUnlocked, unlockedKeys) {
                 isAuthenticated = isCurrentlyUnlocked
                 if (!preferences.lockEnabled || isCurrentlyUnlocked) {
                     isAuthChecked = true
@@ -70,8 +69,7 @@ class MainActivity : AppCompatActivity() {
                     ) { result ->
                         when (result) {
                             is BiometricResult.Success -> {
-                                appLockManager.setUnlocked(lockKey, 60_000L)
-                                isAuthChecked = true
+                                appLockManager.setUnlocked(AppLockManager.Keys.MAIN)
                             }
                             is BiometricResult.Error -> finishAffinity()
                             is BiometricResult.Failed -> finishAffinity()

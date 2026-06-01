@@ -42,6 +42,9 @@ import androidx.documentfile.provider.DocumentFile
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
 import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.lock.BiometricResult
+import off.kys.backtalk.common.lock.LocalAppLockManager
+import off.kys.backtalk.common.lock.rememberBiometricLauncher
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.isSecurityEnabled
@@ -72,6 +75,15 @@ fun SettingsScreenContent(
     val showExperimentalSyncDialog = remember { mutableStateOf(false) }
     val showReminderIntervalDialog = remember { mutableStateOf(false) }
     val showSmartIntensityDialog = remember { mutableStateOf(false) }
+    val showLockTimeoutDialog = remember { mutableStateOf(false) }
+
+    val appLockManager = LocalAppLockManager.current
+
+    val biometricLauncher = rememberBiometricLauncher { result ->
+        if (result is BiometricResult.Success) {
+            appLockManager.setUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE, 30_000L)
+        }
+    }
 
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
     var isImporting by remember { mutableStateOf(false) }
@@ -281,8 +293,42 @@ fun SettingsScreenContent(
                         supportingText = stringResource(R.string.settings_app_lock_desc),
                         icon = painterResource(R.drawable.round_lock_24),
                         checked = state.lockEnabled,
-                        onCheckedChange = { onEvent(SettingsUiEvent.OnLockToggle(it)) }
+                        onCheckedChange = { enabled ->
+                            if (state.lockEnabled && !appLockManager.isUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE)) {
+                                biometricLauncher()
+                                // We don't toggle yet, we wait for user to authenticate and click again, 
+                                // or we could handle it better. 
+                                // To keep it simple: if unlocked, toggle. If not, prompt.
+                            } else {
+                                onEvent(SettingsUiEvent.OnLockToggle(enabled))
+                            }
+                        }
                     )
+                    AnimatedVisibility(visible = state.lockEnabled) {
+                        Column {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+                            val timeoutLabel = when (state.lockTimeoutMillis) {
+                                0L -> stringResource(R.string.lock_timeout_immediately)
+                                15_000L -> stringResource(R.string.lock_timeout_15s)
+                                30_000L -> stringResource(R.string.lock_timeout_30s)
+                                60_000L -> stringResource(R.string.lock_timeout_1m)
+                                300_000L -> stringResource(R.string.lock_timeout_5m)
+                                600_000L -> stringResource(R.string.lock_timeout_10m)
+                                1_800_000L -> stringResource(R.string.lock_timeout_30m)
+                                else -> state.lockTimeoutMillis.toString()
+                            }
+                            SettingsItem(
+                                label = stringResource(R.string.settings_lock_timeout),
+                                value = timeoutLabel,
+                                icon = painterResource(R.drawable.round_access_alarm_24),
+                                onClick = { showLockTimeoutDialog.value = true }
+                            )
+                        }
+                    }
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 0.5.dp,
@@ -524,7 +570,13 @@ fun SettingsScreenContent(
                         label = stringResource(R.string.settings_wipe_data),
                         value = stringResource(R.string.settings_wipe_data_desc),
                         icon = painterResource(R.drawable.round_delete_sweep_24),
-                        onClick = { showWipeDataDialog.value = true }
+                        onClick = {
+                            if (state.lockEnabled && !appLockManager.isUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE)) {
+                                biometricLauncher()
+                            } else {
+                                showWipeDataDialog.value = true
+                            }
+                        }
                     )
                 }
             }
@@ -684,6 +736,17 @@ fun SettingsScreenContent(
             onSelected = {
                 onEvent(SettingsUiEvent.OnSmartIntensityChange(it))
                 showSmartIntensityDialog.value = false
+            }
+        )
+    }
+
+    if (showLockTimeoutDialog.value) {
+        LockTimeoutSelectionDialog(
+            selectedTimeout = state.lockTimeoutMillis,
+            onDismiss = { showLockTimeoutDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnLockTimeoutChange(it))
+                showLockTimeoutDialog.value = false
             }
         )
     }

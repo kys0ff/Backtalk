@@ -51,6 +51,7 @@ class SettingsViewModel(
             ),
             dynamicColorEnabled = preferences.dynamicColorEnabled,
             lockEnabled = preferences.lockEnabled,
+            lockTimeoutMillis = preferences.lockTimeoutMillis,
             secureScreenEnabled = preferences.secureScreenEnabled,
             autoUpdateEnabled = preferences.autoUpdateEnabled,
             autoExportEnabled = preferences.autoExportEnabled,
@@ -77,6 +78,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnLanguageChange -> onLanguageChange(event.language)
         is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
         is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
+        is SettingsUiEvent.OnLockTimeoutChange -> onLockTimeoutChange(event.timeoutMillis)
         is SettingsUiEvent.OnSecureScreenToggle -> onSecureScreenToggle(event.enabled)
         is SettingsUiEvent.OnAutoUpdateToggle -> onAutoUpdateToggle(event.enabled)
         is SettingsUiEvent.OnAutoExportToggle -> onAutoExportToggle(event.enabled)
@@ -131,6 +133,11 @@ class SettingsViewModel(
     private fun onLockToggle(enabled: Boolean) {
         preferences.lockEnabled = enabled
         _state.update { it.copy(lockEnabled = enabled) }
+    }
+
+    private fun onLockTimeoutChange(timeoutMillis: Long) {
+        preferences.lockTimeoutMillis = timeoutMillis
+        _state.update { it.copy(lockTimeoutMillis = timeoutMillis) }
     }
 
     private fun onSecureScreenToggle(enabled: Boolean) {

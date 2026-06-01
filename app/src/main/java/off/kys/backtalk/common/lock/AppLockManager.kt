@@ -7,21 +7,40 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import off.kys.backtalk.common.pref.BacktalkPreferences
 
 /**
  * Tracks unlocked states by key and enforces timeouts using the global app lifecycle.
  */
-class AppLockManager {
+class AppLockManager(private val preferences: BacktalkPreferences) {
     // Maps lock keys to their expiration timestamps in milliseconds
     private val _unlockedKeys = MutableStateFlow<Map<String, Long>>(emptyMap())
     val unlockedKeys: StateFlow<Map<String, Long>> = _unlockedKeys.asStateFlow()
+
+    private var backgroundTimestamp: Long = 0L
+
+    object Keys {
+        const val MAIN = "main_app_lock"
+        const val SENSITIVE = "sensitive_action_lock"
+    }
 
     init {
         // Watch the global app lifecycle. When the app comes to the foreground, purge expired locks.
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             object : DefaultLifecycleObserver {
                 override fun onStart(owner: LifecycleOwner) {
+                    if (backgroundTimestamp != 0L) {
+                        val backgroundDuration = System.currentTimeMillis() - backgroundTimestamp
+                        if (backgroundDuration > preferences.lockTimeoutMillis) {
+                            lock(Keys.MAIN)
+                        }
+                    }
+                    backgroundTimestamp = 0L
                     validateTimeouts()
+                }
+
+                override fun onStop(owner: LifecycleOwner) {
+                    backgroundTimestamp = System.currentTimeMillis()
                 }
             }
         )
@@ -30,8 +49,12 @@ class AppLockManager {
     /**
      * Unlocks a specific key for a given duration.
      */
-    fun setUnlocked(key: String, timeoutMillis: Long) {
-        val expirationTime = System.currentTimeMillis() + timeoutMillis
+    fun setUnlocked(key: String, durationMillis: Long = Long.MAX_VALUE) {
+        val expirationTime = if (durationMillis == Long.MAX_VALUE) {
+            Long.MAX_VALUE
+        } else {
+            System.currentTimeMillis() + durationMillis
+        }
         _unlockedKeys.update { current ->
             current + (key to expirationTime)
         }

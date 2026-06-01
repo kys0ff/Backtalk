@@ -76,6 +76,17 @@
     <string name="auth_subtitle">Please authenticate to continue</string>
     <string name="auth_locked_title">Backtalk is locked</string>
 
+    <!-- Lock Timeout -->
+    <string name="settings_lock_timeout">Lock timeout</string>
+    <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
+    <string name="lock_timeout_immediately">Immediately</string>
+    <string name="lock_timeout_15s">15 seconds</string>
+    <string name="lock_timeout_30s">30 seconds</string>
+    <string name="lock_timeout_1m">1 minute</string>
+    <string name="lock_timeout_5m">5 minutes</string>
+    <string name="lock_timeout_10m">10 minutes</string>
+    <string name="lock_timeout_30m">30 minutes</string>
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_security_title">Security</string>
