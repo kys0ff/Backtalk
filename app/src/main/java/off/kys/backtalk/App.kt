@@ -6,6 +6,7 @@ import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import off.kys.backtalk.di.appModule
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 
 /**
@@ -14,7 +15,7 @@ import org.koin.core.context.startKoin
  * This class is responsible for initializing global application state,
  * including the dependency injection framework (Koin).
  */
-class App: Application(), ImageLoaderFactory {
+class App: Application(), ImageLoaderFactory, KoinComponent {
 
     /**
      * Called when the application is starting, before any activity, service,

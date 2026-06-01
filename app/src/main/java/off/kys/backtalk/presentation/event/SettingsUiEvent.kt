@@ -20,6 +20,7 @@ sealed class SettingsUiEvent {
     data class OnAutoExportPasswordChange(val password: String?) : SettingsUiEvent()
     data class OnRemindersToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnReminderIntervalChange(val interval: off.kys.backtalk.common.ExportInterval) : SettingsUiEvent()
+    data class OnSmartIntensityChange(val intensity: off.kys.backtalk.common.SmartIntensity) : SettingsUiEvent()
     data class OnHapticFeedbackToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnKeepScreenOnToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnDevModeToggle(val enabled: Boolean) : SettingsUiEvent()

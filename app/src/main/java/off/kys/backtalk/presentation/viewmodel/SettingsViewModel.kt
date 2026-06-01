@@ -18,9 +18,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.AppLanguage
+import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.worker.AutoExportWorker
+import off.kys.backtalk.data.worker.ReminderWorker
 import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
@@ -58,6 +60,7 @@ class SettingsViewModel(
             autoExportPassword = preferences.autoExportPassword,
             remindersEnabled = preferences.remindersEnabled,
             reminderInterval = preferences.reminderInterval,
+            smartReminderIntensity = preferences.smartReminderIntensity,
             hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
             keepScreenOn = preferences.keepScreenOn,
             devModeEnabled = preferences.devModeEnabled,
@@ -83,6 +86,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
         is SettingsUiEvent.OnRemindersToggle -> onRemindersToggle(event.enabled)
         is SettingsUiEvent.OnReminderIntervalChange -> onReminderIntervalChange(event.interval)
+        is SettingsUiEvent.OnSmartIntensityChange -> onSmartIntensityChange(event.intensity)
         is SettingsUiEvent.OnHapticFeedbackToggle -> onHapticFeedbackToggle(event.enabled)
         is SettingsUiEvent.OnKeepScreenOnToggle -> onKeepScreenOnToggle(event.enabled)
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
@@ -190,14 +194,23 @@ class SettingsViewModel(
             scheduleReminders()
         } else {
             cancelReminders()
+            ReminderWorker.cancelSmartReminder(context)
         }
     }
 
-    private fun onReminderIntervalChange(interval: off.kys.backtalk.common.ExportInterval) {
+    private fun onReminderIntervalChange(interval: ExportInterval) {
         preferences.reminderInterval = interval
         _state.update { it.copy(reminderInterval = interval) }
         if (preferences.remindersEnabled) {
             scheduleReminders()
+        }
+    }
+
+    private fun onSmartIntensityChange(intensity: off.kys.backtalk.common.SmartIntensity) {
+        preferences.smartReminderIntensity = intensity
+        _state.update { it.copy(smartReminderIntensity = intensity) }
+        if (preferences.remindersEnabled && preferences.reminderInterval == ExportInterval.SMART) {
+            ReminderWorker.scheduleSmartReminder(context)
         }
     }
 
@@ -255,9 +268,9 @@ class SettingsViewModel(
     private fun scheduleAutoExport() {
         val interval = preferences.autoExportInterval
         val workRequest = PeriodicWorkRequestBuilder<AutoExportWorker>(
-            interval.days.toLong(), TimeUnit.DAYS
+            interval.hours.toLong(), TimeUnit.HOURS
         )
-            .setInitialDelay(interval.days.toLong(), TimeUnit.DAYS)
+            .setInitialDelay(interval.hours.toLong(), TimeUnit.HOURS)
             .setConstraints(
                 Constraints.Builder()
                     .setRequiresStorageNotLow(true)
@@ -278,10 +291,20 @@ class SettingsViewModel(
 
     private fun scheduleReminders() {
         val interval = preferences.reminderInterval
-        val workRequest = PeriodicWorkRequestBuilder<off.kys.backtalk.data.worker.ReminderWorker>(
-            interval.days.toLong(), TimeUnit.DAYS
+        
+        if (interval == ExportInterval.SMART) {
+            cancelReminders() // Cancel periodic if it exists
+            ReminderWorker.scheduleSmartReminder(context)
+            return
+        }
+        
+        // Ensure smart is canceled if we switched to periodic
+        ReminderWorker.cancelSmartReminder(context)
+
+        val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(
+            interval.hours.toLong(), TimeUnit.HOURS
         )
-            .setInitialDelay(interval.days.toLong(), TimeUnit.DAYS)
+            .setInitialDelay(interval.hours.toLong(), TimeUnit.HOURS)
             .setConstraints(
                 Constraints.Builder()
                     .setRequiresBatteryNotLow(true)

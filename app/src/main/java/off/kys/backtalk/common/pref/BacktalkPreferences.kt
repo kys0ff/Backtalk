@@ -7,10 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.SmartIntensity
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.base.PreferenceItem
 import off.kys.backtalk.common.pref.model.BooleanPreferenceItem
 import off.kys.backtalk.common.pref.model.EnumPreferenceItem
+import off.kys.backtalk.common.pref.model.IntPreferenceItem
+import off.kys.backtalk.common.pref.model.LongPreferenceItem
 import off.kys.backtalk.common.pref.model.StringPreferenceItem
 import java.util.UUID
 import kotlin.properties.ReadWriteProperty
@@ -75,6 +78,11 @@ class BacktalkPreferences(context: Context) {
         EnumPreferenceItem(prefs, KEY_REMINDER_INTERVAL, ExportInterval.DAILY, ExportInterval::class.java)
     )
 
+    /** The intensity level for smart reminders. */
+    var smartReminderIntensity by preference(
+        EnumPreferenceItem(prefs, KEY_SMART_REMINDER_INTENSITY, SmartIntensity.NORMAL, SmartIntensity::class.java)
+    )
+
     /** The persistable URI of the directory where auto-exports are saved. */
     var autoExportUri by preference(StringPreferenceItem(prefs, KEY_AUTO_EXPORT_URI, null))
 
@@ -110,8 +118,23 @@ class BacktalkPreferences(context: Context) {
     /** Whether to use smart pointing for image paths instead of duplicating them. */
     var smartImagePointingEnabled by preference(BooleanPreferenceItem(prefs, KEY_SMART_IMAGE_POINTING, false))
 
+    /** The unique ID for this device used for sync pairing. */
+    var lastUsageTimestamp by preference(LongPreferenceItem(prefs, KEY_LAST_USAGE_TIMESTAMP, 0L))
+
+    /** The average interval between app uses in milliseconds. */
+    var averageUsageInterval by preference(LongPreferenceItem(prefs, KEY_AVERAGE_USAGE_INTERVAL, 24 * 60 * 60 * 1000L))
+
+    /** The number of times the app has been used. */
+    var usageCount by preference(IntPreferenceItem(prefs, KEY_USAGE_COUNT, 0))
+
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
+
+    /** Whether there is a notification active that the user hasn't seen by opening the app yet. */
+    var hasUnreadReminder by preference(BooleanPreferenceItem(prefs, KEY_HAS_UNREAD_REMINDER, false))
+
+    /** The timestamp of the last time a reminder notification was shown. */
+    var lastReminderTimestamp by preference(LongPreferenceItem(prefs, KEY_LAST_REMINDER_TIMESTAMP, 0L))
 
     /** Whether it's the first time the app is being launched. */
     var firstLaunch by preference(BooleanPreferenceItem(prefs, KEY_FIRST_LAUNCH, true))
@@ -164,6 +187,7 @@ class BacktalkPreferences(context: Context) {
         const val KEY_AUTO_EXPORT_ENABLED = "auto_export_enabled"
         const val KEY_REMINDERS_ENABLED = "reminders_enabled"
         const val KEY_REMINDER_INTERVAL = "reminder_interval"
+        const val KEY_SMART_REMINDER_INTENSITY = "smart_reminder_intensity"
         const val KEY_AUTO_EXPORT_URI = "auto_export_uri"
         const val KEY_AUTO_EXPORT_INTERVAL = "auto_export_interval"
         const val KEY_AUTO_EXPORT_ENCRYPTED = "auto_export_encrypted"
@@ -176,6 +200,11 @@ class BacktalkPreferences(context: Context) {
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_PAIRED_DEVICES = "paired_devices"
+        const val KEY_LAST_USAGE_TIMESTAMP = "last_usage_timestamp"
+        const val KEY_AVERAGE_USAGE_INTERVAL = "average_usage_interval"
+        const val KEY_USAGE_COUNT = "usage_count"
+        const val KEY_HAS_UNREAD_REMINDER = "has_unread_reminder"
+        const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"
         const val KEY_DEVICE_ID = "device_id"
     }

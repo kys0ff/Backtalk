@@ -1,7 +1,6 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
@@ -14,28 +13,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.view.WindowCompat.enableEdgeToEdge
-import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.Constants
-import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.components.SplitThemeContainer
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
-import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.compose.rememberHashtags
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
-import off.kys.backtalk.util.getAssetFile
-import org.koin.compose.KoinApplication
-import org.koin.dsl.koinConfiguration
-import org.koin.dsl.module
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,26 +44,34 @@ fun MessagesScreenContent(
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
     val tags = rememberHashtags(state.messages)
 
-    val selectedMessagesCount = state.selectedMessageIds.size
-    val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
+    // Move heavy collection metrics out of the raw recomposition path
+    val selectionMetrics = remember(state.selectedMessageIds, state.selectedImagePaths, state.messages) {
+        val selectedMessagesCount = state.selectedMessageIds.size
+        val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
 
-    val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
-        it !in state.selectedMessageIds
-    }.values.sumOf { it.size }
+        val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
+            it !in state.selectedMessageIds
+        }.values.sumOf { it.size }
 
-    val currentTime = System.currentTimeMillis()
-    val deletableMessagesCount = state.messages.count {
-        it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+        val currentTime = System.currentTimeMillis()
+        val deletableMessagesCount = state.messages.count {
+            it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+        }
+
+        val deletableImagesCount = state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
+            val message = state.messages.find { it.id == messageId }
+            if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+                paths.size
+            } else 0
+        }
+
+        SelectionMetrics(
+            selectedMessagesCount = selectedMessagesCount,
+            selectedImagesCount = selectedImagesCount,
+            totalSelectedCount = totalSelectedCount,
+            totalDeletableCount = deletableMessagesCount + deletableImagesCount
+        )
     }
-
-    val deletableImagesCount = state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
-        val message = state.messages.find { it.id == messageId }
-        if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-            paths.size
-        } else 0
-    }
-
-    val totalDeletableCount = deletableMessagesCount + deletableImagesCount
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
@@ -86,32 +83,26 @@ fun MessagesScreenContent(
         }
     }
 
-    BackHandler(state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty()) {
-        onEvent(MessagesUiEvent.ClearSelection)
+    // Consolidate seven BackHandlers into one sequential interceptor
+    val isBackHandlerActive = remember(state) {
+        derivedStateOf {
+            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() ||
+                    state.showDeleteConfirmation || state.replyingTo != null ||
+                    state.editingMessage != null || state.isSearchActive ||
+                    state.showPinnedMessagesDialog || state.showMediaPicker
+        }
     }
 
-    BackHandler(state.showDeleteConfirmation) {
-        onEvent(MessagesUiEvent.DismissDeleteConfirmation)
-    }
-
-    BackHandler(state.replyingTo != null) {
-        onEvent(MessagesUiEvent.ReplyTo(null))
-    }
-
-    BackHandler(state.editingMessage != null) {
-        onEvent(MessagesUiEvent.EditMessage(null))
-    }
-
-    BackHandler(state.isSearchActive) {
-        onEvent(MessagesUiEvent.ToggleSearch(false))
-    }
-
-    BackHandler(state.showPinnedMessagesDialog) {
-        onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(false))
-    }
-
-    BackHandler(state.showMediaPicker) {
-        onEvent(MessagesUiEvent.ToggleMediaPicker(false))
+    BackHandler(enabled = isBackHandlerActive.value) {
+        when {
+            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() -> onEvent(MessagesUiEvent.ClearSelection)
+            state.showDeleteConfirmation -> onEvent(MessagesUiEvent.DismissDeleteConfirmation)
+            state.replyingTo != null -> onEvent(MessagesUiEvent.ReplyTo(null))
+            state.editingMessage != null -> onEvent(MessagesUiEvent.EditMessage(null))
+            state.isSearchActive -> onEvent(MessagesUiEvent.ToggleSearch(false))
+            state.showPinnedMessagesDialog -> onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(false))
+            state.showMediaPicker -> onEvent(MessagesUiEvent.ToggleMediaPicker(false))
+        }
     }
 
     LaunchedEffect(state.shouldScrollToSearch) {
@@ -151,7 +142,7 @@ fun MessagesScreenContent(
         topBar = {
             MessagesTopBar(
                 scrollBehavior = scrollBehavior,
-                selectedCount = totalSelectedCount,
+                selectedCount = selectionMetrics.totalSelectedCount,
                 isSearchActive = state.isSearchActive,
                 searchQuery = state.searchQuery,
                 searchResultsCount = state.searchResults.size,
@@ -162,8 +153,7 @@ fun MessagesScreenContent(
                 onPin = {
                     val selectedId = state.selectedMessageIds.firstOrNull()
                     if (selectedId != null) {
-                        val isPinned =
-                            state.messages.find { it.id == selectedId }?.isPinned ?: false
+                        val isPinned = state.messages.find { it.id == selectedId }?.isPinned ?: false
                         onEvent(MessagesUiEvent.TogglePinMessage(selectedId, !isPinned))
                         onEvent(MessagesUiEvent.ClearSelection)
                     }
@@ -172,20 +162,14 @@ fun MessagesScreenContent(
                 onThreads = onThreadsClick,
                 onReminders = onRemindersClick,
                 onStatistics = onStatisticsClick,
-                onToggleSearch = { active: Boolean ->
-                    onEvent(MessagesUiEvent.ToggleSearch(active))
-                },
-                onSearchQueryChange = { query: String ->
-                    onEvent(MessagesUiEvent.UpdateSearchQuery(query))
-                },
-                onNavigateSearch = { up: Boolean ->
-                    onEvent(MessagesUiEvent.NavigateSearch(up))
-                },
+                onToggleSearch = { active -> onEvent(MessagesUiEvent.ToggleSearch(active)) },
+                onSearchQueryChange = { query -> onEvent(MessagesUiEvent.UpdateSearchQuery(query)) },
+                onNavigateSearch = { up -> onEvent(MessagesUiEvent.NavigateSearch(up)) },
                 tags = tags,
                 selectedTag = state.selectedTag,
                 onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
-                isImageSelectionOnly = selectedMessagesCount == 0 && selectedImagesCount > 0,
-                canDelete = totalDeletableCount > 0
+                isImageSelectionOnly = selectionMetrics.selectedMessagesCount == 0 && selectionMetrics.selectedImagesCount > 0,
+                canDelete = selectionMetrics.totalDeletableCount > 0
             )
         },
         bottomBar = {
@@ -197,18 +181,14 @@ fun MessagesScreenContent(
                 editingMessage = state.editingMessage,
                 onCancelReply = { onEvent(MessagesUiEvent.ReplyTo(null)) },
                 onCancelEdit = { onEvent(MessagesUiEvent.EditMessage(null)) },
-                onMessageSend = {
-                    onEvent(MessagesUiEvent.SendMessage(it))
-                },
+                onMessageSend = { onEvent(MessagesUiEvent.SendMessage(it)) },
                 onVoiceSend = { path, duration, waveform ->
                     onEvent(MessagesUiEvent.SendVoiceMessage(path, duration, waveform))
                 },
                 onMessageSchedule = { text, time ->
                     onEvent(MessagesUiEvent.ScheduleMessage(text, time))
                 },
-                onAttachClick = {
-                    onEvent(MessagesUiEvent.ToggleMediaPicker(true))
-                }
+                onAttachClick = { onEvent(MessagesUiEvent.ToggleMediaPicker(true)) }
             )
         },
         floatingActionButton = {
@@ -248,17 +228,10 @@ fun MessagesScreenContent(
             onConfirmDelete = { onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
             onDismissDelete = { onEvent(MessagesUiEvent.DismissDeleteConfirmation) },
             onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
-            onNavigatePinned = {
-                onEvent(MessagesUiEvent.NavigatePinned)
-            },
+            onNavigatePinned = { onEvent(MessagesUiEvent.NavigatePinned) },
             onTogglePinnedDialog = { onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
             onTogglePin = { message, isPinned ->
-                onEvent(
-                    MessagesUiEvent.TogglePinMessage(
-                        message.id,
-                        isPinned
-                    )
-                )
+                onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
             },
             onScrollToMessage = { id ->
                 scrollToAndBlink(id)
@@ -267,95 +240,15 @@ fun MessagesScreenContent(
             onToggleImageSelect = { messageId, imagePath ->
                 onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
             },
-            totalDeletableCount = totalDeletableCount,
-            totalSelectedCount = totalSelectedCount
+            totalDeletableCount = selectionMetrics.totalDeletableCount,
+            totalSelectedCount = selectionMetrics.totalSelectedCount
         )
     }
 }
 
-@Preview(
-    showSystemUi = true,
-    device = "id:pixel_10",
+private data class SelectionMetrics(
+    val selectedMessagesCount: Int,
+    val selectedImagesCount: Int,
+    val totalSelectedCount: Int,
+    val totalDeletableCount: Int
 )
-@Composable
-private fun MessagesScreenPreview() {
-    val context = LocalContext.current
-
-    KoinApplication(
-        configuration = koinConfiguration(
-            declaration = {
-                modules(
-                    module {
-                        single { BacktalkPreferences(context) }
-                        single { AudioPlayer() }
-                    }
-                )
-
-            }
-        ),
-        content = {
-            SplitThemeContainer {
-                val window = LocalActivity.currentOrThrow.window
-                enableEdgeToEdge(window)
-                val mockMessages = buildList {
-                    add(
-                        MessageEntity(
-                            id = MessageId.generate(),
-                            text = "Saw a massive duck today. Need to remember the name of that park.",
-                            timestamp = System.currentTimeMillis() - 600000,
-                            repliedToId = null
-                        )
-                    )
-
-                    val duckImageId = MessageId.generate()
-                    add(
-                        MessageEntity(
-                            id = duckImageId,
-                            text = "duck",
-                            timestamp = System.currentTimeMillis() - 500000,
-                            repliedToId = null,
-                            mediaPath = context.getAssetFile("duck.jpg").absolutePath,
-                            mediaType = "image/jpeg"
-                        )
-                    )
-
-                    add(
-                        MessageEntity(
-                            id = MessageId.generate(),
-                            text = "it's a good duck.",
-                            timestamp = System.currentTimeMillis() - 400000,
-                            repliedToId = duckImageId
-                        )
-                    )
-
-                    add(
-                        MessageEntity(
-                            id = MessageId.generate(),
-                            text = "Buy birdseed / bread crumbs for the pond tomorrow.",
-                            timestamp = System.currentTimeMillis() - 100000,
-                            repliedToId = null,
-                            isReminder = true,
-                            scheduledTimestamp = System.currentTimeMillis() + 86400000,
-                            isPinned = true
-                        )
-                    )
-                }
-
-                MessagesScreenContent(
-                    state = MessagesUiState(
-                        messages = mockMessages,
-                        filteredMessages = mockMessages,
-                        pinnedMessages = mockMessages.filter { it.isPinned }.reversed(),
-                        isLoading = false,
-                    ),
-                    onEvent = {},
-                    onSettingsClick = {},
-                    onThreadsClick = {},
-                    onRemindersClick = {},
-                    onStatisticsClick = {},
-                    onStopAudio = {}
-                )
-            }
-        }
-    )
-}

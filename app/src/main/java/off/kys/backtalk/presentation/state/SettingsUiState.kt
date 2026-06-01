@@ -3,6 +3,7 @@ package off.kys.backtalk.presentation.state
 import android.net.Uri
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.SmartIntensity
 import off.kys.backtalk.common.ThemeMode
 
 /**
@@ -22,6 +23,7 @@ data class SettingsUiState(
     val autoExportPassword: String? = null,
     val remindersEnabled: Boolean = false,
     val reminderInterval: ExportInterval = ExportInterval.DAILY,
+    val smartReminderIntensity: SmartIntensity = SmartIntensity.NORMAL,
     val hapticFeedbackEnabled: Boolean = true,
     val keepScreenOn: Boolean = false,
     val devModeEnabled: Boolean = false,

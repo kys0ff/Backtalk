@@ -1,88 +1,120 @@
 package off.kys.backtalk.presentation.viewmodel
 
 import android.app.Application
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.data.worker.ReminderWorker
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.state.MainUiState
-import off.kys.backtalk.util.openUrl
 
 /**
- * ViewModel for the main screen.
+ * ViewModel for the MainActivity.
  *
- * This ViewModel manages the UI state for the main activity and coordinates
- * app update checks using the [CheckAppUpdate] use case.
+ * Handles app-wide logic such as update checks and reminder management.
  *
- * @param application The [Application] context.
- * @param checkAppUpdate The use case to check for application updates.
+ * @param checkAppUpdate Use case to check for application updates.
+ * @param preferences Application-wide preferences.
+ * @param application The Android application context.
  */
 class MainViewModel(
-    private val application: Application,
     private val checkAppUpdate: CheckAppUpdate,
     val preferences: BacktalkPreferences,
+    private val application: Application
 ) : AndroidViewModel(application) {
 
-    /**
-     * Internal mutable state flow for the main UI.
-     */
     private val _mainUiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
-
-    /**
-     * Publicly exposed state flow for the main UI.
-     * Observers can use this to react to changes in the UI state.
-     */
-    val mainUiState: StateFlow<MainUiState> = _mainUiState
+    val mainUiState = _mainUiState.asStateFlow()
 
     init {
+        updateUsageStats()
+
+        // Clear unread reminder flag when the app is opened
+        if (preferences.hasUnreadReminder) {
+            preferences.hasUnreadReminder = false
+            
+            // Re-schedule smart reminder to keep it updated and avoid the "abandoned" state
+            if (preferences.remindersEnabled && preferences.reminderInterval == ExportInterval.SMART) {
+                ReminderWorker.scheduleSmartReminder(application)
+            }
+        }
+
+        // Automatically check for updates if enabled
         if (preferences.autoUpdateEnabled) {
             onEvent(MainUiEvent.CheckUpdate)
         }
     }
 
     /**
-     * Processes UI events originating from the main screen.
-     *
-     * @param event The [MainUiEvent] to handle, such as checking for updates or dismissing dialogs.
+     * Handles UI events for the main screen.
      */
     fun onEvent(event: MainUiEvent) {
         when (event) {
-            is MainUiEvent.CheckUpdate -> checkForUpdate()
-            is MainUiEvent.DismissDialog -> _mainUiState.value = MainUiState.Idle
-            is MainUiEvent.UpdateNow -> application.openUrl(event.downloadUrl)
+            MainUiEvent.CheckUpdate -> checkForUpdates()
+            MainUiEvent.DismissDialog -> {
+                _mainUiState.value = MainUiState.Idle
+            }
+            is MainUiEvent.UpdateNow -> {
+                openUpdateUrl(event.downloadUrl)
+            }
         }
     }
 
-    /**
-     * Initiates a check for app updates.
-     *
-     * This method launches a coroutine to perform the update check. It updates
-     * the [_mainUiState] to reflect the current progress and results:
-     * - [MainUiState.Checking]: While the update check is in progress.
-     * - [MainUiState.UpdateAvailable]: If a new version is found.
-     * - [MainUiState.UpToDate]: If the app is already at the latest version.
-     * - [MainUiState.Error]: If an exception occurs during the check.
-     */
-    private fun checkForUpdate() {
-        if (_mainUiState.value is MainUiState.Checking) return
-
+    private fun checkForUpdates() {
         viewModelScope.launch {
             _mainUiState.value = MainUiState.Checking
-            try {
-                checkAppUpdate(
-                    onUpdateAvailable = { result ->
-                        _mainUiState.value = MainUiState.UpdateAvailable(result)
-                    },
-                ) {
+            checkAppUpdate(
+                onUpdateAvailable = { result ->
+                    _mainUiState.value = MainUiState.UpdateAvailable(result)
+                },
+                onUpToDate = {
                     _mainUiState.value = MainUiState.UpToDate
                 }
-            } catch (e: Exception) {
-                _mainUiState.value = MainUiState.Error(e.message ?: "Unknown error")
+            )
+        }
+    }
+
+    private fun updateUsageStats() {
+        val now = System.currentTimeMillis()
+        val lastUsage = preferences.lastUsageTimestamp
+
+        if (lastUsage != 0L) {
+            val interval = now - lastUsage
+            // Only count if it's been at least 5 minutes since last usage to avoid spamming stats
+            if (interval > 5 * 60 * 1000L) {
+                val count = preferences.usageCount
+                val avg = preferences.averageUsageInterval
+
+                // Simple moving average
+                val newAvg = (avg * count + interval) / (count + 1)
+
+                preferences.averageUsageInterval = newAvg
+                preferences.usageCount = count + 1
+                preferences.lastUsageTimestamp = now
             }
+        } else {
+            preferences.lastUsageTimestamp = now
+            if (preferences.usageCount == 0) {
+                preferences.usageCount = 1
+            }
+        }
+    }
+
+    private fun openUpdateUrl(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            application.startActivity(intent)
+        } catch (_: Exception) {
+            _mainUiState.value = MainUiState.Error("Could not open update URL")
         }
     }
 }

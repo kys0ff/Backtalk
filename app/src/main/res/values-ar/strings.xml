@@ -23,6 +23,7 @@
     <string name="common_monthly">شهرياً</string>
     <string name="common_not_set">غير محدد</string>
     <string name="common_confirm">تأكيد</string>
+    <string name="common_smart">ذكية</string>
     <string name="common_experimental">تجريبي</string>
     <string name="common_error">خطأ</string>
     <string name="common_password_set">••••••••</string>
@@ -117,6 +118,13 @@
     <string name="reminder_message_5">ما هو أبرز حدث في يومك حتى الآن؟</string>
     <string name="reminder_message_6">لا تنسَ تسجيل أفكارك اليوم.</string>
     <string name="reminder_message_7">خذ نفساً عميقاً واكتب بضعة أسطر.</string>
+    <string name="reminder_message_8">ما هو الشيء الوحيد الذي تعلمته اليوم؟</string>
+    <string name="reminder_message_9">كيف تشعر الآن؟ ضع مشاعرك في كلمات.</string>
+    <string name="reminder_message_10">فكر في فوز صغير حققته في يومك.</string>
+    <string name="reminder_message_11">هل هناك شيء تريد التخلص منه اليوم؟</string>
+    <string name="reminder_message_12">ما الذي جعلك تبتسم اليوم؟</string>
+    <string name="reminder_message_13">خذ لحظة للتحقق من أهدافك.</string>
+    <string name="reminder_message_14">أفكارك تستحق أن تُسمع. اكتبها.</string>
     <string name="reminder_message_title">وقت التأمل</string>
     <string name="reminder_notification_channel">التذكيرات اليومية</string>
     <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>

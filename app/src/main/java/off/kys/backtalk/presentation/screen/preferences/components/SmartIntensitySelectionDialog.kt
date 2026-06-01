@@ -26,15 +26,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.SmartIntensity
 
 @Composable
-fun IntervalSelectionDialog(
-    title: String,
-    selected: ExportInterval,
+fun SmartIntensitySelectionDialog(
+    selected: SmartIntensity,
     onDismiss: () -> Unit,
-    onSelected: (ExportInterval) -> Unit,
-    filter: (ExportInterval) -> Boolean = { true }
+    onSelected: (SmartIntensity) -> Unit
 ) {
     var tempSelected by remember { mutableStateOf(selected) }
 
@@ -42,22 +40,22 @@ fun IntervalSelectionDialog(
         onDismissRequest = onDismiss,
         icon = {
             Icon(
-                painter = painterResource(R.drawable.round_refresh_24),
+                painter = painterResource(R.drawable.round_notifications_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
         },
-        title = { Text(text = title) },
+        title = { Text(text = stringResource(R.string.settings_smart_intensity)) },
         text = {
             Column(
                 modifier = Modifier.selectableGroup(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                ExportInterval.entries.filter(filter).forEach { interval ->
-                    val isSelected = interval == tempSelected
+                SmartIntensity.entries.forEach { intensity ->
+                    val isSelected = intensity == tempSelected
                     Surface(
                         selected = isSelected,
-                        onClick = { tempSelected = interval },
+                        onClick = { tempSelected = intensity },
                         shape = MaterialTheme.shapes.medium,
                         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(
                             alpha = 0.3f
@@ -71,7 +69,7 @@ fun IntervalSelectionDialog(
                         ) {
                             RadioButton(selected = isSelected, onClick = null)
                             Text(
-                                text = stringResource(interval.titleResId),
+                                text = stringResource(intensity.titleResId),
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(start = 16.dp)
                             )

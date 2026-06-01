@@ -20,10 +20,14 @@
     <string name="common_search">Search</string>
     <string name="common_selected">Selected</string>
     <string name="common_daily">Daily</string>
+    <string name="common_twice_daily">Twice Daily</string>
+    <string name="common_every_six_hours">Every 6 Hours</string>
+    <string name="common_every_four_hours">Every 4 Hours</string>
     <string name="common_weekly">Weekly</string>
     <string name="common_monthly">Monthly</string>
     <string name="common_not_set">Not set</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_smart">Smart</string>
     <string name="common_experimental">Experimental</string>
     <string name="common_error">Error</string>
     <string name="common_password_set">••••••••</string>
@@ -104,6 +108,14 @@
     <string name="settings_reminders">Reminders</string>
     <string name="settings_reminders_desc">Get notified to write about your day</string>
     <string name="settings_reminder_interval">Frequency</string>
+    <string name="settings_smart_intensity">Smart Intensity</string>
+    <string name="settings_smart_intensity_desc">How often should smart reminders try to reach you?</string>
+
+    <!-- Smart Intensity -->
+    <string name="smart_intensity_relaxed">Relaxed</string>
+    <string name="smart_intensity_normal">Normal</string>
+    <string name="smart_intensity_frequent">Frequent</string>
+    <string name="smart_intensity_intense">Intense</string>
 
     <!-- Reminder Messages -->
     <string name="reminder_message_1">How was your day? Take a moment to talk to yourself.</string>
@@ -113,6 +125,13 @@
     <string name="reminder_message_5">What\'s the highlight of your day so far?</string>
     <string name="reminder_message_6">Don\'t forget to capture your thoughts today.</string>
     <string name="reminder_message_7">Take a deep breath and write a few lines.</string>
+    <string name="reminder_message_8">What is one thing you learned today?</string>
+    <string name="reminder_message_9">How are you feeling right now? Put it into words.</string>
+    <string name="reminder_message_10">Reflect on a small win from your day.</string>
+    <string name="reminder_message_11">Is there something you want to let go of today?</string>
+    <string name="reminder_message_12">What made you smile today?</string>
+    <string name="reminder_message_13">Take a moment to check in with your goals.</string>
+    <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
     <string name="reminder_message_title">Reflection Time</string>
     <string name="reminder_notification_channel">Daily Reminders</string>
     <string name="settings_trim_messages">Trim sent messages</string>
