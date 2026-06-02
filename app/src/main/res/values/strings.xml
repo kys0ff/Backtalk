@@ -30,7 +30,7 @@
     <string name="common_smart">Smart</string>
     <string name="common_experimental">Experimental</string>
     <string name="common_error">Error</string>
-    <string name="common_password_set">••••••••</string>
+    <string name="common_password_set" translatable="false">••••••••</string>
 
     <!-- Chat -->
     <string name="chat_title">Messages</string>
@@ -60,8 +60,13 @@
         <item quantity="other">Are you sure you want to delete %1$d selected messages?</item>
     </plurals>
     <string name="chat_delete_undone_warning">This action cannot be undone.</string>
+    <string name="chat_reminder_tag">Reminder</string>
+    <string name="chat_pinned_tag">Pinned</string>
+
+    <!-- Link Safety -->
     <string name="link_safety_title">External Link</string>
-    <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>    <string name="link_safety_open">Open</string>
+    <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>
+    <string name="link_safety_open">Open</string>
     <string name="link_safety_cancel">Cancel</string>
 
     <!-- Search -->
@@ -75,19 +80,6 @@
     <string name="auth_title">Verify your identity</string>
     <string name="auth_subtitle">Please authenticate to continue</string>
     <string name="auth_locked_title">Backtalk is locked</string>
-
-    <!-- Lock Timeout -->
-    <string name="settings_lock_timeout">Lock timeout</string>
-    <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
-    <string name="settings_lock_on_screen_off">Lock on screen off</string>
-    <string name="settings_lock_on_screen_off_desc">Lock the app immediately when the phone screen is turned off</string>
-    <string name="lock_timeout_immediately">Immediately</string>
-    <string name="lock_timeout_15s">15 seconds</string>
-    <string name="lock_timeout_30s">30 seconds</string>
-    <string name="lock_timeout_1m">1 minute</string>
-    <string name="lock_timeout_5m">5 minutes</string>
-    <string name="lock_timeout_10m">10 minutes</string>
-    <string name="lock_timeout_30m">30 minutes</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -106,8 +98,33 @@
     <string name="settings_haptic_feedback_desc">Vibrate on interactions like swipe-to-reply or long-press</string>
     <string name="settings_external_link_warning">External link warning</string>
     <string name="settings_external_link_warning_desc">Show a confirmation dialog before opening links in your browser</string>
+    <string name="settings_stay_awake">Stay awake</string>
+    <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
+    <string name="settings_date_format">Date format</string>
+    <string name="settings_time_format">Time format</string>
+    <string name="settings_chat">Chat</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_reminders_desc">Get notified to write about your day</string>
+    <string name="settings_reminder_interval">Frequency</string>
+    <string name="settings_smart_intensity">Smart Intensity</string>
+    <string name="settings_smart_intensity_desc">How often should smart reminders try to reach you?</string>
+    <string name="settings_trim_messages">Trim sent messages</string>
+    <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
+    <string name="settings_remove_image_metadata">Remove image metadata</string>
+    <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
+    <string name="settings_smart_pointing_images">Smart pointing for images</string>
+    <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
+    <string name="settings_license">Open source licenses</string>
+    <string name="settings_license_desc">Libraries used in the application</string>
+    <string name="settings_information">Information</string>
+    <string name="settings_choose_theme">Choose Theme</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_experimental_sync_title">Experimental Feature</string>
+    <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
+
+    <!-- Developer Settings -->
     <string name="settings_developer">Developer</string>
-    <string name="settings_dev_name">kys0ff</string>
+    <string name="settings_dev_name" translatable="false">kys0ff</string>
     <string name="settings_dev_click">You found me. Now go away.</string>
     <string name="settings_dev_click_fine">fine…</string>
     <string name="settings_secret_category">Developer Options</string>
@@ -115,10 +132,33 @@
     <string name="settings_wipe_data_desc">Clear database, cache, and all preferences</string>
     <string name="settings_show_secret_category">Show developer options</string>
     <string name="settings_show_secret_category_desc">Disable to hide this section</string>
-    <string name="settings_stay_awake">Stay awake</string>
-    <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
-    <string name="settings_date_format">Date format</string>
-    <string name="settings_time_format">Time format</string>
+    <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
+    <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
+
+    <!-- Lock Timeout -->
+    <string name="settings_lock_timeout">Lock timeout</string>
+    <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
+    <string name="settings_lock_on_screen_off">Lock on screen off</string>
+    <string name="settings_lock_on_screen_off_desc">Lock the app immediately when the phone screen is turned off</string>
+    <string name="lock_timeout_immediately">Immediately</string>
+    <string name="lock_timeout_15s">15 seconds</string>
+    <string name="lock_timeout_30s">30 seconds</string>
+    <string name="lock_timeout_1m">1 minute</string>
+    <string name="lock_timeout_5m">5 minutes</string>
+    <string name="lock_timeout_10m">10 minutes</string>
+    <string name="lock_timeout_30m">30 minutes</string>
+
+    <!-- Themes -->
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System default</string>
+
+    <!-- Languages -->
+    <string name="language_system">System Default</string>
+    <string name="language_english">English</string>
+    <string name="language_arabic">Arabic (العربية)</string>
+
+    <!-- Date & Time Formats -->
     <string name="date_format_system">System default</string>
     <string name="date_format_dmy_slash">DD/MM/YYYY</string>
     <string name="date_format_mdy_slash">MM/DD/YYYY</string>
@@ -131,57 +171,12 @@
     <string name="time_format_system">System default</string>
     <string name="time_format_12h">12-hour</string>
     <string name="time_format_24h">24-hour</string>
-    <string name="settings_chat">Chat</string>
-    <string name="settings_reminders">Reminders</string>
-    <string name="settings_reminders_desc">Get notified to write about your day</string>
-    <string name="settings_reminder_interval">Frequency</string>
-    <string name="settings_smart_intensity">Smart Intensity</string>
-    <string name="settings_smart_intensity_desc">How often should smart reminders try to reach you?</string>
 
     <!-- Smart Intensity -->
     <string name="smart_intensity_relaxed">Relaxed</string>
     <string name="smart_intensity_normal">Normal</string>
     <string name="smart_intensity_frequent">Frequent</string>
     <string name="smart_intensity_intense">Intense</string>
-
-    <!-- Reminder Messages -->
-    <string name="reminder_message_1">How was your day? Take a moment to talk to yourself.</string>
-    <string name="reminder_message_2">Got something on your mind? Write it down.</string>
-    <string name="reminder_message_3">Your future self will thank you for today\'s notes.</string>
-    <string name="reminder_message_4">Time for a quick check-in with yourself.</string>
-    <string name="reminder_message_5">What\'s the highlight of your day so far?</string>
-    <string name="reminder_message_6">Don\'t forget to capture your thoughts today.</string>
-    <string name="reminder_message_7">Take a deep breath and write a few lines.</string>
-    <string name="reminder_message_8">What is one thing you learned today?</string>
-    <string name="reminder_message_9">How are you feeling right now? Put it into words.</string>
-    <string name="reminder_message_10">Reflect on a small win from your day.</string>
-    <string name="reminder_message_11">Is there something you want to let go of today?</string>
-    <string name="reminder_message_12">What made you smile today?</string>
-    <string name="reminder_message_13">Take a moment to check in with your goals.</string>
-    <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
-    <string name="reminder_message_title">Reflection Time</string>
-    <string name="reminder_notification_channel">Daily Reminders</string>
-    <string name="settings_trim_messages">Trim sent messages</string>
-    <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
-    <string name="settings_remove_image_metadata">Remove image metadata</string>
-    <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
-    <string name="settings_smart_pointing_images">Smart pointing for images</string>
-    <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
-    <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
-    <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
-    <string name="settings_license">Open source licenses</string>
-    <string name="settings_license_desc">Libraries used in the application</string>
-    <string name="settings_information">Information</string>
-    <string name="settings_choose_theme">Choose Theme</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_system">System default</string>
-    <string name="settings_language">Language</string>
-    <string name="language_system">System Default</string>
-    <string name="language_english">English</string>
-    <string name="language_arabic">Arabic (العربية)</string>
-    <string name="settings_experimental_sync_title">Experimental Feature</string>
-    <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
 
     <!-- Statistics -->
     <string name="statistics_title">Statistics</string>
@@ -257,8 +252,6 @@
     <string name="reminders_empty">No scheduled reminders</string>
     <string name="reminders_cancel_confirm_title">Cancel reminder?</string>
     <string name="reminders_cancel_confirm_msg">Are you sure you want to cancel this scheduled reminder?</string>
-    <string name="chat_reminder_tag">Reminder</string>
-    <string name="chat_pinned_tag">Pinned</string>
     <string name="chat_reminder_notification_channel">Reminders</string>
     <string name="chat_reminder_notification_title">Note to self</string>
     <string name="chat_reminder_original_time">original:</string>
@@ -274,6 +267,7 @@
     <string name="camera_flash">Flash</string>
     <string name="camera_retake">Retake</string>
     <string name="camera_send">Send photo</string>
+    <string name="camera_blocked">Camera Blocked</string>
 
     <!-- Sync & Devices -->
     <string name="sync_title">Sync &amp; Devices</string>
@@ -339,6 +333,7 @@
     <string name="onboarding_permission_media">Media Library</string>
     <string name="onboarding_permission_media_desc">Required to select and send images from your gallery.</string>
     <string name="onboarding_permission_request">Enable</string>
+    <string name="onboarding_permission_granted">Granted</string>
     <string name="onboarding_get_started">Get Started</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
@@ -360,5 +355,33 @@
         <item quantity="one">View pinned message</item>
         <item quantity="other">View all %1$d pinned messages</item>
     </plurals>
+
+    <!-- Image Preview -->
+    <string name="image_preview_visual_preview">Visual preview</string>
+
+    <!-- Errors -->
+    <string name="error_update_url">Could not open update URL</string>
+    <string name="error_pairing_failed">Pairing request failed</string>
+    <string name="error_pin_verification_failed">PIN verification failed</string>
+    <string name="error_sync_failed">Sync failed</string>
+    <string name="error_pull_sync_failed">Pull sync failed</string>
+
+    <!-- Reminder Messages -->
+    <string name="reminder_message_1">How was your day? Take a moment to talk to yourself.</string>
+    <string name="reminder_message_2">Got something on your mind? Write it down.</string>
+    <string name="reminder_message_3">Your future self will thank you for today\'s notes.</string>
+    <string name="reminder_message_4">Time for a quick check-in with yourself.</string>
+    <string name="reminder_message_5">What\'s the highlight of your day so far?</string>
+    <string name="reminder_message_6">Don\'t forget to capture your thoughts today.</string>
+    <string name="reminder_message_7">Take a deep breath and write a few lines.</string>
+    <string name="reminder_message_8">What is one thing you learned today?</string>
+    <string name="reminder_message_9">How are you feeling right now? Put it into words.</string>
+    <string name="reminder_message_10">Reflect on a small win from your day.</string>
+    <string name="reminder_message_11">Is there something you want to let go of today?</string>
+    <string name="reminder_message_12">What made you smile today?</string>
+    <string name="reminder_message_13">Take a moment to check in with your goals.</string>
+    <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
+    <string name="reminder_message_title">Reflection Time</string>
+    <string name="reminder_notification_channel">Daily Reminders</string>
 
 </resources>

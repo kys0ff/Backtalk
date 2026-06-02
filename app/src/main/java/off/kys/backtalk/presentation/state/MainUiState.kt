@@ -32,6 +32,10 @@ sealed interface MainUiState {
      * Error state.
      *
      * @param message The error message.
+     * @param messageRes The error message resource ID.
      */
-    data class Error(val message: String) : MainUiState
+    data class Error(
+        val message: String? = null,
+        val messageRes: Int? = null
+    ) : MainUiState
 }

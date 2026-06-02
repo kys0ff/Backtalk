@@ -147,7 +147,7 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
             ) {
                 AsyncImage(
                     model = if (imagePath.startsWith("/")) File(imagePath) else imagePath,
-                    contentDescription = "Visual preview",
+                    contentDescription = stringResource(R.string.image_preview_visual_preview),
                     modifier = Modifier
                         .fillMaxSize()
                         .graphicsLayer {

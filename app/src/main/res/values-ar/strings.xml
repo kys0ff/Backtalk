@@ -19,6 +19,9 @@
     <string name="common_search">بحث</string>
     <string name="common_selected">محدد</string>
     <string name="common_daily">يومياً</string>
+    <string name="common_twice_daily">مرتين يومياً</string>
+    <string name="common_every_six_hours">كل 6 ساعات</string>
+    <string name="common_every_four_hours">كل 4 ساعات</string>
     <string name="common_weekly">أسبوعياً</string>
     <string name="common_monthly">شهرياً</string>
     <string name="common_not_set">غير محدد</string>
@@ -26,7 +29,7 @@
     <string name="common_smart">ذكية</string>
     <string name="common_experimental">تجريبي</string>
     <string name="common_error">خطأ</string>
-    <string name="common_password_set">••••••••</string>
+    <string name="common_password_set" translatable="false">••••••••</string>
 
     <!-- Chat -->
     <string name="chat_title">الرسائل</string>
@@ -60,6 +63,10 @@
         <item quantity="other">هل أنت متيقِّن أنك تريد حذف %1$d رسالة مختارة؟</item>
     </plurals>
     <string name="chat_delete_undone_warning">لا يمكن التراجع عن هذا الإجراء لاحقًا.</string>
+    <string name="chat_reminder_tag">تذكير</string>
+    <string name="chat_pinned_tag">مثبتة</string>
+
+    <!-- Link Safety -->
     <string name="link_safety_title">رابط خارجي</string>
     <string name="link_safety_message">أنت الآن تغادر التطبيق لزيارة موقع خارجي. يرجى التأكد من ثقتك في المصدر قبل المتابعة.</string>
     <string name="link_safety_open">فتح</string>
@@ -76,12 +83,6 @@
     <string name="auth_title">تأكيد الهوية</string>
     <string name="auth_subtitle">يرجى المصادقة للمتابعة</string>
     <string name="auth_locked_title">Backtalk مقفل</string>
-
-    <!-- Lock Timeout -->
-    <string name="settings_lock_timeout">مهلة القفل</string>
-    <string name="settings_lock_timeout_desc">المدة التي يظل فيها التطبيق مفتوحاً في الخلفية</string>
-    <string name="settings_lock_on_screen_off">القفل عند إيقاف الشاشة</string>
-    <string name="settings_lock_on_screen_off_desc">قفل التطبيق فوراً عند إيقاف تشغيل شاشة الهاتف</string>
 
     <!-- Settings -->
     <string name="settings_title">الإعدادات</string>
@@ -100,8 +101,33 @@
     <string name="settings_haptic_feedback_desc">اهتزاز خفيف عند التفاعل (مثل السحب للرد أو الضغط المطول)</string>
     <string name="settings_external_link_warning">تحذير الروابط الخارجية</string>
     <string name="settings_external_link_warning_desc">إظهار مربع حِوَار تأكيدي قبل فتح الروابط في المتصفح</string>
+    <string name="settings_stay_awake">إبقاء الشاشة قيد التشغيل</string>
+    <string name="settings_stay_awake_desc">منع الشاشة من الإغلاق التلقائي في أثناء الشحن أو جلسات التطوير</string>
+    <string name="settings_date_format">تنسيق التاريخ</string>
+    <string name="settings_time_format">تنسيق الوقت</string>
+    <string name="settings_chat">المحادثة</string>
+    <string name="settings_reminders">التذكيرات</string>
+    <string name="settings_reminders_desc">تلقي إشعارات لتذكيرك بالكتابة عن يومك</string>
+    <string name="settings_reminder_interval">التكرار</string>
+    <string name="settings_smart_intensity">الشدة الذكية</string>
+    <string name="settings_smart_intensity_desc">كم مرة يجب أن تحاول التذكيرات الذكية الوصول إليك؟</string>
+    <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
+    <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
+    <string name="settings_remove_image_metadata">إزالة بيانات الصور الوصفية</string>
+    <string name="settings_remove_image_metadata_desc">تنظيف الصور من بيانات EXIF والبيانات الحساسة الأخرى قبل إرسالها</string>
+    <string name="settings_smart_pointing_images">الإشارة الذكية للصور</string>
+    <string name="settings_smart_pointing_images_desc">الإشارة إلى ملفات الصور الموجودة مسبقًا بدلًا من تكرارها عند إرسال نفس المِلَفّ مجددًا</string>
+    <string name="settings_license">تراخيص البرمجيات مفتوحة المصدر</string>
+    <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
+    <string name="settings_information">معلومات</string>
+    <string name="settings_choose_theme">اختر المظهر</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_experimental_sync_title">ميزة تجريبية</string>
+    <string name="settings_experimental_sync_message">ميزة المزامنة بين الأجهزة لا تزل في مرحلتها التجريبية. قد تواجه بعض الأخطاء أو السلوكيات غير المتوقعة. استخدمها على مسؤوليتك الخاصة، وننصح بشدة بأخذ نسخة احتياطية لبياناتك أولًا.</string>
+
+    <!-- Developer Settings -->
     <string name="settings_developer">المطور</string>
-    <string name="settings_dev_name">kys0ff</string>
+    <string name="settings_dev_name" translatable="false">kys0ff</string>
     <string name="settings_dev_click">لقد وجدتني. الآن ارحل بعيدًا.</string>
     <string name="settings_dev_click_fine">حسناً…</string>
     <string name="settings_secret_category">خيارات المطور</string>
@@ -109,51 +135,51 @@
     <string name="settings_wipe_data_desc">حذف قاعدة البيانات، التخزين المؤقت، وجميع التفضيلات</string>
     <string name="settings_show_secret_category">إظهار خيارات المطور</string>
     <string name="settings_show_secret_category_desc">قم بإيقاف هذا الخِيار لإخفاء هذا القسم مجدداً</string>
-    <string name="settings_stay_awake">إبقاء الشاشة قيد التشغيل</string>
-    <string name="settings_stay_awake_desc">منع الشاشة من الإغلاق التلقائي في أثناء الشحن أو جلسات التطوير</string>
-    <string name="settings_chat">المحادثة</string>
-    <string name="settings_reminders">التذكيرات</string>
-    <string name="settings_reminders_desc">تلقي إشعارات لتذكيرك بالكتابة عن يومك</string>
-    <string name="settings_reminder_interval">التكرار</string>
-
-    <!-- Reminder Messages -->
-    <string name="reminder_message_1">كيف كان يومك؟ خذ لحظة للتحدث مع نفسك.</string>
-    <string name="reminder_message_2">هل يدور شيء في ذهنك؟ دوّنه الآن.</string>
-    <string name="reminder_message_3">ستشكرك نفسك المستقبلية على ملاحظات اليوم.</string>
-    <string name="reminder_message_4">حان وقت مراجعة سريعة مع نفسك.</string>
-    <string name="reminder_message_5">ما هو أبرز حدث في يومك حتى الآن؟</string>
-    <string name="reminder_message_6">لا تنسَ تسجيل أفكارك اليوم.</string>
-    <string name="reminder_message_7">خذ نفساً عميقاً واكتب بضعة أسطر.</string>
-    <string name="reminder_message_8">ما هو الشيء الوحيد الذي تعلمته اليوم؟</string>
-    <string name="reminder_message_9">كيف تشعر الآن؟ ضع مشاعرك في كلمات.</string>
-    <string name="reminder_message_10">فكر في فوز صغير حققته في يومك.</string>
-    <string name="reminder_message_11">هل هناك شيء تريد التخلص منه اليوم؟</string>
-    <string name="reminder_message_12">ما الذي جعلك تبتسم اليوم؟</string>
-    <string name="reminder_message_13">خذ لحظة للتحقق من أهدافك.</string>
-    <string name="reminder_message_14">أفكارك تستحق أن تُسمع. اكتبها.</string>
-    <string name="reminder_message_title">وقت التأمل</string>
-    <string name="reminder_notification_channel">التذكيرات اليومية</string>
-    <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
-    <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
-    <string name="settings_remove_image_metadata">إزالة بيانات الصور الوصفية</string>
-    <string name="settings_remove_image_metadata_desc">تنظيف الصور من بيانات EXIF والبيانات الحساسة الأخرى قبل إرسالها</string>
-    <string name="settings_smart_pointing_images">الإشارة الذكية للصور</string>
-    <string name="settings_smart_pointing_images_desc">الإشارة إلى ملفات الصور الموجودة مسبقًا بدلًا من تكرارها عند إرسال نفس المِلَفّ مجددًا</string>
     <string name="settings_wipe_data_confirm_title">هل تريد مسح جميع البيانات؟</string>
     <string name="settings_wipe_data_confirm_message">سيتم حذف جميع رسائلك، المهام المجدولة، والملاحظات الصوتية نهائيًا، كما ستتم إعادة تعيين الإعدادات. لايمكن التراجع عن هذا الإجراء.</string>
-    <string name="settings_license">تراخيص البرمجيات مفتوحة المصدر</string>
-    <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
-    <string name="settings_information">معلومات</string>
-    <string name="settings_choose_theme">اختر المظهر</string>
+
+    <!-- Lock Timeout -->
+    <string name="settings_lock_timeout">مهلة القفل</string>
+    <string name="settings_lock_timeout_desc">المدة التي يظل فيها التطبيق مفتوحاً في الخلفية</string>
+    <string name="settings_lock_on_screen_off">القفل عند إيقاف الشاشة</string>
+    <string name="settings_lock_on_screen_off_desc">قفل التطبيق فوراً عند إيقاف تشغيل شاشة الهاتف</string>
+    <string name="lock_timeout_immediately">فوراً</string>
+    <string name="lock_timeout_15s">15 ثانية</string>
+    <string name="lock_timeout_30s">30 ثانية</string>
+    <string name="lock_timeout_1m">دقيقة واحدة</string>
+    <string name="lock_timeout_5m">5 دقائق</string>
+    <string name="lock_timeout_10m">10 دقائق</string>
+    <string name="lock_timeout_30m">30 دقيقة</string>
+
+    <!-- Themes -->
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_system">تلقائي</string>
-    <string name="settings_language">اللغة</string>
+
+    <!-- Languages -->
     <string name="language_system">تلقائي (لغة النظام)</string>
     <string name="language_english">الإنجليزية (English)</string>
     <string name="language_arabic">العربية</string>
-    <string name="settings_experimental_sync_title">ميزة تجريبية</string>
-    <string name="settings_experimental_sync_message">ميزة المزامنة بين الأجهزة لا تزل في مرحلتها التجريبية. قد تواجه بعض الأخطاء أو السلوكيات غير المتوقعة. استخدمها على مسؤوليتك الخاصة، وننصح بشدة بأخذ نسخة احتياطية لبياناتك أولًا.</string>
+
+    <!-- Date & Time Formats -->
+    <string name="date_format_system">تلقائي</string>
+    <string name="date_format_dmy_slash">يوم/شهر/سنة</string>
+    <string name="date_format_mdy_slash">شهر/يوم/سنة</string>
+    <string name="date_format_ymd_dash">سنة-شهر-يوم</string>
+    <string name="date_format_dmy_dot">يوم.شهر.سنة</string>
+    <string name="date_format_custom">مخصص…</string>
+    <string name="date_format_custom_title">تنسيق تاريخ مخصص</string>
+    <string name="date_format_custom_hint">مثال: EEEE, MMM d</string>
+    <string name="date_format_invalid">تنسيق غير صالح</string>
+    <string name="time_format_system">تلقائي</string>
+    <string name="time_format_12h">12 ساعة</string>
+    <string name="time_format_24h">24 ساعة</string>
+
+    <!-- Smart Intensity -->
+    <string name="smart_intensity_relaxed">هادئ</string>
+    <string name="smart_intensity_normal">عادي</string>
+    <string name="smart_intensity_frequent">متكرر</string>
+    <string name="smart_intensity_intense">مكثف</string>
 
     <!-- Statistics -->
     <string name="statistics_title">الإحصائيات</string>
@@ -229,8 +255,6 @@
     <string name="reminders_empty">لا توجد تذكيرات مجدولة</string>
     <string name="reminders_cancel_confirm_title">إلغاء التذكير؟</string>
     <string name="reminders_cancel_confirm_msg">هل أنت متحقِّق من أنك تريد إلغاء هذا التذكير المجدول؟</string>
-    <string name="chat_reminder_tag">تذكير</string>
-    <string name="chat_pinned_tag">مثبتة</string>
     <string name="chat_reminder_notification_channel">التذكيرات</string>
     <string name="chat_reminder_notification_title">ملاحظة لنفسي</string>
     <string name="chat_reminder_original_time">الوقت الأصلي:</string>
@@ -246,6 +270,7 @@
     <string name="camera_flash">الفلاش</string>
     <string name="camera_retake">إعادة التقاط</string>
     <string name="camera_send">إرسال الصورة</string>
+    <string name="camera_blocked">الكاميرا محجوبة</string>
 
     <!-- Sync & Devices -->
     <string name="sync_title">المزامنة والأجهزة</string>
@@ -254,7 +279,7 @@
     <string name="sync_paired_devices">الأجهزة المقترنة</string>
     <string name="sync_start_discovery">بدء البحث</string>
     <string name="sync_stop_discovery">إيقاف البحث</string>
-    <string name="sync_no_devices_found">لم يتم العثور على أجهزة</string>
+    <string name="sync_no_devices_found">لم يتم العور على أجهزة</string>
     <string name="sync_pairing_request_title">طلب اقتران وارد</string>
     <string name="sync_pairing_request_msg">وصلك طلب اقتران من</string>
     <string name="sync_show_pin">إظهار رمز الـ PIN</string>
@@ -311,6 +336,7 @@
     <string name="onboarding_permission_media">مكتبة الوسائط</string>
     <string name="onboarding_permission_media_desc">مطلوبة لاختيار وإرسال الصور من المَعْرِض الخاص بك.</string>
     <string name="onboarding_permission_request">تفعيل</string>
+    <string name="onboarding_permission_granted">تم المنح</string>
     <string name="onboarding_get_started">ابدأ الآن</string>
     <string name="onboarding_next">التالي</string>
     <string name="onboarding_skip">تخطي</string>
@@ -319,6 +345,7 @@
     <string name="onboarding_mock_message_1">مرحباً يا نفسي! يجب أن أتذكر شرب المزيد من الماء اليوم.</string>
     <string name="onboarding_mock_message_2">فكرة جيدة. على ترطيب جسمك حافظ! 💧</string>
     <string name="onboarding_mock_reminder">اضغط مطولًا على زر الإرسال لجدولة تذكير كهذا!</string>
+    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">رسالة مثبتة</string>
@@ -335,4 +362,33 @@
         <item quantity="many">عرض كل الرسائل المثبتة (%1$d)</item>
         <item quantity="other">عرض كل الرسائل المثبتة (%1$d)</item>
     </plurals>
+
+    <!-- Image Preview -->
+    <string name="image_preview_visual_preview">معاينة بصرية</string>
+
+    <!-- Errors -->
+    <string name="error_update_url">تعذر فتح رابط التحديث</string>
+    <string name="error_pairing_failed">فشل طلب الاقتران</string>
+    <string name="error_pin_verification_failed">فشل التحقق من رمز PIN</string>
+    <string name="error_sync_failed">فشلت المزامنة</string>
+    <string name="error_pull_sync_failed">فشل جلب المزامنة</string>
+
+    <!-- Reminder Messages -->
+    <string name="reminder_message_1">كيف كان يومك؟ خذ لحظة للتحدث مع نفسك.</string>
+    <string name="reminder_message_2">هل يدور شيء في ذهنك؟ دوّنه الآن.</string>
+    <string name="reminder_message_3">ستشكرك نفسك المستقبلية على ملاحظات اليوم.</string>
+    <string name="reminder_message_4">حان وقت مراجعة سريعة مع نفسك.</string>
+    <string name="reminder_message_5">ما هو أبرز حدث في يومك حتى الآن؟</string>
+    <string name="reminder_message_6">لا تنسَ تسجيل أفكارك اليوم.</string>
+    <string name="reminder_message_7">خذ نفساً عميقاً واكتب بضعة أسطر.</string>
+    <string name="reminder_message_8">ما هو الشيء الوحيد الذي تعلمته اليوم؟</string>
+    <string name="reminder_message_9">كيف تشعر الآن؟ ضع مشاعرك في كلمات.</string>
+    <string name="reminder_message_10">فكر في فوز صغير حققته في يومك.</string>
+    <string name="reminder_message_11">هل هناك شيء تريد التخلص منه اليوم؟</string>
+    <string name="reminder_message_12">ما الذي جعلك تبتسم اليوم؟</string>
+    <string name="reminder_message_13">خذ لحظة للتحقق من أهدافك.</string>
+    <string name="reminder_message_14">أفكارك تستحق أن تُسمع. اكتبها.</string>
+    <string name="reminder_message_title">وقت التأمل</string>
+    <string name="reminder_notification_channel">التذكيرات اليومية</string>
+
 </resources>

@@ -211,7 +211,7 @@ fun MediaPickerSheet(
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
                                         Text(
-                                            text = "Camera Blocked",
+                                            text = stringResource(R.string.camera_blocked),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             style = MaterialTheme.typography.labelSmall
                                         )

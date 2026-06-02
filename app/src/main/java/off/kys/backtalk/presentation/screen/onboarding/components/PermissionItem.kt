@@ -112,7 +112,7 @@ fun PermissionItem(
                 if (granted) {
                     Icon(
                         painter = painterResource(R.drawable.round_check_24),
-                        contentDescription = "Granted",
+                        contentDescription = stringResource(R.string.onboarding_permission_granted),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )

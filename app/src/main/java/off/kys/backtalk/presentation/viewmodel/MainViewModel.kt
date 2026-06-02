@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import off.kys.backtalk.R
 import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.worker.ReminderWorker
@@ -114,7 +115,7 @@ class MainViewModel(
             }
             application.startActivity(intent)
         } catch (_: Exception) {
-            _mainUiState.value = MainUiState.Error("Could not open update URL")
+            _mainUiState.value = MainUiState.Error(messageRes = R.string.error_update_url)
         }
     }
 }

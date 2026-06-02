@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.repository.SyncRepository
+import off.kys.backtalk.R
 import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.state.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
@@ -108,8 +109,8 @@ class SyncViewModel(
                 val exception = result.exceptionOrNull()
                 _state.value = _state.value.copy(
                     syncStatus = SyncStatus.FAILED,
-                    error = if (exception is SyncException) null else exception?.message ?: "Pairing request failed",
-                    errorRes = (exception as? SyncException)?.getErrorMessageRes(),
+                    error = if (exception is SyncException) null else exception?.message,
+                    errorRes = (exception as? SyncException)?.getErrorMessageRes() ?: R.string.error_pairing_failed,
                     deviceBeingPaired = null
                 )
             }
@@ -146,8 +147,8 @@ class SyncViewModel(
                 val exception = result.exceptionOrNull()
                 _state.value = _state.value.copy(
                     syncStatus = SyncStatus.FAILED,
-                    error = if (exception is SyncException) null else exception?.message ?: "PIN verification failed",
-                    errorRes = (exception as? SyncException)?.getErrorMessageRes()
+                    error = if (exception is SyncException) null else exception?.message,
+                    errorRes = (exception as? SyncException)?.getErrorMessageRes() ?: R.string.error_pin_verification_failed
                 )
             }
         }
@@ -163,8 +164,8 @@ class SyncViewModel(
                 val exception = result.exceptionOrNull()
                 _state.value = _state.value.copy(
                     syncStatus = SyncStatus.FAILED,
-                    error = if (exception is SyncException) null else exception?.message ?: "Sync failed",
-                    errorRes = (exception as? SyncException)?.getErrorMessageRes()
+                    error = if (exception is SyncException) null else exception?.message,
+                    errorRes = (exception as? SyncException)?.getErrorMessageRes() ?: R.string.error_sync_failed
                 )
             }
         }
@@ -180,8 +181,8 @@ class SyncViewModel(
                 val exception = result.exceptionOrNull()
                 _state.value = _state.value.copy(
                     syncStatus = SyncStatus.FAILED,
-                    error = if (exception is SyncException) null else exception?.message ?: "Pull sync failed",
-                    errorRes = (exception as? SyncException)?.getErrorMessageRes()
+                    error = if (exception is SyncException) null else exception?.message,
+                    errorRes = (exception as? SyncException)?.getErrorMessageRes() ?: R.string.error_pull_sync_failed
                 )
             }
         }

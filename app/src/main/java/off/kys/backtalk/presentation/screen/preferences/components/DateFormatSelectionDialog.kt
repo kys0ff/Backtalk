@@ -141,7 +141,7 @@ fun DateFormatSelectionDialog(
 }
 
 @Composable
-fun CustomDateFormatDialog(
+private fun CustomDateFormatDialog(
     initialPattern: String,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit
