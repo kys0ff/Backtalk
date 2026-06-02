@@ -7,11 +7,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
@@ -44,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition {
-            !isAuthChecked || !isAuthenticated || messagesUiState.isLoading
+            !isAuthChecked || (isAuthenticated && messagesUiState.isLoading)
         }
 
         enableEdgeToEdge()
@@ -56,18 +54,21 @@ class MainActivity : AppCompatActivity() {
             val unlockedKeys by appLockManager.unlockedKeys.collectAsState()
             val isCurrentlyUnlocked = !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
 
+            var isAuthenticating by remember { mutableStateOf(false) }
+
             val authenticate = remember(biometricManager, appLockManager) {
                 {
-                    biometricManager.authenticate(
-                        titleRes = R.string.auth_title,
-                        subtitleRes = R.string.auth_subtitle,
-                    ) { result ->
-                        when (result) {
-                            is BiometricResult.Success -> {
+                    if (!isAuthenticating) {
+                        isAuthenticating = true
+                        biometricManager.authenticate(
+                            titleRes = R.string.auth_title,
+                            subtitleRes = R.string.auth_subtitle,
+                        ) { result ->
+                            isAuthenticating = false
+                            isAuthChecked = true
+                            if (result is BiometricResult.Success) {
                                 appLockManager.setUnlocked(AppLockManager.Keys.MAIN)
                             }
-                            is BiometricResult.Error -> finishAffinity()
-                            is BiometricResult.Failed -> finishAffinity()
                         }
                     }
                 }
@@ -81,12 +82,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             LaunchedEffect(isCurrentlyUnlocked) {
-                if (preferences.lockEnabled && !isCurrentlyUnlocked) {
-                    authenticate()
-                }
-            }
-
-            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
                 if (preferences.lockEnabled && !isCurrentlyUnlocked) {
                     authenticate()
                 }
