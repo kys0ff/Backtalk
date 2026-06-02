@@ -1,4 +1,4 @@
-<!--suppress GrazieInspection -->
+<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <!-- Common -->
     <string name="common_send">إرسال</string>
