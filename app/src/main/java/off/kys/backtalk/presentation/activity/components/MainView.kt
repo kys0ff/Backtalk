@@ -18,7 +18,8 @@ import off.kys.backtalk.presentation.viewmodel.MainViewModel
 @Composable
 fun MainView(
     viewModel: MainViewModel,
-    isAuthenticated: Boolean
+    isAuthenticated: Boolean,
+    onRetryAuthentication: () -> Unit = {}
 ) {
     val updateState by viewModel.mainUiState.collectAsStateWithLifecycle()
     val isDarkTheme = viewModel.preferences.themeMode.isDark(isSystemInDarkTheme())
@@ -37,7 +38,7 @@ fun MainView(
                     SlideTransition(navigator)
                 }
             } else {
-                LockView()
+                LockView(onRetryAuthentication = onRetryAuthentication)
             }
         }
 

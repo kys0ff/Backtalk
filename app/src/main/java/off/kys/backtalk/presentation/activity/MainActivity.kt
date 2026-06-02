@@ -8,7 +8,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
@@ -27,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModel<MainViewModel>()
     private val messagesViewModel by viewModel<MessagesViewModel>()
 
-    // Keeping your Activity-level states so the Splash Screen doesn't throw a tantrum.
     private var isAuthChecked by mutableStateOf(false)
     private var isAuthenticated by mutableStateOf(false)
 
@@ -54,15 +56,8 @@ class MainActivity : AppCompatActivity() {
             val unlockedKeys by appLockManager.unlockedKeys.collectAsState()
             val isCurrentlyUnlocked = !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
 
-            LaunchedEffect(isCurrentlyUnlocked, unlockedKeys) {
-                isAuthenticated = isCurrentlyUnlocked
-                if (!preferences.lockEnabled || isCurrentlyUnlocked) {
-                    isAuthChecked = true
-                }
-            }
-
-            if (preferences.lockEnabled && !isCurrentlyUnlocked) {
-                LaunchedEffect(Unit) {
+            val authenticate = remember(biometricManager, appLockManager) {
+                {
                     biometricManager.authenticate(
                         titleRes = R.string.auth_title,
                         subtitleRes = R.string.auth_subtitle,
@@ -78,6 +73,25 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            LaunchedEffect(isCurrentlyUnlocked, unlockedKeys) {
+                isAuthenticated = isCurrentlyUnlocked
+                if (!preferences.lockEnabled || isCurrentlyUnlocked) {
+                    isAuthChecked = true
+                }
+            }
+
+            LaunchedEffect(isCurrentlyUnlocked) {
+                if (preferences.lockEnabled && !isCurrentlyUnlocked) {
+                    authenticate()
+                }
+            }
+
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                if (preferences.lockEnabled && !isCurrentlyUnlocked) {
+                    authenticate()
+                }
+            }
+
             AppLifecycleHandler(
                 prefs = preferences,
                 window = window
@@ -85,7 +99,8 @@ class MainActivity : AppCompatActivity() {
 
             MainView(
                 viewModel = viewModel,
-                isAuthenticated = isCurrentlyUnlocked
+                isAuthenticated = isCurrentlyUnlocked,
+                onRetryAuthentication = authenticate
             )
         }
     }

@@ -1,5 +1,7 @@
 package off.kys.backtalk.presentation.activity.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,9 +27,17 @@ import off.kys.backtalk.R
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 
 @Composable
-fun LockView(modifier: Modifier = Modifier) {
+fun LockView(
+    modifier: Modifier = Modifier,
+    onRetryAuthentication: () -> Unit = {}
+) {
     Surface(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onRetryAuthentication() },
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
