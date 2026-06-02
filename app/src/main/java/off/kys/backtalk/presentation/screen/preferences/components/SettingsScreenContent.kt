@@ -224,7 +224,7 @@ fun SettingsScreenContent(
                 SettingsItem(
                     label = stringResource(R.string.settings_time_format),
                     value = stringResource(state.timeFormat.titleResId),
-                    icon = painterResource(R.drawable.round_access_alarm_24),
+                    icon = painterResource(R.drawable.round_calendar_clock_24),
                     onClick = { showTimeFormatDialog.value = true }
                 )
             }
