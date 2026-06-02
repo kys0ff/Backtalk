@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -44,12 +43,7 @@ class StatisticsScreen : Screen {
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.statistics_title),
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    },
+                    title = { Text(text = stringResource(R.string.statistics_title)) },
                     navigationIcon = {
                         HintTooltip(stringResource(R.string.common_back)) {
                             IconButton(onClick = { navigator.pop() }) {

@@ -109,6 +109,18 @@ fun StatisticsContent(
             }
         }
 
+        SectionTitle(stringResource(R.string.statistics_app_usage_heatmap))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        ) {
+            AppUsageHeatmap(
+                data = state.heatmapData,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
         SectionTitle(stringResource(R.string.statistics_message_types))
         Card(
             modifier = Modifier.fillMaxWidth(),

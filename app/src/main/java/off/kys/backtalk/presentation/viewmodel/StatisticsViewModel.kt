@@ -10,10 +10,16 @@ import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.presentation.state.DayActivity
+import off.kys.backtalk.presentation.state.HeatmapDay
 import off.kys.backtalk.presentation.state.StatisticsUiState
 import off.kys.backtalk.presentation.state.ThreadStat
 import off.kys.backtalk.util.emptyString
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 import java.util.Calendar
 import java.util.Locale
 
@@ -50,6 +56,7 @@ class StatisticsViewModel(
             } else 0
 
             val activity = calculateLast7DaysActivity(allMessages)
+            val heatmapData = calculateHeatmapData(allMessages)
             val currentStreak = calculateCurrentStreak(allMessages)
 
             val topThreads = calculateTopThreads(allMessages)
@@ -62,6 +69,7 @@ class StatisticsViewModel(
                     totalVoiceDurationMs = totalVoiceDuration,
                     scheduledMessagesCount = scheduledMessages.size,
                     activityLast7Days = activity,
+                    heatmapData = heatmapData,
                     topThreads = topThreads,
                     avgMessageLength = avgLen,
                     imageCount = imageCount,
@@ -141,6 +149,31 @@ class StatisticsViewModel(
             days.add(DayActivity(dayName, count))
         }
         return days
+    }
+
+    private fun calculateHeatmapData(messages: List<MessageEntity>): List<HeatmapDay> {
+        val endDate = LocalDate.now()
+        // Last 16 weeks, starting from Sunday
+        val startDate = endDate.minusWeeks(15).with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+
+        val countsByDate = messages
+            .asSequence()
+            .map {
+                Instant.ofEpochMilli(it.timestamp)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+            }
+            .filter { !it.isBefore(startDate) && !it.isAfter(endDate) }
+            .groupingBy { it }
+            .eachCount()
+
+        val heatmapData = mutableListOf<HeatmapDay>()
+        var currentDate = startDate
+        while (!currentDate.isAfter(endDate)) {
+            heatmapData.add(HeatmapDay(currentDate, countsByDate[currentDate] ?: 0))
+            currentDate = currentDate.plusDays(1)
+        }
+        return heatmapData
     }
 
     private fun calculateTopThreads(messages: List<MessageEntity>): List<ThreadStat> {

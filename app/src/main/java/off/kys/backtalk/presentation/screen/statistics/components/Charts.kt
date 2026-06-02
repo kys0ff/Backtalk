@@ -4,6 +4,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,10 +33,19 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import off.kys.backtalk.presentation.state.DayActivity
+import off.kys.backtalk.presentation.state.HeatmapDay
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.TextStyle
 
 @Composable
 fun ActivityBarChart(
@@ -95,6 +108,132 @@ fun ActivityBarChart(
                     color = labelColor
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AppUsageHeatmap(
+    data: List<HeatmapDay>,
+    modifier: Modifier = Modifier,
+    cellSize: Dp = 12.dp,
+    cellSpacing: Dp = 4.dp
+) {
+    if (data.isEmpty()) return
+
+    // Memoize the data processing so we don't choke the UI thread on recomposition
+    val weeks = remember(data) { data.chunked(7) }
+    val maxCount = remember(data) { data.maxOfOrNull { it.count }?.coerceAtLeast(1) ?: 1 }
+
+    val colorScheme = MaterialTheme.colorScheme
+    val baseColor = colorScheme.primary
+    val emptyColor = colorScheme.surfaceVariant.copy(alpha = 0.3f)
+
+    val locale = LocalLocale.current.platformLocale
+    val dayLabels = remember(locale) {
+        listOf(
+            DayOfWeek.SUNDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY,
+            DayOfWeek.SATURDAY
+        ).map { it.getDisplayName(TextStyle.NARROW, locale) }
+    }
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        // Day labels (Static, doesn't scroll)
+        Column(
+            modifier = Modifier.padding(top = 24.dp, end = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(cellSpacing)
+        ) {
+            dayLabels.forEachIndexed { index, label ->
+                if (index % 2 == 1) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.height(cellSize)
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(cellSize))
+                }
+            }
+        }
+
+        // Heatmap Grid (Scrollable)
+        Column(modifier = Modifier.horizontalScroll(scrollState)) {
+            // Month labels
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+            ) {
+                weeks.forEachIndexed { index, week ->
+                    val firstDay = week.firstOrNull()?.date
+                    // A slightly more robust check for month boundaries
+                    val isNewMonth = firstDay != null && (index == 0 || firstDay.dayOfMonth <= 7)
+
+                    if (isNewMonth) {
+                        Text(
+                            text = firstDay.month.getDisplayName(TextStyle.SHORT, LocalLocale.current.platformLocale),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colorScheme.onSurfaceVariant,
+                            // Dynamically calculate padding based on cell constraints
+                            modifier = Modifier.padding(start = ((cellSize + cellSpacing) * index))
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(cellSpacing))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(cellSpacing)) {
+                weeks.forEach { week ->
+                    Column(verticalArrangement = Arrangement.spacedBy(cellSpacing)) {
+                        week.forEach { day ->
+                            val color = if (day.count == 0) {
+                                emptyColor
+                            } else {
+                                val alpha = (day.count.toFloat() / maxCount).coerceIn(0.2f, 1f)
+                                baseColor.copy(alpha = alpha)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .size(cellSize)
+                                    .background(color, RoundedCornerShape(2.dp))
+                                    // Actually tell the OS what this box is for
+                                    .semantics {
+                                        contentDescription = "Date: ${day.date}, Count: ${day.count}"
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppUsageHeatmapPreview() {
+    val data = List(112) { i ->
+        HeatmapDay(
+            date = LocalDate.now().minusDays(111L - i),
+            count = (0..10).random()
+        )
+    }
+    MaterialTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            AppUsageHeatmap(data = data)
         }
     }
 }

@@ -172,6 +172,7 @@
     <string name="statistics_voice_duration">Voice Duration</string>
     <string name="statistics_scheduled">Scheduled</string>
     <string name="statistics_avg_length">Avg. Length</string>
+    <string name="statistics_app_usage_heatmap">App Usage Heatmap</string>
     <string name="statistics_activity_last_7_days">Activity (Last 7 Days)</string>
     <string name="statistics_message_types">Message Types</string>
     <string name="statistics_voice">Voice</string>

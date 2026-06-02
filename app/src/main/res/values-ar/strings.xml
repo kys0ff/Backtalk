@@ -158,6 +158,7 @@
     <string name="statistics_voice_duration">مدة الصوت</string>
     <string name="statistics_scheduled">المجدولة</string>
     <string name="statistics_avg_length">متوسط الطول</string>
+    <string name="statistics_app_usage_heatmap">خريطة استخدام التطبيق</string>
     <string name="statistics_activity_last_7_days">النشاط (آخر 7 أيام)</string>
     <string name="statistics_message_types">أنواع الرسائل</string>
     <string name="statistics_voice">صوتية</string>
