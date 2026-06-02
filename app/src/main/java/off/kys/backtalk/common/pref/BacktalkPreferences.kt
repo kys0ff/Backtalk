@@ -6,6 +6,8 @@ import android.os.Build
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import off.kys.backtalk.BuildConfig
+import off.kys.backtalk.common.AppDateFormat
+import off.kys.backtalk.common.AppTimeFormat
 import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.SmartIntensity
 import off.kys.backtalk.common.ThemeMode
@@ -88,6 +90,19 @@ class BacktalkPreferences(context: Context) {
     var smartReminderIntensity by preference(
         EnumPreferenceItem(prefs, KEY_SMART_REMINDER_INTENSITY, SmartIntensity.NORMAL, SmartIntensity::class.java)
     )
+
+    /** The date format for displaying dates throughout the app. */
+    var dateFormat by preference(
+        EnumPreferenceItem(prefs, KEY_DATE_FORMAT, AppDateFormat.SYSTEM, AppDateFormat::class.java)
+    )
+
+    /** The time format for displaying times throughout the app. */
+    var timeFormat by preference(
+        EnumPreferenceItem(prefs, KEY_TIME_FORMAT, AppTimeFormat.SYSTEM, AppTimeFormat::class.java)
+    )
+
+    /** The custom date format pattern. */
+    var customDateFormat by preference(StringPreferenceItem(prefs, KEY_CUSTOM_DATE_FORMAT, "MMM d, yyyy"))
 
     /** The persistable URI of the directory where auto-exports are saved. */
     var autoExportUri by preference(StringPreferenceItem(prefs, KEY_AUTO_EXPORT_URI, null))
@@ -196,6 +211,9 @@ class BacktalkPreferences(context: Context) {
         const val KEY_REMINDERS_ENABLED = "reminders_enabled"
         const val KEY_REMINDER_INTERVAL = "reminder_interval"
         const val KEY_SMART_REMINDER_INTENSITY = "smart_reminder_intensity"
+        const val KEY_DATE_FORMAT = "date_format"
+        const val KEY_TIME_FORMAT = "time_format"
+        const val KEY_CUSTOM_DATE_FORMAT = "custom_date_format"
         const val KEY_AUTO_EXPORT_URI = "auto_export_uri"
         const val KEY_AUTO_EXPORT_INTERVAL = "auto_export_interval"
         const val KEY_AUTO_EXPORT_ENCRYPTED = "auto_export_encrypted"

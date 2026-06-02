@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.event
 
 import android.net.Uri
+import off.kys.backtalk.common.AppDateFormat
+import off.kys.backtalk.common.AppTimeFormat
 import off.kys.backtalk.common.ThemeMode
 
 /**
@@ -9,6 +11,9 @@ import off.kys.backtalk.common.ThemeMode
 sealed class SettingsUiEvent {
     data class OnThemeModeChange(val themeMode: ThemeMode) : SettingsUiEvent()
     data class OnLanguageChange(val language: off.kys.backtalk.common.AppLanguage) : SettingsUiEvent()
+    data class OnDateFormatChange(val dateFormat: AppDateFormat) : SettingsUiEvent()
+    data class OnTimeFormatChange(val timeFormat: AppTimeFormat) : SettingsUiEvent()
+    data class OnCustomDateFormatChange(val pattern: String) : SettingsUiEvent()
     data class OnDynamicColorToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnLockToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnLockOnScreenOffToggle(val enabled: Boolean) : SettingsUiEvent()

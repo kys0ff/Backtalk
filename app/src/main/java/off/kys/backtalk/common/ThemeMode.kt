@@ -6,7 +6,7 @@ import off.kys.backtalk.R
 /**
  * Represents the theme mode of the application.
  */
-enum class ThemeMode(@StringRes val titleResId: Int) {
+enum class ThemeMode(@get:StringRes val titleResId: Int) {
     /**
      * Forced light theme.
      */

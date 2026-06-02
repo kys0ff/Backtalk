@@ -76,6 +76,8 @@ fun SettingsScreenContent(
     val showReminderIntervalDialog = remember { mutableStateOf(false) }
     val showSmartIntensityDialog = remember { mutableStateOf(false) }
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
+    val showDateFormatDialog = remember { mutableStateOf(false) }
+    val showTimeFormatDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
 
@@ -202,6 +204,28 @@ fun SettingsScreenContent(
                     icon = painterResource(R.drawable.round_palette_24),
                     checked = state.dynamicColorEnabled,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnDynamicColorToggle(it)) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_date_format),
+                    value = stringResource(state.dateFormat.titleResId),
+                    icon = painterResource(R.drawable.round_calendar_today_24),
+                    onClick = { showDateFormatDialog.value = true }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_time_format),
+                    value = stringResource(state.timeFormat.titleResId),
+                    icon = painterResource(R.drawable.round_access_alarm_24),
+                    onClick = { showTimeFormatDialog.value = true }
                 )
             }
 
@@ -762,6 +786,24 @@ fun SettingsScreenContent(
                 onEvent(SettingsUiEvent.OnLockTimeoutChange(it))
                 showLockTimeoutDialog.value = false
             }
+        )
+    }
+
+    if (showDateFormatDialog.value) {
+        DateFormatSelectionDialog(
+            selectedFormat = state.dateFormat,
+            customPattern = state.customDateFormat,
+            onFormatSelected = { onEvent(SettingsUiEvent.OnDateFormatChange(it)) },
+            onCustomPatternChanged = { onEvent(SettingsUiEvent.OnCustomDateFormatChange(it)) },
+            onDismiss = { showDateFormatDialog.value = false }
+        )
+    }
+
+    if (showTimeFormatDialog.value) {
+        TimeFormatSelectionDialog(
+            selectedFormat = state.timeFormat,
+            onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
+            onDismiss = { showTimeFormatDialog.value = false }
         )
     }
 }

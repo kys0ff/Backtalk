@@ -55,6 +55,9 @@ class SettingsViewModel(
             lockTimeoutMillis = preferences.lockTimeoutMillis,
             secureScreenEnabled = preferences.secureScreenEnabled,
             autoUpdateEnabled = preferences.autoUpdateEnabled,
+            dateFormat = preferences.dateFormat,
+            timeFormat = preferences.timeFormat,
+            customDateFormat = preferences.customDateFormat ?: "MMM d, yyyy",
             autoExportEnabled = preferences.autoExportEnabled,
             autoExportInterval = preferences.autoExportInterval,
             autoExportUri = preferences.autoExportUri,
@@ -77,6 +80,9 @@ class SettingsViewModel(
     fun onEvent(event: SettingsUiEvent) = when (event) {
         is SettingsUiEvent.OnThemeModeChange -> onThemeModeChange(event.themeMode)
         is SettingsUiEvent.OnLanguageChange -> onLanguageChange(event.language)
+        is SettingsUiEvent.OnDateFormatChange -> onDateFormatChange(event.dateFormat)
+        is SettingsUiEvent.OnTimeFormatChange -> onTimeFormatChange(event.timeFormat)
+        is SettingsUiEvent.OnCustomDateFormatChange -> onCustomDateFormatChange(event.pattern)
         is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
         is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
         is SettingsUiEvent.OnLockOnScreenOffToggle -> onLockOnScreenOffToggle(event.enabled)
@@ -125,6 +131,21 @@ class SettingsViewModel(
         }
         AppCompatDelegate.setApplicationLocales(appLocale)
         _state.update { it.copy(appLanguage = language) }
+    }
+
+    private fun onDateFormatChange(dateFormat: off.kys.backtalk.common.AppDateFormat) {
+        preferences.dateFormat = dateFormat
+        _state.update { it.copy(dateFormat = dateFormat) }
+    }
+
+    private fun onTimeFormatChange(timeFormat: off.kys.backtalk.common.AppTimeFormat) {
+        preferences.timeFormat = timeFormat
+        _state.update { it.copy(timeFormat = timeFormat) }
+    }
+
+    private fun onCustomDateFormatChange(pattern: String) {
+        preferences.customDateFormat = pattern
+        _state.update { it.copy(customDateFormat = pattern) }
     }
 
     private fun onDynamicColorToggle(enabled: Boolean) {

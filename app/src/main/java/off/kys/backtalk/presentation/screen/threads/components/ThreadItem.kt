@@ -19,18 +19,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun ThreadItem(
@@ -42,7 +40,7 @@ fun ThreadItem(
     onQuoteClick: ((MessageEntity) -> Unit)? = null,
     getReplyCount: ((MessageEntity) -> Int)? = null
 ) {
-    val timeFormat = SimpleDateFormat("MMM d", LocalLocale.current.platformLocale)
+    val dateFormatter = LocalDateFormatter.current
     val text = thread.root.editedText ?: thread.root.text
 
     Column(
@@ -81,7 +79,7 @@ fun ThreadItem(
                     Text(
                         text = stringResource(
                             R.string.threads_at_you_timestamp,
-                            timeFormat.format(Date(thread.root.timestamp))
+                            dateFormatter.formatDate(thread.root.timestamp)
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline

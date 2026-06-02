@@ -27,8 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.sync.DeviceInfo
-import java.text.DateFormat
 
 @Composable
 fun PairedDeviceItem(
@@ -37,6 +37,7 @@ fun PairedDeviceItem(
     onPullClick: () -> Unit,
     onDisconnectClick: () -> Unit
 ) {
+    val dateFormatter = LocalDateFormatter.current
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         border = CardDefaults.outlinedCardBorder(enabled = device.isOnline)
@@ -49,7 +50,7 @@ fun PairedDeviceItem(
                         Text(
                             stringResource(
                                 R.string.sync_status_last_synced,
-                                DateFormat.getDateTimeInstance().format(device.lastSyncTimestamp)
+                                dateFormatter.formatDateTime(device.lastSyncTimestamp)
                             )
                         )
                     }

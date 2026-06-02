@@ -20,17 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun QuotedMessage(
@@ -39,7 +37,7 @@ fun QuotedMessage(
     replyCount: Int = 0,
     onClick: (() -> Unit)? = null
 ) {
-    val timeFormat = SimpleDateFormat("MMM d", LocalLocale.current.platformLocale)
+    val dateFormatter = LocalDateFormatter.current
     val text = message.editedText ?: message.text
     val shape = RoundedCornerShape(12.dp)
     val isVoice = message.voicePath != null
@@ -80,7 +78,7 @@ fun QuotedMessage(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = timeFormat.format(Date(message.timestamp)),
+                    text = dateFormatter.formatDate(message.timestamp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )

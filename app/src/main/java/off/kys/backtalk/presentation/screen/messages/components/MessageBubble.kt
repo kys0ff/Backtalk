@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
@@ -74,9 +75,6 @@ import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.koinInject
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -650,7 +648,7 @@ private fun MessageFooter(
     targetTimestamp: Long? = null,
     isLocked: Boolean = false
 ) {
-    val timeFormat = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
+    val dateFormatter = LocalDateFormatter.current
 
     AnimatedVisibility(
         visible = isVisible,
@@ -683,18 +681,14 @@ private fun MessageFooter(
             if (isReminder && originalTimestamp != null && targetTimestamp != null) {
                 Text(
                     text = "${stringResource(R.string.chat_reminder_original_time)} ${
-                        timeFormat.format(
-                            Date(originalTimestamp)
-                        )
+                        dateFormatter.formatTime(originalTimestamp)
                     }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
                     text = "${stringResource(R.string.chat_reminder_target_time)} ${
-                        timeFormat.format(
-                            Date(targetTimestamp)
-                        )
+                        dateFormatter.formatTime(targetTimestamp)
                     }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
@@ -702,11 +696,7 @@ private fun MessageFooter(
             } else {
                 Text(
                     text = "${if (editedAt != null) stringResource(R.string.chat_sent_at) else emptyString()} ${
-                        timeFormat.format(
-                            Date(
-                                timestamp
-                            )
-                        )
+                        dateFormatter.formatTime(timestamp)
                     }".trim(),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
@@ -714,7 +704,7 @@ private fun MessageFooter(
             }
             editedAt?.let {
                 Text(
-                    text = stringResource(R.string.chat_edited_at, timeFormat.format(Date(it))),
+                    text = stringResource(R.string.chat_edited_at, dateFormatter.formatTime(it)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )

@@ -8,6 +8,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import off.kys.backtalk.R
+import off.kys.backtalk.util.DateFormatter
 import org.koin.compose.koinInject
 
 val LocalBiometricManager = staticCompositionLocalOf<BiometricPromptManager> {
@@ -16,6 +17,10 @@ val LocalBiometricManager = staticCompositionLocalOf<BiometricPromptManager> {
 
 val LocalAppLockManager = staticCompositionLocalOf<AppLockManager> {
     error("AppLockManager not provided. Did you use setBiometricContent?")
+}
+
+val LocalDateFormatter = staticCompositionLocalOf<DateFormatter> {
+    error("DateFormatter not provided. Did you use setBiometricContent?")
 }
 
 @Composable
@@ -41,10 +46,12 @@ fun FragmentActivity.setBiometricContent(
     setContent {
         val biometricManager = remember(this) { BiometricPromptManager(this) }
         val appLockManager = koinInject<AppLockManager>()
+        val dateFormatter = koinInject<DateFormatter>()
 
         CompositionLocalProvider(
             LocalBiometricManager provides biometricManager,
-            LocalAppLockManager provides appLockManager
+            LocalAppLockManager provides appLockManager,
+            LocalDateFormatter provides dateFormatter
         ) {
             content()
         }

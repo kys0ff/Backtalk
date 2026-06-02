@@ -1,7 +1,9 @@
 package off.kys.backtalk.presentation.state
 
 import android.net.Uri
+import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppLanguage
+import off.kys.backtalk.common.AppTimeFormat
 import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.SmartIntensity
 import off.kys.backtalk.common.ThemeMode
@@ -12,6 +14,9 @@ import off.kys.backtalk.common.ThemeMode
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.AUTO,
     val appLanguage: AppLanguage = AppLanguage.SYSTEM,
+    val dateFormat: AppDateFormat = AppDateFormat.SYSTEM,
+    val timeFormat: AppTimeFormat = AppTimeFormat.SYSTEM,
+    val customDateFormat: String = "MMM d, yyyy",
     val dynamicColorEnabled: Boolean = false,
     val lockEnabled: Boolean = false,
     val lockOnScreenOff: Boolean = false,

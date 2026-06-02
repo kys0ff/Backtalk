@@ -26,19 +26,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
 import off.kys.backtalk.util.emptyString
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun ThreadDetailContent(
@@ -97,8 +95,7 @@ private fun MainThreadItem(
     onReplyClick: (MessageEntity) -> Unit,
     getReplyCount: (MessageEntity) -> Int
 ) {
-    val fullDateFormat =
-        SimpleDateFormat("h:mm a · MMM d, yyyy", LocalLocale.current.platformLocale)
+    val dateFormatter = LocalDateFormatter.current
     val textToCopyOrShare = message.editedText ?: message.text
 
     Column(
@@ -155,7 +152,7 @@ private fun MainThreadItem(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = fullDateFormat.format(Date(message.timestamp)),
+            text = dateFormatter.formatDateTime(message.timestamp),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline
         )
@@ -205,7 +202,7 @@ private fun ThreadMessageItem(
     replyCount: Int,
     onReplyClick: () -> Unit
 ) {
-    val timeFormat = SimpleDateFormat("h:mm a", LocalLocale.current.platformLocale)
+    val dateFormatter = LocalDateFormatter.current
     val textToCopyOrShare = message.editedText ?: message.text
 
     Row(
@@ -254,11 +251,7 @@ private fun ThreadMessageItem(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${stringResource(R.string.threads_at_you)} · ${
-                        timeFormat.format(
-                            Date(
-                                message.timestamp
-                            )
-                        )
+                        dateFormatter.formatTime(message.timestamp)
                     }",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,
