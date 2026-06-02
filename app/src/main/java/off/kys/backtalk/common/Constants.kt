@@ -8,6 +8,16 @@ import java.util.concurrent.TimeUnit
 object Constants {
 
     /**
+     * The ID for the daily reminders notification channel.
+     */
+    const val REMINDER_CHANNEL_ID = "daily_reminders_channel"
+
+    /**
+     * The unique ID for the reminder notification.
+     */
+    const val REMINDER_NOTIFICATION_ID = 1001
+
+    /**
      * The time gap required between messages to display a new date/time header in the chat UI.
      */
     val TIME_GAP_FOR_HEADER = TimeUnit.HOURS.toMillis(1)

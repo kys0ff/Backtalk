@@ -14,6 +14,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import off.kys.backtalk.R
+import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.activity.MainActivity
@@ -23,9 +24,6 @@ import org.koin.core.component.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-
-private const val CHANNEL_ID = "daily_reminders_channel"
-private const val NOTIFICATION_ID = 1001
 
 class ReminderWorker(
     context: Context,
@@ -68,7 +66,7 @@ class ReminderWorker(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID,
+                Constants.REMINDER_CHANNEL_ID,
                 context.getString(R.string.reminder_notification_channel),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
@@ -94,7 +92,7 @@ class ReminderWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, Constants.REMINDER_CHANNEL_ID)
             .setSmallIcon(R.drawable.round_send_24)
             .setContentTitle(context.getString(R.string.reminder_message_title))
             .setContentText(randomMessage)
@@ -104,7 +102,7 @@ class ReminderWorker(
             .setContentIntent(pendingIntent)
             .build()
 
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(Constants.REMINDER_NOTIFICATION_ID, notification)
     }
 
     companion object : KoinComponent {

@@ -35,8 +35,6 @@ class MainViewModel(
     val mainUiState = _mainUiState.asStateFlow()
 
     init {
-        updateUsageStats()
-
         // Clear unread reminder flag when the app is opened
         if (preferences.hasUnreadReminder) {
             preferences.hasUnreadReminder = false
@@ -79,32 +77,6 @@ class MainViewModel(
                     _mainUiState.value = MainUiState.UpToDate
                 }
             )
-        }
-    }
-
-    private fun updateUsageStats() {
-        val now = System.currentTimeMillis()
-        val lastUsage = preferences.lastUsageTimestamp
-
-        if (lastUsage != 0L) {
-            val interval = now - lastUsage
-            // Only count if it's been at least 5 minutes since last usage to avoid spamming stats
-            if (interval > 5 * 60 * 1000L) {
-                val count = preferences.usageCount
-                val avg = preferences.averageUsageInterval
-
-                // Simple moving average
-                val newAvg = (avg * count + interval) / (count + 1)
-
-                preferences.averageUsageInterval = newAvg
-                preferences.usageCount = count + 1
-                preferences.lastUsageTimestamp = now
-            }
-        } else {
-            preferences.lastUsageTimestamp = now
-            if (preferences.usageCount == 0) {
-                preferences.usageCount = 1
-            }
         }
     }
 

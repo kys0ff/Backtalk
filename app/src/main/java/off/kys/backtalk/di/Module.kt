@@ -50,6 +50,7 @@ import off.kys.backtalk.sync.NsdHelper
 import off.kys.backtalk.sync.SyncSocketManager
 import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.DateFormatter
+import off.kys.backtalk.util.UsageTracker
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -178,6 +179,7 @@ private fun Module.systemModule() {
     single { AudioPlayer() }
     single { BacktalkPreferences(get()) }
     single { DateFormatter(get(), get()) }
+    single { UsageTracker(get()) }
     single { AppLockManager(androidContext(), get()) }
     single { AlarmScheduler(get()) }
     single { NsdHelper(get()) }
