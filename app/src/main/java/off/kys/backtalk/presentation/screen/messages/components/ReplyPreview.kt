@@ -41,19 +41,19 @@ fun ReplyPreview(
 
     Row(
         modifier = Modifier
-            .padding(bottom = 4.dp)
+            .padding(start = 8.dp, end = 12.dp)
             .height(IntrinsicSize.Min)
             .clip(cornerShape)
-            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f))
+            .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
             .clickable {
                 onPreviewClick()
-            }
+            },
     ) {
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
+                .background(MaterialTheme.colorScheme.outlineVariant)
         )
         Column(
             modifier = Modifier.padding(
@@ -71,19 +71,19 @@ fun ReplyPreview(
                         painter = painterResource(R.drawable.round_keyboard_voice_24),
                         contentDescription = null,
                         modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
+                        tint = MaterialTheme.colorScheme.outlineVariant
                     )
                     Text(
                         text = text,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                 }
             } else {
                 SmartText(
                     text = text,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.outlineVariant,
                     maxLines = 2
                 )
             }
