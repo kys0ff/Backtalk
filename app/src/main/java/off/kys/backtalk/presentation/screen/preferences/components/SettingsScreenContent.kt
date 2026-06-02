@@ -58,6 +58,7 @@ fun SettingsScreenContent(
     onNavigateBack: () -> Unit,
     onSyncClicked: () -> Unit,
     onLicenseClicked: () -> Unit,
+    onBugScreenClicked: () -> Unit,
     onCheckUpdates: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -615,6 +616,17 @@ fun SettingsScreenContent(
                                 showWipeDataDialog.value = true
                             }
                         }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                    SettingsItem(
+                        label = stringResource(R.string.settings_test_bug_screen),
+                        value = stringResource(R.string.settings_test_bug_screen_desc),
+                        icon = painterResource(R.drawable.round_warning_24),
+                        onClick = onBugScreenClicked
                     )
                 }
             }

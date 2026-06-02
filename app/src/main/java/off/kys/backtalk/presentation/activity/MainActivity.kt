@@ -19,8 +19,10 @@ import off.kys.backtalk.common.lock.setBiometricContent
 import off.kys.backtalk.presentation.activity.components.AppLifecycleHandler
 import off.kys.backtalk.presentation.activity.components.MainView
 import off.kys.backtalk.presentation.event.MainUiEvent
+import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
+import off.kys.backtalk.util.emptyString
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -95,7 +97,15 @@ class MainActivity : AppCompatActivity() {
             MainView(
                 viewModel = viewModel,
                 isAuthenticated = isCurrentlyUnlocked,
-                onRetryAuthentication = authenticate
+                onRetryAuthentication = authenticate,
+                crashData = intent.takeIf { it.hasExtra("EXTRA_CRASH_NAME") }?.let {
+                    BugScreen(
+                        exceptionName = it.getStringExtra("EXTRA_CRASH_NAME") ?: "Unknown",
+                        message = it.getStringExtra("EXTRA_CRASH_MESSAGE"),
+                        stackTrace = it.getStringExtra("EXTRA_CRASH_STACKTRACE") ?: emptyString(),
+                        threadName = it.getStringExtra("EXTRA_CRASH_THREAD") ?: "main"
+                    )
+                }
             )
         }
     }

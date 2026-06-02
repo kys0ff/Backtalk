@@ -25,6 +25,7 @@
     <string name="common_weekly">أسبوعياً</string>
     <string name="common_monthly">شهرياً</string>
     <string name="common_not_set">غير محدد</string>
+    <string name="common_not_available">غير متوفر</string>
     <string name="common_confirm">تأكيد</string>
     <string name="common_smart">ذكية</string>
     <string name="common_experimental">تجريبي</string>
@@ -390,5 +391,18 @@
     <string name="reminder_message_14">أفكارك تستحق أن تُسمع. اكتبها.</string>
     <string name="reminder_message_title">وقت التأمل</string>
     <string name="reminder_notification_channel">التذكيرات اليومية</string>
+
+    <!-- Bug Screen -->
+    <string name="bug_screen_title">سجلات الأعطال</string>
+    <string name="bug_screen_stack_trace_header">تتبع الذاكرة المكدسة (Stack Trace)</string>
+    <string name="bug_screen_thread_label">المؤشر: %1$s</string>
+    <string name="bug_screen_report_header">تقرير الخطأ</string>
+    <string name="bug_screen_report_exception">الاستثناء: %1$s</string>
+    <string name="bug_screen_report_message">الرسالة: %1$s</string>
+    <string name="bug_screen_report_thread">المؤشر: %1$s</string>
+    <string name="bug_screen_report_stack_trace_label">تتبع الذاكرة المكدسة:</string>
+    <string name="bug_screen_report_subject">تقرير خطأ Backtalk</string>
+    <string name="bug_screen_share_report">مشاركة تقرير الخطأ</string>
+    <string name="bug_screen_restart_app">إعادة تشغيل التطبيق</string>
 
 </resources>

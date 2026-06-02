@@ -11,6 +11,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.components.SplitThemeContainer
+import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.screen.license.LicenseScreen
 import off.kys.backtalk.presentation.screen.preferences.components.SettingsScreenContent
 import off.kys.backtalk.presentation.screen.sync.SyncScreen
@@ -37,6 +38,10 @@ class SettingsScreen : Screen {
             onNavigateBack = { navigator.pop() },
             onSyncClicked = { navigator.push(SyncScreen()) },
             onLicenseClicked = { navigator.push(LicenseScreen()) },
+            onBugScreenClicked = {
+                throw Exception("This is a sample bug report for demonstration.")
+
+            },
             onCheckUpdates = { mainActivity?.checkForUpdates() }
         )
     }
@@ -55,6 +60,7 @@ private fun SettingsScreenPreview() {
             onNavigateBack = {},
             onSyncClicked = {},
             onLicenseClicked = {},
+            onBugScreenClicked = {},
             onCheckUpdates = {}
         )
     }

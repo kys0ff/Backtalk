@@ -1,16 +1,20 @@
 package off.kys.backtalk
 
 import android.app.Application
+import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import off.kys.backtalk.di.appModule
+import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.util.UsageTracker
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
+import kotlin.system.exitProcess
 
 /**
  * Main application class for Backtalk.
@@ -31,12 +35,29 @@ class App: Application(), ImageLoaderFactory, KoinComponent {
      */
     override fun onCreate() {
         super.onCreate()
+        
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            handleCrash(thread, throwable)
+        }
+
         startKoin {
             androidContext(this@App)
             modules(appModule)
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(usageTracker)
+    }
+
+    private fun handleCrash(thread: Thread, throwable: Throwable) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            putExtra("EXTRA_CRASH_NAME", throwable.javaClass.simpleName)
+            putExtra("EXTRA_CRASH_MESSAGE", throwable.localizedMessage)
+            putExtra("EXTRA_CRASH_STACKTRACE", Log.getStackTraceString(throwable))
+            putExtra("EXTRA_CRASH_THREAD", thread.name)
+        }
+        startActivity(intent)
+        exitProcess(1)
     }
 
     override fun newImageLoader(): ImageLoader {

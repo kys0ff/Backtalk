@@ -27,6 +27,7 @@
     <string name="common_weekly">Weekly</string>
     <string name="common_monthly">Monthly</string>
     <string name="common_not_set">Not set</string>
+    <string name="common_not_available">N/A</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_smart">Smart</string>
     <string name="common_experimental">Experimental</string>
@@ -135,6 +136,8 @@
     <string name="settings_show_secret_category_desc">Disable to hide this section</string>
     <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
     <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
+    <string name="settings_test_bug_screen">Test bug screen</string>
+    <string name="settings_test_bug_screen_desc">View the custom bug report screen with sample data</string>
 
     <!-- Lock Timeout -->
     <string name="settings_lock_timeout">Lock timeout</string>
@@ -384,5 +387,18 @@
     <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
     <string name="reminder_message_title">Reflection Time</string>
     <string name="reminder_notification_channel">Daily Reminders</string>
+
+    <!-- Bug Screen -->
+    <string name="bug_screen_title">Crash Logs</string>
+    <string name="bug_screen_stack_trace_header">Stack Trace</string>
+    <string name="bug_screen_thread_label">Thread: %1$s</string>
+    <string name="bug_screen_report_header">Bug Report</string>
+    <string name="bug_screen_report_exception">Exception: %1$s</string>
+    <string name="bug_screen_report_message">Message: %1$s</string>
+    <string name="bug_screen_report_thread">Thread: %1$s</string>
+    <string name="bug_screen_report_stack_trace_label">Stack Trace:</string>
+    <string name="bug_screen_report_subject">Backtalk Bug Report</string>
+    <string name="bug_screen_share_report">Share Bug Report</string>
+    <string name="bug_screen_restart_app">Restart App</string>
 
 </resources>

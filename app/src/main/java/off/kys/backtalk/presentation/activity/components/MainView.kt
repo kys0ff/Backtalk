@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import off.kys.backtalk.presentation.event.MainUiEvent
+import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
 import off.kys.backtalk.presentation.state.MainUiState
@@ -19,7 +20,8 @@ import off.kys.backtalk.presentation.viewmodel.MainViewModel
 fun MainView(
     viewModel: MainViewModel,
     isAuthenticated: Boolean,
-    onRetryAuthentication: () -> Unit = {}
+    onRetryAuthentication: () -> Unit = {},
+    crashData: BugScreen? = null
 ) {
     val updateState by viewModel.mainUiState.collectAsStateWithLifecycle()
     val isDarkTheme = viewModel.preferences.themeMode.isDark(isSystemInDarkTheme())
@@ -29,16 +31,22 @@ fun MainView(
         darkTheme = isDarkTheme,
         dynamicColor = dynamicColor
     ) {
-        Crossfade(targetState = isAuthenticated, label = "LoginState") { loggedIn ->
-            if (loggedIn) {
-                val initialScreen = remember {
-                    if (viewModel.preferences.firstLaunch) OnboardingScreen() else MessagesScreen()
+        if (crashData != null) {
+            Navigator(crashData) { navigator ->
+                SlideTransition(navigator)
+            }
+        } else {
+            Crossfade(targetState = isAuthenticated, label = "LoginState") { loggedIn ->
+                if (loggedIn) {
+                    val initialScreen = remember {
+                        if (viewModel.preferences.firstLaunch) OnboardingScreen() else MessagesScreen()
+                    }
+                    Navigator(initialScreen) { navigator ->
+                        SlideTransition(navigator)
+                    }
+                } else {
+                    LockView(onRetryAuthentication = onRetryAuthentication)
                 }
-                Navigator(initialScreen) { navigator ->
-                    SlideTransition(navigator)
-                }
-            } else {
-                LockView(onRetryAuthentication = onRetryAuthentication)
             }
         }
 
