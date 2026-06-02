@@ -176,7 +176,7 @@ fun SettingsScreenContent(
             SettingsSection(title = stringResource(R.string.settings_appearance)) {
                 SettingsItem(
                     label = stringResource(R.string.settings_theme),
-                    value = state.themeMode.name.lowercase().replaceFirstChar { it.uppercase() },
+                    value = stringResource(state.themeMode.titleResId),
                     icon = painterResource(R.drawable.round_brightness_6_24),
                     onClick = { showThemeDialog.value = true }
                 )

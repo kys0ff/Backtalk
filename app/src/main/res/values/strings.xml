@@ -159,6 +159,9 @@
     <string name="settings_license_desc">Libraries used in the application</string>
     <string name="settings_information">Information</string>
     <string name="settings_choose_theme">Choose Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System default</string>
     <string name="settings_language">Language</string>
     <string name="language_system">System Default</string>
     <string name="language_english">English</string>

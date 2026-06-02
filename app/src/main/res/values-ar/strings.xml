@@ -145,6 +145,9 @@
     <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
     <string name="settings_information">معلومات</string>
     <string name="settings_choose_theme">اختر المظهر</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="theme_system">تلقائي</string>
     <string name="settings_language">اللغة</string>
     <string name="language_system">تلقائي (لغة النظام)</string>
     <string name="language_english">الإنجليزية (English)</string>

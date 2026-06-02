@@ -70,8 +70,7 @@ fun ThemeSelectionDialog(
                         ) {
                             RadioButton(selected = isSelected, onClick = null)
                             Text(
-                                text = mode.name.lowercase()
-                                    .replaceFirstChar { it.uppercase() },
+                                text = stringResource(mode.titleResId),
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(start = 16.dp)
                             )
