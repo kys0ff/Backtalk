@@ -41,7 +41,6 @@ import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
-import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
@@ -75,7 +74,6 @@ fun SettingsScreenContent(
     val showWipeDataDialog = remember { mutableStateOf(false) }
     val showExperimentalSyncDialog = remember { mutableStateOf(false) }
     val showReminderIntervalDialog = remember { mutableStateOf(false) }
-    val showSmartIntensityDialog = remember { mutableStateOf(false) }
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
     val showDateFormatDialog = remember { mutableStateOf(false) }
     val showTimeFormatDialog = remember { mutableStateOf(false) }
@@ -293,19 +291,6 @@ fun SettingsScreenContent(
                             icon = painterResource(R.drawable.round_refresh_24),
                             onClick = { showReminderIntervalDialog.value = true }
                         )
-                        if (state.reminderInterval == ExportInterval.SMART) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                thickness = 0.5.dp,
-                                color = MaterialTheme.colorScheme.outlineVariant
-                            )
-                            SettingsItem(
-                                label = stringResource(R.string.settings_smart_intensity),
-                                value = stringResource(state.smartReminderIntensity.titleResId),
-                                icon = painterResource(R.drawable.round_notifications_24),
-                                onClick = { showSmartIntensityDialog.value = true }
-                            )
-                        }
                     }
                 }
             }
@@ -487,7 +472,7 @@ fun SettingsScreenContent(
                         )
                         SettingsItem(
                             label = stringResource(R.string.auto_export_interval),
-                            value = stringResource(state.autoExportInterval.titleResId),
+                            value = stringResource(state.autoRepeatFrequency.titleResId),
                             icon = painterResource(R.drawable.round_refresh_24),
                             onClick = { showIntervalDialog.value = true }
                         )
@@ -722,13 +707,12 @@ fun SettingsScreenContent(
     if (showIntervalDialog.value) {
         IntervalSelectionDialog(
             title = stringResource(R.string.auto_export_interval),
-            selected = state.autoExportInterval,
+            selected = state.autoRepeatFrequency,
             onDismiss = { showIntervalDialog.value = false },
             onSelected = {
                 onEvent(SettingsUiEvent.OnAutoExportIntervalChange(it))
                 showIntervalDialog.value = false
             },
-            filter = { it != ExportInterval.SMART }
         )
     }
 
@@ -775,18 +759,7 @@ fun SettingsScreenContent(
             onSelected = {
                 onEvent(SettingsUiEvent.OnReminderIntervalChange(it))
                 showReminderIntervalDialog.value = false
-            }
-        )
-    }
-
-    if (showSmartIntensityDialog.value) {
-        SmartIntensitySelectionDialog(
-            selected = state.smartReminderIntensity,
-            onDismiss = { showSmartIntensityDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnSmartIntensityChange(it))
-                showSmartIntensityDialog.value = false
-            }
+            },
         )
     }
 

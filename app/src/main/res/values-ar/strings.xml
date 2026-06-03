@@ -27,7 +27,6 @@
     <string name="common_not_set">غير محدد</string>
     <string name="common_not_available">غير متوفر</string>
     <string name="common_confirm">تأكيد</string>
-    <string name="common_smart">ذكية</string>
     <string name="common_experimental">تجريبي</string>
     <string name="common_error">خطأ</string>
     <string name="common_password_set" translatable="false">••••••••</string>
@@ -110,8 +109,6 @@
     <string name="settings_reminders">التذكيرات</string>
     <string name="settings_reminders_desc">تلقي إشعارات لتذكيرك بالكتابة عن يومك</string>
     <string name="settings_reminder_interval">التكرار</string>
-    <string name="settings_smart_intensity">الشدة الذكية</string>
-    <string name="settings_smart_intensity_desc">كم مرة يجب أن تحاول التذكيرات الذكية الوصول إليك؟</string>
     <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
     <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
     <string name="settings_remove_image_metadata">إزالة بيانات الصور الوصفية</string>
@@ -175,12 +172,6 @@
     <string name="time_format_system">تلقائي</string>
     <string name="time_format_12h">12 ساعة</string>
     <string name="time_format_24h">24 ساعة</string>
-
-    <!-- Smart Intensity -->
-    <string name="smart_intensity_relaxed">هادئ</string>
-    <string name="smart_intensity_normal">عادي</string>
-    <string name="smart_intensity_frequent">متكرر</string>
-    <string name="smart_intensity_intense">مكثف</string>
 
     <!-- Statistics -->
     <string name="statistics_title">الإحصائيات</string>

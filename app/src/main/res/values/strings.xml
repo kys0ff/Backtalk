@@ -29,7 +29,6 @@
     <string name="common_not_set">Not set</string>
     <string name="common_not_available">N/A</string>
     <string name="common_confirm">Confirm</string>
-    <string name="common_smart">Smart</string>
     <string name="common_experimental">Experimental</string>
     <string name="common_error">Error</string>
     <string name="common_password_set" translatable="false">••••••••</string>
@@ -108,8 +107,6 @@
     <string name="settings_reminders">Reminders</string>
     <string name="settings_reminders_desc">Get notified to write about your day</string>
     <string name="settings_reminder_interval">Frequency</string>
-    <string name="settings_smart_intensity">Smart Intensity</string>
-    <string name="settings_smart_intensity_desc">How often should smart reminders try to reach you?</string>
     <string name="settings_trim_messages">Trim sent messages</string>
     <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
     <string name="settings_remove_image_metadata">Remove image metadata</string>
@@ -175,12 +172,6 @@
     <string name="time_format_system">System default</string>
     <string name="time_format_12h">12-hour</string>
     <string name="time_format_24h">24-hour</string>
-
-    <!-- Smart Intensity -->
-    <string name="smart_intensity_relaxed">Relaxed</string>
-    <string name="smart_intensity_normal">Normal</string>
-    <string name="smart_intensity_frequent">Frequent</string>
-    <string name="smart_intensity_intense">Intense</string>
 
     <!-- Statistics -->
     <string name="statistics_title">Statistics</string>

@@ -26,15 +26,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.RepeatFrequency
 
 @Composable
 fun IntervalSelectionDialog(
     title: String,
-    selected: ExportInterval,
+    selected: RepeatFrequency,
     onDismiss: () -> Unit,
-    onSelected: (ExportInterval) -> Unit,
-    filter: (ExportInterval) -> Boolean = { true }
+    onSelected: (RepeatFrequency) -> Unit,
 ) {
     var tempSelected by remember { mutableStateOf(selected) }
 
@@ -53,7 +52,7 @@ fun IntervalSelectionDialog(
                 modifier = Modifier.selectableGroup(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                ExportInterval.entries.filter(filter).forEach { interval ->
+                RepeatFrequency.entries.forEach { interval ->
                     val isSelected = interval == tempSelected
                     Surface(
                         selected = isSelected,

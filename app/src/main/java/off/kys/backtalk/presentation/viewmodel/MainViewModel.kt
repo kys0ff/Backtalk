@@ -9,9 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
-import off.kys.backtalk.common.ExportInterval
 import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.data.worker.ReminderWorker
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.state.MainUiState
@@ -38,11 +36,6 @@ class MainViewModel(
         // Clear unread reminder flag when the app is opened
         if (preferences.hasUnreadReminder) {
             preferences.hasUnreadReminder = false
-            
-            // Re-schedule smart reminder to keep it updated and avoid the "abandoned" state
-            if (preferences.remindersEnabled && preferences.reminderInterval == ExportInterval.SMART) {
-                ReminderWorker.scheduleSmartReminder(application)
-            }
         }
 
         // Automatically check for updates if enabled

@@ -4,8 +4,7 @@ import android.net.Uri
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.AppTimeFormat
-import off.kys.backtalk.common.ExportInterval
-import off.kys.backtalk.common.SmartIntensity
+import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 
 /**
@@ -24,13 +23,12 @@ data class SettingsUiState(
     val secureScreenEnabled: Boolean = false,
     val autoUpdateEnabled: Boolean = false,
     val autoExportEnabled: Boolean = false,
-    val autoExportInterval: ExportInterval = ExportInterval.DAILY,
+    val autoRepeatFrequency: RepeatFrequency = RepeatFrequency.DAILY,
     val autoExportUri: String? = null,
     val autoExportEncrypted: Boolean = false,
     val autoExportPassword: String? = null,
     val remindersEnabled: Boolean = false,
-    val reminderInterval: ExportInterval = ExportInterval.DAILY,
-    val smartReminderIntensity: SmartIntensity = SmartIntensity.NORMAL,
+    val reminderInterval: RepeatFrequency = RepeatFrequency.DAILY,
     val hapticFeedbackEnabled: Boolean = true,
     val keepScreenOn: Boolean = false,
     val devModeEnabled: Boolean = false,

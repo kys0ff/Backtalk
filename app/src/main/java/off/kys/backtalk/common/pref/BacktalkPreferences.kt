@@ -10,13 +10,11 @@ import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppTimeFormat
 import off.kys.backtalk.common.Constants
-import off.kys.backtalk.common.ExportInterval
-import off.kys.backtalk.common.SmartIntensity
+import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.base.PreferenceItem
 import off.kys.backtalk.common.pref.model.BooleanPreferenceItem
 import off.kys.backtalk.common.pref.model.EnumPreferenceItem
-import off.kys.backtalk.common.pref.model.IntPreferenceItem
 import off.kys.backtalk.common.pref.model.LongPreferenceItem
 import off.kys.backtalk.common.pref.model.StringPreferenceItem
 import java.util.UUID
@@ -85,12 +83,7 @@ class BacktalkPreferences(private val context: Context) {
 
     /** The interval at which reminders should occur. */
     var reminderInterval by preference(
-        EnumPreferenceItem(prefs, KEY_REMINDER_INTERVAL, ExportInterval.DAILY, ExportInterval::class.java)
-    )
-
-    /** The intensity level for smart reminders. */
-    var smartReminderIntensity by preference(
-        EnumPreferenceItem(prefs, KEY_SMART_REMINDER_INTENSITY, SmartIntensity.NORMAL, SmartIntensity::class.java)
+        EnumPreferenceItem(prefs, KEY_REMINDER_INTERVAL, RepeatFrequency.DAILY, RepeatFrequency::class.java)
     )
 
     /** The date format for displaying dates throughout the app. */
@@ -110,8 +103,8 @@ class BacktalkPreferences(private val context: Context) {
     var autoExportUri by preference(StringPreferenceItem(prefs, KEY_AUTO_EXPORT_URI, null))
 
     /** The interval at which auto-exports should occur. */
-    var autoExportInterval by preference(
-        EnumPreferenceItem(prefs, KEY_AUTO_EXPORT_INTERVAL, ExportInterval.DAILY, ExportInterval::class.java)
+    var autoRepeatFrequency by preference(
+        EnumPreferenceItem(prefs, KEY_AUTO_EXPORT_INTERVAL, RepeatFrequency.DAILY, RepeatFrequency::class.java)
     )
 
     /** Whether auto-exports should be encrypted. */
@@ -140,15 +133,6 @@ class BacktalkPreferences(private val context: Context) {
 
     /** Whether to use smart pointing for image paths instead of duplicating them. */
     var smartImagePointingEnabled by preference(BooleanPreferenceItem(prefs, KEY_SMART_IMAGE_POINTING, false))
-
-    /** The unique ID for this device used for sync pairing. */
-    var lastUsageTimestamp by preference(LongPreferenceItem(prefs, KEY_LAST_USAGE_TIMESTAMP, 0L))
-
-    /** The average interval between app uses in milliseconds. */
-    var averageUsageInterval by preference(LongPreferenceItem(prefs, KEY_AVERAGE_USAGE_INTERVAL, 24 * 60 * 60 * 1000L))
-
-    /** The number of times the app has been used. */
-    var usageCount by preference(IntPreferenceItem(prefs, KEY_USAGE_COUNT, 0))
 
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
@@ -237,7 +221,6 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_AUTO_EXPORT_ENABLED = "auto_export_enabled"
         const val KEY_REMINDERS_ENABLED = "reminders_enabled"
         const val KEY_REMINDER_INTERVAL = "reminder_interval"
-        const val KEY_SMART_REMINDER_INTENSITY = "smart_reminder_intensity"
         const val KEY_DATE_FORMAT = "date_format"
         const val KEY_TIME_FORMAT = "time_format"
         const val KEY_CUSTOM_DATE_FORMAT = "custom_date_format"
@@ -253,9 +236,6 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_PAIRED_DEVICES = "paired_devices"
-        const val KEY_LAST_USAGE_TIMESTAMP = "last_usage_timestamp"
-        const val KEY_AVERAGE_USAGE_INTERVAL = "average_usage_interval"
-        const val KEY_USAGE_COUNT = "usage_count"
         const val KEY_HAS_UNREAD_REMINDER = "has_unread_reminder"
         const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"

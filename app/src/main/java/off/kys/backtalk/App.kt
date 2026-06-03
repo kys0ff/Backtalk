@@ -3,14 +3,11 @@ package off.kys.backtalk
 import android.app.Application
 import android.content.Intent
 import android.util.Log
-import androidx.lifecycle.ProcessLifecycleOwner
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
 import off.kys.backtalk.di.appModule
 import off.kys.backtalk.presentation.activity.MainActivity
-import off.kys.backtalk.util.UsageTracker
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
@@ -23,8 +20,6 @@ import kotlin.system.exitProcess
  * including the dependency injection framework (Koin).
  */
 class App: Application(), ImageLoaderFactory, KoinComponent {
-
-    private val usageTracker: UsageTracker by inject()
 
     /**
      * Called when the application is starting, before any activity, service,
@@ -44,8 +39,6 @@ class App: Application(), ImageLoaderFactory, KoinComponent {
             androidContext(this@App)
             modules(appModule)
         }
-
-        ProcessLifecycleOwner.get().lifecycle.addObserver(usageTracker)
     }
 
     private fun handleCrash(thread: Thread, throwable: Throwable) {

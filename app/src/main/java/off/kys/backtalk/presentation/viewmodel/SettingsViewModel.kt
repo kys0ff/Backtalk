@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.AppLanguage
-import off.kys.backtalk.common.ExportInterval
+import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.worker.AutoExportWorker
@@ -28,7 +28,9 @@ import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
+import java.security.GeneralSecurityException
 import java.util.concurrent.TimeUnit
+import javax.crypto.AEADBadTagException
 import javax.crypto.BadPaddingException
 
 /**
@@ -59,13 +61,12 @@ class SettingsViewModel(
             timeFormat = preferences.timeFormat,
             customDateFormat = preferences.customDateFormat ?: "MMM d, yyyy",
             autoExportEnabled = preferences.autoExportEnabled,
-            autoExportInterval = preferences.autoExportInterval,
+            autoRepeatFrequency = preferences.autoRepeatFrequency,
             autoExportUri = preferences.autoExportUri,
             autoExportEncrypted = preferences.autoExportEncrypted,
             autoExportPassword = preferences.autoExportPassword,
             remindersEnabled = preferences.remindersEnabled,
             reminderInterval = preferences.reminderInterval,
-            smartReminderIntensity = preferences.smartReminderIntensity,
             hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
             keepScreenOn = preferences.keepScreenOn,
             devModeEnabled = preferences.devModeEnabled,
@@ -96,7 +97,6 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
         is SettingsUiEvent.OnRemindersToggle -> onRemindersToggle(event.enabled)
         is SettingsUiEvent.OnReminderIntervalChange -> onReminderIntervalChange(event.interval)
-        is SettingsUiEvent.OnSmartIntensityChange -> onSmartIntensityChange(event.intensity)
         is SettingsUiEvent.OnHapticFeedbackToggle -> onHapticFeedbackToggle(event.enabled)
         is SettingsUiEvent.OnKeepScreenOnToggle -> onKeepScreenOnToggle(event.enabled)
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
@@ -188,9 +188,9 @@ class SettingsViewModel(
         }
     }
 
-    private fun onAutoExportIntervalChange(interval: off.kys.backtalk.common.ExportInterval) {
-        preferences.autoExportInterval = interval
-        _state.update { it.copy(autoExportInterval = interval) }
+    private fun onAutoExportIntervalChange(interval: RepeatFrequency) {
+        preferences.autoRepeatFrequency = interval
+        _state.update { it.copy(autoRepeatFrequency = interval) }
         if (preferences.autoExportEnabled) {
             scheduleAutoExport()
         }
@@ -229,23 +229,14 @@ class SettingsViewModel(
             scheduleReminders()
         } else {
             cancelReminders()
-            ReminderWorker.cancelSmartReminder(context)
         }
     }
 
-    private fun onReminderIntervalChange(interval: ExportInterval) {
+    private fun onReminderIntervalChange(interval: RepeatFrequency) {
         preferences.reminderInterval = interval
         _state.update { it.copy(reminderInterval = interval) }
         if (preferences.remindersEnabled) {
             scheduleReminders()
-        }
-    }
-
-    private fun onSmartIntensityChange(intensity: off.kys.backtalk.common.SmartIntensity) {
-        preferences.smartReminderIntensity = intensity
-        _state.update { it.copy(smartReminderIntensity = intensity) }
-        if (preferences.remindersEnabled && preferences.reminderInterval == ExportInterval.SMART) {
-            ReminderWorker.scheduleSmartReminder(context)
         }
     }
 
@@ -301,7 +292,7 @@ class SettingsViewModel(
     }
 
     private fun scheduleAutoExport() {
-        val interval = preferences.autoExportInterval
+        val interval = preferences.autoRepeatFrequency
         val workRequest = PeriodicWorkRequestBuilder<AutoExportWorker>(
             interval.hours.toLong(), TimeUnit.HOURS
         )
@@ -327,15 +318,6 @@ class SettingsViewModel(
     private fun scheduleReminders() {
         val interval = preferences.reminderInterval
         
-        if (interval == ExportInterval.SMART) {
-            cancelReminders() // Cancel periodic if it exists
-            ReminderWorker.scheduleSmartReminder(context)
-            return
-        }
-        
-        // Ensure smart is canceled if we switched to periodic
-        ReminderWorker.cancelSmartReminder(context)
-
         val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(
             interval.hours.toLong(), TimeUnit.HOURS
         )
@@ -448,14 +430,22 @@ class SettingsViewModel(
                     }
                 }
                 .onFailure { error ->
-                    val isWrongPassword =
-                        error is BadPaddingException || error.message?.contains(
-                            "mac check failed",
-                            ignoreCase = true
-                        ) == true || error.message?.contains(
-                            "pad block corrupted",
-                            ignoreCase = true
-                        ) == true
+                    val isWrongPassword = when (error) {
+                        is AEADBadTagException , is BadPaddingException -> true
+                        is GeneralSecurityException -> {
+                            var cause: Throwable? = error.cause
+                            var match = false
+                            while (cause != null) {
+                                if (cause is AEADBadTagException || cause is BadPaddingException) {
+                                    match = true
+                                    break
+                                }
+                                cause = cause.cause
+                            }
+                            match
+                        }
+                        else -> false
+                    }
 
                     _state.update {
                         it.copy(
