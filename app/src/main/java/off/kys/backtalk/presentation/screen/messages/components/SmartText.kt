@@ -81,8 +81,41 @@ fun SmartText(
     overflow: TextOverflow = TextOverflow.Visible,
     onMentionClicked: (String) -> Unit = {}
 ) {
-    val uriHandler = LocalUriHandler.current
     val preferences = koinInject<BacktalkPreferences>()
+    SmartTextContent(
+        text = text,
+        modifier = modifier,
+        clickableLink = clickableLink,
+        fontSize = fontSize,
+        color = color,
+        style = style,
+        textDecoration = textDecoration,
+        maxLines = maxLines,
+        lineHeight = lineHeight,
+        highlightQuery = highlightQuery,
+        overflow = overflow,
+        onMentionClicked = onMentionClicked,
+        externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+    )
+}
+
+@Composable
+fun SmartTextContent(
+    text: String,
+    modifier: Modifier = Modifier,
+    clickableLink: Boolean = true,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    style: TextStyle = LocalTextStyle.current,
+    textDecoration: TextDecoration = TextDecoration.None,
+    maxLines: Int = Int.MAX_VALUE,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    highlightQuery: String? = null,
+    overflow: TextOverflow = TextOverflow.Visible,
+    onMentionClicked: (String) -> Unit = {},
+    externalLinkWarningEnabled: Boolean
+) {
+    val uriHandler = LocalUriHandler.current
     val showSafetyDialog = remember { mutableStateOf(false) }
     var pendingUrl by remember { mutableStateOf(emptyString()) }
 
@@ -105,7 +138,7 @@ fun SmartText(
             when (annotation) {
                 is LinkAnnotation.Url -> {
                     if (clickableLink) {
-                        if (preferences.externalLinkWarningEnabled) {
+                        if (externalLinkWarningEnabled) {
                             pendingUrl = annotation.url
                             showSafetyDialog.value = true
                         } else {

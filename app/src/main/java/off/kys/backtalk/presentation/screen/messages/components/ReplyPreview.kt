@@ -33,6 +33,7 @@ import off.kys.backtalk.R
  */
 @Composable
 fun ReplyPreview(
+    modifier: Modifier = Modifier,
     text: String,
     voicePath: String? = null,
     onPreviewClick: () -> Unit
@@ -40,11 +41,10 @@ fun ReplyPreview(
     val cornerShape = RoundedCornerShape(4.dp)
 
     Row(
-        modifier = Modifier
-            .padding(start = 8.dp, end = 12.dp)
+        modifier = modifier
             .height(IntrinsicSize.Min)
             .clip(cornerShape)
-            .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.35f))
             .clickable {
                 onPreviewClick()
             },
@@ -53,7 +53,7 @@ fun ReplyPreview(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.outlineVariant)
+                .background(MaterialTheme.colorScheme.background)
         )
         Column(
             modifier = Modifier.padding(
@@ -71,19 +71,19 @@ fun ReplyPreview(
                         painter = painterResource(R.drawable.round_keyboard_voice_24),
                         contentDescription = null,
                         modifier = Modifier.size(12.dp),
-                        tint = MaterialTheme.colorScheme.outlineVariant
+                        tint = MaterialTheme.colorScheme.background
                     )
                     Text(
                         text = text,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = MaterialTheme.colorScheme.background
                     )
                 }
             } else {
                 SmartText(
                     text = text,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outlineVariant,
+                    color = MaterialTheme.colorScheme.background,
                     maxLines = 2
                 )
             }

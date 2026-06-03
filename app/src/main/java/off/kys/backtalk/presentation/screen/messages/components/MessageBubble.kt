@@ -41,6 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,6 +62,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
@@ -71,9 +74,18 @@ import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.screen.components.size_observer.SizeRegistryScope
+import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
+import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
+import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingMocks
 import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
+import off.kys.backtalk.presentation.theme.BacktalkTheme
+import off.kys.backtalk.util.DateFormatter
 import off.kys.backtalk.util.emptyString
+import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
+import org.koin.dsl.koinConfiguration
+import org.koin.dsl.module
 import java.io.File
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -96,9 +108,52 @@ fun MessageBubble(
     onTagClick: (String) -> Unit = {},
     isLocked: Boolean = false
 ) {
+    val preferences = koinInject<BacktalkPreferences>()
+
+    MessageBubbleContent(
+        messageEntity = messageEntity,
+        repliedMessageEntity = repliedMessageEntity,
+        blinkMessageId = blinkMessageId,
+        isTop = isTop,
+        isBottom = isBottom,
+        selectMode = selectMode,
+        isSelected = isSelected,
+        selectedImagePaths = selectedImagePaths,
+        onReplyPreviewClick = onReplyPreviewClick,
+        onClick = onClick,
+        onDoubleClick = onDoubleClick,
+        onLongClick = onLongClick,
+        onToggleImageSelect = onToggleImageSelect,
+        highlightQuery = highlightQuery,
+        onTagClick = onTagClick,
+        isLocked = isLocked,
+        hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MessageBubbleContent(
+    messageEntity: MessageEntity,
+    repliedMessageEntity: MessageEntity?,
+    blinkMessageId: MessageId?,
+    isTop: Boolean,
+    isBottom: Boolean,
+    selectMode: Boolean,
+    isSelected: Boolean,
+    selectedImagePaths: Set<String> = emptySet(),
+    onReplyPreviewClick: () -> Unit,
+    onClick: () -> Unit,
+    onDoubleClick: () -> Unit = {},
+    onLongClick: () -> Unit,
+    onToggleImageSelect: (String) -> Unit = {},
+    highlightQuery: String? = null,
+    onTagClick: (String) -> Unit = {},
+    isLocked: Boolean = false,
+    hapticFeedbackEnabled: Boolean
+) {
     var showExtraInfo by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
-    val preferences = koinInject<BacktalkPreferences>()
     val interactionSource = remember { MutableInteractionSource() }
     val scope = rememberCoroutineScope()
 
@@ -116,7 +171,6 @@ fun MessageBubble(
         }
     }
 
-    // Determine if the content only consists of images (no text, no voice, no replies, no active metadata tags)
     val hasImages =
         !messageEntity.mediaPath.isNullOrEmpty() || !messageEntity.mediaPaths.isNullOrEmpty()
     val hasText = (messageEntity.editedText ?: messageEntity.text).isNotEmpty()
@@ -152,24 +206,30 @@ fun MessageBubble(
                     onDoubleClick = {
                         if (!selectMode) {
                             scope.launch {
-                                scale.animateTo(0.92f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium))
-                                scale.animateTo(1f, spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium))
+                                scale.animateTo(
+                                    0.92f,
+                                    spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)
+                                )
+                                scale.animateTo(
+                                    1f,
+                                    spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium)
+                                )
                             }
-                            if (preferences.hapticFeedbackEnabled) {
+                            if (hapticFeedbackEnabled) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                             onDoubleClick()
                         }
                     },
                     onLongClick = {
-                        if (preferences.hapticFeedbackEnabled) {
+                        if (hapticFeedbackEnabled) {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                         onLongClick()
                     }
                 )
         ) {
-            MessageContent(
+            MessageInnerContent(
                 message = messageEntity,
                 repliedMessage = repliedMessageEntity,
                 onReplyClick = onReplyPreviewClick,
@@ -177,7 +237,8 @@ fun MessageBubble(
                 highlightQuery = highlightQuery,
                 onTagClick = onTagClick,
                 selectedImagePaths = selectedImagePaths,
-                onToggleImageSelect = onToggleImageSelect
+                onToggleImageSelect = onToggleImageSelect,
+                hapticFeedbackEnabled = hapticFeedbackEnabled
             )
         }
 
@@ -255,7 +316,7 @@ private fun MessageSurface(
 }
 
 @Composable
-private fun MessageContent(
+private fun MessageInnerContent(
     message: MessageEntity,
     repliedMessage: MessageEntity?,
     onReplyClick: () -> Unit,
@@ -263,109 +324,126 @@ private fun MessageContent(
     selectedImagePaths: Set<String>,
     onToggleImageSelect: (String) -> Unit,
     highlightQuery: String? = null,
-    onTagClick: (String) -> Unit = {}
+    onTagClick: (String) -> Unit = {},
+    hapticFeedbackEnabled: Boolean
 ) {
+    val innerContentId = "message_inner_content"
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
 
-    AnimatedVisibility(
-        visible = message.isReminder || message.isPinned,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically() + fadeOut()
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+    SizeRegistryScope {
+        Column(modifier = Modifier.observeSize(innerContentId)) {
+            AnimatedVisibility(
+                visible = message.isReminder || message.isPinned,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                if (message.isReminder) {
-                    ReminderTag(contentColor)
-                }
-                AnimatedVisibility(
-                    visible = message.isPinned,
-                    enter = fadeIn() + scaleIn(initialScale = 0.7f, animationSpec = spring(Spring.DampingRatioMediumBouncy)),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    PinTag(contentColor)
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        if (message.isReminder) {
+                            ReminderTag(contentColor)
+                        }
+                        AnimatedVisibility(
+                            visible = message.isPinned,
+                            enter = fadeIn() + scaleIn(
+                                initialScale = 0.7f,
+                                animationSpec = spring(Spring.DampingRatioMediumBouncy)
+                            ),
+                            exit = fadeOut() + scaleOut()
+                        ) {
+                            PinTag(contentColor)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-    }
 
-    if (repliedMessage != null) {
-        ReplyPreview(
-            text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) stringResource(R.string.chat_reply_image_preview) else repliedMessage.text,
-            voicePath = repliedMessage.voicePath,
-            onPreviewClick = onReplyClick
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-    }
-
-    val images = remember(message) {
-        val list = mutableListOf<String>()
-        message.mediaPath?.let { list.add(it) }
-        message.mediaPaths?.let { list.addAll(it) }
-        list
-    }
-
-    if (images.isNotEmpty()) {
-        StaggeredImageGrid(
-            images = images,
-            selectedImages = selectedImagePaths,
-            onImageClick = { imagePath ->
-                if (selectedImagePaths.isNotEmpty()) {
-                    onToggleImageSelect(imagePath)
-                } else {
-                    navigator?.push(ImagePreviewScreen(imagePath))
-                }
-            },
-            onImageLongClick = { imagePath -> onToggleImageSelect(imagePath) }
-        )
-        val messageText = message.editedText ?: message.text
-        if (messageText.isNotEmpty() || message.voicePath != null) {
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-    }
-
-    if (message.voicePath != null) {
-        VoiceMessageBubble(
-            voicePath = message.voicePath,
-            duration = message.voiceDuration ?: 0L,
-            waveformData = message.waveformData ?: emptyList(),
-            contentColor = contentColor
-        )
-    } else {
-        val messageText = message.editedText ?: message.text
-        if (messageText.isNotEmpty()) {
-            if (message.editedText != null && showOriginal) {
-                SmartText(
-                    text = message.text,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = contentColor.copy(alpha = 0.6f),
-                    textDecoration = TextDecoration.LineThrough,
-                    highlightQuery = highlightQuery,
-                    onMentionClicked = onTagClick
+            if (repliedMessage != null) {
+                ReplyPreview(
+                    modifier = Modifier.applyWidth(innerContentId),
+                    text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) stringResource(
+                        R.string.chat_reply_image_preview
+                    ) else repliedMessage.text,
+                    voicePath = repliedMessage.voicePath,
+                    onPreviewClick = onReplyClick
                 )
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
-            SmartText(
-                text = messageText,
-                color = contentColor,
-                style = MaterialTheme.typography.bodyLarge,
-                highlightQuery = highlightQuery,
-                onMentionClicked = onTagClick
-            )
-        }
+            val images = remember(message) {
+                val list = mutableListOf<String>()
+                message.mediaPath?.let { list.add(it) }
+                message.mediaPaths?.let { list.addAll(it) }
+                list
+            }
 
-        if (message.editedText != null) {
-            Text(
-                text = stringResource(R.string.chat_status_edited),
-                style = MaterialTheme.typography.labelSmall,
-                fontStyle = FontStyle.Italic,
-                color = contentColor.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            if (images.isNotEmpty()) {
+                StaggeredImageGrid(
+                    images = images,
+                    selectedImages = selectedImagePaths,
+                    onImageClick = { imagePath ->
+                        if (selectedImagePaths.isNotEmpty()) {
+                            onToggleImageSelect(imagePath)
+                        } else {
+                            navigator?.push(ImagePreviewScreen(imagePath))
+                        }
+                    },
+                    onImageLongClick = { imagePath -> onToggleImageSelect(imagePath) },
+                    hapticFeedbackEnabled = hapticFeedbackEnabled
+                )
+                val messageText = message.editedText ?: message.text
+                if (messageText.isNotEmpty() || message.voicePath != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+            }
+
+            if (message.voicePath != null) {
+                VoiceMessageBubbleContent(
+                    duration = message.voiceDuration ?: 0L,
+                    waveformData = message.waveformData ?: emptyList(),
+                    contentColor = contentColor,
+                    isPlaying = false,
+                    progress = 0f,
+                    onTogglePlay = {}
+                )
+            } else {
+                val messageText = message.editedText ?: message.text
+                if (messageText.isNotEmpty()) {
+                    if (message.editedText != null && showOriginal) {
+                        SmartTextContent(
+                            text = message.text,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = contentColor.copy(alpha = 0.6f),
+                            textDecoration = TextDecoration.LineThrough,
+                            highlightQuery = highlightQuery,
+                            onMentionClicked = onTagClick,
+                            externalLinkWarningEnabled = false
+                        )
+                    }
+
+                    SmartTextContent(
+                        text = messageText,
+                        color = contentColor,
+                        style = MaterialTheme.typography.bodyLarge,
+                        highlightQuery = highlightQuery,
+                        onMentionClicked = onTagClick,
+                        externalLinkWarningEnabled = false
+                    )
+                }
+
+                if (message.editedText != null) {
+                    Text(
+                        text = stringResource(R.string.chat_status_edited),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontStyle = FontStyle.Italic,
+                        color = contentColor.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -376,7 +454,8 @@ fun StaggeredImageGrid(
     images: List<String>,
     selectedImages: Set<String> = emptySet(),
     onImageClick: (String) -> Unit,
-    onImageLongClick: (String) -> Unit = {}
+    onImageLongClick: (String) -> Unit = {},
+    hapticFeedbackEnabled: Boolean
 ) {
     if (images.isEmpty()) return
 
@@ -399,7 +478,8 @@ fun StaggeredImageGrid(
                     imageModifier = Modifier,
                     onClick = onImageClick,
                     onLongClick = onImageLongClick,
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    hapticFeedbackEnabled = hapticFeedbackEnabled
                 )
             }
 
@@ -416,7 +496,8 @@ fun StaggeredImageGrid(
                                 .weight(1f)
                                 .aspectRatio(0.75f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                     }
                 }
@@ -434,7 +515,8 @@ fun StaggeredImageGrid(
                             .weight(1f)
                             .aspectRatio(0.75f),
                         onClick = onImageClick,
-                        onLongClick = onImageLongClick
+                        onLongClick = onImageLongClick,
+                        hapticFeedbackEnabled = hapticFeedbackEnabled
                     )
                     Column(
                         modifier = Modifier.weight(1f),
@@ -448,7 +530,8 @@ fun StaggeredImageGrid(
                                 .weight(1f)
                                 .aspectRatio(1.5f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                         GridImage(
                             path = images[2],
@@ -458,7 +541,8 @@ fun StaggeredImageGrid(
                                 .weight(1f)
                                 .aspectRatio(1.5f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                     }
                 }
@@ -480,7 +564,8 @@ fun StaggeredImageGrid(
                                 .fillMaxWidth()
                                 .aspectRatio(1f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                         GridImage(
                             path = images[2],
@@ -489,7 +574,8 @@ fun StaggeredImageGrid(
                                 .fillMaxWidth()
                                 .aspectRatio(1.5f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                     }
                     Column(
@@ -503,7 +589,8 @@ fun StaggeredImageGrid(
                                 .fillMaxWidth()
                                 .aspectRatio(1.5f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                         GridImage(
                             path = images[3],
@@ -512,7 +599,8 @@ fun StaggeredImageGrid(
                                 .fillMaxSize()
                                 .aspectRatio(1f),
                             onClick = onImageClick,
-                            onLongClick = onImageLongClick
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
                     }
                 }
@@ -530,10 +618,10 @@ private fun GridImage(
     isSelected: Boolean = false,
     onClick: (String) -> Unit,
     onLongClick: (String) -> Unit = {},
-    contentScale: ContentScale = ContentScale.Crop
+    contentScale: ContentScale = ContentScale.Crop,
+    hapticFeedbackEnabled: Boolean
 ) {
     val haptic = LocalHapticFeedback.current
-    val preferences = koinInject<BacktalkPreferences>()
     val context = LocalContext.current
 
     Box(
@@ -542,7 +630,7 @@ private fun GridImage(
             .combinedClickable(
                 onClick = { onClick(path) },
                 onLongClick = {
-                    if (preferences.hapticFeedbackEnabled) {
+                    if (hapticFeedbackEnabled) {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                     onLongClick(path)
@@ -711,4 +799,190 @@ private fun MessageFooter(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessageBubblePreview() {
+    val context = LocalContext.current
+    val preferences = remember { BacktalkPreferences(context) }
+    val dateFormatter = remember { DateFormatter(context, preferences) }
+
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                modules(module {
+                    single { preferences }
+                    single { dateFormatter }
+                }
+                )
+            }
+        ),
+        content = {
+            BacktalkTheme {
+                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        MessageBubbleContent(
+                            messageEntity = OnboardingMocks.message1,
+                            repliedMessageEntity = null,
+                            blinkMessageId = null,
+                            isTop = true,
+                            isBottom = true,
+                            selectMode = false,
+                            isSelected = false,
+                            onReplyPreviewClick = {},
+                            onClick = {},
+                            onLongClick = {},
+                            hapticFeedbackEnabled = true
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Preview(
+    showBackground = true,
+    wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
+)
+@Composable
+private fun MessageBubbleReplyPreview() {
+    val context = LocalContext.current
+    val preferences = remember { BacktalkPreferences(context) }
+    val dateFormatter = remember { DateFormatter(context, preferences) }
+
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                modules(
+                    module {
+                        single { preferences }
+                        single { dateFormatter }
+                    }
+                )
+            }
+        ),
+        content = {
+            BacktalkTheme {
+                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        MessageBubbleContent(
+                            messageEntity = OnboardingMocks.message2,
+                            repliedMessageEntity = OnboardingMocks.message1.copy(text = "Yeah Sure"),
+                            blinkMessageId = null,
+                            isTop = true,
+                            isBottom = true,
+                            selectMode = false,
+                            isSelected = false,
+                            onReplyPreviewClick = {},
+                            onClick = {},
+                            onLongClick = {},
+                            hapticFeedbackEnabled = true
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessageBubbleImagePreview() {
+    val context = LocalContext.current
+    val preferences = remember { BacktalkPreferences(context) }
+    val dateFormatter = remember { DateFormatter(context, preferences) }
+
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                modules(
+                    module {
+                        single { preferences }
+                        single { dateFormatter }
+                    }
+                )
+            }
+        ),
+        content = {
+            BacktalkTheme {
+                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        MessageBubbleContent(
+                            messageEntity = OnboardingMocks.imageMessage,
+                            repliedMessageEntity = null,
+                            blinkMessageId = null,
+                            isTop = true,
+                            isBottom = true,
+                            selectMode = false,
+                            isSelected = false,
+                            onReplyPreviewClick = {},
+                            onClick = {},
+                            onLongClick = {},
+                            hapticFeedbackEnabled = true
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessageBubbleVoicePreview() {
+    val context = LocalContext.current
+    val preferences = remember { BacktalkPreferences(context) }
+    val dateFormatter = remember { DateFormatter(context, preferences) }
+
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                modules(
+                    module {
+                        single { preferences }
+                        single { dateFormatter }
+                    }
+                )
+            }
+        ),
+        content = {
+            BacktalkTheme {
+                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        MessageBubbleContent(
+                            messageEntity = OnboardingMocks.voiceMessage,
+                            repliedMessageEntity = null,
+                            blinkMessageId = null,
+                            isTop = true,
+                            isBottom = true,
+                            selectMode = false,
+                            isSelected = false,
+                            onReplyPreviewClick = {},
+                            onClick = {},
+                            onLongClick = {},
+                            hapticFeedbackEnabled = true
+                        )
+                    }
+                }
+            }
+        }
+    )
 }

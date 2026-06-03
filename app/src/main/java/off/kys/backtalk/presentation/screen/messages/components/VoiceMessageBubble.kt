@@ -43,9 +43,38 @@ fun VoiceMessageBubble(
     val progressGlobal by audioPlayer.progress.collectAsState()
     val currentPath by audioPlayer.currentPath.collectAsState()
 
-    val isThisPlaying = isPlayingGlobal && currentPath == voicePath
-    val progress = if (currentPath == voicePath) progressGlobal else 0f
+    VoiceMessageBubbleContent(
+        duration = duration,
+        waveformData = waveformData,
+        contentColor = contentColor,
+        isPlaying = isPlayingGlobal && currentPath == voicePath,
+        progress = if (currentPath == voicePath) progressGlobal else 0f,
+        onTogglePlay = {
+            if (isPlayingGlobal && currentPath == voicePath) {
+                audioPlayer.pause()
+            } else {
+                val file = File(voicePath)
+                if (file.exists()) {
+                    if (currentPath == voicePath && progressGlobal > 0f && progressGlobal < 1f) {
+                        audioPlayer.resume()
+                    } else {
+                        audioPlayer.playFile(file)
+                    }
+                }
+            }
+        }
+    )
+}
 
+@Composable
+fun VoiceMessageBubbleContent(
+    duration: Long,
+    waveformData: List<Float>,
+    contentColor: Color,
+    isPlaying: Boolean,
+    progress: Float,
+    onTogglePlay: () -> Unit
+) {
     val barWidth = 2.dp
     val gapWidth = 2.dp
 
@@ -60,25 +89,12 @@ fun VoiceMessageBubble(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         IconButton(
-            onClick = {
-                if (isThisPlaying) {
-                    audioPlayer.pause()
-                } else {
-                    val file = File(voicePath)
-                    if (file.exists()) {
-                        if (currentPath == voicePath && progress > 0f && progress < 1f) {
-                            audioPlayer.resume()
-                        } else {
-                            audioPlayer.playFile(file)
-                        }
-                    }
-                }
-            },
+            onClick = onTogglePlay,
             modifier = Modifier.size(32.dp)
         ) {
             Icon(
                 painter = painterResource(
-                    if (isThisPlaying) R.drawable.round_pause_24
+                    if (isPlaying) R.drawable.round_pause_24
                     else R.drawable.round_play_arrow_24
                 ),
                 contentDescription = null,
