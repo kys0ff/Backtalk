@@ -133,8 +133,8 @@
     <string name="settings_show_secret_category_desc">Disable to hide this section</string>
     <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
     <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
-    <string name="settings_test_bug_screen">Test bug screen</string>
-    <string name="settings_test_bug_screen_desc">View the custom bug report screen with sample data</string>
+    <string name="settings_simulate_crash">Simulate crash</string>
+    <string name="settings_simulate_crash_desc">Force an application crash to test the custom bug report screen</string>
 
     <!-- Lock Timeout -->
     <string name="settings_lock_timeout">Lock timeout</string>

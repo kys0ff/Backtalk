@@ -79,7 +79,7 @@ fun ThreadItem(
                     Text(
                         text = stringResource(
                             R.string.threads_at_you_timestamp,
-                            dateFormatter.formatDate(thread.root.timestamp)
+                            dateFormatter.formatThreadDate(thread.root.timestamp)
                         ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline

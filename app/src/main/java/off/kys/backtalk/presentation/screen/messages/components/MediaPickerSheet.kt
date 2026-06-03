@@ -114,18 +114,26 @@ fun MediaPickerSheet(
         )
     }
 
-    val mediaPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_IMAGES
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
+    val mediaPermissions = remember {
+        val permissions = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+            permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+            permissions.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+            permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+        } else {
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        permissions.toTypedArray()
     }
 
     var hasMediaPermission by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                mediaPermission
-            ) == PackageManager.PERMISSION_GRANTED
+            mediaPermissions.any {
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+            }
         )
     }
 
@@ -133,12 +141,14 @@ fun MediaPickerSheet(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         hasCameraPermission = permissions[Manifest.permission.CAMERA] ?: hasCameraPermission
-        hasMediaPermission = permissions[mediaPermission] ?: hasMediaPermission
+        hasMediaPermission = mediaPermissions.any { permissions[it] ?: (ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED) }
     }
 
     LaunchedEffect(Unit) {
         if (!hasCameraPermission || !hasMediaPermission) {
-            permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, mediaPermission))
+            val toRequest = mutableListOf(Manifest.permission.CAMERA)
+            toRequest.addAll(mediaPermissions)
+            permissionLauncher.launch(toRequest.toTypedArray())
         }
     }
 

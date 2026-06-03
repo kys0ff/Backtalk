@@ -152,6 +152,7 @@ fun PinnedMessageBar(
     }
 }
 
+@Suppress("SameParameterValue")
 @Composable
 fun VerticalPinnedIndicator(
     count: Int,

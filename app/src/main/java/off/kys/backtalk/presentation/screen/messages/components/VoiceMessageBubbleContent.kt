@@ -13,8 +13,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -26,45 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.util.AudioPlayer
-import org.koin.compose.koinInject
-import java.io.File
 import java.util.concurrent.TimeUnit
-
-@Composable
-fun VoiceMessageBubble(
-    voicePath: String,
-    duration: Long,
-    waveformData: List<Float>,
-    contentColor: Color
-) {
-    val audioPlayer = koinInject<AudioPlayer>()
-    val isPlayingGlobal by audioPlayer.isPlaying.collectAsState()
-    val progressGlobal by audioPlayer.progress.collectAsState()
-    val currentPath by audioPlayer.currentPath.collectAsState()
-
-    VoiceMessageBubbleContent(
-        duration = duration,
-        waveformData = waveformData,
-        contentColor = contentColor,
-        isPlaying = isPlayingGlobal && currentPath == voicePath,
-        progress = if (currentPath == voicePath) progressGlobal else 0f,
-        onTogglePlay = {
-            if (isPlayingGlobal && currentPath == voicePath) {
-                audioPlayer.pause()
-            } else {
-                val file = File(voicePath)
-                if (file.exists()) {
-                    if (currentPath == voicePath && progressGlobal > 0f && progressGlobal < 1f) {
-                        audioPlayer.resume()
-                    } else {
-                        audioPlayer.playFile(file)
-                    }
-                }
-            }
-        }
-    )
-}
 
 @Composable
 fun VoiceMessageBubbleContent(

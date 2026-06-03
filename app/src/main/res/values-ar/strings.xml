@@ -29,7 +29,6 @@
     <string name="common_confirm">تأكيد</string>
     <string name="common_experimental">تجريبي</string>
     <string name="common_error">خطأ</string>
-    <string name="common_password_set" translatable="false">••••••••</string>
 
     <!-- Chat -->
     <string name="chat_title">الرسائل</string>
@@ -135,12 +134,14 @@
     <string name="settings_show_secret_category_desc">قم بإيقاف هذا الخِيار لإخفاء هذا القسم مجدداً</string>
     <string name="settings_wipe_data_confirm_title">هل تريد مسح جميع البيانات؟</string>
     <string name="settings_wipe_data_confirm_message">سيتم حذف جميع رسائلك، المهام المجدولة، والملاحظات الصوتية نهائيًا، كما ستتم إعادة تعيين الإعدادات. لايمكن التراجع عن هذا الإجراء.</string>
+    <string name="settings_simulate_crash">محاكاة تعطل التطبيق</string>
+    <string name="settings_simulate_crash_desc">فرض تعطل التطبيق لاختبار شاشة تقرير الأخطاء المخصصة</string>
 
     <!-- Lock Timeout -->
     <string name="settings_lock_timeout">مهلة القفل</string>
-    <string name="settings_lock_timeout_desc">المدة التي يظل فيها التطبيق مفتوحاً في الخلفية</string>
+    <string name="settings_lock_timeout_desc">المدة التي يظل فيها التطبيق مفتوحًا في الخلفية</string>
     <string name="settings_lock_on_screen_off">القفل عند إيقاف الشاشة</string>
-    <string name="settings_lock_on_screen_off_desc">قفل التطبيق فوراً عند إيقاف تشغيل شاشة الهاتف</string>
+    <string name="settings_lock_on_screen_off_desc">قفل التطبيق فورًا عند إيقاف تشغيل شاشة الهاتف</string>
     <string name="lock_timeout_immediately">فوراً</string>
     <string name="lock_timeout_15s">15 ثانية</string>
     <string name="lock_timeout_30s">30 ثانية</string>
@@ -337,7 +338,6 @@
     <string name="onboarding_mock_message_1">مرحباً يا نفسي! يجب أن أتذكر شرب المزيد من الماء اليوم.</string>
     <string name="onboarding_mock_message_2">فكرة جيدة. على ترطيب جسمك حافظ! 💧</string>
     <string name="onboarding_mock_reminder">اضغط مطولًا على زر الإرسال لجدولة تذكير كهذا!</string>
-    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">رسالة مثبتة</string>
@@ -372,7 +372,7 @@
     <string name="reminder_message_4">حان وقت مراجعة سريعة مع نفسك.</string>
     <string name="reminder_message_5">ما هو أبرز حدث في يومك حتى الآن؟</string>
     <string name="reminder_message_6">لا تنسَ تسجيل أفكارك اليوم.</string>
-    <string name="reminder_message_7">خذ نفساً عميقاً واكتب بضعة أسطر.</string>
+    <string name="reminder_message_7">خذ نفسًا عميقًا واكتب بضعة أسطر.</string>
     <string name="reminder_message_8">ما هو الشيء الوحيد الذي تعلمته اليوم؟</string>
     <string name="reminder_message_9">كيف تشعر الآن؟ ضع مشاعرك في كلمات.</string>
     <string name="reminder_message_10">فكر في فوز صغير حققته في يومك.</string>

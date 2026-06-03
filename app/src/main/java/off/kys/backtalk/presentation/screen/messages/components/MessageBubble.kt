@@ -769,14 +769,14 @@ private fun MessageFooter(
             if (isReminder && originalTimestamp != null && targetTimestamp != null) {
                 Text(
                     text = "${stringResource(R.string.chat_reminder_original_time)} ${
-                        dateFormatter.formatTime(originalTimestamp)
+                        dateFormatter.formatMessageTime(originalTimestamp)
                     }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
                     text = "${stringResource(R.string.chat_reminder_target_time)} ${
-                        dateFormatter.formatTime(targetTimestamp)
+                        dateFormatter.formatMessageTime(targetTimestamp)
                     }",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
@@ -784,7 +784,7 @@ private fun MessageFooter(
             } else {
                 Text(
                     text = "${if (editedAt != null) stringResource(R.string.chat_sent_at) else emptyString()} ${
-                        dateFormatter.formatTime(timestamp)
+                        dateFormatter.formatMessageTime(timestamp)
                     }".trim(),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
@@ -792,7 +792,7 @@ private fun MessageFooter(
             }
             editedAt?.let {
                 Text(
-                    text = stringResource(R.string.chat_edited_at, dateFormatter.formatTime(it)),
+                    text = stringResource(R.string.chat_edited_at, dateFormatter.formatMessageTime(it)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )

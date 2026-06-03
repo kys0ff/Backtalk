@@ -30,9 +30,12 @@ class App: Application(), ImageLoaderFactory, KoinComponent {
      */
     override fun onCreate() {
         super.onCreate()
-        
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             handleCrash(thread, throwable)
+            defaultHandler?.uncaughtException(thread, throwable) ?: run {
+                exitProcess(1)
+            }
         }
 
         startKoin {
@@ -50,7 +53,6 @@ class App: Application(), ImageLoaderFactory, KoinComponent {
             putExtra("EXTRA_CRASH_THREAD", thread.name)
         }
         startActivity(intent)
-        exitProcess(1)
     }
 
     override fun newImageLoader(): ImageLoader {

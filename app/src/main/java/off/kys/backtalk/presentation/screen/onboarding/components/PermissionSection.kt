@@ -31,6 +31,12 @@ fun PermissionSection(
         onUpdatePermissions()
     }
 
+    val multiplePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ ->
+        onUpdatePermissions()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -90,12 +96,28 @@ fun PermissionSection(
             icon = R.drawable.round_image_24,
             isGranted = state.mediaPermissionGranted,
             onRequest = {
-                val mediaPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    Manifest.permission.READ_MEDIA_IMAGES
-                } else {
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                        multiplePermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.READ_MEDIA_IMAGES,
+                                Manifest.permission.READ_MEDIA_VIDEO,
+                                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                            )
+                        )
+                    }
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                        multiplePermissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.READ_MEDIA_IMAGES,
+                                Manifest.permission.READ_MEDIA_VIDEO
+                            )
+                        )
+                    }
+                    else -> {
+                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
                 }
-                permissionLauncher.launch(mediaPermission)
             }
         )
     }

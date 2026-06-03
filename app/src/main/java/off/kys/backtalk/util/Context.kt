@@ -1,6 +1,5 @@
 package off.kys.backtalk.util
 
-import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -10,7 +9,6 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.biometric.BiometricManager
-import androidx.core.net.toUri
 import off.kys.backtalk.R
 import java.io.File
 
@@ -41,24 +39,6 @@ fun Context.toast(message: String, duration: Int = Toast.LENGTH_SHORT) =
  */
 fun Context.toast(@StringRes message: Int, duration: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(this, message, duration).show()
-
-/**
- * Opens the given URL in the default browser.
- *
- * This function converts the [url] string into a URI and starts an activity
- * with [Intent.ACTION_VIEW].
- *
- * @param url The string representation of the URL to open.
- * @receiver The Context used to start the activity.
- */
-fun Context.openUrl(url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
-        if (this@openUrl !is Activity) {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-    }
-    startActivity(intent)
-}
 
 /**
  * Copies the given text to the system clipboard.
@@ -137,7 +117,7 @@ fun Context.getAssetFile(assetFileName: String): File {
                     inputStream.copyTo(outputStream)
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return cacheFile
         }
     }

@@ -251,7 +251,7 @@ private fun ThreadMessageItem(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "${stringResource(R.string.threads_at_you)} · ${
-                        dateFormatter.formatTime(message.timestamp)
+                        dateFormatter.formatMessageTime(message.timestamp)
                     }",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,

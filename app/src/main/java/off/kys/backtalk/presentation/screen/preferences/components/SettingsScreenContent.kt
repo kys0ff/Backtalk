@@ -57,7 +57,7 @@ fun SettingsScreenContent(
     onNavigateBack: () -> Unit,
     onSyncClicked: () -> Unit,
     onLicenseClicked: () -> Unit,
-    onBugScreenClicked: () -> Unit,
+    onSimulateCrashClicked: () -> Unit,
     onCheckUpdates: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -608,10 +608,10 @@ fun SettingsScreenContent(
                         color = MaterialTheme.colorScheme.outlineVariant
                     )
                     SettingsItem(
-                        label = stringResource(R.string.settings_test_bug_screen),
-                        value = stringResource(R.string.settings_test_bug_screen_desc),
+                        label = stringResource(R.string.settings_simulate_crash),
+                        value = stringResource(R.string.settings_simulate_crash_desc),
                         icon = painterResource(R.drawable.round_warning_24),
-                        onClick = onBugScreenClicked
+                        onClick = onSimulateCrashClicked
                     )
                 }
             }

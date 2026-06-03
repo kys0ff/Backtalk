@@ -76,4 +76,20 @@ class DateFormatterTest {
         assert(result.contains(":30"))
         assert(!result.contains("AM") && !result.contains("PM"))
     }
+
+    @Test
+    fun `formatMessageTime returns formatted time`() {
+        every { preferences.timeFormat } returns AppTimeFormat.TWENTY_FOUR_HOUR
+        val timestamp = 1717326000000L
+        val result = dateFormatter.formatMessageTime(timestamp)
+        assertEquals(dateFormatter.formatTime(timestamp), result)
+    }
+
+    @Test
+    fun `formatThreadDate returns formatted date`() {
+        every { preferences.dateFormat } returns AppDateFormat.DMY_SLASH
+        val timestamp = 1717326000000L
+        val result = dateFormatter.formatThreadDate(timestamp)
+        assertEquals(dateFormatter.formatDate(timestamp), result)
+    }
 }

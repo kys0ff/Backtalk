@@ -78,7 +78,7 @@ fun QuotedMessage(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = dateFormatter.formatDate(message.timestamp),
+                    text = dateFormatter.formatThreadDate(message.timestamp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )

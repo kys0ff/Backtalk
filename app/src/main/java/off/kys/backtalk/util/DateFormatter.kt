@@ -30,7 +30,7 @@ class DateFormatter(
 
         return try {
             SimpleDateFormat(pattern, Locale.getDefault()).format(date)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Fallback for invalid custom patterns
             DateFormat.getDateFormat(context).format(date)
         }
@@ -51,7 +51,7 @@ class DateFormatter(
 
         return try {
             SimpleDateFormat(pattern, Locale.getDefault()).format(date)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DateFormat.getTimeFormat(context).format(date)
         }
     }
@@ -62,7 +62,7 @@ class DateFormatter(
     fun formatDateTime(timestamp: Long): String {
         return "${formatDate(timestamp)}, ${formatTime(timestamp)}"
     }
-    
+
     /**
      * Formats a timestamp for the message bubble (short time).
      */

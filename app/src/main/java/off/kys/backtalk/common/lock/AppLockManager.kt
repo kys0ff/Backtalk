@@ -18,7 +18,7 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
  * Tracks unlocked states by key and enforces timeouts using the global app lifecycle.
  */
 class AppLockManager(
-    private val context: Context,
+    context: Context,
     private val preferences: BacktalkPreferences
 ) {
     // Maps lock keys to their expiration timestamps in milliseconds

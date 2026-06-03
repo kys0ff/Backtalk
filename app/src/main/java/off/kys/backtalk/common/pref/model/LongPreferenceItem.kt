@@ -2,7 +2,7 @@ package off.kys.backtalk.common.pref.model
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.core.content.edit
 
 /**
@@ -13,7 +13,7 @@ class LongPreferenceItem(
     key: String,
     defaultValue: Long
 ) : BasePreferenceItem<Long>(prefs, key, defaultValue) {
-    override val internalState: MutableState<Long> = mutableStateOf(readFromPrefs())
+    override val internalState: MutableState<Long> = mutableLongStateOf(readFromPrefs())
 
     override fun readFromPrefs(): Long = prefs.getLong(key, defaultValue)
     override fun writeToPrefs(value: Long) = prefs.edit { putLong(key, value) }
