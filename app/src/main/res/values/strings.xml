@@ -39,6 +39,7 @@
     <string name="chat_selection_count">%1$d selected</string>
     <string name="chat_replying_to">Replying to</string>
     <string name="chat_voice_message">Voice Message</string>
+    <string name="chat_media_voice">[Voice Message]</string>
     <string name="chat_copy_success">Copied to clipboard</string>
     <string name="chat_copy_label">Copied text</string>
     <string name="chat_status_edited">edited</string>
@@ -46,6 +47,9 @@
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_sent_at">sent at</string>
     <string name="chat_edited_at">edited at %1$s</string>
+    <string name="chat_media_image">[Image]</string>
+    <string name="chat_media_video">[Video]</string>
+    <string name="chat_media_general">[Media]</string>
     <string name="chat_reply_image_preview">[Image]</string>
     <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
     <string name="chat_input_hold_to_record">Hold to record</string>

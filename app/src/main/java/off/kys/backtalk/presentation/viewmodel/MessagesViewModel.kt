@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -200,10 +201,18 @@ class MessagesViewModel(
                     val chunks = mediaPaths.chunked(4)
                     chunks.forEachIndexed { index, chunk ->
                         val isLastChunk = index == chunks.size - 1
+                        val defaultCaption = when {
+                            type.startsWith("image/") -> application.getString(R.string.chat_media_image)
+                            type.startsWith("video/") -> application.getString(R.string.chat_media_video)
+                            else -> application.getString(R.string.chat_media_general)
+                        }
+
                         useCases.insertMessage(
                             MessageEntity(
                                 id = MessageId.generate(),
-                                text = if (isLastChunk) description ?: emptyString() else emptyString(),
+                                text = if (isLastChunk) {
+                                    if (description.isNullOrBlank()) defaultCaption else description
+                                } else emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
                                 mediaPaths = chunk,
@@ -422,7 +431,7 @@ class MessagesViewModel(
             useCases.insertMessage(
                 MessageEntity(
                     id = MessageId.generate(),
-                    text = "[Voice Message]",
+                    text = application.getString(R.string.chat_media_voice),
                     timestamp = System.currentTimeMillis(),
                     repliedToId = replyTo?.id,
                     voicePath = path,

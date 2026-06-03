@@ -171,9 +171,20 @@ fun MessageBubbleContent(
         }
     }
 
+    val messageText = messageEntity.editedText ?: messageEntity.text
+    val defaultCaptions = listOf(
+        stringResource(R.string.chat_media_image),
+        stringResource(R.string.chat_media_video),
+        stringResource(R.string.chat_media_general),
+        stringResource(R.string.chat_media_voice),
+        stringResource(R.string.chat_reply_image_preview),
+        stringResource(R.string.chat_voice_message)
+    )
+    val isDefaultCaption = messageText in defaultCaptions
+
     val hasImages =
         !messageEntity.mediaPath.isNullOrEmpty() || !messageEntity.mediaPaths.isNullOrEmpty()
-    val hasText = (messageEntity.editedText ?: messageEntity.text).isNotEmpty()
+    val hasText = messageText.isNotEmpty() && !(hasImages && isDefaultCaption)
     val hasVoice = messageEntity.voicePath != null
     val hasRepliedMessage = repliedMessageEntity != null
     val hasTags = messageEntity.isReminder || messageEntity.isPinned
@@ -395,7 +406,17 @@ private fun MessageInnerContent(
                     hapticFeedbackEnabled = hapticFeedbackEnabled
                 )
                 val messageText = message.editedText ?: message.text
-                if (messageText.isNotEmpty() || message.voicePath != null) {
+                val isDefaultCaption = messageText in listOf(
+                    stringResource(R.string.chat_media_image),
+                    stringResource(R.string.chat_media_video),
+                    stringResource(R.string.chat_media_general),
+                    stringResource(R.string.chat_media_voice),
+                    stringResource(R.string.chat_reply_image_preview),
+                    stringResource(R.string.chat_voice_message)
+                )
+                val hasActualText = messageText.isNotEmpty() && !isDefaultCaption
+
+                if (hasActualText || message.voicePath != null) {
                     Spacer(modifier = Modifier.height(4.dp))
                 }
             }
@@ -411,7 +432,17 @@ private fun MessageInnerContent(
                 )
             } else {
                 val messageText = message.editedText ?: message.text
-                if (messageText.isNotEmpty()) {
+                val isDefaultCaption = messageText in listOf(
+                    stringResource(R.string.chat_media_image),
+                    stringResource(R.string.chat_media_video),
+                    stringResource(R.string.chat_media_general),
+                    stringResource(R.string.chat_media_voice),
+                    stringResource(R.string.chat_reply_image_preview),
+                    stringResource(R.string.chat_voice_message)
+                )
+                val shouldShowText = messageText.isNotEmpty() && !(images.isNotEmpty() && isDefaultCaption)
+
+                if (shouldShowText) {
                     if (message.editedText != null && showOriginal) {
                         SmartTextContent(
                             text = message.text,
