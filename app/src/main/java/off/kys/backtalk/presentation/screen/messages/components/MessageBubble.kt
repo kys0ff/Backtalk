@@ -747,25 +747,6 @@ private fun MessageFooter(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(end = 8.dp, top = 2.dp)
         ) {
-            if (isLocked) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.chat_editing_locked),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        fontStyle = FontStyle.Italic
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.round_lock_24),
-                        contentDescription = null,
-                        modifier = Modifier.size(10.dp),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                }
-            }
             if (isReminder && originalTimestamp != null && targetTimestamp != null) {
                 Text(
                     text = "${stringResource(R.string.chat_reminder_original_time)} ${
@@ -796,6 +777,25 @@ private fun MessageFooter(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
+            }
+            if (isLocked) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.chat_editing_locked),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        fontStyle = FontStyle.Italic
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.round_lock_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(10.dp),
+                        tint = MaterialTheme.colorScheme.outline
+                    )
+                }
             }
         }
     }
