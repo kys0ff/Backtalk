@@ -48,6 +48,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.HintTooltip
 import java.io.File
 
 class ImagePreviewScreen(val imagePath: String) : Screen {
@@ -109,40 +110,44 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
                     TopAppBar(
                         title = {},
                         navigationIcon = {
-                            IconButton(onClick = { navigator.pop() }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.round_arrow_back_24),
-                                    contentDescription = stringResource(R.string.common_back),
-                                )
+                            HintTooltip(stringResource(R.string.common_navigate_up)) {
+                                IconButton(onClick = { navigator.pop() }) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.round_arrow_back_24),
+                                        contentDescription = stringResource(R.string.common_navigate_up),
+                                    )
+                                }
                             }
                         },
                         actions = {
-                            IconButton(
-                                onClick = {
-                                    if (URLUtil.isNetworkUrl(imagePath)) {
-                                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                            type = "text/plain"
-                                            putExtra(Intent.EXTRA_TEXT, imagePath)
-                                        }
-                                        context.startActivity(Intent.createChooser(shareIntent, null))
-                                    } else {
-                                        val file = File(imagePath)
-                                        if (file.exists()) {
-                                            val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                            HintTooltip(stringResource(R.string.common_share)) {
+                                IconButton(
+                                    onClick = {
+                                        if (URLUtil.isNetworkUrl(imagePath)) {
                                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                                type = "image/*"
-                                                putExtra(Intent.EXTRA_STREAM, uri)
-                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                type = "text/plain"
+                                                putExtra(Intent.EXTRA_TEXT, imagePath)
                                             }
                                             context.startActivity(Intent.createChooser(shareIntent, null))
+                                        } else {
+                                            val file = File(imagePath)
+                                            if (file.exists()) {
+                                                val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                    type = "image/*"
+                                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                }
+                                                context.startActivity(Intent.createChooser(shareIntent, null))
+                                            }
                                         }
                                     }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.round_share_24),
+                                        contentDescription = stringResource(R.string.common_share),
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.round_share_24),
-                                    contentDescription = stringResource(R.string.common_share),
-                                )
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
