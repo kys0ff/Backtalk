@@ -104,6 +104,8 @@
     <string name="changelog_type_docs">توثيق</string>
     <string name="changelog_type_style">مظهر</string>
     <string name="changelog_type_ui">واجهة المستخدم</string>
+    <string name="changelog_type_build">بناء</string>
+    <string name="changelog_type_merge">دمج</string>
     <string name="changelog_type_unknown">معلومات</string>
     <string name="settings_app_lock_desc">طلب المصادقة الحيوية عند فتح التطبيق</string>
     <string name="settings_secure_screen">حماية الشاشة</string>

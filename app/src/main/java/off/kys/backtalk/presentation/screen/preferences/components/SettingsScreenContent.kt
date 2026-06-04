@@ -41,10 +41,12 @@ import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
 import off.kys.backtalk.presentation.event.SettingsUiEvent
+import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.isSecurityEnabled
 import off.kys.backtalk.util.toast
@@ -78,13 +80,14 @@ fun SettingsScreenContent(
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
     val showDateFormatDialog = remember { mutableStateOf(false) }
     val showTimeFormatDialog = remember { mutableStateOf(false) }
+    val showChangelogDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
 
     val biometricLauncher = rememberBiometricLauncher { result ->
         if (result is BiometricResult.Success) {
             appLockManager.setUnlocked(
-                off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE,
+                AppLockManager.Keys.SENSITIVE,
                 30_000L
             )
         }
@@ -320,7 +323,7 @@ fun SettingsScreenContent(
                         icon = painterResource(R.drawable.round_lock_24),
                         checked = state.lockEnabled,
                         onCheckedChange = { enabled ->
-                            if (state.lockEnabled && !appLockManager.isUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE)) {
+                            if (state.lockEnabled && !appLockManager.isUnlocked(AppLockManager.Keys.SENSITIVE)) {
                                 biometricLauncher()
                                 // We don't toggle yet, we wait for user to authenticate and click again, 
                                 // or we could handle it better. 
@@ -557,7 +560,8 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_changelog),
                     value = stringResource(R.string.settings_changelog_desc),
                     icon = painterResource(R.drawable.round_update_24),
-                    onClick = onChangelogClick
+                    onClick = onChangelogClick,
+                    onLongClick = { showChangelogDialog.value = true }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -628,7 +632,7 @@ fun SettingsScreenContent(
                         value = stringResource(R.string.settings_wipe_data_desc),
                         icon = painterResource(R.drawable.round_delete_sweep_24),
                         onClick = {
-                            if (state.lockEnabled && !appLockManager.isUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE)) {
+                            if (state.lockEnabled && !appLockManager.isUnlocked(AppLockManager.Keys.SENSITIVE)) {
                                 biometricLauncher()
                             } else {
                                 showWipeDataDialog.value = true
@@ -822,6 +826,12 @@ fun SettingsScreenContent(
             selectedFormat = state.timeFormat,
             onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
             onDismiss = { showTimeFormatDialog.value = false }
+        )
+    }
+
+    if (showChangelogDialog.value) {
+        ChangelogDialog(
+            onDismiss = { showChangelogDialog.value = false }
         )
     }
 }

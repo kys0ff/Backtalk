@@ -12,3 +12,5 @@ package off.kys.backtalk.util
  */
 @Suppress("SameReturnValue")
 inline fun emptyString(): String = ""
+
+inline fun String.capitalize(): String = this.replaceFirstChar { it.uppercase() }

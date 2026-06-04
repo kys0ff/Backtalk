@@ -38,7 +38,33 @@ class ChangelogRepositoryImpl(
         val hash = line.substring(0, firstSpace)
         val remainder = line.substring(firstSpace + 1).trim()
 
-        val regex = Regex("""\b(feat|fix|refactor|chore|docs|style|ui):\s+""")
+        // Handle Merge Pull Request
+        val mergeRegex = Regex("""^Merge pull request (#\d+) from (.*)$""", RegexOption.IGNORE_CASE)
+        val mergeMatch = mergeRegex.find(remainder)
+        if (mergeMatch != null) {
+            val prNumber = mergeMatch.groupValues[1]
+            val branch = mergeMatch.groupValues[2]
+            return listOf(
+                ChangelogEntry(
+                    hash = hash,
+                    type = "merge",
+                    message = "Pull request $prNumber from $branch"
+                )
+            )
+        }
+
+        // Handle generic Merge commits
+        if (remainder.startsWith("Merge ", ignoreCase = true)) {
+            return listOf(
+                ChangelogEntry(
+                    hash = hash,
+                    type = "merge",
+                    message = remainder.removePrefix("Merge ").removePrefix("merge ").trim()
+                )
+            )
+        }
+
+        val regex = Regex("""\b(feat|fix|refactor|chore|docs|style|ui|build)(?:\s+(#\d+))?:\s+""")
         val matches = regex.findAll(remainder).toList()
 
         if (matches.isEmpty()) {
@@ -57,6 +83,7 @@ class ChangelogRepositoryImpl(
         for (i in matches.indices) {
             val currentMatch = matches[i]
             val type = currentMatch.groupValues[1].lowercase()
+            val issue = currentMatch.groupValues[2]
 
             val messageStart = currentMatch.range.last + 1
             val messageEnd = if (i + 1 < matches.size) {
@@ -65,7 +92,8 @@ class ChangelogRepositoryImpl(
                 remainder.length
             }
 
-            val message = remainder.substring(messageStart, messageEnd).trim()
+            val rawMessage = remainder.substring(messageStart, messageEnd).trim()
+            val message = if (issue.isNotEmpty()) "$issue $rawMessage" else rawMessage
             entries.add(ChangelogEntry(hash = hash, type = type, message = message))
         }
 

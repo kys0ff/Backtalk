@@ -50,11 +50,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -65,10 +62,15 @@ import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.ChangelogEntry
+import off.kys.backtalk.presentation.screen.components.changelog.ChangelogTag
 import off.kys.backtalk.presentation.screen.components.changelog.FastScrollHandler
+import off.kys.backtalk.presentation.screen.components.changelog.extractIssueFromMessage
+import off.kys.backtalk.presentation.screen.components.changelog.formatChangelogMessage
+import off.kys.backtalk.presentation.screen.components.changelog.getColorsForType
 import off.kys.backtalk.presentation.screen.components.changelog.getIconForType
 import off.kys.backtalk.presentation.screen.components.changelog.getLabelForType
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
+import off.kys.backtalk.util.capitalize
 import org.koin.compose.viewmodel.koinViewModel
 
 class ChangelogScreen : Screen {
@@ -177,7 +179,7 @@ private fun ChangelogHeader(
 ) {
     Box(
         modifier = modifier
-                .fillMaxWidth()
+            .fillMaxWidth()
             .hazeEffect(state = hazeState)
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.70f))
     ) {
@@ -209,6 +211,13 @@ private fun ChangelogHeader(
 
 @Composable
 private fun ChangelogTimelineRow(entry: ChangelogEntry) {
+    val (issue, messageText) = extractIssueFromMessage(entry.message)
+    val (containerColor, contentColor) = if (entry.isParsedSuccessfully) {
+        getColorsForType(entry.type, issue != null)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
@@ -221,13 +230,13 @@ private fun ChangelogTimelineRow(entry: ChangelogEntry) {
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(containerColor),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = getIconForType(entry.type),
                     contentDescription = getLabelForType(entry.type),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = contentColor,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -250,26 +259,30 @@ private fun ChangelogTimelineRow(entry: ChangelogEntry) {
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                val (annotatedString, inlineContent) = formatChangelogMessage(
+                    message = messageText.capitalize(),
+                    type = entry.type
+                )
+
+                if (entry.isParsedSuccessfully) {
+                    val label = getLabelForType(entry.type)
+                    val tagText = if (issue != null) "$label $issue" else label
+
+                    ChangelogTag(
+                        text = tagText,
+                        containerColor = containerColor,
+                        contentColor = contentColor
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 Text(
-                    text = buildAnnotatedString {
-                        if (entry.isParsedSuccessfully) {
-                            withStyle(
-                                SpanStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                append(getLabelForType(entry.type).uppercase())
-                            }
-                            append("\n")
-                            append(entry.getCapitalizedMessage())
-                        } else {
-                            append(entry.getCapitalizedMessage())
-                        }
-                    },
+                    text = annotatedString,
+                    inlineContent = inlineContent,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+
                 if (entry.hash.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(

@@ -103,6 +103,8 @@
     <string name="changelog_type_docs">Docs</string>
     <string name="changelog_type_style">Style</string>
     <string name="changelog_type_ui">UI</string>
+    <string name="changelog_type_build">Build</string>
+    <string name="changelog_type_merge">Merge</string>
     <string name="changelog_type_unknown">Info</string>
     <string name="settings_app_lock_desc">Require biometrics on startup</string>
     <string name="settings_secure_screen">Screen security</string>

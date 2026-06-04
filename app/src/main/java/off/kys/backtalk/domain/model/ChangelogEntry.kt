@@ -13,6 +13,4 @@ data class ChangelogEntry(
     val type: String,
     val message: String,
     val isParsedSuccessfully: Boolean = true
-) {
-    fun getCapitalizedMessage(): String = message.replaceFirstChar { it.uppercase() }
-}
+)

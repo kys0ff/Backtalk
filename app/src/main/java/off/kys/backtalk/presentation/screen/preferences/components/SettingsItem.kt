@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.screen.preferences.components
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ListItem
@@ -15,16 +16,25 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsItem(
     label: String,
     value: String? = null,
     icon: Painter,
     badge: (@Composable () -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null
 ) {
     ListItem(
-        modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
+        modifier = if (onClick != null || onLongClick != null) {
+            Modifier.combinedClickable(
+                onClick = onClick ?: {},
+                onLongClick = onLongClick
+            )
+        } else {
+            Modifier
+        },
         headlineContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

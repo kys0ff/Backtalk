@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,16 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.ChangelogEntry
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
+import off.kys.backtalk.util.capitalize
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -144,7 +142,12 @@ private fun ChangelogDialogContent(
  */
 @Composable
 private fun ChangelogRow(entry: ChangelogEntry) {
-    val typeLabel = if (entry.isParsedSuccessfully) getLabelForType(entry.type) else ""
+    val (issue, messageText) = extractIssueFromMessage(entry.message)
+    val (containerColor, contentColor) = if (entry.isParsedSuccessfully) {
+        getColorsForType(entry.type, issue != null)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -153,8 +156,8 @@ private fun ChangelogRow(entry: ChangelogEntry) {
         if (entry.isParsedSuccessfully) {
             Icon(
                 painter = getIconForType(entry.type),
-                contentDescription = typeLabel,
-                tint = MaterialTheme.colorScheme.secondary,
+                contentDescription = getLabelForType(entry.type),
+                tint = if (issue != null || entry.type.lowercase() == "merge") contentColor else MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .padding(top = 2.dp)
                     .size(18.dp)
@@ -163,25 +166,30 @@ private fun ChangelogRow(entry: ChangelogEntry) {
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = buildAnnotatedString {
-                    if (entry.isParsedSuccessfully) {
-                        withStyle(
-                            SpanStyle(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        ) {
-                            append(typeLabel)
-                        }
-                        append(": ")
-                        append(entry.message)
-                    } else {
-                        append(entry.message)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium
+            val (annotatedString, inlineContent) = formatChangelogMessage(
+                message = messageText.capitalize(),
+                type = entry.type
             )
+
+            if (entry.isParsedSuccessfully) {
+                val label = getLabelForType(entry.type)
+                val tagText = if (issue != null) "$label $issue" else label
+                
+                ChangelogTag(
+                    text = tagText,
+                    containerColor = containerColor,
+                    contentColor = contentColor
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            Text(
+                text = annotatedString,
+                inlineContent = inlineContent,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             if (entry.hash.isNotEmpty()) {
                 Text(
                     text = entry.hash,
