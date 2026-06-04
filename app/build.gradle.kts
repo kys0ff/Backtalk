@@ -134,9 +134,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-// Register the task properly with explicit output tracking
 val generateChangelogTask = tasks.register("generateChangelog") {
-    // We tell Gradle exactly what file this task produces
     val changelogFile = file("src/main/assets/changelog.txt")
     outputs.file(changelogFile)
     outputs.upToDateWhen { false }

@@ -3,11 +3,14 @@ package off.kys.backtalk.presentation.activity.components
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import off.kys.backtalk.R
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
@@ -15,6 +18,7 @@ import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
 import off.kys.backtalk.presentation.state.MainUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
+import off.kys.backtalk.util.toast
 
 @Composable
 fun MainView(
@@ -23,9 +27,17 @@ fun MainView(
     onRetryAuthentication: () -> Unit = {},
     crashData: BugScreen? = null
 ) {
+    val context = LocalContext.current
     val updateState by viewModel.mainUiState.collectAsStateWithLifecycle()
     val isDarkTheme = viewModel.preferences.themeMode.isDark(isSystemInDarkTheme())
     val dynamicColor = viewModel.preferences.dynamicColorEnabled
+
+    LaunchedEffect(updateState) {
+        if (updateState is MainUiState.UpToDate) {
+            context.toast(R.string.settings_up_to_date)
+            viewModel.onEvent(MainUiEvent.DismissDialog)
+        }
+    }
 
     BacktalkTheme(
         darkTheme = isDarkTheme,

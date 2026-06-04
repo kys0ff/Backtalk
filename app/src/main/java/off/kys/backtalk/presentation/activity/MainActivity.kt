@@ -111,6 +111,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun checkForUpdates() {
-        viewModel.onEvent(MainUiEvent.CheckUpdate)
+        viewModel.onEvent(MainUiEvent.CheckUpdate(isManual = true))
     }
 }

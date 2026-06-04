@@ -220,6 +220,7 @@
     <string name="settings_check_updates_now">Check for updates now</string>
     <string name="settings_check_updates_desc">See if you are running the latest build</string>
     <string name="settings_checking_updates">Checking for updates…</string>
+    <string name="settings_up_to_date">You are running the latest version.</string>
 
     <!-- Backup & Restore -->
     <string name="backup_title">Backup &amp; Restore</string>

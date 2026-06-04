@@ -46,7 +46,7 @@ class MainViewModel(
 
         // Automatically check for updates if enabled
         if (preferences.autoUpdateEnabled) {
-            onEvent(MainUiEvent.CheckUpdate)
+            onEvent(MainUiEvent.CheckUpdate())
         }
     }
 
@@ -55,7 +55,7 @@ class MainViewModel(
      */
     fun onEvent(event: MainUiEvent) {
         when (event) {
-            MainUiEvent.CheckUpdate -> checkForUpdates()
+            is MainUiEvent.CheckUpdate -> checkForUpdates(event.isManual)
             MainUiEvent.DismissDialog -> {
                 _mainUiState.value = MainUiState.Idle
             }
@@ -65,7 +65,7 @@ class MainViewModel(
         }
     }
 
-    private fun checkForUpdates() {
+    private fun checkForUpdates(isManual: Boolean) {
         viewModelScope.launch {
             _mainUiState.value = MainUiState.Checking
             checkAppUpdate(
@@ -73,7 +73,11 @@ class MainViewModel(
                     _mainUiState.value = MainUiState.UpdateAvailable(result)
                 },
                 onUpToDate = {
-                    _mainUiState.value = MainUiState.UpToDate
+                    if (isManual) {
+                        _mainUiState.value = MainUiState.UpToDate
+                    } else {
+                        _mainUiState.value = MainUiState.Idle
+                    }
                 }
             )
         }

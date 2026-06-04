@@ -222,6 +222,7 @@
     <string name="settings_check_updates_now">التحقق من وجود تحديثات</string>
     <string name="settings_check_updates_desc">تأكد مما إذا كنت تستخدم أحدث إصدار</string>
     <string name="settings_checking_updates">جاري التحقق من التحديثات…</string>
+    <string name="settings_up_to_date">أنت تستخدم أحدث إصدار بالفعل.</string>
 
     <!-- Backup & Restore -->
     <string name="backup_title">النسخ الاحتياطي والاستعادة</string>

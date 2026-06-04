@@ -7,7 +7,7 @@ sealed interface MainUiEvent {
     /**
      * Event to check for app updates.
      */
-    object CheckUpdate : MainUiEvent
+    data class CheckUpdate(val isManual: Boolean = false) : MainUiEvent
 
     /**
      * Event to dismiss the update dialog.
