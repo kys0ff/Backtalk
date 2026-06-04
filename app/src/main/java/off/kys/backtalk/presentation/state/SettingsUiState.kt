@@ -42,7 +42,8 @@ data class SettingsUiState(
     val selectedBackupUri: Uri? = null,
     val error: String? = null,
     val successMessage: String? = null,
-    val showOldBackupWarning: Boolean = false
+    val showOldBackupWarning: Boolean = false,
+    val lastSeenChangelogVersion: String = ""
 ) {
     companion object {
         fun empty(): SettingsUiState = SettingsUiState()

@@ -140,6 +140,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether it's the first time the app is being launched. */
     var firstLaunch by preference(BooleanPreferenceItem(prefs, KEY_FIRST_LAUNCH, true))
 
+    /** The last version of the app for which the changelog was seen. */
+    var lastSeenChangelogVersion by preference(StringPreferenceItem(prefs, KEY_LAST_SEEN_CHANGELOG_VERSION, ""))
+
     // --- Compose State Device ID ---
     private val _deviceIdState = mutableStateOf(getOrCreateDeviceId())
 
@@ -207,6 +210,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"
         const val KEY_DEVICE_ID = "device_id"
+        const val KEY_LAST_SEEN_CHANGELOG_VERSION = "last_seen_changelog_version"
     }
 
     fun getExportablePreferences(): Map<String, String> {

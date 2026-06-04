@@ -92,6 +92,9 @@
     <string name="settings_security_title">الأمان</string>
     <string name="settings_theme">المظهر</string>
     <string name="settings_version">الإصدار</string>
+    <string name="settings_changelog">سجل التغييرات</string>
+    <string name="settings_changelog_desc">عرض أحدث التغييرات والتحسينات</string>
+    <string name="settings_changelog_title">ما الجديد</string>
     <string name="settings_app_lock_desc">طلب المصادقة الحيوية عند فتح التطبيق</string>
     <string name="settings_secure_screen">حماية الشاشة</string>
     <string name="settings_secure_screen_summary">إخفاء المحتوى في قائمة التطبيقات الأخيرة ومنع لقطات الشاشة</string>

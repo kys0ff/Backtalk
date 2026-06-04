@@ -184,4 +184,9 @@ sealed interface MessagesUiEvent {
      * UI event to clear image selection for all messages.
      */
     data object ClearImageSelection : MessagesUiEvent
+
+    /**
+     * UI event to dismiss the changelog dialog.
+     */
+    data object DismissChangelog : MessagesUiEvent
 }

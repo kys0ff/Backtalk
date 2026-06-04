@@ -52,6 +52,13 @@ class MessagesViewModel(
 
     init {
         onEvent(MessagesUiEvent.LoadMessages)
+        checkChangelog()
+    }
+
+    private fun checkChangelog() {
+        if (preferences.lastSeenChangelogVersion != off.kys.backtalk.BuildConfig.VERSION_NAME) {
+            _uiState.value = _uiState.value.copy(showChangelogDialog = true)
+        }
     }
 
     /**
@@ -151,6 +158,10 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
             }
             is MessagesUiEvent.ClearImageSelection -> clearImageSelection()
+            MessagesUiEvent.DismissChangelog -> {
+                preferences.lastSeenChangelogVersion = off.kys.backtalk.BuildConfig.VERSION_NAME
+                _uiState.value = _uiState.value.copy(showChangelogDialog = false)
+            }
         }
     }
 

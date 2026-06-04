@@ -34,5 +34,6 @@ data class MessagesUiState(
     val filteredMessages: List<MessageEntity> = emptyList(),
     val showMediaPicker: Boolean = false,
     val shouldScrollToBottom: Boolean = false,
-    val selectedImagePaths: Map<MessageId, Set<String>> = emptyMap()
+    val selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
+    val showChangelogDialog: Boolean = false
 )

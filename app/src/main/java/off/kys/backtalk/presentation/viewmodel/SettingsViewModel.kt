@@ -73,7 +73,8 @@ class SettingsViewModel(
             externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
             trimMessagesEnabled = preferences.trimMessagesEnabled,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
-            smartImagePointingEnabled = preferences.smartImagePointingEnabled
+            smartImagePointingEnabled = preferences.smartImagePointingEnabled,
+            lastSeenChangelogVersion = preferences.lastSeenChangelogVersion ?: ""
         )
     )
     val state = _state.asStateFlow()
@@ -104,6 +105,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnTrimMessagesToggle -> onTrimMessagesToggle(event.enabled)
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
+        is SettingsUiEvent.OnChangelogVersionUpdate -> onChangelogVersionUpdate(event.version)
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -273,6 +275,11 @@ class SettingsViewModel(
     private fun onSmartImagePointingToggle(enabled: Boolean) {
         preferences.smartImagePointingEnabled = enabled
         _state.update { it.copy(smartImagePointingEnabled = enabled) }
+    }
+
+    private fun onChangelogVersionUpdate(version: String) {
+        preferences.lastSeenChangelogVersion = version
+        _state.update { it.copy(lastSeenChangelogVersion = version) }
     }
 
     private fun onWipeAppData() {

@@ -91,6 +91,9 @@
     <string name="settings_security_title">Security</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_version">Version</string>
+    <string name="settings_changelog">Changelog</string>
+    <string name="settings_changelog_desc">View the latest changes and improvements</string>
+    <string name="settings_changelog_title">What\'s New</string>
     <string name="settings_app_lock_desc">Require biometrics on startup</string>
     <string name="settings_secure_screen">Screen security</string>
     <string name="settings_secure_screen_summary">Hide content in recent apps and prevent screenshots</string>

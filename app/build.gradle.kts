@@ -132,3 +132,28 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+tasks.register("generateChangelog") {
+    doLast {
+        val assetDir = file("src/main/assets")
+        if (!assetDir.exists()) assetDir.mkdirs()
+
+        // 1. Find the latest tag on your current branch
+        val tagProcess = ProcessBuilder("git", "describe", "--tags", "--abbrev=0").start()
+        val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
+
+        val logText = if (lastTag.isNotEmpty()) {
+            // 2. Get commits from that tag up to your current HEAD
+            val logProcess = ProcessBuilder("git", "log", "$lastTag..HEAD", "--oneline").start()
+            logProcess.inputStream.bufferedReader().readText()
+        } else {
+            // Fallback if you haven't created a single tag yet
+            val logProcess = ProcessBuilder("git", "log", "-n", "5", "--oneline").start()
+            logProcess.inputStream.bufferedReader().readText()
+        }
+
+        file("src/main/assets/changelog.txt").writeText(
+            logText.ifBlank { "- Routine maintenance and stability updates." }
+        )
+    }
+}

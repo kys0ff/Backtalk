@@ -77,6 +77,7 @@ fun SettingsScreenContent(
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
     val showDateFormatDialog = remember { mutableStateOf(false) }
     val showTimeFormatDialog = remember { mutableStateOf(false) }
+    val showChangelogDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
 
@@ -532,6 +533,17 @@ fun SettingsScreenContent(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 SettingsItem(
+                    label = stringResource(R.string.settings_changelog),
+                    value = stringResource(R.string.settings_changelog_desc),
+                    icon = painterResource(R.drawable.round_update_24),
+                    onClick = { showChangelogDialog.value = true }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
                     label = stringResource(R.string.settings_license),
                     value = stringResource(R.string.settings_license_desc),
                     icon = painterResource(R.drawable.round_code_xml_24),
@@ -789,6 +801,12 @@ fun SettingsScreenContent(
             selectedFormat = state.timeFormat,
             onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
             onDismiss = { showTimeFormatDialog.value = false }
+        )
+    }
+
+    if (showChangelogDialog.value) {
+        ChangelogDialog(
+            onDismiss = { showChangelogDialog.value = false }
         )
     }
 }
