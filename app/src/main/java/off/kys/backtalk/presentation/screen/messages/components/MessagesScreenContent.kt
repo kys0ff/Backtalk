@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.event.MessagesUiEvent
-import off.kys.backtalk.presentation.screen.preferences.components.ChangelogDialog
+import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.util.compose.rememberHashtags
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility

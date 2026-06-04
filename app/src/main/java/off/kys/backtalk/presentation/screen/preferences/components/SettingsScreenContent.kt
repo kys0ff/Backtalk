@@ -56,6 +56,7 @@ fun SettingsScreenContent(
     onEvent: (SettingsUiEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onSyncClicked: () -> Unit,
+    onChangelogClick: () -> Unit,
     onLicenseClicked: () -> Unit,
     onSimulateCrashClicked: () -> Unit,
     onCheckUpdates: () -> Unit
@@ -77,13 +78,15 @@ fun SettingsScreenContent(
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
     val showDateFormatDialog = remember { mutableStateOf(false) }
     val showTimeFormatDialog = remember { mutableStateOf(false) }
-    val showChangelogDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
 
     val biometricLauncher = rememberBiometricLauncher { result ->
         if (result is BiometricResult.Success) {
-            appLockManager.setUnlocked(off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE, 30_000L)
+            appLockManager.setUnlocked(
+                off.kys.backtalk.common.lock.AppLockManager.Keys.SENSITIVE,
+                30_000L
+            )
         }
     }
 
@@ -349,7 +352,13 @@ fun SettingsScreenContent(
                                     supportingText = stringResource(R.string.settings_lock_on_screen_off_desc),
                                     icon = painterResource(R.drawable.round_screen_lock_portrait_24),
                                     checked = state.lockOnScreenOff,
-                                    onCheckedChange = { onEvent(SettingsUiEvent.OnLockOnScreenOffToggle(it)) }
+                                    onCheckedChange = {
+                                        onEvent(
+                                            SettingsUiEvent.OnLockOnScreenOffToggle(
+                                                it
+                                            )
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -536,7 +545,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_changelog),
                     value = stringResource(R.string.settings_changelog_desc),
                     icon = painterResource(R.drawable.round_update_24),
-                    onClick = { showChangelogDialog.value = true }
+                    onClick = onChangelogClick
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -801,12 +810,6 @@ fun SettingsScreenContent(
             selectedFormat = state.timeFormat,
             onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
             onDismiss = { showTimeFormatDialog.value = false }
-        )
-    }
-
-    if (showChangelogDialog.value) {
-        ChangelogDialog(
-            onDismiss = { showChangelogDialog.value = false }
         )
     }
 }

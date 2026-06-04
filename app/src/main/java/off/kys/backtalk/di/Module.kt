@@ -15,9 +15,11 @@ import off.kys.backtalk.data.local.migrations.MIGRATION_5_6
 import off.kys.backtalk.data.local.migrations.MIGRATION_6_7
 import off.kys.backtalk.data.local.migrations.MIGRATION_7_8
 import off.kys.backtalk.data.repository.BackupRepositoryImpl
+import off.kys.backtalk.data.repository.ChangelogRepositoryImpl
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.data.repository.SyncRepositoryImpl
 import off.kys.backtalk.domain.repository.BackupRepository
+import off.kys.backtalk.domain.repository.ChangelogRepository
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.domain.use_case.CancelScheduledMessage
@@ -38,6 +40,7 @@ import off.kys.backtalk.domain.use_case.SyncData
 import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
+import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
@@ -102,6 +105,7 @@ private fun Module.repositoryModule() {
     single<MessagesRepository> { MessagesRepositoryImpl(get(), get()) }
     single<BackupRepository> { BackupRepositoryImpl(get()) }
     single<SyncRepository> { SyncRepositoryImpl(get(), get(), get(), get(), get()) }
+    single<ChangelogRepository> { ChangelogRepositoryImpl(androidContext()) }
 }
 
 /**
@@ -166,6 +170,7 @@ private fun Module.viewModelModule() {
     viewModel { OnboardingViewModel(androidApplication(), get(), get()) }
     viewModel { StatisticsViewModel(get()) }
     viewModel { RemindersViewModel(get()) }
+    viewModel { ChangelogViewModel(get()) }
 }
 
 /**

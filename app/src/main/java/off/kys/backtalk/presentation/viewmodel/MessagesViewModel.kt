@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.manager.AlarmScheduler
@@ -56,7 +57,7 @@ class MessagesViewModel(
     }
 
     private fun checkChangelog() {
-        if (preferences.lastSeenChangelogVersion != off.kys.backtalk.BuildConfig.VERSION_NAME) {
+        if (preferences.lastSeenChangelogVersion != BuildConfig.VERSION_NAME) {
             _uiState.value = _uiState.value.copy(showChangelogDialog = true)
         }
     }
@@ -159,7 +160,7 @@ class MessagesViewModel(
             }
             is MessagesUiEvent.ClearImageSelection -> clearImageSelection()
             MessagesUiEvent.DismissChangelog -> {
-                preferences.lastSeenChangelogVersion = off.kys.backtalk.BuildConfig.VERSION_NAME
+                preferences.lastSeenChangelogVersion = BuildConfig.VERSION_NAME
                 _uiState.value = _uiState.value.copy(showChangelogDialog = false)
             }
         }

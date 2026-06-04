@@ -95,6 +95,15 @@
     <string name="settings_changelog">سجل التغييرات</string>
     <string name="settings_changelog_desc">عرض أحدث التغييرات والتحسينات</string>
     <string name="settings_changelog_title">ما الجديد</string>
+    <string name="settings_changelog_error">خطأ في تحميل سجل التغييرات أو لم يتم العثور على تغييرات.</string>
+    <string name="changelog_type_feat">ميزة</string>
+    <string name="changelog_type_fix">إصلاح</string>
+    <string name="changelog_type_refactor">إعادة هيكلة</string>
+    <string name="changelog_type_chore">عمل دوري</string>
+    <string name="changelog_type_docs">توثيق</string>
+    <string name="changelog_type_style">مظهر</string>
+    <string name="changelog_type_ui">واجهة المستخدم</string>
+    <string name="changelog_type_unknown">معلومات</string>
     <string name="settings_app_lock_desc">طلب المصادقة الحيوية عند فتح التطبيق</string>
     <string name="settings_secure_screen">حماية الشاشة</string>
     <string name="settings_secure_screen_summary">إخفاء المحتوى في قائمة التطبيقات الأخيرة ومنع لقطات الشاشة</string>

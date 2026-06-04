@@ -94,6 +94,15 @@
     <string name="settings_changelog">Changelog</string>
     <string name="settings_changelog_desc">View the latest changes and improvements</string>
     <string name="settings_changelog_title">What\'s New</string>
+    <string name="settings_changelog_error">Error loading changelog or no changes found.</string>
+    <string name="changelog_type_feat">Feature</string>
+    <string name="changelog_type_fix">Fix</string>
+    <string name="changelog_type_refactor">Refactor</string>
+    <string name="changelog_type_chore">Chore</string>
+    <string name="changelog_type_docs">Docs</string>
+    <string name="changelog_type_style">Style</string>
+    <string name="changelog_type_ui">UI</string>
+    <string name="changelog_type_unknown">Info</string>
     <string name="settings_app_lock_desc">Require biometrics on startup</string>
     <string name="settings_secure_screen">Screen security</string>
     <string name="settings_secure_screen_summary">Hide content in recent apps and prevent screenshots</string>
