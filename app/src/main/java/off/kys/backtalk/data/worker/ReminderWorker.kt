@@ -27,24 +27,20 @@ class ReminderWorker(
     override suspend fun doWork(): Result {
         if (!preferences.remindersEnabled) return Result.success()
 
-        // If they ignored the last notification, check how old it is.
-        if (preferences.hasUnreadReminder) {
-            val lastReminder = preferences.lastReminderTimestamp
-            val twelveHoursInMs = 12 * 60 * 60 * 1000L
-            
-            // If the unread notification is less than 12 hours old, skip.
-            // This prevents spamming multiple notifications within a short window,
-            // but ensures the user eventually gets reminded again if they just ignored it.
-            if (System.currentTimeMillis() - lastReminder < twelveHoursInMs) {
-                return Result.success()
-            }
+        val lastReminder = preferences.lastReminderTimestamp
+        val intervalMillis = preferences.reminderInterval.hours * 60 * 60 * 1000L
+        val currentTime = System.currentTimeMillis()
+
+        // Skip if the user has been active or reminded within the interval.
+        // This ensures reminders are actually "periodic since last use".
+        if (currentTime - lastReminder < intervalMillis) {
+            return Result.success()
         }
 
         showNotification(applicationContext)
 
-        // Mark that a notification is now active/unread
-        preferences.hasUnreadReminder = true
-        preferences.lastReminderTimestamp = System.currentTimeMillis()
+        // Update last reminder timestamp
+        preferences.lastReminderTimestamp = currentTime
 
         return Result.success()
     }

@@ -306,7 +306,7 @@ class SettingsViewModel(
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "auto_export_work",
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.REPLACE,
             workRequest
         )
     }
@@ -331,7 +331,7 @@ class SettingsViewModel(
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "daily_reminders_work",
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.REPLACE,
             workRequest
         )
     }

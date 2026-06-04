@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.viewmodel
 
 import android.app.Application
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
@@ -33,10 +36,13 @@ class MainViewModel(
     val mainUiState = _mainUiState.asStateFlow()
 
     init {
-        // Clear unread reminder flag when the app is opened
-        if (preferences.hasUnreadReminder) {
-            preferences.hasUnreadReminder = false
-        }
+        // Clear reminder notification when the app is opened
+        val notificationManager = application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(Constants.REMINDER_NOTIFICATION_ID)
+        
+        // Update last reminder timestamp to 'now' because the user is active.
+        // This ensures the next periodic reminder is scheduled relative to this use.
+        preferences.lastReminderTimestamp = System.currentTimeMillis()
 
         // Automatically check for updates if enabled
         if (preferences.autoUpdateEnabled) {

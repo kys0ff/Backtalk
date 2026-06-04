@@ -1,6 +1,5 @@
 package off.kys.backtalk.common.pref
 
-import android.app.NotificationManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
@@ -9,7 +8,6 @@ import androidx.core.content.edit
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppTimeFormat
-import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.base.PreferenceItem
@@ -20,7 +18,6 @@ import off.kys.backtalk.common.pref.model.StringPreferenceItem
 import java.util.UUID
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
-import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * Manages the persistent storage and retrieval of application-wide settings using [SharedPreferences].
@@ -137,34 +134,6 @@ class BacktalkPreferences(private val context: Context) {
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
 
-    private val _hasUnreadReminderItem = BooleanPreferenceItem(prefs, KEY_HAS_UNREAD_REMINDER, false)
-
-    /** Whether there is a notification active that the user hasn't seen by opening the app yet. */
-    var hasUnreadReminder: Boolean
-        get() {
-            val hasPref = _hasUnreadReminderItem.value
-            if (!hasPref) return false
-
-            // Double check if the notification is actually still there
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val activeNotifications = notificationManager.activeNotifications
-
-            val isShown = activeNotifications?.any { it.id == Constants.REMINDER_NOTIFICATION_ID } ?: true
-            if (!isShown) {
-                // Desync: preference says true but notification is gone. Correct it.
-                _hasUnreadReminderItem.value = false
-                return false
-            }
-            return true
-        }
-        set(value) {
-            _hasUnreadReminderItem.value = value
-            if (!value) {
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(Constants.REMINDER_NOTIFICATION_ID)
-            }
-        }
-
     /** The timestamp of the last time a reminder notification was shown. */
     var lastReminderTimestamp by preference(LongPreferenceItem(prefs, KEY_LAST_REMINDER_TIMESTAMP, 0L))
 
@@ -179,7 +148,6 @@ class BacktalkPreferences(private val context: Context) {
 
     // --- Initialization Logic and Listeners ---
 
-    @OptIn(ExperimentalUuidApi::class)
     private fun getOrCreateDeviceId(): String {
         val id = prefs.getString(KEY_DEVICE_ID, null)
         return if (id == null) {
@@ -236,7 +204,6 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_PAIRED_DEVICES = "paired_devices"
-        const val KEY_HAS_UNREAD_REMINDER = "has_unread_reminder"
         const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"
         const val KEY_DEVICE_ID = "device_id"
