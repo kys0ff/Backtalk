@@ -127,6 +127,9 @@
     <string name="settings_reminder_interval">التكرار</string>
     <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
     <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
+    <string name="settings_send_with_enter">إرسال بمفتاح Enter</string>
+    <string name="settings_send_with_enter_desc">استبدال مفتاح السطر الجديد بمفتاح الإرسال في لوحة مفاتيح المحادثة</string>
+
     <string name="settings_remove_image_metadata">إزالة بيانات الصور الوصفية</string>
     <string name="settings_remove_image_metadata_desc">تنظيف الصور من بيانات EXIF والبيانات الحساسة الأخرى قبل إرسالها</string>
     <string name="settings_smart_pointing_images">الإشارة الذكية للصور</string>
