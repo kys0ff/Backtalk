@@ -100,10 +100,7 @@ class ChangelogScreen : Screen {
                     exit = fadeOut()
                 ) {
                     FloatingActionButton(
-                        onClick = { navigator.pop() },
-                        shape = CircleShape,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        onClick = { navigator.pop() }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.round_arrow_upward_24),
