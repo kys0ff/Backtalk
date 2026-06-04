@@ -1,0 +1,12 @@
+- Dedicated Changelog screen to track app updates.
+- New "Lock on screen off" setting and customizable lock timeouts.
+- Biometric verification for sensitive actions (exports, security settings).
+- App usage heatmap and activity streaks in Statistics.
+- Multi-image selection, caption support, and SVG support.
+- Staggered image grid and immersive mode for media preview.
+- Journaling reminders with customizable notifications.
+- "Send with Enter" preference and keyboard search action.
+- Per-app language selection (Android 13+) and custom date/time formats.
+- Custom bug reporting and global crash handler for stability.
+- Redesigned Statistics screen with Material 3 LargeTopAppBar.
+- Backups now include images for complete restoration.
