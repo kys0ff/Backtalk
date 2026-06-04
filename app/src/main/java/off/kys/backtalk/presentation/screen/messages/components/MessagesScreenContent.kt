@@ -106,11 +106,10 @@ fun MessagesScreenContent(
         }
     }
 
-    LaunchedEffect(state.shouldScrollToSearch) {
-        if (state.isSearchActive && state.currentSearchResultIndex != -1 && state.shouldScrollToSearch) {
+    LaunchedEffect(state.scrollToSearchTrigger) {
+        if (state.isSearchActive && state.currentSearchResultIndex != -1 && state.scrollToSearchTrigger > 0) {
             val targetId = state.searchResults[state.currentSearchResultIndex]
             scrollToAndBlink(targetId)
-            onEvent(MessagesUiEvent.ConsumedScrollToSearch)
         }
     }
 

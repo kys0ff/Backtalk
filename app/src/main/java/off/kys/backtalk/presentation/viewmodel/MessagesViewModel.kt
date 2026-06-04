@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,6 +51,8 @@ class MessagesViewModel(
      * The current UI state of the Messages screen, represented as a [State] of [MessagesUiState].
      */
     val uiState: State<MessagesUiState> = _uiState
+
+    private var blinkJob: Job? = null
 
     init {
         onEvent(MessagesUiEvent.LoadMessages)
@@ -150,9 +153,6 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(shouldScrollToPinned = false)
             }
 
-            MessagesUiEvent.ConsumedScrollToSearch -> {
-                _uiState.value = _uiState.value.copy(shouldScrollToSearch = false)
-            }
             is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(event.messageId, event.imagePath)
             is MessagesUiEvent.ToggleImageSelection -> toggleImageSelection(event.messageId, event.imagePath)
             is MessagesUiEvent.DeleteSelectedImages -> {
@@ -243,7 +243,8 @@ class MessagesViewModel(
     }
 
     private fun blinkMessage(id: MessageId?) {
-        viewModelScope.launch {
+        blinkJob?.cancel()
+        blinkJob = viewModelScope.launch {
             _uiState.value = _uiState.value.copy(blinkMessageId = id)
             if (id != null) {
                 delay(1920)
@@ -571,7 +572,7 @@ class MessagesViewModel(
 
         _uiState.value = state.copy(
             currentSearchResultIndex = newIndex,
-            shouldScrollToSearch = true
+            scrollToSearchTrigger = state.scrollToSearchTrigger + 1
         )
     }
 }

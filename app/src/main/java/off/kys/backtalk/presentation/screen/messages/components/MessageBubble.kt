@@ -168,6 +168,9 @@ fun MessageBubbleContent(
                 blinkAlpha.animateTo(1f, tween(180))
                 blinkAlpha.animateTo(0f, tween(300))
             }
+        } else {
+            scale.snapTo(1f)
+            blinkAlpha.snapTo(0f)
         }
     }
 

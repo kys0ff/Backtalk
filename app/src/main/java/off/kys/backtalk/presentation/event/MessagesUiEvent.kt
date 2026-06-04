@@ -158,11 +158,6 @@ sealed interface MessagesUiEvent {
     data object ConsumedScrollToPinned : MessagesUiEvent
 
     /**
-     * UI event to notify that the scroll to a search result has been consumed.
-     */
-    data object ConsumedScrollToSearch : MessagesUiEvent
-
-    /**
      * UI event to remove a single image from a message.
      *
      * @param messageId The ID of the message containing the image.
