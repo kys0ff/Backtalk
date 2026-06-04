@@ -43,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,10 +62,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
+import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.ChangelogEntry
 import off.kys.backtalk.presentation.screen.components.changelog.FastScrollHandler
 import off.kys.backtalk.presentation.screen.components.changelog.getIconForType
+import off.kys.backtalk.presentation.screen.components.changelog.getLabelForType
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -75,6 +78,7 @@ class ChangelogScreen : Screen {
         val viewModel = koinViewModel<ChangelogViewModel>()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
+        val coroutineScope = rememberCoroutineScope()
 
         val listState = rememberLazyListState()
         val showFab by remember {
@@ -100,11 +104,15 @@ class ChangelogScreen : Screen {
                     exit = fadeOut()
                 ) {
                     FloatingActionButton(
-                        onClick = { navigator.pop() }
+                        onClick = {
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(0)
+                            }
+                        }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.round_arrow_upward_24),
-                            contentDescription = "Scroll to top"
+                            contentDescription = stringResource(R.string.changelog_scroll_to_top)
                         )
                     }
                 }
@@ -218,7 +226,7 @@ private fun ChangelogTimelineRow(entry: ChangelogEntry) {
             ) {
                 Icon(
                     painter = getIconForType(entry.type),
-                    contentDescription = entry.type,
+                    contentDescription = getLabelForType(entry.type),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(16.dp)
                 )
@@ -251,7 +259,7 @@ private fun ChangelogTimelineRow(entry: ChangelogEntry) {
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             ) {
-                                append(entry.type.uppercase())
+                                append(getLabelForType(entry.type).uppercase())
                             }
                             append("\n")
                             append(entry.getCapitalizedMessage())

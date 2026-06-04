@@ -45,6 +45,7 @@
     <string name="chat_status_edited">edited</string>
     <string name="chat_editing_locked">Editing is locked</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
+    <string name="changelog_scroll_to_top">Scroll to top</string>
     <string name="chat_sent_at">sent at</string>
     <string name="chat_edited_at">edited at %1$s</string>
     <string name="chat_media_image">[Image]</string>

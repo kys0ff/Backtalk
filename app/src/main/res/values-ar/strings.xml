@@ -41,6 +41,7 @@
     <string name="chat_status_edited">مُعدّلة</string>
     <string name="chat_editing_locked">التعديل مغلق</string>
     <string name="chat_scroll_to_bottom">انتقال للأسفل</string>
+    <string name="changelog_scroll_to_top">انتقال للأعلى</string>
     <string name="chat_sent_at">أُرسلت في</string>
     <string name="chat_edited_at">عُدّلت في %1$s</string>
     <string name="chat_media_image">[صورة]</string>
