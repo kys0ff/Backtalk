@@ -34,6 +34,7 @@ data class SettingsUiState(
     val devModeEnabled: Boolean = false,
     val externalLinkWarningEnabled: Boolean = true,
     val trimMessagesEnabled: Boolean = false,
+    val sendWithEnter: Boolean = false,
     val removeImageMetadataEnabled: Boolean = false,
     val smartImagePointingEnabled: Boolean = false,
     val backupLoading: Boolean = false,

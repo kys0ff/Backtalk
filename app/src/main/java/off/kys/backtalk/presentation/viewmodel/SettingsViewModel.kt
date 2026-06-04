@@ -72,9 +72,10 @@ class SettingsViewModel(
             devModeEnabled = preferences.devModeEnabled,
             externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
             trimMessagesEnabled = preferences.trimMessagesEnabled,
+            sendWithEnter = preferences.sendWithEnter,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
-            lastSeenChangelogVersion = preferences.lastSeenChangelogVersion ?: ""
+            lastSeenChangelogVersion = preferences.lastSeenChangelogVersion.orEmpty()
         )
     )
     val state = _state.asStateFlow()
@@ -103,6 +104,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
         is SettingsUiEvent.OnExternalLinkWarningToggle -> onExternalLinkWarningToggle(event.enabled)
         is SettingsUiEvent.OnTrimMessagesToggle -> onTrimMessagesToggle(event.enabled)
+        is SettingsUiEvent.OnSendWithEnterToggle -> onSendWithEnterToggle(event.enabled)
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
         is SettingsUiEvent.OnChangelogVersionUpdate -> onChangelogVersionUpdate(event.version)
@@ -265,6 +267,11 @@ class SettingsViewModel(
     private fun onTrimMessagesToggle(enabled: Boolean) {
         preferences.trimMessagesEnabled = enabled
         _state.update { it.copy(trimMessagesEnabled = enabled) }
+    }
+
+    private fun onSendWithEnterToggle(enabled: Boolean) {
+        preferences.sendWithEnter = enabled
+        _state.update { it.copy(sendWithEnter = enabled) }
     }
 
     private fun onRemoveImageMetadataToggle(enabled: Boolean) {

@@ -125,6 +125,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether to trim sent messages by default. */
     var trimMessagesEnabled by preference(BooleanPreferenceItem(prefs, KEY_TRIM_MESSAGES, false))
 
+    /** Whether the keyboard's enter key should trigger a send action instead of a new line. */
+    var sendWithEnter by preference(BooleanPreferenceItem(prefs, KEY_SEND_WITH_ENTER, false))
+
     /** Whether to remove metadata from sent images. */
     var removeImageMetadataEnabled by preference(BooleanPreferenceItem(prefs, KEY_REMOVE_IMAGE_METADATA, false))
 
@@ -204,6 +207,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_DEV_MODE_ENABLED = "dev_mode_enabled"
         const val KEY_EXTERNAL_LINK_WARNING = "external_link_warning"
         const val KEY_TRIM_MESSAGES = "trim_messages"
+        const val KEY_SEND_WITH_ENTER = "send_with_enter"
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_PAIRED_DEVICES = "paired_devices"

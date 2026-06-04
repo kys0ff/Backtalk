@@ -247,6 +247,18 @@ fun SettingsScreenContent(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 SettingsToggle(
+                    label = stringResource(R.string.settings_send_with_enter),
+                    supportingText = stringResource(R.string.settings_send_with_enter_desc),
+                    icon = painterResource(R.drawable.round_send_24),
+                    checked = state.sendWithEnter,
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnSendWithEnterToggle(it)) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
                     label = stringResource(R.string.settings_remove_image_metadata),
                     supportingText = stringResource(R.string.settings_remove_image_metadata_desc),
                     icon = painterResource(R.drawable.round_description_24),
