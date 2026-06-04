@@ -118,11 +118,11 @@ fun FastScrollHandler(
 
 @Composable
 fun getIconForType(type: String): Painter = when (type) {
-    "feat" -> painterResource(R.drawable.round_add_24)
+    "feat" -> painterResource(R.drawable.round_add_box_24)
     "fix" -> painterResource(R.drawable.round_build_24)
     "refactor" -> painterResource(R.drawable.round_refresh_24)
-    "chore" -> painterResource(R.drawable.round_settings_24)
-    "docs" -> painterResource(R.drawable.round_edit_24)
+    "chore" -> painterResource(R.drawable.round_cleaning_services_24)
+    "docs" -> painterResource(R.drawable.round_docs_24)
     "style", "ui" -> painterResource(R.drawable.round_star_24)
     else -> painterResource(R.drawable.round_info_24)
 }
