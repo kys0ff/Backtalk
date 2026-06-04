@@ -134,23 +134,49 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-tasks.register("generateChangelog") {
+// Register the task properly with explicit output tracking
+val generateChangelogTask = tasks.register("generateChangelog") {
+    // We tell Gradle exactly what file this task produces
+    val changelogFile = file("src/main/assets/changelog.txt")
+    outputs.file(changelogFile)
+    outputs.upToDateWhen { false }
+
     doLast {
         val assetDir = file("src/main/assets")
         if (!assetDir.exists()) assetDir.mkdirs()
 
-        val tagProcess = ProcessBuilder("git", "describe", "--tags", "--abbrev=0").start()
-        val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
-        val logText = if (lastTag.isNotEmpty()) {
-            val logProcess = ProcessBuilder("git", "log", "$lastTag..HEAD", "--oneline").start()
-            logProcess.inputStream.bufferedReader().readText()
-        } else {
-            val logProcess = ProcessBuilder("git", "log", "-n", "5", "--oneline").start()
-            logProcess.inputStream.bufferedReader().readText()
-        }
+        val logText = runCatching {
+            val tagProcess = ProcessBuilder("git", "describe", "--tags", "--abbrev=0").start()
+            tagProcess.waitFor()
+            val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
 
-        file("src/main/assets/changelog.txt").writeText(
-            logText.ifBlank { "- Routine maintenance and stability updates." }
-        )
+            if (lastTag.isNotEmpty()) {
+                val logProcess = ProcessBuilder("git", "log", "$lastTag..HEAD", "--oneline").start()
+                logProcess.waitFor()
+                logProcess.inputStream.bufferedReader().readText()
+            } else {
+                val logProcess = ProcessBuilder("git", "log", "-n", "5", "--oneline").start()
+                logProcess.waitFor()
+                logProcess.inputStream.bufferedReader().readText()
+            }
+        }.getOrElse { "No changelog available" }
+
+        changelogFile.writeText(logText)
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val isFDroid = variant.productFlavors.any { it.second == "fdroid" }
+
+        if (!isFDroid) {
+            variant.sources.assets?.addGeneratedSourceDirectory(
+                generateChangelogTask
+            ) {
+                val directoryProperty = project.objects.directoryProperty()
+                directoryProperty.set(project.layout.projectDirectory.dir("src/main/assets"))
+                directoryProperty
+            }
+        }
     }
 }

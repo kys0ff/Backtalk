@@ -1,3 +1,4 @@
+0e4d056 feat: add changelog asset with project history
 2c159ae chore: update Arabic translations with new settings strings
 f05cc8c feat: add tooltips to ImagePreviewScreen top bar actions
 c209bff feat: add immersive mode support and smooth animations to ImagePreviewScreen
