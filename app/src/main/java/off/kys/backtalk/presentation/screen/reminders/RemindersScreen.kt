@@ -18,8 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,13 +48,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
 import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.presentation.viewmodel.RemindersViewModel
 import org.koin.compose.viewmodel.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Screen for managing (viewing and canceling) scheduled reminders.
@@ -78,7 +74,7 @@ class RemindersScreen : Screen {
                 TopAppBar(
                     title = { Text(stringResource(R.string.reminders_title)) },
                     navigationIcon = {
-                        HintTooltip(stringResource(R.string.common_back)) {
+                        HintTooltip(stringResource(R.string.common_navigate_up)) {
                             IconButton(onClick = { navigator.pop() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.round_arrow_back_24),
@@ -93,6 +89,9 @@ class RemindersScreen : Screen {
         ) { padding ->
             AnimatedContent(
                 targetState = state,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 transitionSpec = {
                     fadeIn(animationSpec = spring(stiffness = 380f)) togetherWith
                             fadeOut(animationSpec = spring(stiffness = 380f))
@@ -101,9 +100,7 @@ class RemindersScreen : Screen {
             ) { targetState ->
                 if (targetState.isLoading) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding),
+                        modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -111,9 +108,7 @@ class RemindersScreen : Screen {
                     }
                 } else if (targetState.reminders.isEmpty()) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding),
+                        modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -135,8 +130,8 @@ class RemindersScreen : Screen {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
-                            top = padding.calculateTopPadding() + 8.dp,
-                            bottom = padding.calculateBottomPadding() + 16.dp,
+                            top = 8.dp,
+                            bottom = 16.dp,
                             start = 16.dp,
                             end = 16.dp
                         ),
@@ -194,64 +189,61 @@ class RemindersScreen : Screen {
         onCancelClick: () -> Unit,
         modifier: Modifier = Modifier
     ) {
-        val formattedDate = remember(reminder.scheduledTimestamp) {
-            SimpleDateFormat("MMM d, yyyy · h:mm a", Locale.getDefault())
-                .format(Date(reminder.scheduledTimestamp))
+        val dateFormatter = LocalDateFormatter.current
+        val formattedDate = remember(dateFormatter, reminder.scheduledTimestamp) {
+            dateFormatter.formatDateTime(reminder.scheduledTimestamp)
         }
 
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
+        ListItem(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large),
+            colors = ListItemDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-        ) {
-            ListItem(
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                headlineContent = {
-                    Text(
-                        text = reminder.text,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+            tonalElevation = 1.dp,
+            headlineContent = {
+                Text(
+                    text = reminder.text,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            supportingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_calendar_today_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                },
-                supportingContent = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.padding(top = 2.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.round_calendar_today_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = formattedDate,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                trailingContent = {
-                    IconButton(
-                        onClick = onCancelClick,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.round_delete_24),
-                            contentDescription = stringResource(R.string.common_cancel)
-                        )
-                    }
+                    Text(
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            )
-        }
+            },
+            trailingContent = {
+                IconButton(
+                    onClick = onCancelClick,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_delete_24),
+                        contentDescription = stringResource(R.string.common_cancel)
+                    )
+                }
+            }
+        )
     }
 }
