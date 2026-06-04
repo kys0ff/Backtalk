@@ -1,11 +1,18 @@
 package off.kys.backtalk.presentation.screen.preview
 
+import android.app.Activity
 import android.content.Intent
 import android.webkit.URLUtil
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +40,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.core.content.FileProvider
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -39,12 +50,6 @@ import coil.compose.AsyncImage
 import off.kys.backtalk.R
 import java.io.File
 
-/**
- * Voyager screen for full-screen image viewing with bound-restricted pinch-to-zoom,
- * panning, double-tap to reset/zoom, and crash-safe action logic.
- *
- * @param imagePath Local file path or remote URL of the image.
- */
 class ImagePreviewScreen(val imagePath: String) : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -58,64 +63,109 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
         var offsetY by remember { mutableFloatStateOf(0f) }
         var size by remember { mutableStateOf(IntSize.Zero) }
 
+        var isUiVisible by remember { mutableStateOf(true) }
+
+        val window = (context as? Activity)?.window
+
+        LaunchedEffect(isUiVisible, window) {
+            window?.let { win ->
+                WindowCompat.setDecorFitsSystemWindows(win, false)
+
+                val insetsController = WindowCompat.getInsetsController(win, win.decorView)
+                insetsController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+                if (isUiVisible) {
+                    insetsController.show(WindowInsetsCompat.Type.systemBars())
+                } else {
+                    insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+        }
+
+        val animatedScale by animateFloatAsState(
+            targetValue = scale,
+            animationSpec = tween(durationMillis = 250),
+            label = "ScaleAnimation"
+        )
+        val animatedOffsetX by animateFloatAsState(
+            targetValue = offsetX,
+            animationSpec = tween(durationMillis = 250),
+            label = "OffsetXAnimation"
+        )
+        val animatedOffsetY by animateFloatAsState(
+            targetValue = offsetY,
+            animationSpec = tween(durationMillis = 250),
+            label = "OffsetYAnimation"
+        )
+
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {},
-                    navigationIcon = {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_arrow_back_24),
-                                contentDescription = stringResource(R.string.common_back),
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                if (URLUtil.isNetworkUrl(imagePath)) {
-                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, imagePath)
-                                    }
-                                    context.startActivity(Intent.createChooser(shareIntent, null))
-                                } else {
-                                    val file = File(imagePath)
-                                    if (file.exists()) {
-                                        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                AnimatedVisibility(
+                    visible = isUiVisible,
+                    enter = slideInVertically(initialOffsetY = { -it }),
+                    exit = slideOutVertically(targetOffsetY = { -it })
+                ) {
+                    TopAppBar(
+                        title = {},
+                        navigationIcon = {
+                            IconButton(onClick = { navigator.pop() }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.round_arrow_back_24),
+                                    contentDescription = stringResource(R.string.common_back),
+                                )
+                            }
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    if (URLUtil.isNetworkUrl(imagePath)) {
                                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                            type = "image/*"
-                                            putExtra(Intent.EXTRA_STREAM, uri)
-                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            type = "text/plain"
+                                            putExtra(Intent.EXTRA_TEXT, imagePath)
                                         }
                                         context.startActivity(Intent.createChooser(shareIntent, null))
+                                    } else {
+                                        val file = File(imagePath)
+                                        if (file.exists()) {
+                                            val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                                type = "image/*"
+                                                putExtra(Intent.EXTRA_STREAM, uri)
+                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            context.startActivity(Intent.createChooser(shareIntent, null))
+                                        }
                                     }
                                 }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.round_share_24),
+                                    contentDescription = stringResource(R.string.common_share),
+                                )
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_share_24),
-                                contentDescription = stringResource(R.string.common_share),
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Black.copy(alpha = 0.5f)
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Black.copy(alpha = 0.5f)
+                        )
                     )
-                )
+                }
             },
             containerColor = Color.Black
         ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(if (isUiVisible) innerPadding else PaddingValues())
                     .background(Color.Black)
                     .onGloballyPositioned { coordinates ->
                         size = coordinates.size
                     }
                     .pointerInput(Unit) {
                         detectTapGestures(
+                            onTap = {
+                                isUiVisible = !isUiVisible
+                            },
                             onDoubleTap = {
                                 if (scale > 1f) {
                                     scale = 1f
@@ -151,10 +201,10 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
                     modifier = Modifier
                         .fillMaxSize()
                         .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            translationX = offsetX
-                            translationY = offsetY
+                            scaleX = animatedScale
+                            scaleY = animatedScale
+                            translationX = animatedOffsetX
+                            translationY = animatedOffsetY
                         },
                     contentScale = ContentScale.Fit
                 )
