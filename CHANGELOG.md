@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-06-04
+
+### Added
+- **Changelog Screen**: Dedicated screen to track app updates with a detailed version history and automatic tracking.
+- **Security & Privacy**:
+  - New "Lock on screen off" setting and customizable lock timeouts.
+  - Biometric verification for sensitive actions (e.g., exports, security settings).
+  - Time-limited deletion for messages to enhance privacy.
+- **Enhanced Statistics**: Added an app usage heatmap and activity streaks for better insights.
+- **Media Features**:
+  - Support for multi-image selection and deletion.
+  - Added caption support for media messages and SVG support.
+  - Implemented a staggered image grid for better media layout in chat.
+  - Immersive mode and smooth animations for the image preview screen.
+- **Reminders**: Introduced journaling reminders with customizable intervals notifications.
+- **UX Improvements**:
+  - "Send with Enter" preference and keyboard search action support.
+  - Per-app language selection (Android 13+) and customizable date/time formats.
+  - Double-click gesture to quickly toggle message pinning.
+  - Scroll-to-top functionality in the Changelog screen.
+- **Maintenance**: Custom bug reporting screen and global crash handler for improved stability.
+
+### Changed
+- **Statistics Redesign**: Overhauled the Statistics screen with Material 3 `LargeTopAppBar` and improved layouts.
+- **Pinned Messages UI**: Redesigned the vertical pinned indicator with scrolling and dynamic scaling for better navigation.
+- **Settings Architecture**: Migrated to a structured `PreferenceItem` system and property delegates for better maintainability.
+- **Backup & Restore**: Backups now include images, ensuring a complete restoration of your chat history.
+- **Localization**: Comprehensive updates to Arabic translations and localized theme/settings strings.
+
+### Fixed
+- **Authentication**: Refined biometric flow and improved splash screen behavior.
+- **App Updates**: Fixed update checking issues caused by ProGuard minification and redesigned the update dialog.
+- **Animations**: Improved search scrolling and message blink animations.
+- **Onboarding**: Fixed various logic and navigation issues in the onboarding flow.
+
+### Refactored
+- **UI Architecture**: Decoupled message components to improve Preview support and extracted stateless screen contents.
+- **Background Work**: Moved usage tracking to background workers for better performance.
+- **RTL Support**: Added proper logical directions to swipe gestures for better RTL layout consistency.
+
+### Build
+- **Automation**: Integrated changelog generation directly into the build process using AGP variant APIs.
+- **Maintenance**: Bumped version to 0.3.2.
+
+---
+
 ## [0.2.5] - 2026-05-22
 
 ### Added

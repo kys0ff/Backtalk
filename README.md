@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.2.5-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.3.2-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -37,7 +37,6 @@ yourself.*
 |:--------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
 | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="360" alt="Screenshot 1"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="360" alt="Screenshot 2"> |
 | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="360" alt="Screenshot 3"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width="360" alt="Screenshot 4"> |
-| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" width="360" alt="Screenshot 5"> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" width="360" alt="Screenshot 6"> |
 
 ---
 
@@ -54,14 +53,13 @@ yourself.*
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.2.5)
+## Recent Changes (v0.3.2)
 
-- **Media Attachments**: Full support for gallery images and a new custom camera interface.
-- **Pinned Messages**: Pin important thoughts and navigate through them easily.
-- **Reminders & Hashtags**: Improved organization with dedicated reminders management and tag filtering.
-- **Enhanced Statistics**: New insights into your media usage and improved chart visualizations.
-- **UI/UX Polish**: Refined animations, improved scrolling behavior, and modernized components.
-- **Quoted Threads**: Support for quoted threads in both the main threads and detail views.
+- **Changelog Screen**: A new dedicated screen to keep track of every update and improvement.
+- **Security Enhancements**: Added "Lock on screen off", customizable timeouts, and biometric checks for sensitive actions.
+- **Media Overhaul**: Multi-image support, media captions, SVG support, and a beautiful staggered grid layout.
+- **Advanced Statistics**: Visualize your habits with a new usage heatmap and activity streaks.
+- **UX & Localization**: "Send with Enter" support, per-app language settings, and improved Arabic localization.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 

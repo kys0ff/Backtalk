@@ -1,3 +1,6 @@
+8ccec73 docs: update short description and refresh F-Droid screenshots
+1d407a2 feat: add up-to-date feedback for manual update checks
+3247412 build: improve changelog generation task and integrate with AGP variant APIs
 0e4d056 feat: add changelog asset with project history
 2c159ae chore: update Arabic translations with new settings strings
 f05cc8c feat: add tooltips to ImagePreviewScreen top bar actions
