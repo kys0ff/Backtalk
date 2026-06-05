@@ -1,6 +1,7 @@
 package off.kys.backtalk.domain.use_case
 
 import off.kys.backtalk.BuildConfig
+import off.kys.backtalk.common.Constants
 import off.kys.github_app_updater_lib.checkAppUpdate
 import off.kys.github_app_updater_lib.common.ChangelogSource
 import off.kys.github_app_updater_lib.model.updater.UpdateResult
@@ -34,7 +35,7 @@ class CheckAppUpdate(
 
         runCatching {
             checkAppUpdate {
-                githubRepo("kys0ff/Backtalk")
+                githubRepo(Constants.BACKTALK_GITHUB_REPO)
                 currentVersion(this@CheckAppUpdate.currentVersion)
                 changelogSource(ChangelogSource.COMMITS)
 
