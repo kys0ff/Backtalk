@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.util.emptyString
 
 @Composable
 fun ChangelogTag(
@@ -69,7 +70,10 @@ fun ChangelogTag(
 }
 
 @Composable
-fun formatChangelogMessage(message: String, type: String = ""): Pair<AnnotatedString, Map<String, InlineTextContent>> {
+fun formatChangelogMessage(
+    message: String,
+    type: String = emptyString()
+): Pair<AnnotatedString, Map<String, InlineTextContent>> {
     val issueRegex = Regex("""#\d+""")
     val branchRegex = Regex("""\b[\w.-]{2,}/[\w.-]{2,}\b""")
     val isMerge = type.lowercase() == "merge"
@@ -147,8 +151,8 @@ fun getColorsForType(type: String, hasIssue: Boolean = false): Pair<Color, Color
         "fix" -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
         "merge" -> MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         "refactor" -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-        "docs" -> Color(0xFFD1E4FF) to Color(0xFF001D36) // Light blue
-        "chore" -> Color(0xFFE2E2E6) to Color(0xFF45464F) // Grey
+        "docs" -> Color(0xFFD1E4FF) to Color(0xFF001D36)
+        "chore" -> Color(0xFFE2E2E6) to Color(0xFF45464F)
         else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
     }
 }
