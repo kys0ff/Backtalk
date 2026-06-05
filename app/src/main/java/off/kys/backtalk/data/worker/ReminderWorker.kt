@@ -31,17 +31,12 @@ class ReminderWorker(
         val intervalMillis = preferences.reminderInterval.hours * 60 * 60 * 1000L
         val currentTime = System.currentTimeMillis()
 
-        // Skip if the user has been active or reminded within the interval.
-        // This ensures reminders are actually "periodic since last use".
         if (currentTime - lastReminder < intervalMillis) {
             return Result.success()
         }
 
         showNotification(applicationContext)
-
-        // Update last reminder timestamp
         preferences.lastReminderTimestamp = currentTime
-
         return Result.success()
     }
 

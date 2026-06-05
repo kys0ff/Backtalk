@@ -27,24 +27,26 @@ class CheckAppUpdate(
         onUpdateAvailable: (UpdateResult) -> Unit,
         onUpToDate: () -> Unit
     ) {
-
-        if (this@CheckAppUpdate.isFDroid) {
+        if (isFDroid) {
             onUpToDate()
             return
         }
 
-        checkAppUpdate {
-            githubRepo("kys0ff/Backtalk")
-            currentVersion(this@CheckAppUpdate.currentVersion)
-            changelogSource(ChangelogSource.COMMITS)
+        runCatching {
+            checkAppUpdate {
+                githubRepo("kys0ff/Backtalk")
+                currentVersion(this@CheckAppUpdate.currentVersion)
+                changelogSource(ChangelogSource.COMMITS)
 
-            onUpdateAvailable { result ->
-                onUpdateAvailable(result)
+                onUpdateAvailable { result ->
+                    onUpdateAvailable(result)
+                }
+                onUpToDate {
+                    onUpToDate()
+                }
             }
-            onUpToDate {
-                onUpToDate()
-            }
+        }.onFailure {
+            onUpToDate()
         }
     }
-
 }

@@ -330,12 +330,7 @@ class SettingsViewModel(
     }
 
     private fun scheduleReminders() {
-        val interval = preferences.reminderInterval
-        
-        val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(
-            interval.hours.toLong(), TimeUnit.HOURS
-        )
-            .setInitialDelay(interval.hours.toLong(), TimeUnit.HOURS)
+        val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.HOURS)
             .setConstraints(
                 Constraints.Builder()
                     .setRequiresBatteryNotLow(true)
