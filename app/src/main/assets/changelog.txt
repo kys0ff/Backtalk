@@ -1,3 +1,5 @@
+27d568d fix: update backup file MIME type to octet-stream and clean up imports
+29edac6 ui: refine GridImage selection overlay and checkmark styling
 dc164c0 style: set text direction based on content for tags and media captions
 eee15ec build: update changelog generation output and execution logic
 0b5024b build: refactor changelog generation to use version tags and generated assets

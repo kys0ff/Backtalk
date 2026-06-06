@@ -39,10 +39,6 @@ class MainViewModel(
         // Clear reminder notification when the app is opened
         val notificationManager = application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(Constants.REMINDER_NOTIFICATION_ID)
-        
-        // Update last reminder timestamp to 'now' because the user is active.
-        // This ensures the next periodic reminder is scheduled relative to this use.
-        preferences.lastReminderTimestamp = System.currentTimeMillis()
 
         // Automatically check for updates if enabled
         if (preferences.autoUpdateEnabled) {

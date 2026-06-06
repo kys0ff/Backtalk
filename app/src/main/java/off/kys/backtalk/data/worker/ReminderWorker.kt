@@ -12,6 +12,7 @@ import androidx.work.WorkerParameters
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.presentation.activity.MainActivity
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,15 +24,19 @@ class ReminderWorker(
 ) : CoroutineWorker(context, workerParams), KoinComponent {
 
     private val preferences: BacktalkPreferences by inject()
+    private val messagesRepository: MessagesRepository by inject()
 
     override suspend fun doWork(): Result {
         if (!preferences.remindersEnabled) return Result.success()
 
+        val lastMessageTime = messagesRepository.getLastMessageTimestamp() ?: 0L
         val lastReminder = preferences.lastReminderTimestamp
+        val lastSeen = maxOf(lastMessageTime, lastReminder)
+        
         val intervalMillis = preferences.reminderInterval.hours * 60 * 60 * 1000L
         val currentTime = System.currentTimeMillis()
 
-        if (currentTime - lastReminder < intervalMillis) {
+        if (currentTime - lastSeen < intervalMillis) {
             return Result.success()
         }
 

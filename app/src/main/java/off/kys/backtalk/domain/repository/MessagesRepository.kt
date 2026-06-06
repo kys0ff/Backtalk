@@ -83,6 +83,11 @@ interface MessagesRepository {
     suspend fun updatePinnedStatus(id: MessageId, isPinned: Boolean)
 
     /**
+     * Gets the timestamp of the last message sent that is not a reminder.
+     */
+    suspend fun getLastMessageTimestamp(): Long?
+
+    /**
      * Checks if a media path is referenced by any message or scheduled message.
      *
      * @param path The path to check.

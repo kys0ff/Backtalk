@@ -76,6 +76,10 @@ class MessagesRepositoryImpl(
         messagesDao.updatePinnedStatus(id, isPinned)
     }
 
+    override suspend fun getLastMessageTimestamp(): Long? {
+        return messagesDao.getLastMessageTimestamp()
+    }
+
     override suspend fun isPathReferenced(path: String): Boolean {
         val countInMessages = messagesDao.getPathUsageCount(path)
         val countInScheduled = scheduledMessagesDao.getPathUsageCount(path)

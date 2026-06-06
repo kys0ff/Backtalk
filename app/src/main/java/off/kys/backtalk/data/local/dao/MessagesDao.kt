@@ -80,6 +80,12 @@ interface MessagesDao {
     suspend fun updatePinnedStatus(id: MessageId, isPinned: Boolean)
 
     /**
+     * Gets the timestamp of the last message sent that is not a reminder.
+     */
+    @Query("SELECT MAX(timestamp) FROM messages WHERE isReminder = 0")
+    suspend fun getLastMessageTimestamp(): Long?
+
+    /**
      * Counts how many messages use a specific media path.
      *
      * @param path The path to check.
