@@ -2,6 +2,7 @@ package off.kys.backtalk.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import off.kys.backtalk.domain.repository.BackupRepository
@@ -60,8 +61,8 @@ class BackupRepositoryImpl(private val context: Context) : BackupRepository {
 
     override suspend fun createBackupFile(directoryUri: Uri, fileName: String): Result<Uri> = withContext(Dispatchers.IO) {
         runCatching {
-            androidx.documentfile.provider.DocumentFile.fromTreeUri(context, directoryUri)
-                ?.createFile("application/json", fileName)
+            DocumentFile.fromTreeUri(context, directoryUri)
+                ?.createFile("application/octet-stream", fileName)
                 ?.uri ?: throw IllegalStateException("Could not create file")
         }
     }
