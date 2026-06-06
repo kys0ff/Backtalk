@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.InputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -6,6 +7,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.devtools.ksp)
 }
+
+val appVersion: String = "0.3.2"
 
 android {
     namespace = "off.kys.backtalk"
@@ -17,7 +20,7 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 32
-        versionName = "0.3.2"
+        versionName = appVersion
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -134,33 +137,46 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-val generateChangelogTask = tasks.register("generateChangelog") {
-    val changelogFile = file("src/main/assets/changelog.txt")
-    outputs.file(changelogFile)
-    outputs.upToDateWhen { false }
+abstract class GenerateChangelogTask : DefaultTask() {
+    @get:Input
+    abstract val currentVersion: Property<String>
 
-    doLast {
-        val assetDir = file("src/main/assets")
-        if (!assetDir.exists()) assetDir.mkdirs()
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val dir = outputDir.get().asFile
+        if (!dir.exists()) dir.mkdirs()
+        val changelogFile = File(dir, "changelog.txt")
+
+        val targetTag = "v${currentVersion.get()}"
 
         val logText = runCatching {
-            val tagProcess = ProcessBuilder("git", "describe", "--tags", "--abbrev=0").start()
-            tagProcess.waitFor()
-            val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
+            ProcessBuilder("git", "fetch", "--tags").start().waitFor()
 
-            if (lastTag.isNotEmpty()) {
-                val logProcess = ProcessBuilder("git", "log", "$lastTag..HEAD", "--oneline").start()
+            val checkTag = ProcessBuilder("git", "rev-parse", "--verify", targetTag).start()
+            if (checkTag.waitFor() == 0) {
+                val logProcess = ProcessBuilder("git", "log", "$targetTag..HEAD", "--oneline").start()
+                val commits = logProcess.inputStream.boostedReadText().trim()
                 logProcess.waitFor()
-                logProcess.inputStream.bufferedReader().readText()
+
+                commits.ifEmpty { "No new commits since $targetTag" }
             } else {
-                val logProcess = ProcessBuilder("git", "log", "-n", "5", "--oneline").start()
-                logProcess.waitFor()
-                logProcess.inputStream.bufferedReader().readText()
+                "Version tag $targetTag not found. No changelog available."
             }
-        }.getOrElse { "No changelog available" }
+        }.getOrElse { "Error generating changelog: ${it.message}" }
 
         changelogFile.writeText(logText)
     }
+
+    private fun InputStream.boostedReadText(): String = bufferedReader().use { it.readText() }
+}
+
+val generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
+    currentVersion.set(appVersion)
+    outputDir.set(layout.buildDirectory.dir("generated/changelog"))
+    outputs.upToDateWhen { false }
 }
 
 androidComponents {
@@ -169,12 +185,9 @@ androidComponents {
 
         if (!isFDroid) {
             variant.sources.assets?.addGeneratedSourceDirectory(
-                generateChangelogTask
-            ) {
-                val directoryProperty = project.objects.directoryProperty()
-                directoryProperty.set(project.layout.projectDirectory.dir("src/main/assets"))
-                directoryProperty
-            }
+                generateChangelogTask,
+                GenerateChangelogTask::outputDir
+            )
         }
     }
 }
