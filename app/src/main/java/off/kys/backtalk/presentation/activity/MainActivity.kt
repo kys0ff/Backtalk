@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
@@ -54,6 +56,9 @@ class MainActivity : AppCompatActivity() {
             val appLockManager = LocalAppLockManager.current
 
             val unlockedKeys by appLockManager.unlockedKeys.collectAsState()
+            val lifecycleOwner = LocalLifecycleOwner.current
+            val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
             val isCurrentlyUnlocked = !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
 
             var isAuthenticating by remember { mutableStateOf(false) }
@@ -83,8 +88,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            LaunchedEffect(isCurrentlyUnlocked) {
-                if (preferences.lockEnabled && !isCurrentlyUnlocked) {
+            LaunchedEffect(isCurrentlyUnlocked, lifecycleState) {
+                if (lifecycleState == Lifecycle.State.RESUMED) {
+                    isAuthenticating = false
+                }
+                if (preferences.lockEnabled && !isCurrentlyUnlocked && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
                     authenticate()
                 }
             }
