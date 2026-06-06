@@ -157,7 +157,8 @@ abstract class GenerateChangelogTask : DefaultTask() {
 
             val checkTag = ProcessBuilder("git", "rev-parse", "--verify", targetTag).start()
             if (checkTag.waitFor() == 0) {
-                val logProcess = ProcessBuilder("git", "log", "$targetTag..HEAD", "--oneline").start()
+                val logProcess =
+                    ProcessBuilder("git", "log", "$targetTag..HEAD", "--oneline").start()
                 val commits = logProcess.inputStream.boostedReadText().trim()
                 logProcess.waitFor()
 
@@ -175,19 +176,17 @@ abstract class GenerateChangelogTask : DefaultTask() {
 
 val generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
     currentVersion.set(appVersion)
-    outputDir.set(layout.buildDirectory.dir("generated/changelog"))
+    outputDir.set(file("$projectDir/src/main/assets"))
     outputs.upToDateWhen { false }
+
+    val taskRequests = gradle.startParameter.taskNames
+    val isFDroidTargeted = taskRequests.any { it.contains("fdroid", ignoreCase = true) }
+
+    if (isFDroidTargeted) {
+        enabled = false
+    }
 }
 
-androidComponents {
-    onVariants { variant ->
-        val isFDroid = variant.productFlavors.any { it.second == "fdroid" }
-
-        if (!isFDroid) {
-            variant.sources.assets?.addGeneratedSourceDirectory(
-                generateChangelogTask,
-                GenerateChangelogTask::outputDir
-            )
-        }
-    }
+tasks.matching { it.name.startsWith("preBuild") }.configureEach {
+    dependsOn(generateChangelogTask)
 }
