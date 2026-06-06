@@ -13,8 +13,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -75,6 +73,7 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.screen.components.size_observer.SizeRegistryScope
+import off.kys.backtalk.presentation.screen.components.size_observer.applySize
 import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
 import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
 import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingMocks
@@ -647,7 +646,7 @@ fun StaggeredImageGrid(
 @Composable
 private fun GridImage(
     modifier: Modifier = Modifier,
-    imageModifier: Modifier = Modifier.fillMaxSize(),
+    imageModifier: Modifier = Modifier,
     path: String,
     isSelected: Boolean = false,
     onClick: (String) -> Unit,
@@ -671,17 +670,26 @@ private fun GridImage(
                 }
             )
     ) {
-        AsyncImage(
-            modifier = imageModifier,
-            model = ImageRequest.Builder(context)
-                .data(File(path))
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            placeholder = painterResource(R.drawable.round_progress_activity_24),
-            error = painterResource(R.drawable.round_broken_image_24),
-            contentScale = contentScale,
-        )
+        SizeRegistryScope {
+            AsyncImage(
+                modifier = imageModifier.observeSize("image"),
+                model = ImageRequest.Builder(context)
+                    .data(File(path))
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                placeholder = painterResource(R.drawable.round_progress_activity_24),
+                error = painterResource(R.drawable.round_broken_image_24),
+                contentScale = contentScale,
+            )
+
+            if (isSelected) {
+                Surface(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    modifier = Modifier.applySize("image")
+                ) {}
+            }
+        }
 
         AnimatedVisibility(
             visible = isSelected,
@@ -689,18 +697,23 @@ private fun GridImage(
             exit = fadeOut() + scaleOut(),
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
-                    .border(width = 1.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
+            Surface(
+                modifier = Modifier.padding(8.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                tonalElevation = 2.dp
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.round_check_24),
-                    contentDescription = stringResource(R.string.common_selected),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Box(
+                    modifier = Modifier.size(28.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_check_24),
+                        contentDescription = stringResource(R.string.common_selected),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }

@@ -1,3 +1,4 @@
+dc164c0 style: set text direction based on content for tags and media captions
 eee15ec build: update changelog generation output and execution logic
 0b5024b build: refactor changelog generation to use version tags and generated assets
 dd85e62 refactor: reference GitHub repo from Constants and convert properties to compile-time constants
