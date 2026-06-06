@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -91,7 +92,7 @@ private fun TagChip(
         ) {
             Text(
                 text = "#$tag",
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelLarge.copy(textDirection = TextDirection.Content),
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
         }

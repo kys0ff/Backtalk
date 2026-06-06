@@ -1,3 +1,4 @@
+eee15ec build: update changelog generation output and execution logic
 0b5024b build: refactor changelog generation to use version tags and generated assets
 dd85e62 refactor: reference GitHub repo from Constants and convert properties to compile-time constants
 8b20757 fix: update reminder scheduling logic and resolve startup crash by adding safety to update check
