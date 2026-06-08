@@ -28,6 +28,7 @@ import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.util.WorkScheduler
 import java.security.GeneralSecurityException
 import java.util.concurrent.TimeUnit
 import javax.crypto.AEADBadTagException
@@ -185,19 +186,13 @@ class SettingsViewModel(
     private fun onAutoExportToggle(enabled: Boolean) {
         preferences.autoExportEnabled = enabled
         _state.update { it.copy(autoExportEnabled = enabled) }
-        if (enabled) {
-            scheduleAutoExport()
-        } else {
-            cancelAutoExport()
-        }
+        WorkScheduler.scheduleAutoExport(context, preferences, forceReplace = true)
     }
 
     private fun onAutoExportIntervalChange(interval: RepeatFrequency) {
         preferences.autoRepeatFrequency = interval
         _state.update { it.copy(autoRepeatFrequency = interval) }
-        if (preferences.autoExportEnabled) {
-            scheduleAutoExport()
-        }
+        WorkScheduler.scheduleAutoExport(context, preferences, forceReplace = true)
     }
 
     private fun onAutoExportFolderChange(uri: Uri) {
@@ -208,11 +203,10 @@ class SettingsViewModel(
         preferences.autoExportUri = uriString
         _state.update { it.copy(autoExportUri = uriString) }
         
-        // If it was just selected, enable it automatically
+        WorkScheduler.scheduleAutoExport(context, preferences, forceReplace = true)
         if (!preferences.autoExportEnabled) {
-            onAutoExportToggle(true)
-        } else {
-            scheduleAutoExport()
+             _state.update { it.copy(autoExportEnabled = true) }
+             preferences.autoExportEnabled = true
         }
     }
 
@@ -229,19 +223,13 @@ class SettingsViewModel(
     private fun onRemindersToggle(enabled: Boolean) {
         preferences.remindersEnabled = enabled
         _state.update { it.copy(remindersEnabled = enabled) }
-        if (enabled) {
-            scheduleReminders()
-        } else {
-            cancelReminders()
-        }
+        WorkScheduler.scheduleReminders(context, preferences, forceReplace = true)
     }
 
     private fun onReminderIntervalChange(interval: RepeatFrequency) {
         preferences.reminderInterval = interval
         _state.update { it.copy(reminderInterval = interval) }
-        if (preferences.remindersEnabled) {
-            scheduleReminders()
-        }
+        WorkScheduler.scheduleReminders(context, preferences, forceReplace = true)
     }
 
     private fun onHapticFeedbackToggle(enabled: Boolean) {
@@ -303,50 +291,6 @@ class SettingsViewModel(
                 )
             }
         }
-    }
-
-    private fun scheduleAutoExport() {
-        val interval = preferences.autoRepeatFrequency
-        val workRequest = PeriodicWorkRequestBuilder<AutoExportWorker>(
-            interval.hours.toLong(), TimeUnit.HOURS
-        )
-            .setInitialDelay(interval.hours.toLong(), TimeUnit.HOURS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresStorageNotLow(true)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "auto_export_work",
-            ExistingPeriodicWorkPolicy.REPLACE,
-            workRequest
-        )
-    }
-
-    private fun cancelAutoExport() {
-        WorkManager.getInstance(context).cancelUniqueWork("auto_export_work")
-    }
-
-    private fun scheduleReminders() {
-        val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.HOURS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiresBatteryNotLow(true)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "daily_reminders_work",
-            ExistingPeriodicWorkPolicy.REPLACE,
-            workRequest
-        )
-    }
-
-    private fun cancelReminders() {
-        WorkManager.getInstance(context).cancelUniqueWork("daily_reminders_work")
     }
 
     private fun exportBackup(uri: Uri, password: String?) {

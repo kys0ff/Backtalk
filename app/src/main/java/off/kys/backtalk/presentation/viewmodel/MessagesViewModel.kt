@@ -24,6 +24,7 @@ import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
+import off.kys.backtalk.util.WorkScheduler
 import off.kys.backtalk.util.emptyString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -232,6 +233,7 @@ class MessagesViewModel(
                             )
                         )
                     }
+                    WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
                 }
                 withContext(Dispatchers.Main) {
                     _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
@@ -394,6 +396,7 @@ class MessagesViewModel(
                     repliedToId = replyTo?.id
                 )
             )
+            WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
             _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
         }
         updateReply(null)
@@ -490,6 +493,7 @@ class MessagesViewModel(
                         waveformData = waveform
                     )
                 )
+                WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
                 withContext(Dispatchers.Main) {
                     _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
                 }

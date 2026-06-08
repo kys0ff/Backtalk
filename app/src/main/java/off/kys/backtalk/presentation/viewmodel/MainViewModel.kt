@@ -16,6 +16,7 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.state.MainUiState
+import off.kys.backtalk.util.WorkScheduler
 
 /**
  * ViewModel for the MainActivity.
@@ -44,6 +45,10 @@ class MainViewModel(
         if (preferences.autoUpdateEnabled) {
             onEvent(MainUiEvent.CheckUpdate())
         }
+
+        // Ensure background tasks are scheduled and reset reminder clock on app open
+        WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
+        WorkScheduler.scheduleAutoExport(application, preferences)
     }
 
     /**
