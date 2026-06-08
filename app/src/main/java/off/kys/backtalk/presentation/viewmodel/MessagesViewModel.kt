@@ -298,9 +298,16 @@ class MessagesViewModel(
         updateReply(null)
     }
 
+    private var isMigrationDone = false
+
     private fun loadMessages() {
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
+                if (!isMigrationDone) {
+                    migrateVoiceMessages(messages)
+                    isMigrationDone = true
+                }
+
                 val sortedMessages = messages.sortedBy { it.timestamp }
                 val pinnedMessages = sortedMessages.filter { it.isPinned }.reversed()
 
@@ -312,6 +319,25 @@ class MessagesViewModel(
                     activePinnedMessageIndex = if (pinnedMessages.isEmpty()) 0 else _uiState.value.activePinnedMessageIndex % pinnedMessages.size
                 )
                 updateFilteredMessages()
+            }
+        }
+    }
+
+    private fun migrateVoiceMessages(messages: List<MessageEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val cachePath = application.cacheDir.absolutePath
+            val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
+
+            messages.filter { it.voicePath?.startsWith(cachePath) == true }.forEach { message ->
+                val oldFile = File(message.voicePath!!)
+                if (oldFile.exists()) {
+                    val newFile = File(voiceDir, oldFile.name)
+                    runCatching {
+                        oldFile.copyTo(newFile, overwrite = true)
+                        useCases.insertMessage(message.copy(voicePath = newFile.absolutePath))
+                        oldFile.delete()
+                    }
+                }
             }
         }
     }
@@ -440,19 +466,34 @@ class MessagesViewModel(
 
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>) {
         val replyTo = _uiState.value.replyingTo
-        viewModelScope.launch {
-            useCases.insertMessage(
-                MessageEntity(
-                    id = MessageId.generate(),
-                    text = application.getString(R.string.chat_media_voice),
-                    timestamp = System.currentTimeMillis(),
-                    repliedToId = replyTo?.id,
-                    voicePath = path,
-                    voiceDuration = duration,
-                    waveformData = waveform
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
+                val sourceFile = File(path)
+                val destFile = File(voiceDir, "voice_${System.currentTimeMillis()}.m4a")
+
+                sourceFile.inputStream().use { input ->
+                    destFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                sourceFile.delete()
+
+                useCases.insertMessage(
+                    MessageEntity(
+                        id = MessageId.generate(),
+                        text = application.getString(R.string.chat_media_voice),
+                        timestamp = System.currentTimeMillis(),
+                        repliedToId = replyTo?.id,
+                        voicePath = destFile.absolutePath,
+                        voiceDuration = duration,
+                        waveformData = waveform
+                    )
                 )
-            )
-            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+                withContext(Dispatchers.Main) {
+                    _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+                }
+            }
         }
         updateReply(null)
     }

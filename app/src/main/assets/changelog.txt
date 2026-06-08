@@ -1,3 +1,4 @@
+9d98d8c fix: update app lock authentication logic to be lifecycle-aware
 2b9044c feat: update reminder logic to account for the last sent message
 27d568d fix: update backup file MIME type to octet-stream and clean up imports
 29edac6 ui: refine GridImage selection overlay and checkmark styling

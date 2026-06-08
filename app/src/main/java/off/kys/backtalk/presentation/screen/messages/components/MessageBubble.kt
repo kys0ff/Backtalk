@@ -67,6 +67,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -424,13 +426,30 @@ private fun MessageInnerContent(
             }
 
             if (message.voicePath != null) {
+                val audioPlayer = koinInject<AudioPlayer>()
+                val isPlayingState by audioPlayer.isPlaying.collectAsStateWithLifecycle()
+                val progressState by audioPlayer.progress.collectAsStateWithLifecycle()
+                val currentPathState by audioPlayer.currentPath.collectAsStateWithLifecycle()
+
+                val isThisPlaying = isPlayingState && currentPathState == message.voicePath
+
                 VoiceMessageBubbleContent(
                     duration = message.voiceDuration ?: 0L,
                     waveformData = message.waveformData ?: emptyList(),
                     contentColor = contentColor,
-                    isPlaying = false,
-                    progress = 0f,
-                    onTogglePlay = {}
+                    isPlaying = isThisPlaying,
+                    progress = if (isThisPlaying) progressState else 0f,
+                    onTogglePlay = {
+                        if (isThisPlaying) {
+                            audioPlayer.pause()
+                        } else {
+                            if (currentPathState == message.voicePath) {
+                                audioPlayer.resume()
+                            } else {
+                                audioPlayer.playFile(File(message.voicePath))
+                            }
+                        }
+                    }
                 )
             } else {
                 val messageText = message.editedText ?: message.text

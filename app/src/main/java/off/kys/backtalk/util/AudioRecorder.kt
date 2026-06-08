@@ -28,7 +28,7 @@ class AudioRecorder(private val context: Context) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun startRecording() {
-        val file = File(context.cacheDir, "recording_${System.currentTimeMillis()}.mp3")
+        val file = File(context.cacheDir, "recording_${System.currentTimeMillis()}.m4a")
         recordingFile = file
 
         recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

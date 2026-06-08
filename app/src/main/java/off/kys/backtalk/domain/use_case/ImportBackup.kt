@@ -92,6 +92,7 @@ class ImportBackup(
 
             // Restore Media and Messages
             val mediaDir = File(context.filesDir, "media").apply { mkdirs() }
+            val voiceDir = File(context.filesDir, "voice").apply { mkdirs() }
             backupData.messages.forEach { message ->
                 var updatedMessage = message
                 
@@ -99,7 +100,7 @@ class ImportBackup(
                     val fileName = File(oldPath).name
                     val mediaBytes = mediaMap[fileName]
                     if (mediaBytes != null) {
-                        val newFile = File(mediaDir, fileName)
+                        val newFile = File(voiceDir, fileName)
                         newFile.writeBytes(mediaBytes)
                         updatedMessage = updatedMessage.copy(voicePath = newFile.absolutePath)
                     }
