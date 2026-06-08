@@ -36,6 +36,9 @@ sealed class SettingsUiEvent {
     data class OnRemoveImageMetadataToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSmartImagePointingToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnChangelogVersionUpdate(val version: String) : SettingsUiEvent()
+    data object OnDisableBatteryOptimization : SettingsUiEvent()
+    data object OnOpenDontKillMyApp : SettingsUiEvent()
+    data object OnRefreshBatteryStatus : SettingsUiEvent()
 
     data class ExportBackup(val uri: Uri, val password: String?) : SettingsUiEvent()
     data class CheckBackupEncryption(val uri: Uri) : SettingsUiEvent()

@@ -39,6 +39,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.AppLockManager
@@ -83,6 +86,19 @@ fun SettingsScreenContent(
     val showChangelogDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                onEvent(SettingsUiEvent.OnRefreshBatteryStatus)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     val biometricLauncher = rememberBiometricLauncher { result ->
         if (result is BiometricResult.Success) {
@@ -524,6 +540,32 @@ fun SettingsScreenContent(
                         }
                     }
                 }
+            }
+
+            // Troubleshooting Section
+            SettingsSection(title = stringResource(R.string.settings_troubleshooting)) {
+                val batteryStatus = if (state.isIgnoringBatteryOptimizations) {
+                    stringResource(R.string.settings_battery_optimization_ignored)
+                } else {
+                    stringResource(R.string.settings_battery_optimization_not_ignored)
+                }
+                SettingsItem(
+                    label = stringResource(R.string.settings_disable_battery_optimization),
+                    value = stringResource(R.string.settings_disable_battery_optimization_desc, batteryStatus),
+                    icon = painterResource(R.drawable.round_phone_android_24),
+                    onClick = { onEvent(SettingsUiEvent.OnDisableBatteryOptimization) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_dont_kill_my_app),
+                    value = stringResource(R.string.settings_dont_kill_my_app_desc),
+                    icon = painterResource(R.drawable.round_warning_24),
+                    onClick = { onEvent(SettingsUiEvent.OnOpenDontKillMyApp) }
+                )
             }
 
             // Updates & About

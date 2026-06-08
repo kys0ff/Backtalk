@@ -4,14 +4,12 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,8 +19,6 @@ import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.data.worker.AutoExportWorker
-import off.kys.backtalk.data.worker.ReminderWorker
 import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
@@ -30,7 +26,6 @@ import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.WorkScheduler
 import java.security.GeneralSecurityException
-import java.util.concurrent.TimeUnit
 import javax.crypto.AEADBadTagException
 import javax.crypto.BadPaddingException
 
@@ -76,7 +71,9 @@ class SettingsViewModel(
             sendWithEnter = preferences.sendWithEnter,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
-            lastSeenChangelogVersion = preferences.lastSeenChangelogVersion.orEmpty()
+            lastSeenChangelogVersion = preferences.lastSeenChangelogVersion.orEmpty(),
+            isIgnoringBatteryOptimizations = (application.getSystemService(Context.POWER_SERVICE) as PowerManager)
+                .isIgnoringBatteryOptimizations(application.packageName)
         )
     )
     val state = _state.asStateFlow()
@@ -109,6 +106,9 @@ class SettingsViewModel(
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
         is SettingsUiEvent.OnChangelogVersionUpdate -> onChangelogVersionUpdate(event.version)
+        SettingsUiEvent.OnDisableBatteryOptimization -> onDisableBatteryOptimization()
+        SettingsUiEvent.OnOpenDontKillMyApp -> onOpenDontKillMyApp()
+        SettingsUiEvent.OnRefreshBatteryStatus -> onRefreshBatteryStatus()
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -275,6 +275,31 @@ class SettingsViewModel(
     private fun onChangelogVersionUpdate(version: String) {
         preferences.lastSeenChangelogVersion = version
         _state.update { it.copy(lastSeenChangelogVersion = version) }
+    }
+
+    private fun onDisableBatteryOptimization() {
+        val packageName = context.packageName
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        }
+    }
+
+    private fun onOpenDontKillMyApp() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://dontkillmyapp.com/")).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }
+
+    private fun onRefreshBatteryStatus() {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val isIgnoring = pm.isIgnoringBatteryOptimizations(context.packageName)
+        _state.update { it.copy(isIgnoringBatteryOptimizations = isIgnoring) }
     }
 
     private fun onWipeAppData() {

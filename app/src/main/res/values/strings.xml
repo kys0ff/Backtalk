@@ -142,6 +142,15 @@
     <string name="settings_experimental_sync_title">Experimental Feature</string>
     <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
 
+    <!-- Troubleshooting -->
+    <string name="settings_troubleshooting">Troubleshooting</string>
+    <string name="settings_disable_battery_optimization">Disable battery optimization</string>
+    <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably. Status: %1$s</string>
+    <string name="settings_battery_optimization_ignored">Ignored</string>
+    <string name="settings_battery_optimization_not_ignored">Not ignored</string>
+    <string name="settings_dont_kill_my_app">Don\'t Kill My App!</string>
+    <string name="settings_dont_kill_my_app_desc">Device-specific instructions to prevent background process termination</string>
+
     <!-- Developer Settings -->
     <string name="settings_developer">Developer</string>
     <string name="settings_dev_name" translatable="false">kys0ff</string>
