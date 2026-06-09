@@ -10,8 +10,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ import off.kys.backtalk.util.emptyString
 fun MessagesContent(
     modifier: Modifier,
     state: MessagesUiState,
+    tags: List<String>,
     listState: LazyListState,
     onEditMessage: (MessageEntity?) -> Unit,
     onReply: (MessageEntity?) -> Unit,
@@ -60,6 +63,16 @@ fun MessagesContent(
     val context = LocalContext.current
     val isSelectionMode = totalSelectedCount > 0
 
+    val pinnedVisible = state.pinnedMessages.isNotEmpty() && !isSelectionMode
+    val tagsVisible = tags.isNotEmpty() && !isSelectionMode
+
+    val topPadding = when {
+        pinnedVisible && tagsVisible -> 116.dp
+        pinnedVisible -> 68.dp
+        tagsVisible -> 52.dp
+        else -> 0.dp
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         MessagesList(
             messages = state.filteredMessages,
@@ -75,23 +88,39 @@ fun MessagesContent(
             selectedImagePaths = state.selectedImagePaths,
             onToggleImageSelect = onToggleImageSelect,
             onTogglePin = onTogglePin,
-            contentPadding = if (state.pinnedMessages.isNotEmpty() && !isSelectionMode) PaddingValues(top = 48.dp) else PaddingValues(
-                0.dp
-            )
+            contentPadding = PaddingValues(top = topPadding)
         )
 
-        AnimatedVisibility(
-            visible = state.pinnedMessages.isNotEmpty() && !isSelectionMode,
-            enter = slideInVertically { -it } + fadeIn(),
-            exit = slideOutVertically { -it } + fadeOut(),
-            modifier = Modifier.align(Alignment.TopCenter)
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
         ) {
-            PinnedMessageBar(
-                pinnedMessages = state.pinnedMessages,
-                activeIndex = state.activePinnedMessageIndex,
-                onClick = onNavigatePinned,
-                onListClick = { onTogglePinnedDialog(true) }
-            )
+            AnimatedVisibility(
+                visible = pinnedVisible,
+                enter = slideInVertically { -it } + fadeIn(),
+                exit = slideOutVertically { -it } + fadeOut()
+            ) {
+                PinnedMessageBar(
+                    pinnedMessages = state.pinnedMessages,
+                    activeIndex = state.activePinnedMessageIndex,
+                    onClick = onNavigatePinned,
+                    onListClick = { onTogglePinnedDialog(true) }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = tagsVisible,
+                enter = slideInVertically { -it } + fadeIn(),
+                exit = slideOutVertically { -it } + fadeOut()
+            ) {
+                TagFilterBar(
+                    tags = tags,
+                    selectedTag = state.selectedTag,
+                    onTagClick = onTagClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         if (state.showPinnedMessagesDialog) {

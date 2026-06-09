@@ -1,12 +1,8 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
@@ -35,26 +32,21 @@ fun TagFilterBar(
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AnimatedVisibility(
-        visible = tags.isNotEmpty(),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.Transparent),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        LazyRow(
-            modifier = modifier
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items(tags, key = { it }) { tag ->
-                val isSelected = tag == selectedTag
-                TagChip(
-                    tag = tag,
-                    isSelected = isSelected,
-                    onClick = { onTagClick(tag) }
-                )
-            }
+        items(tags, key = { it }) { tag ->
+            val isSelected = tag == selectedTag
+            TagChip(
+                tag = tag,
+                isSelected = isSelected,
+                onClick = { onTagClick(tag) }
+            )
         }
     }
 }

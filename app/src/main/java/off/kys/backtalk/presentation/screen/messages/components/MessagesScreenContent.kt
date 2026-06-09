@@ -165,9 +165,6 @@ fun MessagesScreenContent(
                 onToggleSearch = { active -> onEvent(MessagesUiEvent.ToggleSearch(active)) },
                 onSearchQueryChange = { query -> onEvent(MessagesUiEvent.UpdateSearchQuery(query)) },
                 onNavigateSearch = { up -> onEvent(MessagesUiEvent.NavigateSearch(up)) },
-                tags = tags,
-                selectedTag = state.selectedTag,
-                onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
                 isImageSelectionOnly = selectionMetrics.selectedMessagesCount == 0 && selectionMetrics.selectedImagesCount > 0,
                 canDelete = selectionMetrics.totalDeletableCount > 0
             )
@@ -220,6 +217,7 @@ fun MessagesScreenContent(
         MessagesContent(
             modifier = Modifier.padding(scaffoldPadding),
             state = state,
+            tags = tags,
             listState = messagesScrollState,
             onEditMessage = { onEvent(MessagesUiEvent.EditMessage(it)) },
             onReply = { onEvent(MessagesUiEvent.ReplyTo(it)) },
