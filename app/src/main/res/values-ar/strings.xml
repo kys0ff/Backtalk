@@ -144,6 +144,15 @@
     <string name="settings_experimental_sync_title">ميزة تجريبية</string>
     <string name="settings_experimental_sync_message">ميزة المزامنة بين الأجهزة لا تزل في مرحلتها التجريبية. قد تواجه بعض الأخطاء أو السلوكيات غير المتوقعة. استخدمها على مسؤوليتك الخاصة، وننصح بشدة بأخذ نسخة احتياطية لبياناتك أولًا.</string>
 
+    <!-- Troubleshooting -->
+    <string name="settings_troubleshooting">استكشاف الأخطاء وإصلاحها</string>
+    <string name="settings_disable_battery_optimization">إيقاف تحسين البطارية</string>
+    <string name="settings_disable_battery_optimization_desc">يضمن تشغيل المهام في الخلفية مثل التذكيرات والتصدير التلقائي بموثوقية. الحالة: %1$s</string>
+    <string name="settings_battery_optimization_ignored">متجاهَل</string>
+    <string name="settings_battery_optimization_not_ignored">غير متجاهَل</string>
+    <string name="settings_dont_kill_my_app">!Don\'t Kill My App</string>
+    <string name="settings_dont_kill_my_app_desc">تعليمات خاصة بالجهاز لمنع إنهاء عمليات الخلفية</string>
+
     <!-- Developer Settings -->
     <string name="settings_developer">المطور</string>
     <string name="settings_dev_name" translatable="false">kys0ff</string>
