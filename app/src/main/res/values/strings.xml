@@ -287,6 +287,8 @@
 
     <!-- Message Scheduling -->
     <string name="message_scheduling_select_time">Select time</string>
+    <string name="message_scheduled_success">Message scheduled</string>
+    <string name="message_scheduling_invalid_time">Time must be in the future</string>
 
     <!-- Camera -->
     <string name="camera_switch">Switch camera</string>

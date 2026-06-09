@@ -52,6 +52,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -96,8 +97,11 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.emptyString
+import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
+import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
@@ -130,7 +134,21 @@ fun InputBar(
     val shakeOffset = remember { Animatable(0f) }
 
     val schedulingStage = remember { mutableStateOf(SchedulingStage.Hidden) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = remember {
+            object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    return utcTimeMillis >= calendar.timeInMillis
+                }
+            }
+        }
+    )
     val timePickerState = rememberTimePickerState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -280,6 +298,7 @@ fun InputBar(
         onSchedule = { time ->
             onMessageSchedule(textValue.text, time)
             textValue = TextFieldValue(emptyString())
+            context.toast(R.string.message_scheduled_success)
         }
     )
 

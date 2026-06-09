@@ -280,6 +280,8 @@
 
     <!-- Message Scheduling -->
     <string name="message_scheduling_select_time">تحديد الوقت</string>
+    <string name="message_scheduled_success">تمت جدولة الرسالة</string>
+    <string name="message_scheduling_invalid_time">يجب أن يكون الوقت في المستقبل</string>
 
     <!-- Camera -->
     <string name="camera_switch">تبديل الكاميرا</string>

@@ -61,6 +61,20 @@ fun MessageSchedulingDialogs(
         derivedStateOf { datePickerState.selectedDateMillis != null }
     }
 
+    val isTimeValid by remember(datePickerState.selectedDateMillis, timePickerState.hour, timePickerState.minute) {
+        derivedStateOf {
+            val calendar = Calendar.getInstance()
+            datePickerState.selectedDateMillis?.let {
+                calendar.timeInMillis = it
+            }
+            calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+            calendar.set(Calendar.MINUTE, timePickerState.minute)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            calendar.timeInMillis > System.currentTimeMillis()
+        }
+    }
+
     when (stage) {
         SchedulingStage.Hidden -> return
 
@@ -128,6 +142,15 @@ fun MessageSchedulingDialogs(
                             TimePicker(state = targetState)
                         }
 
+                        if (!isTimeValid) {
+                            Text(
+                                text = stringResource(R.string.message_scheduling_invalid_time),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(24.dp))
 
                         Row(
@@ -160,7 +183,8 @@ fun MessageSchedulingDialogs(
                                         onSchedule(calendar.timeInMillis)
                                         onStageChange(SchedulingStage.Hidden)
                                     }
-                                }
+                                },
+                                enabled = isTimeValid
                             ) {
                                 Text(stringResource(R.string.common_ok))
                             }
