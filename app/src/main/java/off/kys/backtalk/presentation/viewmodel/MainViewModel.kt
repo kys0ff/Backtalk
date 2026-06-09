@@ -46,8 +46,8 @@ class MainViewModel(
             onEvent(MainUiEvent.CheckUpdate())
         }
 
-        // Ensure background tasks are scheduled and reset reminder clock on app open
-        WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
+        // Ensure background tasks are scheduled
+        WorkScheduler.scheduleReminders(application, preferences)
         WorkScheduler.scheduleAutoExport(application, preferences)
         WorkScheduler.scheduleAutoUpdate(application, preferences)
     }

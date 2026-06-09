@@ -140,9 +140,6 @@ class BacktalkPreferences(private val context: Context) {
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
 
-    /** The timestamp of the last time a reminder notification was shown. */
-    var lastReminderTimestamp by preference(LongPreferenceItem(prefs, KEY_LAST_REMINDER_TIMESTAMP, 0L))
-
     /** Whether it's the first time the app is being launched. */
     var firstLaunch by preference(BooleanPreferenceItem(prefs, KEY_FIRST_LAUNCH, true))
 
@@ -215,7 +212,6 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_SHOW_TAGS_BAR = "show_tags_bar"
         const val KEY_PAIRED_DEVICES = "paired_devices"
-        const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"
         const val KEY_DEVICE_ID = "device_id"
         const val KEY_LAST_SEEN_CHANGELOG_VERSION = "last_seen_changelog_version"
