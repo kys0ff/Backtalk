@@ -1,11 +1,5 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -37,11 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import off.kys.backtalk.R
+import off.kys.backtalk.common.lock.LocalDateFormatter
 import java.util.Calendar
 
-/**
- * Controlled state definition for the scheduling flow to eliminate raw MutableState parameters.
- */
 enum class SchedulingStage {
     Hidden,
     SelectingDate,
@@ -57,23 +48,32 @@ fun MessageSchedulingDialogs(
     onStageChange: (SchedulingStage) -> Unit,
     onSchedule: (Long) -> Unit
 ) {
+    val formatter = LocalDateFormatter.current
+
     val isDateValid by remember {
         derivedStateOf { datePickerState.selectedDateMillis != null }
     }
 
-    val isTimeValid by remember(datePickerState.selectedDateMillis, timePickerState.hour, timePickerState.minute) {
+    val targetTimestampAndValidity by remember(datePickerState.selectedDateMillis, timePickerState.hour, timePickerState.minute) {
         derivedStateOf {
-            val calendar = Calendar.getInstance()
-            datePickerState.selectedDateMillis?.let {
-                calendar.timeInMillis = it
+            val baseMillis = datePickerState.selectedDateMillis
+            if (baseMillis == null) {
+                Pair(0L, false)
+            } else {
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = baseMillis
+                    set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                    set(Calendar.MINUTE, timePickerState.minute)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val finalTime = calendar.timeInMillis
+                Pair(finalTime, finalTime > System.currentTimeMillis())
             }
-            calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-            calendar.set(Calendar.MINUTE, timePickerState.minute)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            calendar.timeInMillis > System.currentTimeMillis()
         }
     }
+
+    val (scheduledTimestamp, isTimeValid) = targetTimestampAndValidity
 
     when (stage) {
         SchedulingStage.Hidden -> return
@@ -82,7 +82,7 @@ fun MessageSchedulingDialogs(
             DatePickerDialog(
                 onDismissRequest = { onStageChange(SchedulingStage.Hidden) },
                 confirmButton = {
-                    Button(
+                    TextButton(
                         onClick = { onStageChange(SchedulingStage.SelectingTime) },
                         enabled = isDateValid
                     ) {
@@ -112,8 +112,8 @@ fun MessageSchedulingDialogs(
             ) {
                 Surface(
                     modifier = Modifier
-                        .padding(24.dp)
-                        .widthIn(max = 328.dp),
+                        .padding(EdgeInsetsDialogDimensions)
+                        .widthIn(max = TimePickerDialogMaxWidth),
                     shape = MaterialTheme.shapes.extraLarge,
                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     tonalElevation = 6.dp
@@ -122,36 +122,43 @@ fun MessageSchedulingDialogs(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Header Title Layout mirroring Material 3 design spec
                         Text(
                             text = stringResource(R.string.message_scheduling_select_time),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 20.dp)
+                                .padding(bottom = 16.dp)
                         )
 
-                        AnimatedContent(
-                            targetState = timePickerState,
-                            transitionSpec = {
-                                fadeIn(animationSpec = tween(400, easing = EaseInOutCubic)) togetherWith
-                                        fadeOut(animationSpec = tween(300))
-                            },
-                            label = "TimePickerExpressiveTransition"
-                        ) { targetState ->
-                            TimePicker(state = targetState)
-                        }
-
-                        if (!isTimeValid) {
+                        if (isDateValid) {
                             Text(
-                                text = stringResource(R.string.message_scheduling_invalid_time),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(top = 8.dp)
+                                text = formatter.formatDateTime(scheduledTimestamp),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 24.dp)
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        TimePicker(state = timePickerState)
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(32.dp),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            if (!isTimeValid) {
+                                Text(
+                                    text = stringResource(R.string.message_scheduling_invalid_time),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -168,19 +175,10 @@ fun MessageSchedulingDialogs(
                                 Text(stringResource(R.string.common_cancel))
                             }
 
-                            Button(
+                            TextButton(
                                 onClick = {
-                                    val calendar = Calendar.getInstance()
-                                    datePickerState.selectedDateMillis?.let {
-                                        calendar.timeInMillis = it
-                                    }
-                                    calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                                    calendar.set(Calendar.MINUTE, timePickerState.minute)
-                                    calendar.set(Calendar.SECOND, 0)
-                                    calendar.set(Calendar.MILLISECOND, 0)
-
-                                    if (calendar.timeInMillis > System.currentTimeMillis()) {
-                                        onSchedule(calendar.timeInMillis)
+                                    if (isTimeValid) {
+                                        onSchedule(scheduledTimestamp)
                                         onStageChange(SchedulingStage.Hidden)
                                     }
                                 },
@@ -195,3 +193,6 @@ fun MessageSchedulingDialogs(
         }
     }
 }
+
+private val EdgeInsetsDialogDimensions = 24.dp
+private val TimePickerDialogMaxWidth = 328.dp
