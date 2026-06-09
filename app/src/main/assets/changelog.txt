@@ -1,3 +1,6 @@
+7e53119 feat: add troubleshooting and battery optimization strings for Arabic locale
+86b1f02 style: refine MessageSchedulingDialogs UI and validation logic
+81dc88c feat #27: add validation and success feedback to message scheduling
 5c300cd feat: add battery optimization troubleshooting to Settings
 8e80441 refactor: centralize WorkManager scheduling in WorkScheduler and update reminder logic
 1e796c0 fix #26: implement voice message playback and migrate voice notes to persistent storage

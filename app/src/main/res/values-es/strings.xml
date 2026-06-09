@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Common -->
+    <string name="common_send">Enviar</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_copy">Copiar</string>
+    <string name="common_later">Más tarde</string>
+    <string name="common_close">Cerrar</string>
+    <string name="common_clear">Limpiar</string>
+    <string name="common_back">Atrás</string>
+    <string name="common_more">Más</string>
+    <string name="common_share">Compartir</string>
+    <string name="common_ok">Aceptar</string>
+    <string name="common_please_wait">Por favor, espere…</string>
+    <string name="common_navigate_up">Subir</string>
+    <string name="common_edit">Editar</string>
+    <string name="common_attach">Adjuntar</string>
+    <string name="common_search">Buscar</string>
+    <string name="common_selected">Seleccionado</string>
+    <string name="common_daily">Diariamente</string>
+    <string name="common_twice_daily">Dos veces al día</string>
+    <string name="common_every_six_hours">Cada 6 horas</string>
+    <string name="common_every_four_hours">Cada 4 horas</string>
+    <string name="common_weekly">Semanalmente</string>
+    <string name="common_monthly">Mensualmente</string>
+    <string name="common_not_set">No establecido</string>
+    <string name="common_not_available">N/D</string>
+    <string name="common_confirm">Confirmar</string>
+    <string name="common_experimental">Experimental</string>
+    <string name="common_error">Error</string>
+
+    <!-- Chat -->
+    <string name="chat_title">Mensajes</string>
+    <string name="chat_input_hint">Escribe un mensaje…</string>
+    <string name="chat_selection_count">%1$d seleccionados</string>
+    <string name="chat_replying_to">Respondiendo a</string>
+    <string name="chat_voice_message">Mensaje de voz</string>
+    <string name="chat_media_voice">[Mensaje de voz]</string>
+    <string name="chat_copy_success">Copiado al portapapeles</string>
+    <string name="chat_copy_label">Texto copiado</string>
+    <string name="chat_status_edited">editado</string>
+    <string name="chat_editing_locked">La edición está bloqueada</string>
+    <string name="chat_scroll_to_bottom">Deslizar al final</string>
+    <string name="changelog_scroll_to_top">Deslizar al inicio</string>
+    <string name="chat_sent_at">enviado a las</string>
+    <string name="chat_edited_at">editado a las %1$s</string>
+    <string name="chat_media_image">[Imagen]</string>
+    <string name="chat_media_video">[Video]</string>
+    <string name="chat_media_general">[Multimedia]</string>
+    <string name="chat_reply_image_preview">[Imagen]</string>
+    <string name="chat_input_slide_to_cancel">&lt; Desliza para cancelar</string>
+    <string name="chat_input_hold_to_record">Mantén presionado para grabar</string>
+    <string name="chat_input_record_cd">Grabar</string>
+    <string name="chat_input_format_bold">N</string>
+    <string name="chat_input_format_italic">K</string>
+    <string name="chat_input_format_underline">S</string>
+    <string name="chat_input_format_strikethrough">T</string>
+    <string name="chat_input_format_monospace">M</string>
+    <string name="chat_delete_selected_title">¿Eliminar mensajes?</string>
+    <plurals name="chat_delete_selected_count_confirmation">
+        <item quantity="one">¿Estás seguro de que deseas eliminar %1$d mensaje seleccionado?</item>
+        <item quantity="many">¿Estás seguro de que deseas eliminar %1$d mensajes seleccionados?</item>
+        <item quantity="other">¿Estás seguro de que deseas eliminar %1$d mensajes seleccionados?</item>
+    </plurals>
+    <string name="chat_delete_undone_warning">Esta acción no se puede deshacer.</string>
+    <string name="chat_reminder_tag">Recordatorio</string>
+    <string name="chat_pinned_tag">Fijado</string>
+
+    <!-- Link Safety -->
+    <string name="link_safety_title">Enlace Externo</string>
+    <string name="link_safety_message">Estás saliendo de la aplicación para visitar un sitio web externo. Asegúrate de confiar en esta fuente antes de continuar.</string>
+    <string name="link_safety_open">Abrir</string>
+    <string name="link_safety_cancel">Cancelar</string>
+
+    <!-- Search -->
+    <string name="search_hint">Buscar mensajes…</string>
+    <string name="search_previous">Resultado anterior</string>
+    <string name="search_next">Siguiente resultado</string>
+    <string name="search_results_count">%1$d de %2$d</string>
+    <string name="search_no_results">0 de 0</string>
+
+    <!-- Auth -->
+    <string name="auth_title">Verifica tu identidad</string>
+    <string name="auth_subtitle">Por favor, autentícate para continuar</string>
+    <string name="auth_locked_title">Backtalk está bloqueado</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_security_title">Seguridad</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_changelog">Registro de cambios</string>
+    <string name="settings_changelog_desc">Ver los últimos cambios y mejoras</string>
+    <string name="settings_changelog_title">Novedades</string>
+    <string name="settings_changelog_error">Error al cargar el registro de cambios o no se encontraron cambios.</string>
+    <string name="changelog_type_feat">Función</string>
+    <string name="changelog_type_fix">Corrección</string>
+    <string name="changelog_type_refactor">Refactorización</string>
+    <string name="changelog_type_chore">Tarea</string>
+    <string name="changelog_type_docs">Docs</string>
+    <string name="changelog_type_style">Estilo</string>
+    <string name="changelog_type_ui">IU</string>
+    <string name="changelog_type_build">Compilación</string>
+    <string name="changelog_type_merge">Fusión</string>
+    <string name="changelog_type_unknown">Info</string>
+    <string name="settings_app_lock_desc">Requerir biometría al iniciar</string>
+    <string name="settings_secure_screen">Seguridad de pantalla</string>
+    <string name="settings_secure_screen_summary">Ocultar contenido en aplicaciones recientes y evitar capturas de pantalla</string>
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_dynamic_color">Color dinámico de Material You</string>
+    <string name="settings_dynamic_color_desc">Aplicar colores del sistema a la interfaz de la aplicación</string>
+    <string name="settings_privacy_security">Privacidad y Seguridad</string>
+    <string name="settings_enable_app_lock">Habilitar bloqueo de aplicación</string>
+    <string name="settings_haptic_feedback">Respuesta háptica</string>
+    <string name="settings_haptic_feedback_desc">Vibrar en interacciones como deslizar para responder o presión prolongada</string>
+    <string name="settings_external_link_warning">Advertencia de enlace externo</string>
+    <string name="settings_external_link_warning_desc">Mostrar un diálogo de confirmación antes de abrir enlaces en el navegador</string>
+    <string name="settings_stay_awake">Mantener encendido</string>
+    <string name="settings_stay_awake_desc">Evita que la pantalla entre en modo de suspensión durante la carga activa o sesiones de desarrollo.</string>
+    <string name="settings_date_format">Formato de fecha</string>
+    <string name="settings_time_format">Formato de hora</string>
+    <string name="settings_chat">Chat</string>
+    <string name="settings_reminders">Recordatorios</string>
+    <string name="settings_reminders_desc">Recibe notificaciones para escribir sobre tu día</string>
+    <string name="settings_reminder_interval">Frecuencia</string>
+    <string name="settings_trim_messages">Recortar mensajes enviados</string>
+    <string name="settings_trim_messages_desc">Eliminar espacios en blanco iniciales y finales de los mensajes por defecto</string>
+    <string name="settings_send_with_enter">Enviar con Enter</string>
+    <string name="settings_send_with_enter_desc">Reemplazar la tecla de nueva línea con una tecla de envío en la entrada del chat</string>
+    <string name="settings_remove_image_metadata">Eliminar metadatos de imagen</string>
+    <string name="settings_remove_image_metadata_desc">Eliminar datos EXIF y otros metadatos sensibles de las imágenes antes de enviarlas</string>
+    <string name="settings_smart_pointing_images">Apuntado inteligente de imágenes</string>
+    <string name="settings_smart_pointing_images_desc">Referenciar imágenes existentes en lugar de duplicarlas al enviar el mismo archivo</string>
+    <string name="settings_license">Licencias de código abierto</string>
+    <string name="settings_license_desc">Bibliotecas utilizadas en la aplicación</string>
+    <string name="settings_information">Información</string>
+    <string name="settings_choose_theme">Elegir tema</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_experimental_sync_title">Función Experimental</string>
+    <string name="settings_experimental_sync_message">Sincronización y Dispositivos es actualmente una función experimental. Puede contener errores o mostrar comportamientos no deseados. Úselo bajo su propio riesgo. Se recomienda encarecidamente hacer una copia de seguridad de sus datos antes de usar esta función.</string>
+
+    <!-- Troubleshooting -->
+    <string name="settings_troubleshooting">Solución de problemas</string>
+    <string name="settings_disable_battery_optimization">Desactivar optimización de batería</string>
+    <string name="settings_disable_battery_optimization_desc">Asegura que las tareas en segundo plano como recordatorios y exportación automática se ejecuten de manera confiable. Estado: %1$s</string>
+    <string name="settings_battery_optimization_ignored">Ignorado</string>
+    <string name="settings_battery_optimization_not_ignored">No ignorado</string>
+    <string name="settings_dont_kill_my_app">¡Don\'t Kill My App!</string>
+    <string name="settings_dont_kill_my_app_desc">Instrucciones específicas del dispositivo para evitar la terminación de procesos en segundo plano</string>
+
+    <!-- Developer Settings -->
+    <string name="settings_developer">Desarrollador</string>
+    <string name="settings_dev_click">Me encontraste. Ahora vete.</string>
+    <string name="settings_dev_click_fine">bien…</string>
+    <string name="settings_secret_category">Opciones de Desarrollador</string>
+    <string name="settings_wipe_data">Borrar todos los datos de la aplicación</string>
+    <string name="settings_wipe_data_desc">Borrar base de datos, caché y todas las preferencias</string>
+    <string name="settings_show_secret_category">Mostrar opciones de desarrollador</string>
+    <string name="settings_show_secret_category_desc">Desactivar para ocultar esta sección</string>
+    <string name="settings_wipe_data_confirm_title">¿Borrar todos los datos?</string>
+    <string name="settings_wipe_data_confirm_message">Esto eliminará permanentemente todos tus mensajes, mensajes programados, notas de voz y restablecerá todos los ajustes. Esta acción no se puede deshacer.</string>
+    <string name="settings_simulate_crash">Simular error</string>
+    <string name="settings_simulate_crash_desc">Forzar un error de la aplicación para probar la pantalla de informe de errores personalizada</string>
+
+    <!-- Lock Timeout -->
+    <string name="settings_lock_timeout">Tiempo de espera de bloqueo</string>
+    <string name="settings_lock_timeout_desc">Cuánto tiempo permanece la aplicación desbloqueada en segundo plano</string>
+    <string name="settings_lock_on_screen_off">Bloquear al apagar la pantalla</string>
+    <string name="settings_lock_on_screen_off_desc">Bloquear la aplicación inmediatamente cuando se apaga la pantalla del teléfono</string>
+    <string name="lock_timeout_immediately">Inmediatamente</string>
+    <string name="lock_timeout_15s">15 segundos</string>
+    <string name="lock_timeout_30s">30 segundos</string>
+    <string name="lock_timeout_1m">1 minuto</string>
+    <string name="lock_timeout_5m">5 minutos</string>
+    <string name="lock_timeout_10m">10 minutos</string>
+    <string name="lock_timeout_30m">30 minutos</string>
+
+    <!-- Themes -->
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Predeterminado del sistema</string>
+
+    <!-- Languages -->
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="language_english">Inglés (English)</string>
+    <string name="language_arabic">Árabe (العربية)</string>
+    <string name="language_spanish">Español</string>
+
+    <!-- Date & Time Formats -->
+    <string name="date_format_system">Predeterminado del sistema</string>
+    <string name="date_format_dmy_slash">DD/MM/AAAA</string>
+    <string name="date_format_mdy_slash">MM/DD/AAAA</string>
+    <string name="date_format_ymd_dash">AAAA-MM-DD</string>
+    <string name="date_format_dmy_dot">DD.MM.AAAA</string>
+    <string name="date_format_custom">Personalizado…</string>
+    <string name="date_format_custom_title">Formato de fecha personalizado</string>
+    <string name="date_format_custom_hint">ej. EEEE, d MMM</string>
+    <string name="date_format_invalid">Patrón no válido</string>
+    <string name="time_format_system">Predeterminado del sistema</string>
+    <string name="time_format_12h">12 horas</string>
+    <string name="time_format_24h">24 horas</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Estadísticas</string>
+    <string name="statistics_total_messages">Total de mensajes</string>
+    <string name="statistics_voice_duration">Duración de voz</string>
+    <string name="statistics_scheduled">Programados</string>
+    <string name="statistics_avg_length">Longitud prom.</string>
+    <string name="statistics_app_usage_heatmap">Mapa de calor de uso</string>
+    <string name="statistics_activity_last_7_days">Actividad (Últimos 7 días)</string>
+    <string name="statistics_message_types">Tipos de mensajes</string>
+    <string name="statistics_voice">Voz</string>
+    <string name="statistics_text">Texto</string>
+    <string name="statistics_images">Imágenes</string>
+    <string name="statistics_current_streak">Racha actual</string>
+    <string name="statistics_top_threads">Hilos principales</string>
+    <string name="statistics_messages_count">%1$d mensajes</string>
+    <string name="statistics_total_activity_percentage">%1$d%% de la actividad total</string>
+    <string name="statistics_duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="statistics_duration_seconds">%1$ds</string>
+
+    <!-- Updates -->
+    <string name="update_dialog_title">Actualización disponible</string>
+    <string name="update_dialog_message">La versión %1$s ya está disponible.\n\n%2$s</string>
+    <string name="update_dialog_action_now">Actualizar ahora</string>
+    <string name="settings_auto_check_updates">Buscar actualizaciones automáticamente</string>
+    <string name="settings_auto_check_updates_desc">Comprobar periódicamente si hay una versión más reciente disponible</string>
+    <string name="settings_check_updates_now">Buscar actualizaciones ahora</string>
+    <string name="settings_check_updates_desc">Ver si estás usando la última versión</string>
+    <string name="settings_checking_updates">Buscando actualizaciones…</string>
+    <string name="settings_up_to_date">Estás usando la última versión.</string>
+
+    <!-- Backup & Restore -->
+    <string name="backup_title">Copia de seguridad y Restauración</string>
+    <string name="backup_export_title">Exportar copia de seguridad</string>
+    <string name="backup_export_desc">Crear una copia de seguridad cifrada o simple</string>
+    <string name="backup_import_title">Importar copia de seguridad</string>
+    <string name="backup_import_desc">Restaurar datos desde un archivo exportado previamente</string>
+    <string name="backup_enter_password">Introducir contraseña</string>
+    <string name="backup_merge_data">Combinar datos</string>
+    <string name="backup_clear_and_import">Limpiar e importar</string>
+    <string name="backup_import_strategy">Estrategia de importación</string>
+    <string name="backup_import_strategy_desc">Elige cómo manejar los mensajes existentes.</string>
+    <string name="backup_password_prompt">¿Proteger tu copia de seguridad con una contraseña?</string>
+    <string name="backup_import_success">Copia de seguridad importada con éxito</string>
+    <string name="backup_import_failed">Error al importar</string>
+    <string name="backup_check_failed">Error al comprobar la copia de seguridad</string>
+    <string name="backup_export_failed">Error al exportar</string>
+    <string name="backup_export_success">Copia de seguridad exportada con éxito</string>
+    <string name="backup_error_incorrect_password">Contraseña incorrecta. Por favor, inténtalo de nuevo.</string>
+    <string name="backup_encrypted_prompt">Esta copia de seguridad está cifrada. Por favor, introduce la contraseña para continuar.</string>
+    <string name="backup_old_format_warning_title">Formato de copia antiguo</string>
+    <string name="backup_old_format_warning_message">Has importado un formato de copia de seguridad antiguo (.json). Este formato no admite mensajes de voz y es menos seguro. Recomendamos exportar una nueva copia de seguridad (.bkt) para asegurar todos tus datos.</string>
+
+    <!-- Auto Export -->
+    <string name="auto_export_title">Exportación automática</string>
+    <string name="auto_export_summary">Hacer copias de seguridad periódicas en segundo plano</string>
+    <string name="auto_export_interval">Intervalo de exportación</string>
+    <string name="auto_export_folder">Carpeta de copias de seguridad</string>
+    <string name="auto_export_password">Contraseña de exportación automática</string>
+    <string name="auto_export_encrypt">Cifrar exportación automática</string>
+    <string name="auto_export_no_folder">Ninguna carpeta seleccionada</string>
+    <string name="auto_export_password_desc">Esta contraseña se utilizará para cifrar tus copias de seguridad programadas.</string>
+
+    <!-- Threads -->
+    <string name="threads_title">Hilos</string>
+    <string name="threads_empty">No se encontraron hilos</string>
+    <string name="threads_replies_count">Respuestas · %1$d</string>
+    <string name="threads_you">Tú</string>
+    <string name="threads_at_you">\@ti</string>
+    <string name="threads_at_you_timestamp">\@ti · %1$s</string>
+
+    <!-- Reminders -->
+    <string name="reminders_title">Recordatorios</string>
+    <string name="reminders_empty">No hay recordatorios programados</string>
+    <string name="reminders_cancel_confirm_title">¿Cancelar recordatorio?</string>
+    <string name="reminders_cancel_confirm_msg">¿Estás seguro de que deseas cancelar este recordatorio programado?</string>
+    <string name="chat_reminder_notification_channel">Recordatorios</string>
+    <string name="chat_reminder_notification_title">Nota para mí</string>
+    <string name="chat_reminder_original_time">original:</string>
+    <string name="chat_reminder_target_time">objetivo:</string>
+    <string name="chat_reminder_permission_rationale">Para entregar tus "notas futuras" a tiempo, Backtalk necesita permiso para mostrar notificaciones y programar alarmas exactas. ¿Te gustaría concederlos en los ajustes?</string>
+    <string name="chat_reminder_open_settings">Abrir Ajustes</string>
+
+    <!-- Message Scheduling -->
+    <string name="message_scheduling_select_time">Seleccionar hora</string>
+    <string name="message_scheduled_success">Mensaje programado</string>
+    <string name="message_scheduling_invalid_time">La hora debe ser en el futuro</string>
+
+    <!-- Camera -->
+    <string name="camera_switch">Cambiar cámara</string>
+    <string name="camera_flash">Flash</string>
+    <string name="camera_retake">Volver a tomar</string>
+    <string name="camera_send">Enviar foto</string>
+    <string name="camera_blocked">Cámara bloqueada</string>
+
+    <!-- Sync & Devices -->
+    <string name="sync_title">Sincronización y Dispositivos</string>
+    <string name="sync_summary">Sincronizar mensajes entre dispositivos en la misma red Wi-Fi</string>
+    <string name="sync_available_devices">Dispositivos Disponibles</string>
+    <string name="sync_paired_devices">Dispositivos Vinculados</string>
+    <string name="sync_start_discovery">Iniciar búsqueda</string>
+    <string name="sync_stop_discovery">Detener búsqueda</string>
+    <string name="sync_no_devices_found">No se encontraron dispositivos</string>
+    <string name="sync_pairing_request_title">Solicitud de vinculación entrante</string>
+    <string name="sync_pairing_request_msg">Se ha recibido una solicitud de vinculación de</string>
+    <string name="sync_show_pin">Mostrar PIN</string>
+    <string name="sync_enter_pin">Introducir PIN</string>
+    <string name="sync_pin_label">Introduce el PIN de 6 dígitos que se muestra en el otro dispositivo</string>
+    <string name="sync_status_syncing">Sincronizando…</string>
+    <string name="sync_status_last_synced">Última sincronización: %1$s</string>
+    <string name="sync_now">Sincronizar ahora</string>
+    <string name="sync_pull">Sincronización forzada</string>
+    <string name="sync_status_online">En línea</string>
+    <string name="sync_status_offline">Fuera de línea</string>
+    <string name="sync_disconnect">Desconectar</string>
+    <string name="sync_disconnect_confirm">¿Desconectar de "%1$s"?</string>
+    <string name="sync_pairing_pin_title">PIN de vinculación</string>
+    <string name="sync_pairing_pin_msg">Introduce este PIN en el otro dispositivo:</string>
+    <string name="sync_already_paired_title">Ya vinculado</string>
+    <string name="sync_already_paired_msg">Ya estás vinculado con "%1$s". ¿Deseas desvincularte e iniciar una nueva vinculación?</string>
+    <string name="sync_unpair_and_restart">Desvincular e Iniciar de nuevo</string>
+
+    <!-- Sync Errors -->
+    <string name="sync_error_unknown">Ocurrió un error desconocido</string>
+    <string name="sync_error_connection_failed">Error de conexión. Asegúrate de que ambos dispositivos estén en la misma red Wi-Fi.</string>
+    <string name="sync_error_timeout">La conexión expiró</string>
+    <string name="sync_error_pairing_refused">La solicitud de vinculación fue rechazada por el otro dispositivo</string>
+    <string name="sync_error_invalid_pin">PIN no válido. Por favor, inténtalo de nuevo.</string>
+    <string name="sync_error_device_not_found">Dispositivo no encontrado</string>
+    <string name="sync_error_sync_failed">Error de sincronización</string>
+    <string name="sync_error_unauthorized">Acceso no autorizado</string>
+    <string name="sync_error_protocol_error">Error de protocolo</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Bienvenido a Backtalk</string>
+    <string name="onboarding_welcome_desc">Tu aplicación privada de notas y mensajería local. Todo se queda en tu dispositivo.</string>
+    <string name="onboarding_messaging_title">Mensajería contigo mismo</string>
+    <string name="onboarding_messaging_desc">Organiza tus pensamientos, tareas y enlaces en una interfaz de chat familiar.</string>
+    <string name="onboarding_voice_title">Notas de voz</string>
+    <string name="onboarding_voice_desc">Graba pensamientos rápidos sobre la marcha con mensajes de voz integrados y ondas sonoras.</string>
+    <string name="onboarding_threads_title">Hilos y Respuestas</string>
+    <string name="onboarding_threads_desc">Mantén tus conversaciones organizadas. Responde a cualquier mensaje para iniciar un hilo de pensamientos enfocado.</string>
+    <string name="onboarding_sync_title">Sincronización y Respaldo</string>
+    <string name="onboarding_sync_desc">Mantén tus datos seguros con copias de seguridad manuales o automáticas. Sincroniza entre dispositivos en la misma red Wi-Fi.</string>
+    <string name="onboarding_security_title">Privacidad primero</string>
+    <string name="onboarding_security_desc">Protege tus notas con Bloqueo de App, Pantalla Segura y cifrado local de extremo a extremo.</string>
+    <string name="onboarding_permissions_title">Permisos</string>
+    <string name="onboarding_permissions_desc">Para ofrecer la mejor experiencia, Backtalk necesita algunos permisos. Puedes gestionarlos más tarde en los ajustes.</string>
+    <string name="onboarding_permission_notifications">Notificaciones</string>
+    <string name="onboarding_permission_notifications_desc">Requerido para entregar recordatorios y notas programadas.</string>
+    <string name="onboarding_permission_microphone">Micrófono</string>
+    <string name="onboarding_permission_microphone_desc">Requerido para grabar y enviar mensajes de voz.</string>
+    <string name="onboarding_permission_alarms">Alarmas exactas</string>
+    <string name="onboarding_permission_alarms_desc">Requerido para la entrega precisa de tus recordatorios programados.</string>
+    <string name="onboarding_permission_camera">Cámara</string>
+    <string name="onboarding_permission_camera_desc">Requerido para tomar y enviar fotos directamente desde la aplicación.</string>
+    <string name="onboarding_permission_media">Biblioteca multimedia</string>
+    <string name="onboarding_permission_media_desc">Requerido para seleccionar y enviar imágenes desde tu galería.</string>
+    <string name="onboarding_permission_request">Habilitar</string>
+    <string name="onboarding_permission_granted">Concedido</string>
+    <string name="onboarding_get_started">Comenzar</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_skip">Omitir</string>
+
+    <!-- Onboarding Mocks -->
+    <string name="onboarding_mock_message_1">¡Hola yo! Debo recordar beber más agua hoy.</string>
+    <string name="onboarding_mock_message_2">Buen punto. ¡Mantente hidratado! 💧</string>
+    <string name="onboarding_mock_reminder">¡Mantén presionado el botón de enviar para programar un recordatorio como este!</string>
+
+    <!-- Pinned Messages -->
+    <string name="pinned_message">Mensaje fijado</string>
+    <string name="pinned_messages_title">Mensajes fijados</string>
+    <string name="pinned_messages_empty">No hay mensajes fijados</string>
+    <string name="pinned_messages_unpin_cd">Desfijar mensaje</string>
+    <string name="pinned_message_with_index">Mensaje fijado (%1$d/%2$d)</string>
+    <string name="pinned_message_jump_label">Ir al mensaje fijado</string>
+    <plurals name="pinned_message_view_all">
+        <item quantity="one">Ver mensaje fijado</item>
+        <item quantity="many">Ver los %1$d mensajes fijados</item>
+        <item quantity="other">Ver los %1$d mensajes fijados</item>
+    </plurals>
+
+    <!-- Image Preview -->
+    <string name="image_preview_visual_preview">Vista previa visual</string>
+
+    <!-- Errors -->
+    <string name="error_update_url">No se pudo abrir la URL de actualización</string>
+    <string name="error_pairing_failed">Error en la solicitud de vinculación</string>
+    <string name="error_pin_verification_failed">Error en la verificación del PIN</string>
+    <string name="error_sync_failed">Error de sincronización</string>
+    <string name="error_pull_sync_failed">Error en la sincronización forzada</string>
+
+    <!-- Reminder Messages -->
+    <string name="reminder_message_1">¿Cómo estuvo tu día? Tómate un momento para hablar contigo mismo.</string>
+    <string name="reminder_message_2">¿Tienes algo en mente? Escríbelo.</string>
+    <string name="reminder_message_3">Tu yo del futuro te agradecerá las notas de hoy.</string>
+    <string name="reminder_message_4">Hora de un breve chequeo contigo mismo.</string>
+    <string name="reminder_message_5">¿Qué ha sido lo más destacado de tu día hasta ahora?</string>
+    <string name="reminder_message_6">No olvides capturar tus pensamientos hoy.</string>
+    <string name="reminder_message_7">Respira hondo y escribe unas líneas.</string>
+    <string name="reminder_message_8">¿Qué es lo que has aprendido hoy?</string>
+    <string name="reminder_message_9">¿Cómo te sientes ahora mismo? Ponlo en palabras.</string>
+    <string name="reminder_message_10">Reflexiona sobre una pequeña victoria de tu día.</string>
+    <string name="reminder_message_11">¿Hay algo de lo que quieras desprenderte hoy?</string>
+    <string name="reminder_message_12">¿Qué te hizo sonreír hoy?</string>
+    <string name="reminder_message_13">Tómate un momento para revisar tus objetivos.</string>
+    <string name="reminder_message_14">Tus pensamientos merecen ser escuchados. Escríbelos.</string>
+    <string name="reminder_message_title">Tiempo de Reflexión</string>
+    <string name="reminder_notification_channel">Recordatorios Diarios</string>
+
+    <!-- Bug Screen -->
+    <string name="bug_screen_title">Registros de errores</string>
+    <string name="bug_screen_stack_trace_header">Traza de la pila (Stack Trace)</string>
+    <string name="bug_screen_thread_label">Hilo: %1$s</string>
+    <string name="bug_screen_report_header">Informe de error</string>
+    <string name="bug_screen_report_exception">Excepción: %1$s</string>
+    <string name="bug_screen_report_message">Mensaje: %1$s</string>
+    <string name="bug_screen_report_thread">Hilo: %1$s</string>
+    <string name="bug_screen_report_stack_trace_label">Traza de la pila:</string>
+    <string name="bug_screen_report_subject">Informe de error de Backtalk</string>
+    <string name="bug_screen_share_report">Compartir informe de error</string>
+    <string name="bug_screen_restart_app">Reiniciar aplicación</string>
+
+</resources>

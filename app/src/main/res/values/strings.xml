@@ -188,6 +188,7 @@
     <string name="language_system">System Default</string>
     <string name="language_english">English</string>
     <string name="language_arabic">Arabic (العربية)</string>
+    <string name="language_spanish">Spanish (Español)</string>
 
     <!-- Date & Time Formats -->
     <string name="date_format_system">System default</string>

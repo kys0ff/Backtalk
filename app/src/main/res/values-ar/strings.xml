@@ -190,6 +190,7 @@
     <string name="language_system">تلقائي (لغة النظام)</string>
     <string name="language_english">الإنجليزية (English)</string>
     <string name="language_arabic">العربية</string>
+    <string name="language_spanish">الإسبانية (Español)</string>
 
     <!-- Date & Time Formats -->
     <string name="date_format_system">تلقائي</string>
