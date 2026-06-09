@@ -1,6 +1,10 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,9 +72,6 @@ import off.kys.backtalk.util.emptyString
  * @param onToggleSearch Callback to enable or disable the search mode.
  * @param onSearchQueryChange Callback to update the current search query text.
  * @param onNavigateSearch Callback to move between search results (true for up, false for down).
- * @param tags A list of tag strings available for filtering.
- * @param selectedTag The currently active filter tag, or null if no tag is selected.
- * @param onTagClick Callback triggered when a tag is clicked for filtering.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,7 +309,24 @@ private fun SelectionTopBar(
     canDelete: Boolean = true
 ) {
     TopAppBar(
-        title = { Text(stringResource(R.string.chat_selection_count, selectedCount)) },
+        title = {
+            AnimatedContent(
+                targetState = selectedCount,
+                transitionSpec = {
+                    // If the new count is larger, slide up. If smaller, slide down.
+                    if (targetState > initialState) {
+                        slideInVertically { height -> height } + androidx.compose.animation.fadeIn() togetherWith
+                                slideOutVertically { height -> -height } + androidx.compose.animation.fadeOut()
+                    } else {
+                        slideInVertically { height -> -height } + androidx.compose.animation.fadeIn() togetherWith
+                                slideOutVertically { height -> height } + androidx.compose.animation.fadeOut()
+                    }
+                },
+                label = "SelectionCountAnimation"
+            ) { targetCount ->
+                Text(stringResource(R.string.chat_selection_count, targetCount))
+            }
+        },
         navigationIcon = {
             HintTooltip(stringResource(R.string.common_close)) {
                 IconButton(onClick = onCloseSelection) {
@@ -321,17 +339,17 @@ private fun SelectionTopBar(
         },
         actions = {
             if (showPin) {
-                HintTooltip("Pin") {
+                HintTooltip(stringResource(R.string.common_pin)) {
                     IconButton(onClick = onPin) {
                         Icon(
                             painter = painterResource(R.drawable.round_push_pin_24),
-                            contentDescription = "Pin",
+                            contentDescription = stringResource(R.string.common_pin),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
-            HintTooltip(if (canDelete) stringResource(R.string.common_delete) else "Cannot delete messages older than 1 hour") {
+            HintTooltip(if (canDelete) stringResource(R.string.common_delete) else stringResource(R.string.chat_selection_cannot_delete_old)) {
                 IconButton(onClick = onDelete, enabled = canDelete) {
                     Icon(
                         painter = painterResource(R.drawable.round_delete_24),

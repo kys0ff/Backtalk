@@ -19,6 +19,7 @@
     <string name="common_edit">Edit</string>
     <string name="common_attach">Attach</string>
     <string name="common_search">Search</string>
+    <string name="common_pin">Pin</string>
     <string name="common_selected">Selected</string>
     <string name="common_daily">Daily</string>
     <string name="common_twice_daily">Twice Daily</string>
@@ -68,6 +69,7 @@
     <string name="chat_delete_undone_warning">This action cannot be undone.</string>
     <string name="chat_reminder_tag">Reminder</string>
     <string name="chat_pinned_tag">Pinned</string>
+    <string name="chat_selection_cannot_delete_old">Cannot delete messages older than 1 hour</string>
 
     <!-- Link Safety -->
     <string name="link_safety_title">External Link</string>

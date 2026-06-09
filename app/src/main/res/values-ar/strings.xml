@@ -17,6 +17,7 @@
     <string name="common_edit">تعديل</string>
     <string name="common_attach">إرفاق</string>
     <string name="common_search">بحث</string>
+    <string name="common_pin">تثبيت</string>
     <string name="common_selected">محدد</string>
     <string name="common_daily">يومياً</string>
     <string name="common_twice_daily">مرتين يومياً</string>
@@ -69,6 +70,7 @@
     <string name="chat_delete_undone_warning">لا يمكن التراجع عن هذا الإجراء لاحقًا.</string>
     <string name="chat_reminder_tag">تذكير</string>
     <string name="chat_pinned_tag">مثبتة</string>
+    <string name="chat_selection_cannot_delete_old">لا يمكن حذف الرسائل التي مضى عليها أكثر من ساعة واحدة</string>
 
     <!-- Link Safety -->
     <string name="link_safety_title">رابط خارجي</string>

@@ -17,6 +17,7 @@
     <string name="common_edit">Editar</string>
     <string name="common_attach">Adjuntar</string>
     <string name="common_search">Buscar</string>
+    <string name="common_pin">Fijar</string>
     <string name="common_selected">Seleccionado</string>
     <string name="common_daily">Diariamente</string>
     <string name="common_twice_daily">Dos veces al día</string>
@@ -66,6 +67,7 @@
     <string name="chat_delete_undone_warning">Esta acción no se puede deshacer.</string>
     <string name="chat_reminder_tag">Recordatorio</string>
     <string name="chat_pinned_tag">Fijado</string>
+    <string name="chat_selection_cannot_delete_old">No se pueden eliminar mensajes con más de 1 hora de antigüedad</string>
 
     <!-- Link Safety -->
     <string name="link_safety_title">Enlace Externo</string>
