@@ -58,6 +58,7 @@ fun MessagesContent(
     totalSelectedCount: Int = 0
 ) {
     val context = LocalContext.current
+    val isSelectionMode = totalSelectedCount > 0
 
     Box(modifier = modifier.fillMaxSize()) {
         MessagesList(
@@ -74,13 +75,13 @@ fun MessagesContent(
             selectedImagePaths = state.selectedImagePaths,
             onToggleImageSelect = onToggleImageSelect,
             onTogglePin = onTogglePin,
-            contentPadding = if (state.pinnedMessages.isNotEmpty()) PaddingValues(top = 48.dp) else PaddingValues(
+            contentPadding = if (state.pinnedMessages.isNotEmpty() && !isSelectionMode) PaddingValues(top = 48.dp) else PaddingValues(
                 0.dp
             )
         )
 
         AnimatedVisibility(
-            visible = state.pinnedMessages.isNotEmpty(),
+            visible = state.pinnedMessages.isNotEmpty() && !isSelectionMode,
             enter = slideInVertically { -it } + fadeIn(),
             exit = slideOutVertically { -it } + fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter)
