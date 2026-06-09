@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -284,12 +286,13 @@ class SettingsViewModel(
         _state.update { it.copy(lastSeenChangelogVersion = version) }
     }
 
+    @SuppressLint("BatteryLife")
     private fun onDisableBatteryOptimization() {
         val packageName = context.packageName
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         if (!pm.isIgnoringBatteryOptimizations(packageName)) {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                data = Uri.parse("package:$packageName")
+                data = "package:$packageName".toUri()
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
@@ -297,7 +300,7 @@ class SettingsViewModel(
     }
 
     private fun onOpenDontKillMyApp() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://dontkillmyapp.com/")).apply {
+        val intent = Intent(Intent.ACTION_VIEW, "https://dontkillmyapp.com/".toUri()).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
