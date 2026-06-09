@@ -49,6 +49,7 @@ class MainViewModel(
         // Ensure background tasks are scheduled and reset reminder clock on app open
         WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
         WorkScheduler.scheduleAutoExport(application, preferences)
+        WorkScheduler.scheduleAutoUpdate(application, preferences)
     }
 
     /**

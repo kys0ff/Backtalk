@@ -13,9 +13,19 @@ object Constants {
     const val REMINDER_CHANNEL_ID: String = "daily_reminders_channel"
 
     /**
+     * The ID for the app updates notification channel.
+     */
+    const val UPDATE_CHANNEL_ID: String = "app_updates_channel"
+
+    /**
      * The unique ID for the reminder notification.
      */
     const val REMINDER_NOTIFICATION_ID: Int = 1001
+
+    /**
+     * The unique ID for the update notification.
+     */
+    const val UPDATE_NOTIFICATION_ID: Int = 1002
 
     /**
      * The time gap required between messages to display a new date/time header in the chat UI.

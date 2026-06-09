@@ -185,6 +185,7 @@ class SettingsViewModel(
     private fun onAutoUpdateToggle(enabled: Boolean) {
         preferences.autoUpdateEnabled = enabled
         _state.update { it.copy(autoUpdateEnabled = enabled) }
+        WorkScheduler.scheduleAutoUpdate(context, preferences, forceReplace = true)
     }
 
     private fun onAutoExportToggle(enabled: Boolean) {
