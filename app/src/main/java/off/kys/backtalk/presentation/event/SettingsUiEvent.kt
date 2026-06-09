@@ -35,6 +35,7 @@ sealed class SettingsUiEvent {
     data class OnSendWithEnterToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnRemoveImageMetadataToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSmartImagePointingToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnShowTagsBarToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnChangelogVersionUpdate(val version: String) : SettingsUiEvent()
     data object OnDisableBatteryOptimization : SettingsUiEvent()
     data object OnOpenDontKillMyApp : SettingsUiEvent()

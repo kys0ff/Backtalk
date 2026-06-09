@@ -184,4 +184,9 @@ sealed interface MessagesUiEvent {
      * UI event to dismiss the changelog dialog.
      */
     data object DismissChangelog : MessagesUiEvent
+
+    /**
+     * UI event to refresh message-related settings from preferences.
+     */
+    data object RefreshSettings : MessagesUiEvent
 }

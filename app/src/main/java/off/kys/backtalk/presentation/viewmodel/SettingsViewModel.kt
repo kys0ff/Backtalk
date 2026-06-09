@@ -71,6 +71,7 @@ class SettingsViewModel(
             sendWithEnter = preferences.sendWithEnter,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
+            showTagsBar = preferences.showTagsBar,
             lastSeenChangelogVersion = preferences.lastSeenChangelogVersion.orEmpty(),
             isIgnoringBatteryOptimizations = (application.getSystemService(Context.POWER_SERVICE) as PowerManager)
                 .isIgnoringBatteryOptimizations(application.packageName)
@@ -105,6 +106,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnSendWithEnterToggle -> onSendWithEnterToggle(event.enabled)
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
+        is SettingsUiEvent.OnShowTagsBarToggle -> onShowTagsBarToggle(event.enabled)
         is SettingsUiEvent.OnChangelogVersionUpdate -> onChangelogVersionUpdate(event.version)
         SettingsUiEvent.OnDisableBatteryOptimization -> onDisableBatteryOptimization()
         SettingsUiEvent.OnOpenDontKillMyApp -> onOpenDontKillMyApp()
@@ -270,6 +272,11 @@ class SettingsViewModel(
     private fun onSmartImagePointingToggle(enabled: Boolean) {
         preferences.smartImagePointingEnabled = enabled
         _state.update { it.copy(smartImagePointingEnabled = enabled) }
+    }
+
+    private fun onShowTagsBarToggle(enabled: Boolean) {
+        preferences.showTagsBar = enabled
+        _state.update { it.copy(showTagsBar = enabled) }
     }
 
     private fun onChangelogVersionUpdate(version: String) {

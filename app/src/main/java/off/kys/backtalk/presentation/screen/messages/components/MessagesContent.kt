@@ -64,7 +64,7 @@ fun MessagesContent(
     val isSelectionMode = totalSelectedCount > 0
 
     val pinnedVisible = state.pinnedMessages.isNotEmpty() && !isSelectionMode
-    val tagsVisible = tags.isNotEmpty() && !isSelectionMode
+    val tagsVisible = tags.isNotEmpty() && !isSelectionMode && state.showTagsBar
 
     val topPadding = when {
         pinnedVisible && tagsVisible -> 116.dp

@@ -296,6 +296,18 @@ fun SettingsScreenContent(
                     checked = state.smartImagePointingEnabled,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnSmartImagePointingToggle(it)) }
                 )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_show_tags_bar),
+                    supportingText = stringResource(R.string.settings_show_tags_bar_desc),
+                    icon = painterResource(R.drawable.round_tag_24),
+                    checked = state.showTagsBar,
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnShowTagsBarToggle(it)) }
+                )
             }
 
             // Reminders Section

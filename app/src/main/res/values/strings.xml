@@ -134,6 +134,8 @@
     <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
     <string name="settings_smart_pointing_images">Smart pointing for images</string>
     <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
+    <string name="settings_show_tags_bar">Show tags bar</string>
+    <string name="settings_show_tags_bar_desc">Display hashtags at the top of the chat for quick filtering</string>
     <string name="settings_license">Open source licenses</string>
     <string name="settings_license_desc">Libraries used in the application</string>
     <string name="settings_information">Information</string>

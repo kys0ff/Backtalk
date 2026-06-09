@@ -164,6 +164,9 @@ class MessagesViewModel(
                 preferences.lastSeenChangelogVersion = BuildConfig.VERSION_NAME
                 _uiState.value = _uiState.value.copy(showChangelogDialog = false)
             }
+            MessagesUiEvent.RefreshSettings -> {
+                _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
+            }
         }
     }
 
@@ -303,6 +306,7 @@ class MessagesViewModel(
     private var isMigrationDone = false
 
     private fun loadMessages() {
+        _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
                 if (!isMigrationDone) {

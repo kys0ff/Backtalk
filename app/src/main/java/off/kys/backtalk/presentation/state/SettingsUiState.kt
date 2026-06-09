@@ -37,6 +37,7 @@ data class SettingsUiState(
     val sendWithEnter: Boolean = false,
     val removeImageMetadataEnabled: Boolean = false,
     val smartImagePointingEnabled: Boolean = false,
+    val showTagsBar: Boolean = true,
     val backupLoading: Boolean = false,
     val isBackupEncrypted: Boolean? = null,
     val wrongPasswordError: Boolean = false,

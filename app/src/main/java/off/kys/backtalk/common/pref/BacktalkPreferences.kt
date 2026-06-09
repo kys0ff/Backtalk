@@ -134,6 +134,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether to use smart pointing for image paths instead of duplicating them. */
     var smartImagePointingEnabled by preference(BooleanPreferenceItem(prefs, KEY_SMART_IMAGE_POINTING, false))
 
+    /** Whether the hashtags bar is shown at the top of the messages list. */
+    var showTagsBar by preference(BooleanPreferenceItem(prefs, KEY_SHOW_TAGS_BAR, true))
+
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
 
@@ -210,6 +213,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_SEND_WITH_ENTER = "send_with_enter"
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
+        const val KEY_SHOW_TAGS_BAR = "show_tags_bar"
         const val KEY_PAIRED_DEVICES = "paired_devices"
         const val KEY_LAST_REMINDER_TIMESTAMP = "last_reminder_timestamp"
         const val KEY_FIRST_LAUNCH = "first_launch"
