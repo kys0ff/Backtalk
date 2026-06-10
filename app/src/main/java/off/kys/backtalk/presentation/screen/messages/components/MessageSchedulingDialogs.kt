@@ -31,7 +31,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 enum class SchedulingStage {
     Hidden,
@@ -60,14 +62,16 @@ fun MessageSchedulingDialogs(
             if (baseMillis == null) {
                 Pair(0L, false)
             } else {
-                val calendar = Calendar.getInstance().apply {
-                    timeInMillis = baseMillis
-                    set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-                    set(Calendar.MINUTE, timePickerState.minute)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }
-                val finalTime = calendar.timeInMillis
+                // 1. Convert UTC millis directly to a pure date, ignoring local offset shifts
+                val localDate = Instant.ofEpochMilli(baseMillis)
+                    .atZone(ZoneId.of("UTC"))
+                    .toLocalDate()
+
+                // 2. Combine that pure date with the user's selected time in their system timezone
+                val localDateTime = localDate.atTime(timePickerState.hour, timePickerState.minute)
+                val zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault())
+
+                val finalTime = zonedDateTime.toInstant().toEpochMilli()
                 Pair(finalTime, finalTime > System.currentTimeMillis())
             }
         }

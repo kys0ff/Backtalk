@@ -99,9 +99,9 @@ import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Locale
-import java.util.TimeZone
 import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
@@ -138,13 +138,14 @@ fun InputBar(
         selectableDates = remember {
             object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
-                        set(Calendar.HOUR_OF_DAY, 0)
-                        set(Calendar.MINUTE, 0)
-                        set(Calendar.SECOND, 0)
-                        set(Calendar.MILLISECOND, 0)
-                    }
-                    return utcTimeMillis >= calendar.timeInMillis
+                    val todayUtc = Instant.now()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .atStartOfDay(ZoneId.of("UTC"))
+                        .toInstant()
+                        .toEpochMilli()
+
+                    return utcTimeMillis >= todayUtc
                 }
             }
         }
