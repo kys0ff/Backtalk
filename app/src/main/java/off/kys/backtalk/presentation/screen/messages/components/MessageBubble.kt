@@ -84,6 +84,7 @@ import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.util.DateFormatter
 import off.kys.backtalk.util.emptyString
+import off.kys.backtalk.util.getFirstLinkOrNull
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import org.koin.dsl.koinConfiguration
@@ -486,7 +487,7 @@ private fun MessageInnerContent(
                         externalLinkWarningEnabled = false
                     )
 
-                    val firstUrl = remember(messageText) { ComposeTextParser.extractFirstUrl(messageText) }
+                    val firstUrl = remember(messageText) { messageText.getFirstLinkOrNull() }
                     if (firstUrl != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         LinkPreviewCard(

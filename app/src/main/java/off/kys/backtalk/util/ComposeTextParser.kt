@@ -56,23 +56,6 @@ object ComposeTextParser {
         parseRecursive(text, this, linkStyles, onAnnotationClicked)
     }
 
-    /**
-     * Finds the first URL (Markdown or naked) in the given text.
-     */
-    fun extractFirstUrl(text: String): String? {
-        val mLink = MARKDOWN_LINK_REGEX.find(text)
-        val nLink = NAKED_URL_REGEX.find(text)
-
-        return when {
-            mLink != null && nLink != null -> {
-                if (mLink.range.first < nLink.range.first) mLink.groupValues[2] else nLink.value
-            }
-            mLink != null -> mLink.groupValues[2]
-            nLink != null -> nLink.value
-            else -> null
-        }
-    }
-
     private fun parseRecursive(
         text: String,
         builder: AnnotatedString.Builder,

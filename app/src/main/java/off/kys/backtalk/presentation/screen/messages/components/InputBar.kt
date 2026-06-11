@@ -99,6 +99,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.ComposeTextParser
 import off.kys.backtalk.util.emptyString
+import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
 import java.time.Instant
@@ -321,7 +322,7 @@ fun InputBar(
 
             val firstUrl = remember(textValue.text, preferences.linkPreviewEnabled) {
                 if (preferences.linkPreviewEnabled) {
-                    ComposeTextParser.extractFirstUrl(textValue.text)
+                    textValue.text.getFirstLinkOrNull()
                 } else null
             }
             AnimatedVisibility(

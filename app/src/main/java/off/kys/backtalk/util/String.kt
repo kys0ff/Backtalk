@@ -13,4 +13,33 @@ package off.kys.backtalk.util
 @Suppress("SameReturnValue")
 inline fun emptyString(): String = ""
 
+/**
+ * Capitalizes the first character of this string.
+ *
+ * If the string is empty, an empty string is returned. Otherwise, returns a copy of this string
+ * with the first character converted to uppercase using the default locale.
+ *
+ * @return The capitalized string.
+ */
 inline fun String.capitalize(): String = this.replaceFirstChar { it.uppercase() }
+
+/**
+ * Extracts the first URL found within the receiver string.
+ *
+ * @return The first detected link as a [String], or `null` if no link is found.
+ */
+inline fun String.getFirstLinkOrNull():String? {
+    val mdLink = Regex("""\[([^]]+)]\(([^)]+)\)""")
+    val nakedUrl = Regex("""(https?://[^\s)\]]+)""")
+    val mLink = mdLink.find(this)
+    val nLink = nakedUrl.find(this)
+
+    return when {
+        mLink != null && nLink != null -> {
+            if (mLink.range.first < nLink.range.first) mLink.groupValues[2] else nLink.value
+        }
+        mLink != null -> mLink.groupValues[2]
+        nLink != null -> nLink.value
+        else -> null
+    }
+}
