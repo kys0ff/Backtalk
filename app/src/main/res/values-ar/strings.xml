@@ -131,6 +131,8 @@
     <string name="settings_reminder_interval">التكرار</string>
     <string name="settings_trim_messages">تهذيب الرسائل المرسلة</string>
     <string name="settings_trim_messages_desc">إزالة المسافات الفارغة الزائدة من بداية ونهاية الرسائل تلقائيًا</string>
+    <string name="settings_link_preview">معاينة الروابط</string>
+    <string name="settings_link_preview_desc">إظهار بطاقة معاينة لأول رابط في الرسالة</string>
     <string name="settings_send_with_enter">إرسال بمفتاح Enter</string>
     <string name="settings_send_with_enter_desc">استبدال مفتاح السطر الجديد بمفتاح الإرسال في لوحة مفاتيح المحادثة</string>
 
@@ -138,6 +140,8 @@
     <string name="settings_remove_image_metadata_desc">تنظيف الصور من بيانات EXIF والبيانات الحساسة الأخرى قبل إرسالها</string>
     <string name="settings_smart_pointing_images">الإشارة الذكية للصور</string>
     <string name="settings_smart_pointing_images_desc">الإشارة إلى ملفات الصور الموجودة مسبقًا بدلًا من تكرارها عند إرسال نفس المِلَفّ مجددًا</string>
+    <string name="settings_show_tags_bar">إظهار شريط الوسوم</string>
+    <string name="settings_show_tags_bar_desc">عرض الوسوم (Hashtags) في أعلى المحادثة للتصفية السريعة</string>
     <string name="settings_license">تراخيص البرمجيات مفتوحة المصدر</string>
     <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
     <string name="settings_information">معلومات</string>
@@ -432,5 +436,10 @@
     <string name="bug_screen_report_subject">تقرير خطأ Backtalk</string>
     <string name="bug_screen_share_report">مشاركة تقرير الخطأ</string>
     <string name="bug_screen_restart_app">إعادة تشغيل التطبيق</string>
+
+    <!-- Link Preview -->
+    <string name="link_preview_load_failed">فشل تحميل المعاينة</string>
+    <string name="link_preview_error_default">تعذر تحميل المعاينة</string>
+    <string name="link_preview_retry">إعادة المحاولة</string>
 
 </resources>

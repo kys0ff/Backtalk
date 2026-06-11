@@ -432,4 +432,9 @@
     <string name="bug_screen_share_report">Share Bug Report</string>
     <string name="bug_screen_restart_app">Restart App</string>
 
+    <!-- Link Preview -->
+    <string name="link_preview_load_failed">Failed to load preview</string>
+    <string name="link_preview_error_default">Couldn\'t load preview</string>
+    <string name="link_preview_retry">Retry</string>
+
 </resources>

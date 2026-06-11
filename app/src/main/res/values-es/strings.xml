@@ -128,12 +128,16 @@
     <string name="settings_reminder_interval">Frecuencia</string>
     <string name="settings_trim_messages">Recortar mensajes enviados</string>
     <string name="settings_trim_messages_desc">Eliminar espacios en blanco iniciales y finales de los mensajes por defecto</string>
+    <string name="settings_link_preview">Vista previa de enlaces</string>
+    <string name="settings_link_preview_desc">Mostrar una tarjeta de vista previa para el primer enlace en un mensaje</string>
     <string name="settings_send_with_enter">Enviar con Enter</string>
     <string name="settings_send_with_enter_desc">Reemplazar la tecla de nueva línea con una tecla de envío en la entrada del chat</string>
     <string name="settings_remove_image_metadata">Eliminar metadatos de imagen</string>
     <string name="settings_remove_image_metadata_desc">Eliminar datos EXIF y otros metadatos sensibles de las imágenes antes de enviarlas</string>
     <string name="settings_smart_pointing_images">Apuntado inteligente de imágenes</string>
     <string name="settings_smart_pointing_images_desc">Referenciar imágenes existentes en lugar de duplicarlas al enviar el mismo archivo</string>
+    <string name="settings_show_tags_bar">Mostrar barra de etiquetas</string>
+    <string name="settings_show_tags_bar_desc">Mostrar hashtags en la parte superior del chat para un filtrado rápido</string>
     <string name="settings_license">Licencias de código abierto</string>
     <string name="settings_license_desc">Bibliotecas utilizadas en la aplicación</string>
     <string name="settings_information">Información</string>
@@ -424,5 +428,10 @@
     <string name="bug_screen_report_subject">Informe de error de Backtalk</string>
     <string name="bug_screen_share_report">Compartir informe de error</string>
     <string name="bug_screen_restart_app">Reiniciar aplicación</string>
+
+    <!-- Link Preview -->
+    <string name="link_preview_load_failed">Error al cargar la vista previa</string>
+    <string name="link_preview_error_default">No se pudo cargar la vista previa</string>
+    <string name="link_preview_retry">Reintentar</string>
 
 </resources>
