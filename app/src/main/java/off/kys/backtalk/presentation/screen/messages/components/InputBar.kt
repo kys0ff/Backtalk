@@ -319,8 +319,11 @@ fun InputBar(
                 onCancelEdit = onCancelEdit
             )
 
-            val firstUrl =
-                remember(textValue.text) { ComposeTextParser.extractFirstUrl(textValue.text) }
+            val firstUrl = remember(textValue.text, preferences.linkPreviewEnabled) {
+                if (preferences.linkPreviewEnabled) {
+                    ComposeTextParser.extractFirstUrl(textValue.text)
+                } else null
+            }
             AnimatedVisibility(
                 visible = firstUrl != null,
                 enter = expandVertically() + fadeIn(),

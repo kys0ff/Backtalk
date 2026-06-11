@@ -70,6 +70,7 @@ class SettingsViewModel(
             devModeEnabled = preferences.devModeEnabled,
             externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
             trimMessagesEnabled = preferences.trimMessagesEnabled,
+            linkPreviewEnabled = preferences.linkPreviewEnabled,
             sendWithEnter = preferences.sendWithEnter,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
@@ -105,6 +106,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnDevModeToggle -> onDevModeToggle(event.enabled)
         is SettingsUiEvent.OnExternalLinkWarningToggle -> onExternalLinkWarningToggle(event.enabled)
         is SettingsUiEvent.OnTrimMessagesToggle -> onTrimMessagesToggle(event.enabled)
+        is SettingsUiEvent.OnLinkPreviewToggle -> onLinkPreviewToggle(event.enabled)
         is SettingsUiEvent.OnSendWithEnterToggle -> onSendWithEnterToggle(event.enabled)
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
@@ -260,6 +262,11 @@ class SettingsViewModel(
     private fun onTrimMessagesToggle(enabled: Boolean) {
         preferences.trimMessagesEnabled = enabled
         _state.update { it.copy(trimMessagesEnabled = enabled) }
+    }
+
+    private fun onLinkPreviewToggle(enabled: Boolean) {
+        preferences.linkPreviewEnabled = enabled
+        _state.update { it.copy(linkPreviewEnabled = enabled) }
     }
 
     private fun onSendWithEnterToggle(enabled: Boolean) {

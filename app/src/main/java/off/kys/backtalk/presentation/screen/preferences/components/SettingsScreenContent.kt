@@ -266,6 +266,18 @@ fun SettingsScreenContent(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 SettingsToggle(
+                    label = stringResource(R.string.settings_link_preview),
+                    supportingText = stringResource(R.string.settings_link_preview_desc),
+                    icon = painterResource(R.drawable.round_add_link_24),
+                    checked = state.linkPreviewEnabled,
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnLinkPreviewToggle(it)) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
                     label = stringResource(R.string.settings_send_with_enter),
                     supportingText = stringResource(R.string.settings_send_with_enter_desc),
                     icon = painterResource(R.drawable.round_send_24),

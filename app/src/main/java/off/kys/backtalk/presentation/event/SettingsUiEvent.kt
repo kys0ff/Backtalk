@@ -32,6 +32,7 @@ sealed class SettingsUiEvent {
     data class OnDevModeToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnExternalLinkWarningToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnTrimMessagesToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnLinkPreviewToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSendWithEnterToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnRemoveImageMetadataToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSmartImagePointingToggle(val enabled: Boolean) : SettingsUiEvent()

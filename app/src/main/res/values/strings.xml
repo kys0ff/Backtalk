@@ -130,6 +130,8 @@
     <string name="settings_reminder_interval">Frequency</string>
     <string name="settings_trim_messages">Trim sent messages</string>
     <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
+    <string name="settings_link_preview">Link preview</string>
+    <string name="settings_link_preview_desc">Show a preview card for the first link in a message</string>
     <string name="settings_send_with_enter">Send with Enter</string>
     <string name="settings_send_with_enter_desc">Replace the new line key with a send key in the chat input</string>
     <string name="settings_remove_image_metadata">Remove image metadata</string>
