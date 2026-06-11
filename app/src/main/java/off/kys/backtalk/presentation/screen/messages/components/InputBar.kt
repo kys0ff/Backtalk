@@ -33,6 +33,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
@@ -96,6 +97,7 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.util.AudioRecorder
+import off.kys.backtalk.util.ComposeTextParser
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
@@ -316,6 +318,23 @@ fun InputBar(
                 onCancelReply = onCancelReply,
                 onCancelEdit = onCancelEdit
             )
+
+            val firstUrl =
+                remember(textValue.text) { ComposeTextParser.extractFirstUrl(textValue.text) }
+            AnimatedVisibility(
+                visible = firstUrl != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                if (firstUrl != null) {
+                    Column {
+                        Spacer(Modifier.size(8.dp))
+                        Box(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
+                            LinkPreviewCard(url = firstUrl)
+                        }
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier

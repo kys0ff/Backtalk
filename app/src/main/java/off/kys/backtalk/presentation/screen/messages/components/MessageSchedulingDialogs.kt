@@ -62,16 +62,13 @@ fun MessageSchedulingDialogs(
             if (baseMillis == null) {
                 Pair(0L, false)
             } else {
-                // 1. Convert UTC millis directly to a pure date, ignoring local offset shifts
                 val localDate = Instant.ofEpochMilli(baseMillis)
                     .atZone(ZoneId.of("UTC"))
                     .toLocalDate()
-
-                // 2. Combine that pure date with the user's selected time in their system timezone
                 val localDateTime = localDate.atTime(timePickerState.hour, timePickerState.minute)
                 val zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault())
-
                 val finalTime = zonedDateTime.toInstant().toEpochMilli()
+
                 Pair(finalTime, finalTime > System.currentTimeMillis())
             }
         }
@@ -126,7 +123,6 @@ fun MessageSchedulingDialogs(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Header Title Layout mirroring Material 3 design spec
                         Text(
                             text = stringResource(R.string.message_scheduling_select_time),
                             style = MaterialTheme.typography.labelLarge,

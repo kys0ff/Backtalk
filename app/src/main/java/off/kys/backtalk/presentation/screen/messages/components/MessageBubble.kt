@@ -48,6 +48,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import off.kys.backtalk.util.ComposeTextParser
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -484,6 +485,15 @@ private fun MessageInnerContent(
                         onMentionClicked = onTagClick,
                         externalLinkWarningEnabled = false
                     )
+
+                    val firstUrl = remember(messageText) { ComposeTextParser.extractFirstUrl(messageText) }
+                    if (firstUrl != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LinkPreviewCard(
+                            url = firstUrl,
+                            modifier = Modifier.applyWidth(innerContentId)
+                        )
+                    }
                 }
 
                 if (message.editedText != null) {
