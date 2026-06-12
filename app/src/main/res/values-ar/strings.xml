@@ -159,7 +159,7 @@
     <string name="settings_clear_cache_desc">توفير مساحة عن طريق حذف الملفات المؤقتة</string>
     <string name="settings_clear_cache_success">تم مسح التخزين المؤقت بنجاح</string>
     <string name="settings_disable_battery_optimization">إيقاف تحسين البطارية</string>
-    <string name="settings_disable_battery_optimization_desc">يضمن تشغيل المهام في الخلفية مثل التذكيرات والتصدير التلقائي بموثوقية. الحالة: %1$s</string>
+    <string name="settings_disable_battery_optimization_desc">يضمن تشغيل المهام في الخلفية مثل التذكيرات والتصدير التلقائي بموثوقية.</string>
     <string name="settings_battery_optimization_ignored">متجاهَل</string>
     <string name="settings_battery_optimization_not_ignored">غير متجاهَل</string>
     <string name="settings_dont_kill_my_app">!Don\'t Kill My App</string>

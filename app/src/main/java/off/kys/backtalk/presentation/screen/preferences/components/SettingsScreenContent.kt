@@ -461,7 +461,7 @@ fun SettingsScreenContent(
             SettingsSection(title = stringResource(R.string.backup_title)) {
                 SettingsItem(
                     label = stringResource(R.string.backup_export_title),
-                    value = stringResource(R.string.backup_export_desc),
+                    supportingText = stringResource(R.string.backup_export_desc),
                     icon = painterResource(R.drawable.round_send_24),
                     onClick = { exportLauncher.launch("backtalk_backup_${System.currentTimeMillis()}.bkt") }
                 )
@@ -472,7 +472,7 @@ fun SettingsScreenContent(
                 )
                 SettingsItem(
                     label = stringResource(R.string.backup_import_title),
-                    value = stringResource(R.string.backup_import_desc),
+                    supportingText = stringResource(R.string.backup_import_desc),
                     icon = painterResource(R.drawable.round_reply_24),
                     onClick = {
                         importLauncher.launch(
@@ -575,10 +575,8 @@ fun SettingsScreenContent(
                 }
                 SettingsItem(
                     label = stringResource(R.string.settings_disable_battery_optimization),
-                    value = stringResource(
-                        R.string.settings_disable_battery_optimization_desc,
-                        batteryStatus
-                    ),
+                    supportingText = stringResource(R.string.settings_disable_battery_optimization_desc),
+                    value = batteryStatus,
                     icon = painterResource(R.drawable.round_phone_android_24),
                     onClick = { onEvent(SettingsUiEvent.OnDisableBatteryOptimization) }
                 )
@@ -589,7 +587,7 @@ fun SettingsScreenContent(
                 )
                 SettingsItem(
                     label = stringResource(R.string.settings_dont_kill_my_app),
-                    value = stringResource(R.string.settings_dont_kill_my_app_desc),
+                    supportingText = stringResource(R.string.settings_dont_kill_my_app_desc),
                     icon = painterResource(R.drawable.round_warning_24),
                     onClick = { onEvent(SettingsUiEvent.OnOpenDontKillMyApp) }
                 )
@@ -600,7 +598,8 @@ fun SettingsScreenContent(
                 )
                 SettingsItem(
                     label = stringResource(R.string.settings_clear_cache),
-                    value = stringResource(R.string.settings_clear_cache_desc),
+                    supportingText = stringResource(R.string.settings_clear_cache_desc),
+                    value = state.cacheSize,
                     icon = painterResource(R.drawable.round_cleaning_services_24),
                     onClick = { onEvent(SettingsUiEvent.OnClearCache) }
                 )
@@ -618,7 +617,7 @@ fun SettingsScreenContent(
                     )
                     SettingsItem(
                         label = stringResource(R.string.settings_check_updates_now),
-                        value = stringResource(R.string.settings_check_updates_desc),
+                        supportingText = stringResource(R.string.settings_check_updates_desc),
                         icon = painterResource(R.drawable.round_refresh_24),
                         onClick = {
                             context.toast(R.string.settings_checking_updates)
@@ -638,7 +637,7 @@ fun SettingsScreenContent(
                 )
                 SettingsItem(
                     label = stringResource(R.string.settings_changelog),
-                    value = stringResource(R.string.settings_changelog_desc),
+                    supportingText = stringResource(R.string.settings_changelog_desc),
                     icon = painterResource(R.drawable.round_update_24),
                     onClick = onChangelogClick,
                     onLongClick = { showChangelogDialog.value = true }
@@ -650,7 +649,7 @@ fun SettingsScreenContent(
                 )
                 SettingsItem(
                     label = stringResource(R.string.settings_license),
-                    value = stringResource(R.string.settings_license_desc),
+                    supportingText = stringResource(R.string.settings_license_desc),
                     icon = painterResource(R.drawable.round_code_xml_24),
                     onClick = onLicenseClicked
                 )
@@ -709,7 +708,7 @@ fun SettingsScreenContent(
                     )
                     SettingsItem(
                         label = stringResource(R.string.settings_wipe_data),
-                        value = stringResource(R.string.settings_wipe_data_desc),
+                        supportingText = stringResource(R.string.settings_wipe_data_desc),
                         icon = painterResource(R.drawable.round_delete_sweep_24),
                         onClick = {
                             if (state.lockEnabled && !appLockManager.isUnlocked(AppLockManager.Keys.SENSITIVE)) {
@@ -726,7 +725,7 @@ fun SettingsScreenContent(
                     )
                     SettingsItem(
                         label = stringResource(R.string.settings_simulate_crash),
-                        value = stringResource(R.string.settings_simulate_crash_desc),
+                        supportingText = stringResource(R.string.settings_simulate_crash_desc),
                         icon = painterResource(R.drawable.round_warning_24),
                         onClick = onSimulateCrashClicked
                     )

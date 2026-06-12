@@ -7,15 +7,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.format.Formatter
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.RepeatFrequency
@@ -27,6 +30,7 @@ import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.WorkScheduler
+import java.io.File
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
 import javax.crypto.BadPaddingException
@@ -81,6 +85,10 @@ class SettingsViewModel(
         )
     )
     val state = _state.asStateFlow()
+
+    init {
+        updateCacheSize()
+    }
 
     fun onEvent(event: SettingsUiEvent) = when (event) {
         is SettingsUiEvent.OnThemeModeChange -> onThemeModeChange(event.themeMode)
@@ -319,18 +327,40 @@ class SettingsViewModel(
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val isIgnoring = pm.isIgnoringBatteryOptimizations(context.packageName)
         _state.update { it.copy(isIgnoringBatteryOptimizations = isIgnoring) }
+        updateCacheSize()
     }
 
     private fun onClearCache() {
         viewModelScope.launch {
             runCatching {
-                context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
+                withContext(Dispatchers.IO) {
+                    context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
+                    context.externalCacheDir?.listFiles()?.forEach { it.deleteRecursively() }
+                }
             }.onSuccess {
                 _state.update { it.copy(successMessage = context.getString(R.string.settings_clear_cache_success)) }
             }.onFailure { error ->
                 _state.update { it.copy(error = error.message) }
             }
+            updateCacheSize()
         }
+    }
+
+    private fun updateCacheSize() {
+        viewModelScope.launch {
+            val size = withContext(Dispatchers.IO) {
+                getDirSize(context.cacheDir) + (context.externalCacheDir?.let { getDirSize(it) } ?: 0L)
+            }
+            _state.update { it.copy(cacheSize = Formatter.formatFileSize(context, size)) }
+        }
+    }
+
+    private fun getDirSize(dir: File): Long {
+        var size = 0L
+        dir.listFiles()?.forEach { file ->
+            size += if (file.isDirectory) getDirSize(file) else file.length()
+        }
+        return size
     }
 
     private fun onWipeAppData() {

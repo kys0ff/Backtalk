@@ -157,7 +157,7 @@
     <string name="settings_clear_cache_desc">Free up space by deleting temporary files</string>
     <string name="settings_clear_cache_success">Cache cleared successfully</string>
     <string name="settings_disable_battery_optimization">Disable battery optimization</string>
-    <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably. Status: %1$s</string>
+    <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably.</string>
     <string name="settings_battery_optimization_ignored">Ignored</string>
     <string name="settings_battery_optimization_not_ignored">Not ignored</string>
     <string name="settings_dont_kill_my_app">Don\'t Kill My App!</string>

@@ -3,6 +3,7 @@ package off.kys.backtalk.presentation.screen.preferences.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ListItem
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 fun SettingsItem(
     label: String,
     value: String? = null,
+    supportingText: String? = null,
     icon: Painter,
     badge: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,
@@ -59,14 +61,26 @@ fun SettingsItem(
                 }
             }
         },
-        supportingContent = value?.let {
+        supportingContent = if (value != null || supportingText != null) {
             {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Column {
+                    supportingText?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    value?.let {
+                        Text(
+                            text = it,
+                            style = if (supportingText != null) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
+                            color = if (supportingText != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
-        },
+        } else null,
         leadingContent = { SettingsIcon(icon) },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
     )

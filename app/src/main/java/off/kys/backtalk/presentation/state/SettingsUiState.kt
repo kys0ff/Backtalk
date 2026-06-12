@@ -47,7 +47,8 @@ data class SettingsUiState(
     val successMessage: String? = null,
     val showOldBackupWarning: Boolean = false,
     val lastSeenChangelogVersion: String = "",
-    val isIgnoringBatteryOptimizations: Boolean = false
+    val isIgnoringBatteryOptimizations: Boolean = false,
+    val cacheSize: String = "0 B"
 ) {
     companion object {
         fun empty(): SettingsUiState = SettingsUiState()
