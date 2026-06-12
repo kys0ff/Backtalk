@@ -1,3 +1,4 @@
+826f194 feat: implement CaptionWordsRegistry for restricted message captions
 b0e381c feat: add Gradle task for caption string generation and clean up UI components
 662d6af feat #24: add support for sharing multiple images via external intent
 7caf391 feat #24: add support for sharing images from external apps with a preview and caption dialog

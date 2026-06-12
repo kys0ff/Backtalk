@@ -268,7 +268,7 @@ fun SettingsScreenContent(
                 SettingsToggle(
                     label = stringResource(R.string.settings_link_preview),
                     supportingText = stringResource(R.string.settings_link_preview_desc),
-                    icon = painterResource(R.drawable.round_add_link_24),
+                    icon = painterResource(R.drawable.round_preview_24),
                     checked = state.linkPreviewEnabled,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnLinkPreviewToggle(it)) }
                 )

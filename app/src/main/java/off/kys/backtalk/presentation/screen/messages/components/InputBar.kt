@@ -357,7 +357,7 @@ fun InputBar(
                 ) {
                     IconButton(onClick = onAttachClick) {
                         Icon(
-                            painter = painterResource(R.drawable.round_add_link_24),
+                            painter = painterResource(R.drawable.round_add_photo_alternate_24),
                             contentDescription = stringResource(R.string.common_attach),
                             tint = MaterialTheme.colorScheme.primary
                         )
