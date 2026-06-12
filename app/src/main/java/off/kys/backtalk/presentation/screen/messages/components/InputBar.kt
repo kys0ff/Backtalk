@@ -14,6 +14,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -81,6 +82,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -94,6 +96,8 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -568,6 +572,7 @@ private fun ActionButtons(
     val sendButtonInteractionSource = remember { MutableInteractionSource() }
     val isPressed by sendButtonInteractionSource.collectIsPressedAsState()
     val layoutDirection = LocalLayoutDirection.current
+    val density = LocalDensity.current
 
     val sendButtonScale by animateFloatAsState(
         targetValue = if (isPressed) 0.88f else 1.0f,
@@ -580,68 +585,83 @@ private fun ActionButtons(
 
     AnimatedContent(targetState = showSend, label = "SendVoiceToggle") { targetShowSend ->
         if (targetShowSend) {
-            HintTooltip(stringResource(R.string.common_send)) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .scale(sendButtonScale)
-                        .combinedClickable(
-                            onClick = onSendClick,
-                            onLongClick = onScheduleClick,
-                            interactionSource = sendButtonInteractionSource,
-                            indication = ripple(bounded = false, radius = 24.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_send_24),
-                        contentDescription = stringResource(R.string.common_send),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .scale(sendButtonScale)
+                    .combinedClickable(
+                        onClick = onSendClick,
+                        onLongClick = onScheduleClick,
+                        interactionSource = sendButtonInteractionSource,
+                        indication = ripple(bounded = false, radius = 24.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.round_send_24),
+                    contentDescription = stringResource(R.string.common_send),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         } else {
-            Box(contentAlignment = Alignment.TopCenter) {
-                AnimatedVisibility(
-                    visible = showTapHint,
-                    enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
-                    exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom),
-                    modifier = Modifier.offset(y = (-48).dp)
-                ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                        shape = RoundedCornerShape(8.dp),
-                        tonalElevation = 4.dp
-                    ) {
-                        Text(
-                            text = stringResource(R.string.chat_input_hold_to_record),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
+            val visualX = if (layoutDirection == LayoutDirection.Rtl) {
+                -offsetX + shakeOffset
+            } else {
+                offsetX + shakeOffset
+            }
+
+            val hintTransitionState = remember { MutableTransitionState(showTapHint) }.apply {
+                targetState = showTapHint
+            }
+
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset(visualX.roundToInt(), 0) }
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDragStart = { onDragStart() },
+                            onDrag = onDrag,
+                            onDragEnd = onDragEnd,
+                            onDragCancel = onDragCancel
                         )
+                    },
+                contentAlignment = Alignment.TopCenter
+            ) {
+                if (hintTransitionState.currentState || hintTransitionState.targetState) {
+                    val yOffsetPx = remember(density) { with(density) { -48.dp.roundToPx() } }
+
+                    Popup(
+                        alignment = Alignment.TopCenter,
+                        offset = IntOffset(0, yOffsetPx),
+                        properties = PopupProperties(clippingEnabled = false)
+                    ) {
+                        AnimatedVisibility(
+                            visibleState = hintTransitionState,
+                            enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
+                            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom)
+                        ) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = RoundedCornerShape(8.dp),
+                                tonalElevation = 4.dp
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.chat_input_hold_to_record),
+                                    modifier = Modifier.padding(
+                                        horizontal = 12.dp,
+                                        vertical = 6.dp
+                                    ),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                                )
+                            }
+                        }
                     }
                 }
 
                 HintTooltip(stringResource(R.string.chat_input_record_cd)) {
                     IconButton(
-                        onClick = onShowTapHint,
-                        modifier = Modifier
-                            .offset {
-                                val visualX = if (layoutDirection == LayoutDirection.Rtl) {
-                                    -offsetX + shakeOffset
-                                } else {
-                                    offsetX + shakeOffset
-                                }
-                                IntOffset(visualX.roundToInt(), 0)
-                            }
-                            .pointerInput(Unit) {
-                                detectDragGestures(
-                                    onDragStart = { onDragStart() },
-                                    onDrag = onDrag,
-                                    onDragEnd = onDragEnd,
-                                    onDragCancel = onDragCancel
-                                )
-                            }
+                        onClick = onShowTapHint
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.round_keyboard_voice_24),
