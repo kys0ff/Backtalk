@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.w3c.dom.Element
+import org.w3c.dom.Node
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -179,12 +180,12 @@ abstract class GenerateCaptionStringsAssetTask : DefaultTask() {
                     val nList = doc.getElementsByTagName("string")
                     for (i in 0 until nList.length) {
                         val node = nList.item(i)
-                        if (node.nodeType == org.w3c.dom.Node.ELEMENT_NODE) {
+                        if (node.nodeType == Node.ELEMENT_NODE) {
                             val element = node as Element
                             val nameAttr = element.getAttribute("name")
 
                             if (names.contains(nameAttr)) {
-                                val textValue = element.textContent.trim().lowercase()
+                                val textValue = element.textContent.trim()
                                 if (textValue.isNotEmpty()) {
                                     extractedValues.add(textValue)
                                 }

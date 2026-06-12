@@ -4,6 +4,7 @@ import androidx.room.Room
 import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.data.local.dao.ScheduledMessagesDao
 import off.kys.backtalk.data.local.database.MessagesDatabase
@@ -34,9 +35,9 @@ import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.InsertMessage
 import off.kys.backtalk.domain.use_case.RemoveImageFromMessage
 import off.kys.backtalk.domain.use_case.RemoveImagesFromMessage
-import off.kys.backtalk.domain.use_case.TogglePinMessage
 import off.kys.backtalk.domain.use_case.ScheduleMessageUseCase
 import off.kys.backtalk.domain.use_case.SyncData
+import off.kys.backtalk.domain.use_case.TogglePinMessage
 import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
@@ -56,6 +57,7 @@ import off.kys.backtalk.util.DateFormatter
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -180,6 +182,7 @@ private fun Module.viewModelModule() {
  * low-level Android system interactions.
  */
 private fun Module.systemModule() {
+    singleOf(::CaptionWordsRegistry)
     single { AudioPlayer() }
     single { BacktalkPreferences(get()) }
     single { DateFormatter(get(), get()) }

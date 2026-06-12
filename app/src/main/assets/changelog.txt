@@ -1,3 +1,21 @@
+b0e381c feat: add Gradle task for caption string generation and clean up UI components
+662d6af feat #24: add support for sharing multiple images via external intent
+7caf391 feat #24: add support for sharing images from external apps with a preview and caption dialog
+ee09c0a feat #24: add support for receiving shared text from external apps
+f2fb910 refactor: migrate link extraction logic to String extension
+4468dde feat: add rich link preview component with metadata scraping and caching
+e0fee2d feat: add toggle for link previews in settings
+7d0535c feat: add link preview support to messages and input bar
+986877f fix #27: solve "today" message scheduling mismatch and timezone handling, clean up unused code
+11bd349 feat: animate selection count and localize strings in MessagesTopBar
+d688a3b refactor: simplify ReminderWorker logic and remove manual timestamp tracking
+a019d0f feat: add background update checks and optimize WorkManager scheduling
+bb20702 refactor: use toUri extension and suppress BatteryLife lint in SettingsViewModel
+b14db9d feat: add setting to toggle hashtags bar visibility
+4339860 refactor: move TagFilterBar to MessagesContent and implement dynamic top padding
+a21c7cc refactor: update SettingsItem layout and handle label text overflow
+fc5ae0c feat: hide TagFilterBar and pinned messages during selection mode
+eba2eb3 feat #28: add Spanish localization
 7e53119 feat: add troubleshooting and battery optimization strings for Arabic locale
 86b1f02 style: refine MessageSchedulingDialogs UI and validation logic
 81dc88c feat #27: add validation and success feedback to message scheduling
