@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import off.kys.backtalk.common.lock.setBiometricContent
 import off.kys.backtalk.presentation.activity.components.AppLifecycleHandler
 import off.kys.backtalk.presentation.activity.components.MainView
 import off.kys.backtalk.presentation.event.MainUiEvent
+import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
@@ -34,6 +36,12 @@ class MainActivity : AppCompatActivity() {
 
     private var isAuthChecked by mutableStateOf(false)
     private var isAuthenticated by mutableStateOf(false)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -88,9 +96,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            LaunchedEffect(isCurrentlyUnlocked, lifecycleState) {
+            LaunchedEffect(isCurrentlyUnlocked, lifecycleState, intent) {
                 if (lifecycleState == Lifecycle.State.RESUMED) {
                     isAuthenticating = false
+                    handleIntent(intent)
                 }
                 if (preferences.lockEnabled && !isCurrentlyUnlocked && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
                     authenticate()
@@ -120,5 +129,14 @@ class MainActivity : AppCompatActivity() {
 
     fun checkForUpdates() {
         viewModel.onEvent(MainUiEvent.CheckUpdate(isManual = true))
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedText ->
+                messagesViewModel.onEvent(MessagesUiEvent.SetSharedText(sharedText))
+                intent.action = null
+            }
+        }
     }
 }

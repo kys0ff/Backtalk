@@ -4,12 +4,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesScreenContent
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
@@ -27,7 +29,9 @@ class MessagesScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = koinViewModel<MessagesViewModel>()
+        val context = LocalContext.current
+        val viewModel =
+            koinViewModel<MessagesViewModel>(viewModelStoreOwner = context as MainActivity)
         val audioPlayer = koinInject<AudioPlayer>()
         val state by viewModel.uiState
 

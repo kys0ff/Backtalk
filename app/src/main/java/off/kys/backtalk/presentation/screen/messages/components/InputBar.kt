@@ -97,7 +97,6 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.util.AudioRecorder
-import off.kys.backtalk.util.ComposeTextParser
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast
@@ -287,10 +286,12 @@ fun InputBar(
         }
     }
 
-    LaunchedEffect(key1 = messageInput) {
+    LaunchedEffect(messageInput) {
         if (messageInput != textValue.text) {
-            textValue =
-                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
+            textValue = TextFieldValue(
+                text = messageInput,
+                selection = TextRange(messageInput.length)
+            )
         }
     }
 

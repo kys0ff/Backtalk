@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE", "SameReturnValue")
 
 package off.kys.backtalk.util
 
@@ -10,7 +10,6 @@ package off.kys.backtalk.util
  *
  * @return An empty string ("").
  */
-@Suppress("SameReturnValue")
 inline fun emptyString(): String = ""
 
 /**
@@ -28,16 +27,15 @@ inline fun String.capitalize(): String = this.replaceFirstChar { it.uppercase() 
  *
  * @return The first detected link as a [String], or `null` if no link is found.
  */
-inline fun String.getFirstLinkOrNull():String? {
-    val mdLink = Regex("""\[([^]]+)]\(([^)]+)\)""")
-    val nakedUrl = Regex("""(https?://[^\s)\]]+)""")
-    val mLink = mdLink.find(this)
-    val nLink = nakedUrl.find(this)
+fun String.getFirstLinkOrNull(): String? {
+    val mLink = Regex("""\[([^]]+)]\(([^)]+)\)""").find(this)
+    val nLink = Regex("""(https?://[^\s)\]]+)""").find(this)
 
     return when {
         mLink != null && nLink != null -> {
             if (mLink.range.first < nLink.range.first) mLink.groupValues[2] else nLink.value
         }
+
         mLink != null -> mLink.groupValues[2]
         nLink != null -> nLink.value
         else -> null

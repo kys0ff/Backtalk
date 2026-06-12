@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.viewmodel
 
 import android.app.Application
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -166,6 +167,17 @@ class MessagesViewModel(
             }
             MessagesUiEvent.RefreshSettings -> {
                 _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
+            }
+            is MessagesUiEvent.SetSharedText -> {
+                Log.d(this::class.java.simpleName, "onEvent: Shared text:\n ${event.text}")
+                _uiState.value = _uiState.value.copy(
+                    sharedText = event.text,
+                    editingMessage = null,
+                    replyingTo = null
+                )
+            }
+            MessagesUiEvent.ClearSharedText -> {
+                _uiState.value = _uiState.value.copy(sharedText = null)
             }
         }
     }
@@ -401,7 +413,7 @@ class MessagesViewModel(
                 )
             )
             WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
-            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true, sharedText = null)
         }
         updateReply(null)
     }

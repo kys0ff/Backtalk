@@ -189,4 +189,14 @@ sealed interface MessagesUiEvent {
      * UI event to refresh message-related settings from preferences.
      */
     data object RefreshSettings : MessagesUiEvent
+
+    /**
+     * UI event to set the shared text from an external intent.
+     */
+    data class SetSharedText(val text: String) : MessagesUiEvent
+
+    /**
+     * UI event to clear the shared text.
+     */
+    data object ClearSharedText : MessagesUiEvent
 }

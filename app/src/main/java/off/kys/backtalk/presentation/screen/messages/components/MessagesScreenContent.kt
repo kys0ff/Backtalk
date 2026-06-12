@@ -26,6 +26,7 @@ import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.util.compose.rememberHashtags
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
+import off.kys.backtalk.util.emptyString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,8 +172,12 @@ fun MessagesScreenContent(
         },
         bottomBar = {
             InputBar(
-                messageInput = state.editingMessage?.editedText.orEmpty().ifEmpty {
-                    state.editingMessage?.text.orEmpty()
+                messageInput = when {
+                    state.editingMessage != null -> state.editingMessage.editedText.orEmpty().ifEmpty {
+                        state.editingMessage.text
+                    }
+                    state.sharedText != null -> state.sharedText
+                    else -> emptyString()
                 },
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
