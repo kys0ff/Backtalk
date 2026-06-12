@@ -52,6 +52,9 @@
     <string name="chat_reply_image_preview">[صورة]</string>
     <string name="chat_input_slide_to_cancel">&lt; اسحب للإلغاء</string>
     <string name="chat_input_hold_to_record">استمر في الضغط للتسجيل</string>
+    <string name="chat_input_send_image">إرسال صورة</string>
+    <string name="chat_input_send_images">إرسال %1$d صور</string>
+    <string name="chat_input_caption_hint">إضافة شرح…</string>
     <string name="chat_input_record_cd">تسجيل</string>
     <string name="chat_input_format_bold">ع</string>
     <string name="chat_input_format_italic">م</string>
@@ -379,6 +382,7 @@
     <string name="onboarding_mock_message_1">مرحباً يا نفسي! يجب أن أتذكر شرب المزيد من الماء اليوم.</string>
     <string name="onboarding_mock_message_2">فكرة جيدة. على ترطيب جسمك حافظ! 💧</string>
     <string name="onboarding_mock_reminder">اضغط مطولًا على زر الإرسال لجدولة تذكير كهذا!</string>
+    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">رسالة مثبتة</string>

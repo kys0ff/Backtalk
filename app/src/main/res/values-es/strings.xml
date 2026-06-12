@@ -52,6 +52,9 @@
     <string name="chat_reply_image_preview">[Imagen]</string>
     <string name="chat_input_slide_to_cancel">&lt; Desliza para cancelar</string>
     <string name="chat_input_hold_to_record">Mantén presionado para grabar</string>
+    <string name="chat_input_send_image">Enviar imagen</string>
+    <string name="chat_input_send_images">Enviar %1$d imágenes</string>
+    <string name="chat_input_caption_hint">Añadir un comentario…</string>
     <string name="chat_input_record_cd">Grabar</string>
     <string name="chat_input_format_bold">N</string>
     <string name="chat_input_format_italic">K</string>
@@ -157,6 +160,7 @@
 
     <!-- Developer Settings -->
     <string name="settings_developer">Desarrollador</string>
+    <string name="settings_dev_name" translatable="false">kys0ff</string>
     <string name="settings_dev_click">Me encontraste. Ahora vete.</string>
     <string name="settings_dev_click_fine">bien…</string>
     <string name="settings_secret_category">Opciones de Desarrollador</string>
@@ -374,6 +378,7 @@
     <string name="onboarding_mock_message_1">¡Hola yo! Debo recordar beber más agua hoy.</string>
     <string name="onboarding_mock_message_2">Buen punto. ¡Mantente hidratado! 💧</string>
     <string name="onboarding_mock_reminder">¡Mantén presionado el botón de enviar para programar un recordatorio como este!</string>
+    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">Mensaje fijado</string>
