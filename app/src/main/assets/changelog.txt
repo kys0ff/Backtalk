@@ -1,3 +1,7 @@
+4177849 feat: add tooltips to send and voice record buttons in InputBar
+1cca4c4 feat: add RTL support to voice message waveform rendering
+1800fbf refactor: modularize InputBar and add RTL support for voice recording
+e75f139 feat: update icons for attachments and link previews
 826f194 feat: implement CaptionWordsRegistry for restricted message captions
 b0e381c feat: add Gradle task for caption string generation and clean up UI components
 662d6af feat #24: add support for sharing multiple images via external intent
