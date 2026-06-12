@@ -361,7 +361,6 @@ fun InputBar(
                         if (isRecording) {
                             change.consume()
                             if (layoutDirection == LayoutDirection.Rtl) {
-                                // In RTL, dragging into the screen means moving right (positive numbers)
                                 offsetX = (offsetX + dragAmount.x).coerceAtLeast(0f)
                                 if (offsetX > 300f) {
                                     isRecording = false
@@ -369,7 +368,6 @@ fun InputBar(
                                     offsetX = 0f
                                 }
                             } else {
-                                // In LTR, dragging into the screen means moving left (negative numbers)
                                 offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
                                 if (offsetX < -300f) {
                                     isRecording = false
@@ -582,23 +580,25 @@ private fun ActionButtons(
 
     AnimatedContent(targetState = showSend, label = "SendVoiceToggle") { targetShowSend ->
         if (targetShowSend) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .scale(sendButtonScale)
-                    .combinedClickable(
-                        onClick = onSendClick,
-                        onLongClick = onScheduleClick,
-                        interactionSource = sendButtonInteractionSource,
-                        indication = ripple(bounded = false, radius = 24.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.round_send_24),
-                    contentDescription = stringResource(R.string.common_send),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            HintTooltip(stringResource(R.string.common_send)) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .scale(sendButtonScale)
+                        .combinedClickable(
+                            onClick = onSendClick,
+                            onLongClick = onScheduleClick,
+                            interactionSource = sendButtonInteractionSource,
+                            indication = ripple(bounded = false, radius = 24.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_send_24),
+                        contentDescription = stringResource(R.string.common_send),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         } else {
             Box(contentAlignment = Alignment.TopCenter) {
@@ -622,35 +622,34 @@ private fun ActionButtons(
                     }
                 }
 
-                IconButton(
-                    onClick = onShowTapHint,
-                    modifier = Modifier
-                        .offset {
-                            // In RTL, your gesture drag tracks positive values as it moves inward (right).
-                            // To visually shift the element left into the bar, we invert it (-offsetX).
-                            // In LTR, drag tracks negative values, which already naturally shifts it left.
-                            val visualX = if (layoutDirection == LayoutDirection.Rtl) {
-                                -offsetX + shakeOffset
-                            } else {
-                                offsetX + shakeOffset
+                HintTooltip(stringResource(R.string.chat_input_record_cd)) {
+                    IconButton(
+                        onClick = onShowTapHint,
+                        modifier = Modifier
+                            .offset {
+                                val visualX = if (layoutDirection == LayoutDirection.Rtl) {
+                                    -offsetX + shakeOffset
+                                } else {
+                                    offsetX + shakeOffset
+                                }
+                                IntOffset(visualX.roundToInt(), 0)
                             }
-                            IntOffset(visualX.roundToInt(), 0)
-                        }
-                        .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDragStart = { onDragStart() },
-                                onDrag = onDrag,
-                                onDragEnd = onDragEnd,
-                                onDragCancel = onDragCancel
-                            )
-                        }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_keyboard_voice_24),
-                        contentDescription = stringResource(R.string.chat_input_record_cd),
-                        tint = if (shakeOffset != 0f && !showTapHint) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.primary
-                    )
+                            .pointerInput(Unit) {
+                                detectDragGestures(
+                                    onDragStart = { onDragStart() },
+                                    onDrag = onDrag,
+                                    onDragEnd = onDragEnd,
+                                    onDragCancel = onDragCancel
+                                )
+                            }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_keyboard_voice_24),
+                            contentDescription = stringResource(R.string.chat_input_record_cd),
+                            tint = if (shakeOffset != 0f && !showTapHint) MaterialTheme.colorScheme.error
+                            else MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
