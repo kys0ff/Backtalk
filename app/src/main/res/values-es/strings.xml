@@ -160,7 +160,6 @@
 
     <!-- Developer Settings -->
     <string name="settings_developer">Desarrollador</string>
-    <string name="settings_dev_name" translatable="false">kys0ff</string>
     <string name="settings_dev_click">Me encontraste. Ahora vete.</string>
     <string name="settings_dev_click_fine">bien…</string>
     <string name="settings_secret_category">Opciones de Desarrollador</string>
@@ -378,7 +377,6 @@
     <string name="onboarding_mock_message_1">¡Hola yo! Debo recordar beber más agua hoy.</string>
     <string name="onboarding_mock_message_2">Buen punto. ¡Mantente hidratado! 💧</string>
     <string name="onboarding_mock_reminder">¡Mantén presionado el botón de enviar para programar un recordatorio como este!</string>
-    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">Mensaje fijado</string>

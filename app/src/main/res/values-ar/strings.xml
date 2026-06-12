@@ -164,7 +164,6 @@
 
     <!-- Developer Settings -->
     <string name="settings_developer">المطور</string>
-    <string name="settings_dev_name" translatable="false">kys0ff</string>
     <string name="settings_dev_click">لقد وجدتني. الآن ارحل بعيدًا.</string>
     <string name="settings_dev_click_fine">حسناً…</string>
     <string name="settings_secret_category">خيارات المطور</string>
@@ -382,7 +381,6 @@
     <string name="onboarding_mock_message_1">مرحباً يا نفسي! يجب أن أتذكر شرب المزيد من الماء اليوم.</string>
     <string name="onboarding_mock_message_2">فكرة جيدة. على ترطيب جسمك حافظ! 💧</string>
     <string name="onboarding_mock_reminder">اضغط مطولًا على زر الإرسال لجدولة تذكير كهذا!</string>
-    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
 
     <!-- Pinned Messages -->
     <string name="pinned_message">رسالة مثبتة</string>
