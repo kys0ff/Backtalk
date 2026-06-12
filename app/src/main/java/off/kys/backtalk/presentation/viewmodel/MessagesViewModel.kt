@@ -179,6 +179,16 @@ class MessagesViewModel(
             MessagesUiEvent.ClearSharedText -> {
                 _uiState.value = _uiState.value.copy(sharedText = null)
             }
+            is MessagesUiEvent.SetSharedImage -> {
+                _uiState.value = _uiState.value.copy(
+                    sharedImageUri = event.uri,
+                    editingMessage = null,
+                    replyingTo = null
+                )
+            }
+            MessagesUiEvent.ClearSharedImage -> {
+                _uiState.value = _uiState.value.copy(sharedImageUri = null)
+            }
         }
     }
 
@@ -381,6 +391,10 @@ class MessagesViewModel(
     private fun sendMessage(text: String) {
         val editingMessage = _uiState.value.editingMessage
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
+
+        if (_uiState.value.sharedText != null) {
+            _uiState.value = _uiState.value.copy(sharedText = null)
+        }
 
         if (editingMessage != null) {
             val currentTime = System.currentTimeMillis()

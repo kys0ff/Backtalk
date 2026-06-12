@@ -55,6 +55,8 @@
     <string name="chat_reply_image_preview">[Image]</string>
     <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
     <string name="chat_input_hold_to_record">Hold to record</string>
+    <string name="chat_input_send_image">Send image</string>
+    <string name="chat_input_caption_hint">Add a caption…</string>
     <string name="chat_input_record_cd">Record</string>
     <string name="chat_input_format_bold">B</string>
     <string name="chat_input_format_italic">I</string>

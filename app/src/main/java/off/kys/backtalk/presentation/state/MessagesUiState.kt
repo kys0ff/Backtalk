@@ -37,5 +37,6 @@ data class MessagesUiState(
     val selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
     val showChangelogDialog: Boolean = false,
     val showTagsBar: Boolean = true,
-    val sharedText: String? = null
+    val sharedText: String? = null,
+    val sharedImageUri: String? = null
 )

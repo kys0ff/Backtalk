@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -132,10 +133,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
-            intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedText ->
-                messagesViewModel.onEvent(MessagesUiEvent.SetSharedText(sharedText))
-                intent.action = null
+        if (intent.action == Intent.ACTION_SEND) {
+            when {
+                intent.type == "text/plain" -> {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedText ->
+                        messagesViewModel.onEvent(MessagesUiEvent.SetSharedText(sharedText))
+                        intent.action = null
+                    }
+                }
+                intent.type?.startsWith("image/") == true -> {
+                    IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, android.net.Uri::class.java)?.let { uri ->
+                        messagesViewModel.onEvent(MessagesUiEvent.SetSharedImage(uri.toString()))
+                        intent.action = null
+                    }
+                }
             }
         }
     }

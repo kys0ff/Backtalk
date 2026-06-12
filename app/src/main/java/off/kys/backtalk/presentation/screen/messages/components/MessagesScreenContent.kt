@@ -190,7 +190,18 @@ fun MessagesScreenContent(
                 onMessageSchedule = { text, time ->
                     onEvent(MessagesUiEvent.ScheduleMessage(text, time))
                 },
-                onAttachClick = { onEvent(MessagesUiEvent.ToggleMediaPicker(true)) }
+                onAttachClick = { onEvent(MessagesUiEvent.ToggleMediaPicker(true)) },
+                sharedImageUri = state.sharedImageUri,
+                onCancelSharedImage = { onEvent(MessagesUiEvent.ClearSharedImage) },
+                onSharedImageSend = { uri, caption ->
+                    onEvent(
+                        MessagesUiEvent.SendMediaMessages(
+                            uris = listOf(uri),
+                            type = "image/*",
+                            description = caption.takeIf { it.isNotBlank() }
+                        )
+                    )
+                }
             )
         },
         floatingActionButton = {
