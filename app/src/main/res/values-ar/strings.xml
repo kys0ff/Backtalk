@@ -155,6 +155,9 @@
 
     <!-- Troubleshooting -->
     <string name="settings_troubleshooting">استكشاف الأخطاء وإصلاحها</string>
+    <string name="settings_clear_cache">مسح التخزين المؤقت</string>
+    <string name="settings_clear_cache_desc">توفير مساحة عن طريق حذف الملفات المؤقتة</string>
+    <string name="settings_clear_cache_success">تم مسح التخزين المؤقت بنجاح</string>
     <string name="settings_disable_battery_optimization">إيقاف تحسين البطارية</string>
     <string name="settings_disable_battery_optimization_desc">يضمن تشغيل المهام في الخلفية مثل التذكيرات والتصدير التلقائي بموثوقية. الحالة: %1$s</string>
     <string name="settings_battery_optimization_ignored">متجاهَل</string>

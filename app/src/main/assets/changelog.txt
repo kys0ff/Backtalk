@@ -1,3 +1,7 @@
+1e03b45 refactor: remove unused developer and onboarding mock strings from localized resources
+5da99c8 chore: update Spanish and Arabic translations for image sending and onboarding
+2c456de docs: update changelog for InputBar and RTL improvements
+5afb204 refactor: use Popup for voice recording hint and refine InputBar gesture handling
 4177849 feat: add tooltips to send and voice record buttons in InputBar
 1cca4c4 feat: add RTL support to voice message waveform rendering
 1800fbf refactor: modularize InputBar and add RTL support for voice recording

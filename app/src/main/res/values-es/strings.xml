@@ -151,6 +151,9 @@
 
     <!-- Troubleshooting -->
     <string name="settings_troubleshooting">Solución de problemas</string>
+    <string name="settings_clear_cache">Limpiar caché</string>
+    <string name="settings_clear_cache_desc">Libera espacio eliminando archivos temporales</string>
+    <string name="settings_clear_cache_success">Caché limpiada con éxito</string>
     <string name="settings_disable_battery_optimization">Desactivar optimización de batería</string>
     <string name="settings_disable_battery_optimization_desc">Asegura que las tareas en segundo plano como recordatorios y exportación automática se ejecuten de manera confiable. Estado: %1$s</string>
     <string name="settings_battery_optimization_ignored">Ignorado</string>

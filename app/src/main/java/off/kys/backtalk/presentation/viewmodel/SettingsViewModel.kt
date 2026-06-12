@@ -115,6 +115,7 @@ class SettingsViewModel(
         SettingsUiEvent.OnDisableBatteryOptimization -> onDisableBatteryOptimization()
         SettingsUiEvent.OnOpenDontKillMyApp -> onOpenDontKillMyApp()
         SettingsUiEvent.OnRefreshBatteryStatus -> onRefreshBatteryStatus()
+        SettingsUiEvent.OnClearCache -> onClearCache()
         is SettingsUiEvent.ExportBackup -> exportBackup(event.uri, event.password)
         is SettingsUiEvent.CheckBackupEncryption -> checkBackupEncryption(event.uri)
         is SettingsUiEvent.ImportBackup -> importBackup(
@@ -318,6 +319,18 @@ class SettingsViewModel(
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val isIgnoring = pm.isIgnoringBatteryOptimizations(context.packageName)
         _state.update { it.copy(isIgnoringBatteryOptimizations = isIgnoring) }
+    }
+
+    private fun onClearCache() {
+        viewModelScope.launch {
+            runCatching {
+                context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
+            }.onSuccess {
+                _state.update { it.copy(successMessage = context.getString(R.string.settings_clear_cache_success)) }
+            }.onFailure { error ->
+                _state.update { it.copy(error = error.message) }
+            }
+        }
     }
 
     private fun onWipeAppData() {

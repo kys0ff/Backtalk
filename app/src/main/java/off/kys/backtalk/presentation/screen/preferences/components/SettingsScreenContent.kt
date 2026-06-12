@@ -575,7 +575,10 @@ fun SettingsScreenContent(
                 }
                 SettingsItem(
                     label = stringResource(R.string.settings_disable_battery_optimization),
-                    value = stringResource(R.string.settings_disable_battery_optimization_desc, batteryStatus),
+                    value = stringResource(
+                        R.string.settings_disable_battery_optimization_desc,
+                        batteryStatus
+                    ),
                     icon = painterResource(R.drawable.round_phone_android_24),
                     onClick = { onEvent(SettingsUiEvent.OnDisableBatteryOptimization) }
                 )
@@ -589,6 +592,17 @@ fun SettingsScreenContent(
                     value = stringResource(R.string.settings_dont_kill_my_app_desc),
                     icon = painterResource(R.drawable.round_warning_24),
                     onClick = { onEvent(SettingsUiEvent.OnOpenDontKillMyApp) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_clear_cache),
+                    value = stringResource(R.string.settings_clear_cache_desc),
+                    icon = painterResource(R.drawable.round_cleaning_services_24),
+                    onClick = { onEvent(SettingsUiEvent.OnClearCache) }
                 )
             }
 
