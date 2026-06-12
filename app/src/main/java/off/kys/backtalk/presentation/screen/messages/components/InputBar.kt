@@ -75,11 +75,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -89,6 +92,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.delay
@@ -96,6 +100,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
@@ -108,7 +113,7 @@ import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,
@@ -130,6 +135,7 @@ fun InputBar(
     val audioRecorder = remember { AudioRecorder(context) }
     val haptic = LocalHapticFeedback.current
     val preferences = koinInject<BacktalkPreferences>()
+    val layoutDirection = LocalLayoutDirection.current
 
     var isRecording by remember { mutableStateOf(false) }
     var secondsElapsed by remember { mutableIntStateOf(0) }
@@ -149,7 +155,6 @@ fun InputBar(
                         .atStartOfDay(ZoneId.of("UTC"))
                         .toInstant()
                         .toEpochMilli()
-
                     return utcTimeMillis >= todayUtc
                 }
             }
@@ -160,34 +165,17 @@ fun InputBar(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            Log.i(TAG, "InputBar: Microphone permission is granted")
-        }
+        if (isGranted) Log.i(TAG, "InputBar: Microphone permission is granted")
     }
 
     var recordingStartTime by remember { mutableLongStateOf(0L) }
     var textValue by remember {
         mutableStateOf(
-            TextFieldValue(
-                text = messageInput,
-                selection = TextRange(messageInput.length)
-            )
+            TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
         )
     }
 
     val showPermissionRationale = remember { mutableStateOf(false) }
-
-    val sendButtonInteractionSource = remember { MutableInteractionSource() }
-    val isPressed by sendButtonInteractionSource.collectIsPressedAsState()
-
-    val sendButtonScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.88f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "SendButtonScale"
-    )
 
     LaunchedEffect(key1 = isRecording) {
         if (isRecording) {
@@ -221,9 +209,7 @@ fun InputBar(
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            checkAndRequestExactAlarmPermission()
-        }
+        if (isGranted) checkAndRequestExactAlarmPermission()
     }
 
     fun handleScheduleClick() {
@@ -272,16 +258,6 @@ fun InputBar(
         }
     }
 
-    fun applyStyle(startSym: String, endSym: String) {
-        val selection = textValue.selection
-        val text = textValue.text
-        val selectedText = text.substring(selection.start, selection.end)
-        val newText =
-            text.replaceRange(selection.start, selection.end, "$startSym$selectedText$endSym")
-        val newCursorPos = selection.start + startSym.length + selectedText.length + endSym.length
-        textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
-    }
-
     LaunchedEffect(key1 = showTapHint) {
         if (showTapHint) {
             delay(2000)
@@ -291,10 +267,8 @@ fun InputBar(
 
     LaunchedEffect(messageInput) {
         if (messageInput != textValue.text) {
-            textValue = TextFieldValue(
-                text = messageInput,
-                selection = TextRange(messageInput.length)
-            )
+            textValue =
+                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
         }
     }
 
@@ -324,25 +298,10 @@ fun InputBar(
                 onCancelEdit = onCancelEdit
             )
 
-            val firstUrl = remember(textValue.text, preferences.linkPreviewEnabled) {
-                if (preferences.linkPreviewEnabled) {
-                    textValue.text.getFirstLinkOrNull()
-                } else null
-            }
-            AnimatedVisibility(
-                visible = firstUrl != null,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                if (firstUrl != null) {
-                    Column {
-                        Spacer(Modifier.size(8.dp))
-                        Box(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
-                            LinkPreviewCard(url = firstUrl)
-                        }
-                    }
-                }
-            }
+            LinkPreviewSection(
+                text = textValue.text,
+                previewEnabled = preferences.linkPreviewEnabled
+            )
 
             Row(
                 modifier = Modifier
@@ -350,207 +309,98 @@ fun InputBar(
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AnimatedVisibility(
-                    visible = !isRecording,
-                    enter = expandHorizontally() + fadeIn(),
-                    exit = shrinkHorizontally() + fadeOut()
-                ) {
-                    IconButton(onClick = onAttachClick) {
-                        Icon(
-                            painter = painterResource(R.drawable.round_add_photo_alternate_24),
-                            contentDescription = stringResource(R.string.common_attach),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
+                AttachButtonVisibility(
+                    isVisible = !isRecording,
+                    onAttachClick = onAttachClick
+                )
 
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessMediumLow
-                            )
-                        )
-                ) {
-                    this@Row.AnimatedVisibility(
-                        visible = !isRecording,
-                        enter = fadeIn() + slideInHorizontally(),
-                        exit = fadeOut() + slideOutHorizontally()
-                    ) {
-                        TextField(
-                            value = textValue,
-                            onValueChange = { textValue = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minHeight = 60.dp),
-                            textStyle = TextStyle(textDirection = TextDirection.Content),
-                            placeholder = { Text(stringResource(R.string.chat_input_hint)) },
-                            maxLines = 5,
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                imeAction = if (preferences.sendWithEnter) ImeAction.Send else ImeAction.Default
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onSend = {
-                                    if (textValue.text.isNotBlank()) {
-                                        onMessageSend(textValue.text)
-                                        textValue = TextFieldValue(emptyString())
-                                    }
-                                }
-                            ),
-                            colors = TextFieldDefaults.colors(
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            shape = MaterialTheme.shapes.extraLarge
-                        )
-                    }
-
-                    this@Row.AnimatedVisibility(
-                        visible = isRecording,
-                        enter = fadeIn() + expandHorizontally(),
-                        exit = fadeOut() + shrinkHorizontally()
-                    ) {
-                        VoiceRecordingIndicator(
-                            amplitudes = amplitudes,
-                            durationText = durationText
-                        )
-                    }
-                }
-
-                val showSend = textValue.text.isNotBlank() && !isRecording
-
-                AnimatedContent(
-                    targetState = showSend,
-                    label = "SendVoiceToggle"
-                ) { targetShowSend ->
-                    if (targetShowSend) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .scale(sendButtonScale)
-                                .combinedClickable(
-                                    onClick = {
-                                        if (textValue.text.isNotBlank()) {
-                                            onMessageSend(textValue.text)
-                                            textValue = TextFieldValue(emptyString())
-                                        }
-                                    },
-                                    onLongClick = {
-                                        if (textValue.text.isNotBlank() && editingMessage == null) {
-                                            if (preferences.hapticFeedbackEnabled) {
-                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            }
-                                            handleScheduleClick()
-                                        }
-                                    },
-                                    interactionSource = sendButtonInteractionSource,
-                                    indication = ripple(
-                                        bounded = false,
-                                        radius = 24.dp
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_send_24),
-                                contentDescription = stringResource(R.string.common_send),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                ChatTextField(
+                    modifier = Modifier.weight(1f),
+                    textValue = textValue,
+                    onValueChange = { textValue = it },
+                    isRecording = isRecording,
+                    amplitudes = amplitudes,
+                    durationText = durationText,
+                    sendWithEnter = preferences.sendWithEnter,
+                    onSend = {
+                        if (textValue.text.isNotBlank()) {
+                            onMessageSend(textValue.text)
+                            textValue = TextFieldValue(emptyString())
                         }
-                    } else {
-                        Box(contentAlignment = Alignment.TopCenter) {
-                            this@Row.AnimatedVisibility(
-                                visible = showTapHint,
-                                enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
-                                exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom),
-                                modifier = Modifier.offset(y = (-48).dp)
-                            ) {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                                    shape = RoundedCornerShape(8.dp),
-                                    tonalElevation = 4.dp
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.chat_input_hold_to_record),
-                                        modifier = Modifier.padding(
-                                            horizontal = 12.dp,
-                                            vertical = 6.dp
-                                        ),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                                    )
+                    }
+                )
+
+                ActionButtons(
+                    showSend = textValue.text.isNotBlank() && !isRecording,
+                    onSendClick = {
+                        if (textValue.text.isNotBlank()) {
+                            onMessageSend(textValue.text)
+                            textValue = TextFieldValue(emptyString())
+                        }
+                    },
+                    onScheduleClick = {
+                        if (textValue.text.isNotBlank() && editingMessage == null) {
+                            if (preferences.hapticFeedbackEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                            handleScheduleClick()
+                        }
+                    },
+                    showTapHint = showTapHint,
+                    shakeOffset = shakeOffset.value,
+                    offsetX = offsetX,
+                    onShowTapHint = {
+                        showTapHint = true
+                        triggerDeniedShake()
+                    },
+                    onDragStart = {
+                        showTapHint = false
+                        startRecordingInternal()
+                    },
+                    onDrag = { change, dragAmount ->
+                        if (isRecording) {
+                            change.consume()
+                            if (layoutDirection == LayoutDirection.Rtl) {
+                                // In RTL, dragging into the screen means moving right (positive numbers)
+                                offsetX = (offsetX + dragAmount.x).coerceAtLeast(0f)
+                                if (offsetX > 300f) {
+                                    isRecording = false
+                                    audioRecorder.cancelRecording()
+                                    offsetX = 0f
+                                }
+                            } else {
+                                // In LTR, dragging into the screen means moving left (negative numbers)
+                                offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
+                                if (offsetX < -300f) {
+                                    isRecording = false
+                                    audioRecorder.cancelRecording()
+                                    offsetX = 0f
                                 }
                             }
-
-                            IconButton(
-                                onClick = {
-                                    showTapHint = true
-                                    triggerDeniedShake()
-                                },
-                                modifier = Modifier
-                                    .offset {
-                                        IntOffset(
-                                            (offsetX + shakeOffset.value).roundToInt(),
-                                            0
-                                        )
-                                    }
-                                    .pointerInput(Unit) {
-                                        detectDragGestures(
-                                            onDragStart = {
-                                                showTapHint = false
-                                                startRecordingInternal()
-                                            },
-                                            onDrag = { change, dragAmount ->
-                                                if (isRecording) {
-                                                    change.consume()
-                                                    offsetX =
-                                                        (offsetX + dragAmount.x).coerceAtMost(0f)
-                                                    if (offsetX < -300f) {
-                                                        isRecording = false
-                                                        audioRecorder.cancelRecording()
-                                                        offsetX = 0f
-                                                    }
-                                                }
-                                            },
-                                            onDragEnd = {
-                                                if (isRecording) {
-                                                    isRecording = false
-                                                    val file = audioRecorder.stopRecording()
-                                                    if (file != null) {
-                                                        onVoiceSend(
-                                                            file.absolutePath,
-                                                            System.currentTimeMillis() - recordingStartTime,
-                                                            amplitudes
-                                                        )
-                                                    }
-                                                }
-                                                offsetX = 0f
-                                            },
-                                            onDragCancel = {
-                                                if (isRecording) {
-                                                    isRecording = false
-                                                    audioRecorder.cancelRecording()
-                                                }
-                                                offsetX = 0f
-                                            }
-                                        )
-                                    }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.round_keyboard_voice_24),
-                                    contentDescription = stringResource(R.string.chat_input_record_cd),
-                                    tint = if (shakeOffset.value != 0f && !showTapHint)
-                                        MaterialTheme.colorScheme.error
-                                    else
-                                        MaterialTheme.colorScheme.primary
+                        }
+                    },
+                    onDragEnd = {
+                        if (isRecording) {
+                            isRecording = false
+                            val file = audioRecorder.stopRecording()
+                            if (file != null) {
+                                onVoiceSend(
+                                    file.absolutePath,
+                                    System.currentTimeMillis() - recordingStartTime,
+                                    amplitudes
                                 )
                             }
                         }
+                        offsetX = 0f
+                    },
+                    onDragCancel = {
+                        if (isRecording) {
+                            isRecording = false
+                            audioRecorder.cancelRecording()
+                        }
+                        offsetX = 0f
                     }
-                }
+                )
             }
 
             AnimatedVisibility(
@@ -558,8 +408,18 @@ fun InputBar(
                 enter = expandVertically(expandFrom = Alignment.Bottom) + fadeIn(),
                 exit = shrinkVertically(shrinkTowards = Alignment.Bottom) + fadeOut()
             ) {
-                FormattingToolbar(onFormattingClick = { start, end ->
-                    applyStyle(start, end)
+                FormattingToolbar(onFormattingClick = { startSym, endSym ->
+                    val selection = textValue.selection
+                    val text = textValue.text
+                    val selectedText = text.substring(selection.start, selection.end)
+                    val newText = text.replaceRange(
+                        selection.start,
+                        selection.end,
+                        "$startSym$selectedText$endSym"
+                    )
+                    val newCursorPos =
+                        selection.start + startSym.length + selectedText.length + endSym.length
+                    textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
                 })
             }
         }
@@ -589,5 +449,210 @@ fun InputBar(
                 onCancelSharedImage()
             }
         )
+    }
+}
+
+@Composable
+private fun LinkPreviewSection(text: String, previewEnabled: Boolean) {
+    val firstUrl = remember(text, previewEnabled) {
+        if (previewEnabled) text.getFirstLinkOrNull() else null
+    }
+    AnimatedVisibility(
+        visible = firstUrl != null,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically() + fadeOut()
+    ) {
+        if (firstUrl != null) {
+            Column {
+                Spacer(Modifier.size(8.dp))
+                Box(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
+                    LinkPreviewCard(url = firstUrl)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AttachButtonVisibility(isVisible: Boolean, onAttachClick: () -> Unit) {
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = expandHorizontally() + fadeIn(),
+        exit = shrinkHorizontally() + fadeOut()
+    ) {
+        HintTooltip(stringResource(R.string.common_attach)) {
+            IconButton(onClick = onAttachClick) {
+                Icon(
+                    painter = painterResource(R.drawable.round_add_photo_alternate_24),
+                    contentDescription = stringResource(R.string.common_attach),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChatTextField(
+    modifier: Modifier = Modifier,
+    textValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    isRecording: Boolean,
+    amplitudes: List<Float>,
+    durationText: String,
+    sendWithEnter: Boolean,
+    onSend: () -> Unit
+) {
+    Box(
+        modifier = modifier.animateContentSize(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
+    ) {
+        AnimatedVisibility(
+            visible = !isRecording,
+            enter = fadeIn() + slideInHorizontally(),
+            exit = fadeOut() + slideOutHorizontally()
+        ) {
+            TextField(
+                value = textValue,
+                onValueChange = onValueChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 60.dp),
+                textStyle = TextStyle(textDirection = TextDirection.Content),
+                placeholder = { Text(stringResource(R.string.chat_input_hint)) },
+                maxLines = 5,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = if (sendWithEnter) ImeAction.Send else ImeAction.Default
+                ),
+                keyboardActions = KeyboardActions(onSend = { onSend() }),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = MaterialTheme.shapes.extraLarge
+            )
+        }
+
+        AnimatedVisibility(
+            visible = isRecording,
+            enter = fadeIn() + expandHorizontally(),
+            exit = fadeOut() + shrinkHorizontally()
+        ) {
+            VoiceRecordingIndicator(
+                amplitudes = amplitudes,
+                durationText = durationText
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ActionButtons(
+    showSend: Boolean,
+    onSendClick: () -> Unit,
+    onScheduleClick: () -> Unit,
+    showTapHint: Boolean,
+    shakeOffset: Float,
+    offsetX: Float,
+    onShowTapHint: () -> Unit,
+    onDragStart: () -> Unit,
+    onDrag: (PointerInputChange, Offset) -> Unit,
+    onDragEnd: () -> Unit,
+    onDragCancel: () -> Unit
+) {
+    val sendButtonInteractionSource = remember { MutableInteractionSource() }
+    val isPressed by sendButtonInteractionSource.collectIsPressedAsState()
+    val layoutDirection = LocalLayoutDirection.current
+
+    val sendButtonScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.88f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "SendButtonScale"
+    )
+
+    AnimatedContent(targetState = showSend, label = "SendVoiceToggle") { targetShowSend ->
+        if (targetShowSend) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .scale(sendButtonScale)
+                    .combinedClickable(
+                        onClick = onSendClick,
+                        onLongClick = onScheduleClick,
+                        interactionSource = sendButtonInteractionSource,
+                        indication = ripple(bounded = false, radius = 24.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.round_send_24),
+                    contentDescription = stringResource(R.string.common_send),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        } else {
+            Box(contentAlignment = Alignment.TopCenter) {
+                AnimatedVisibility(
+                    visible = showTapHint,
+                    enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
+                    exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom),
+                    modifier = Modifier.offset(y = (-48).dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        shape = RoundedCornerShape(8.dp),
+                        tonalElevation = 4.dp
+                    ) {
+                        Text(
+                            text = stringResource(R.string.chat_input_hold_to_record),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = onShowTapHint,
+                    modifier = Modifier
+                        .offset {
+                            // In RTL, your gesture drag tracks positive values as it moves inward (right).
+                            // To visually shift the element left into the bar, we invert it (-offsetX).
+                            // In LTR, drag tracks negative values, which already naturally shifts it left.
+                            val visualX = if (layoutDirection == LayoutDirection.Rtl) {
+                                -offsetX + shakeOffset
+                            } else {
+                                offsetX + shakeOffset
+                            }
+                            IntOffset(visualX.roundToInt(), 0)
+                        }
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { onDragStart() },
+                                onDrag = onDrag,
+                                onDragEnd = onDragEnd,
+                                onDragCancel = onDragCancel
+                            )
+                        }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.round_keyboard_voice_24),
+                        contentDescription = stringResource(R.string.chat_input_record_cd),
+                        tint = if (shakeOffset != 0f && !showTapHint) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
     }
 }
