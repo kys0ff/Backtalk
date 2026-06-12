@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import java.util.concurrent.TimeUnit
@@ -107,8 +108,15 @@ fun WaveformVisualizer(
             waveformData
         }
 
+        val isRtl = layoutDirection == LayoutDirection.Rtl
+
         barsToDraw.forEachIndexed { index, amplitude ->
-            val x = index * totalBarWidthPx
+            val x = if (isRtl) {
+                canvasWidth - (index * totalBarWidthPx) - barWidthPx
+            } else {
+                index * totalBarWidthPx
+            }
+
             val barHeight = (amplitude * canvasHeight).coerceAtLeast(2.dp.toPx())
             val y = (canvasHeight - barHeight) / 2
 
