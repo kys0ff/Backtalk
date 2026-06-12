@@ -38,5 +38,5 @@ data class MessagesUiState(
     val showChangelogDialog: Boolean = false,
     val showTagsBar: Boolean = true,
     val sharedText: String? = null,
-    val sharedImageUri: String? = null
+    val sharedImageUris: List<String> = emptyList()
 )

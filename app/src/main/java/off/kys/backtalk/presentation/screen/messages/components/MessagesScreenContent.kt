@@ -191,12 +191,12 @@ fun MessagesScreenContent(
                     onEvent(MessagesUiEvent.ScheduleMessage(text, time))
                 },
                 onAttachClick = { onEvent(MessagesUiEvent.ToggleMediaPicker(true)) },
-                sharedImageUri = state.sharedImageUri,
+                sharedImageUris = state.sharedImageUris,
                 onCancelSharedImage = { onEvent(MessagesUiEvent.ClearSharedImage) },
-                onSharedImageSend = { uri, caption ->
+                onSharedImageSend = { uris, caption ->
                     onEvent(
                         MessagesUiEvent.SendMediaMessages(
-                            uris = listOf(uri),
+                            uris = uris,
                             type = "image/*",
                             description = caption.takeIf { it.isNotBlank() }
                         )

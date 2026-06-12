@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -38,7 +40,7 @@ import off.kys.backtalk.util.emptyString
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SharedImageDialog(
-    uri: String,
+    uris: List<String>,
     onDismiss: () -> Unit,
     onSend: (String) -> Unit
 ) {
@@ -66,7 +68,11 @@ fun SharedImageDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.chat_input_send_image),
+                    text = if (uris.size > 1) {
+                        stringResource(R.string.chat_input_send_images, uris.size)
+                    } else {
+                        stringResource(R.string.chat_input_send_image)
+                    },
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -74,15 +80,33 @@ fun SharedImageDialog(
                         .padding(bottom = 16.dp)
                 )
 
-                AsyncImage(
-                    model = uri,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(minHeight = 200.dp)
-                        .clip(MaterialTheme.shapes.large),
-                    contentScale = ContentScale.Fit
-                )
+                if (uris.size == 1) {
+                    AsyncImage(
+                        model = uris.first(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 200.dp)
+                            .clip(MaterialTheme.shapes.large),
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(uris) { uri ->
+                            AsyncImage(
+                                model = uri,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .clip(MaterialTheme.shapes.medium),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 

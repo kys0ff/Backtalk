@@ -129,9 +129,9 @@ fun InputBar(
     onVoiceSend: (String, Long, List<Float>) -> Unit,
     onMessageSchedule: (String, Long) -> Unit,
     onAttachClick: () -> Unit,
-    sharedImageUri: String? = null,
+    sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
-    onSharedImageSend: (String, String) -> Unit = { _, _ -> }
+    onSharedImageSend: (List<String>, String) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -588,12 +588,12 @@ fun InputBar(
         )
     }
 
-    sharedImageUri?.let { uri ->
+    if (sharedImageUris.isNotEmpty()) {
         SharedImageDialog(
-            uri = uri,
+            uris = sharedImageUris,
             onDismiss = onCancelSharedImage,
             onSend = { caption ->
-                onSharedImageSend(uri, caption)
+                onSharedImageSend(sharedImageUris, caption)
                 onCancelSharedImage()
             }
         )

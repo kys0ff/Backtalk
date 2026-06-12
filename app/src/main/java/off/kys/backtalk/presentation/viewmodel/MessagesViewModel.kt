@@ -181,13 +181,13 @@ class MessagesViewModel(
             }
             is MessagesUiEvent.SetSharedImage -> {
                 _uiState.value = _uiState.value.copy(
-                    sharedImageUri = event.uri,
+                    sharedImageUris = event.uris,
                     editingMessage = null,
                     replyingTo = null
                 )
             }
             MessagesUiEvent.ClearSharedImage -> {
-                _uiState.value = _uiState.value.copy(sharedImageUri = null)
+                _uiState.value = _uiState.value.copy(sharedImageUris = emptyList())
             }
         }
     }

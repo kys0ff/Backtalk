@@ -201,12 +201,12 @@ sealed interface MessagesUiEvent {
     data object ClearSharedText : MessagesUiEvent
 
     /**
-     * UI event to set the shared image from an external intent.
+     * UI event to set the shared image(s) from an external intent.
      */
-    data class SetSharedImage(val uri: String) : MessagesUiEvent
+    data class SetSharedImage(val uris: List<String>) : MessagesUiEvent
 
     /**
-     * UI event to clear the shared image.
+     * UI event to clear the shared image(s).
      */
     data object ClearSharedImage : MessagesUiEvent
 }

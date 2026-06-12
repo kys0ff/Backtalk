@@ -1,16 +1,17 @@
 package off.kys.backtalk.presentation.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.IntentCompat
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -68,7 +69,8 @@ class MainActivity : AppCompatActivity() {
             val lifecycleOwner = LocalLifecycleOwner.current
             val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
-            val isCurrentlyUnlocked = !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
+            val isCurrentlyUnlocked =
+                !preferences.lockEnabled || appLockManager.isUnlocked(AppLockManager.Keys.MAIN)
 
             var isAuthenticating by remember { mutableStateOf(false) }
 
@@ -102,7 +104,10 @@ class MainActivity : AppCompatActivity() {
                     isAuthenticating = false
                     handleIntent(intent)
                 }
-                if (preferences.lockEnabled && !isCurrentlyUnlocked && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
+                if (preferences.lockEnabled && !isCurrentlyUnlocked && lifecycleState.isAtLeast(
+                        Lifecycle.State.RESUMED
+                    )
+                ) {
                     authenticate()
                 }
             }
@@ -133,17 +138,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_SEND) {
-            when {
-                intent.type == "text/plain" -> {
-                    intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedText ->
-                        messagesViewModel.onEvent(MessagesUiEvent.SetSharedText(sharedText))
-                        intent.action = null
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                when {
+                    intent.type == "text/plain" -> {
+                        intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedText ->
+                            messagesViewModel.onEvent(MessagesUiEvent.SetSharedText(sharedText))
+                            intent.action = null
+                        }
+                    }
+
+                    intent.type?.startsWith("image/") == true -> {
+                        IntentCompat.getParcelableExtra(
+                            intent,
+                            Intent.EXTRA_STREAM,
+                            Uri::class.java
+                        )?.let { uri ->
+                            messagesViewModel.onEvent(MessagesUiEvent.SetSharedImage(listOf(uri.toString())))
+                            intent.action = null
+                        }
                     }
                 }
-                intent.type?.startsWith("image/") == true -> {
-                    IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, android.net.Uri::class.java)?.let { uri ->
-                        messagesViewModel.onEvent(MessagesUiEvent.SetSharedImage(uri.toString()))
+            }
+
+            Intent.ACTION_SEND_MULTIPLE -> {
+                if (intent.type?.startsWith("image/") == true) {
+                    IntentCompat.getParcelableArrayListExtra(
+                        intent,
+                        Intent.EXTRA_STREAM,
+                        Uri::class.java
+                    )?.let { uris ->
+                        messagesViewModel.onEvent(MessagesUiEvent.SetSharedImage(uris.map { it.toString() }))
                         intent.action = null
                     }
                 }
