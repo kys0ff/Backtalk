@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.w3c.dom.Element
 import java.io.InputStream
+import javax.xml.parsers.DocumentBuilderFactory
 
 plugins {
     alias(libs.plugins.android.application)
@@ -137,6 +139,69 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
+abstract class GenerateCaptionStringsAssetTask : DefaultTask() {
+    @get:Input
+    abstract val targetStringNames: ListProperty<String>
+
+    @get:InputDirectory
+    abstract val resDir: DirectoryProperty
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun generate() {
+        val names = targetStringNames.get().toSet()
+        val resourcesDir = resDir.get().asFile
+        val outFile = outputFile.get().asFile
+
+        if (!outFile.parentFile.exists()) {
+            outFile.parentFile.mkdirs()
+        }
+
+        val extractedValues = mutableSetOf<String>()
+        val dbFactory = DocumentBuilderFactory.newInstance()
+
+        dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+
+        val valueDirs = resourcesDir.listFiles { file ->
+            file.isDirectory && file.name.startsWith("values")
+        }
+
+        valueDirs?.forEach { valuesDir ->
+            val stringsFile = File(valuesDir, "strings.xml")
+            if (stringsFile.exists()) {
+                try {
+                    val dBuilder = dbFactory.newDocumentBuilder()
+                    val doc = dBuilder.parse(stringsFile)
+                    doc.documentElement.normalize()
+
+                    val nList = doc.getElementsByTagName("string")
+                    for (i in 0 until nList.length) {
+                        val node = nList.item(i)
+                        if (node.nodeType == org.w3c.dom.Node.ELEMENT_NODE) {
+                            val element = node as Element
+                            val nameAttr = element.getAttribute("name")
+
+                            if (names.contains(nameAttr)) {
+                                val textValue = element.textContent.trim().lowercase()
+                                if (textValue.isNotEmpty()) {
+                                    extractedValues.add(textValue)
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.error("Error parsing: ${stringsFile.absolutePath}", e)
+                }
+            }
+        }
+
+        outFile.writeText(extractedValues.joinToString("\n"))
+        logger.lifecycle("Successfully generated ${outFile.name} with ${extractedValues.size} items.")
+    }
+}
+
 abstract class GenerateChangelogTask : DefaultTask() {
     @get:Input
     abstract val currentVersion: Property<String>
@@ -174,6 +239,27 @@ abstract class GenerateChangelogTask : DefaultTask() {
     private fun InputStream.boostedReadText(): String = bufferedReader().use { it.readText() }
 }
 
+val generateCaptionStringsAssetTask =
+    tasks.register<GenerateCaptionStringsAssetTask>("generateCaptionStringsAsset") {
+        targetStringNames.set(
+            listOf(
+                "chat_media_image",
+                "chat_media_video",
+                "chat_media_general",
+                "chat_media_voice"
+            )
+        )
+        resDir.set(file("$projectDir/src/main/res"))
+        outputFile.set(file("$projectDir/src/main/assets/caption_strings.txt"))
+
+        val taskRequests = gradle.startParameter.taskNames
+        val isFDroidTargeted = taskRequests.any { it.contains("fdroid", ignoreCase = true) }
+
+        if (isFDroidTargeted) {
+            enabled = false
+        }
+    }
+
 val generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
     currentVersion.set(appVersion)
     outputDir.set(file("$projectDir/src/main/assets"))
@@ -189,4 +275,5 @@ val generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChang
 
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
     dependsOn(generateChangelogTask)
+    dependsOn(generateCaptionStringsAssetTask)
 }

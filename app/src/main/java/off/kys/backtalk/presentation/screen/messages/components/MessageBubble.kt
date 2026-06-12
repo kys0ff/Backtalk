@@ -48,7 +48,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import off.kys.backtalk.util.ComposeTextParser
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -64,12 +63,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -82,6 +80,7 @@ import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
 import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingMocks
 import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
 import off.kys.backtalk.presentation.theme.BacktalkTheme
+import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.DateFormatter
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
@@ -183,7 +182,6 @@ fun MessageBubbleContent(
         stringResource(R.string.chat_media_video),
         stringResource(R.string.chat_media_general),
         stringResource(R.string.chat_media_voice),
-        stringResource(R.string.chat_reply_image_preview),
         stringResource(R.string.chat_voice_message)
     )
     val isDefaultCaption = messageText in defaultCaptions
