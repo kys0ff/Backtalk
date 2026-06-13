@@ -50,7 +50,6 @@
     <string name="chat_sent_at">sent at</string>
     <string name="chat_edited_at">edited at %1$s</string>
     <string name="chat_media_image">[Image]</string>
-    <string name="chat_media_video">[Video]</string>
     <string name="chat_media_general">[Media]</string>
     <string name="chat_reply_image_preview">[Image]</string>
     <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>

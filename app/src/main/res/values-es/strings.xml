@@ -47,7 +47,6 @@
     <string name="chat_sent_at">enviado a las</string>
     <string name="chat_edited_at">editado a las %1$s</string>
     <string name="chat_media_image">[Imagen]</string>
-    <string name="chat_media_video">[Video]</string>
     <string name="chat_media_general">[Multimedia]</string>
     <string name="chat_reply_image_preview">[Imagen]</string>
     <string name="chat_input_slide_to_cancel">&lt; Desliza para cancelar</string>

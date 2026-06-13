@@ -101,7 +101,6 @@ fun PermissionSection(
                         multiplePermissionLauncher.launch(
                             arrayOf(
                                 Manifest.permission.READ_MEDIA_IMAGES,
-                                Manifest.permission.READ_MEDIA_VIDEO,
                                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
                             )
                         )
@@ -109,8 +108,7 @@ fun PermissionSection(
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                         multiplePermissionLauncher.launch(
                             arrayOf(
-                                Manifest.permission.READ_MEDIA_IMAGES,
-                                Manifest.permission.READ_MEDIA_VIDEO
+                                Manifest.permission.READ_MEDIA_IMAGES
                             )
                         )
                     }

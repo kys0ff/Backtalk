@@ -245,7 +245,6 @@ val generateCaptionStringsAssetTask =
         targetStringNames.set(
             listOf(
                 "chat_media_image",
-                "chat_media_video",
                 "chat_media_general",
                 "chat_media_voice"
             )

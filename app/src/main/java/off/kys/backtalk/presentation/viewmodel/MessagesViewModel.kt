@@ -202,7 +202,7 @@ class MessagesViewModel(
                 val mediaPaths = uris.mapNotNull { uri ->
                     val sourceUri = uri.toUri()
                     val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
-                        ?: if (type.contains("video")) "mp4" else "jpg"
+                        ?: "jpg"
 
                     val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
 
@@ -241,7 +241,6 @@ class MessagesViewModel(
                         val isLastChunk = index == chunks.size - 1
                         val defaultCaption = when {
                             type.startsWith("image/") -> application.getString(R.string.chat_media_image)
-                            type.startsWith("video/") -> application.getString(R.string.chat_media_video)
                             else -> application.getString(R.string.chat_media_general)
                         }
 

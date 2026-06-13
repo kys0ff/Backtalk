@@ -1,3 +1,4 @@
+fa1b2a9 feat: add cache size display and refactor SettingsItem UI hierarchy
 1ff2380 feat: add "Clear cache" option to troubleshooting settings
 1e03b45 refactor: remove unused developer and onboarding mock strings from localized resources
 5da99c8 chore: update Spanish and Arabic translations for image sending and onboarding

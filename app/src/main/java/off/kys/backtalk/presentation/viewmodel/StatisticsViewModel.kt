@@ -47,8 +47,6 @@ class StatisticsViewModel(
             val mediaMessages = allMessages.filter { it.mediaPaths != null || it.mediaPath != null }
             val imageCount = mediaMessages.filter { it.mediaType?.contains("image") == true || it.mediaType == null }
                 .sumOf { (it.mediaPaths?.size ?: 0) + (if (it.mediaPath != null) 1 else 0) }
-            val videoCount = mediaMessages.filter { it.mediaType?.contains("video") == true }
-                .sumOf { (it.mediaPaths?.size ?: 0) + (if (it.mediaPath != null) 1 else 0) }
 
             val totalVoiceDuration = voiceMessages.sumOf { it.voiceDuration ?: 0L }
             val avgLen = if (textMessages.isNotEmpty()) {
@@ -73,7 +71,6 @@ class StatisticsViewModel(
                     topThreads = topThreads,
                     avgMessageLength = avgLen,
                     imageCount = imageCount,
-                    videoCount = videoCount,
                     currentStreak = currentStreak,
                     isLoading = false
                 )

@@ -46,7 +46,6 @@
     <string name="chat_sent_at">أُرسلت في</string>
     <string name="chat_edited_at">عُدّلت في %1$s</string>
     <string name="chat_media_image">[صورة]</string>
-    <string name="chat_media_video">[فيديو]</string>
     <string name="chat_media_general">[وسائط]</string>
     <string name="chat_media_voice">[رسالة صوتية]</string>
     <string name="chat_reply_image_preview">[صورة]</string>
