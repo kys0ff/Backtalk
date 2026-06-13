@@ -2,6 +2,7 @@ package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -98,10 +99,19 @@ fun MessagesTopBar(
 ) {
     val appBarColors = TopAppBarDefaults.topAppBarColors()
     val colorTransitionFraction = scrollBehavior.state.overlappedFraction
-    val containerColor = lerp(
-        appBarColors.containerColor,
-        appBarColors.scrolledContainerColor,
-        colorTransitionFraction
+    val targetContainerColor = if (selectedCount > 0) {
+        MaterialTheme.colorScheme.surfaceContainerHighest
+    } else {
+        lerp(
+            appBarColors.containerColor,
+            appBarColors.scrolledContainerColor,
+            colorTransitionFraction
+        )
+    }
+
+    val containerColor by animateColorAsState(
+        targetValue = targetContainerColor,
+        label = "TopBarContainerColor"
     )
 
     Column(Modifier.background(containerColor)) {

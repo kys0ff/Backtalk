@@ -40,40 +40,41 @@ fun MessagesScreenContent(
     onStopAudio: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(canScroll = { false })
     val messagesScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
     val tags = rememberHashtags(state.messages)
 
-    // Move heavy collection metrics out of the raw recomposition path
-    val selectionMetrics = remember(state.selectedMessageIds, state.selectedImagePaths, state.messages) {
-        val selectedMessagesCount = state.selectedMessageIds.size
-        val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
+    val selectionMetrics =
+        remember(state.selectedMessageIds, state.selectedImagePaths, state.messages) {
+            val selectedMessagesCount = state.selectedMessageIds.size
+            val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
 
-        val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
-            it !in state.selectedMessageIds
-        }.values.sumOf { it.size }
+            val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
+                it !in state.selectedMessageIds
+            }.values.sumOf { it.size }
 
-        val currentTime = System.currentTimeMillis()
-        val deletableMessagesCount = state.messages.count {
-            it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+            val currentTime = System.currentTimeMillis()
+            val deletableMessagesCount = state.messages.count {
+                it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+            }
+
+            val deletableImagesCount =
+                state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
+                    val message = state.messages.find { it.id == messageId }
+                    if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+                        paths.size
+                    } else 0
+                }
+
+            SelectionMetrics(
+                selectedMessagesCount = selectedMessagesCount,
+                selectedImagesCount = selectedImagesCount,
+                totalSelectedCount = totalSelectedCount,
+                totalDeletableCount = deletableMessagesCount + deletableImagesCount
+            )
         }
-
-        val deletableImagesCount = state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
-            val message = state.messages.find { it.id == messageId }
-            if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-                paths.size
-            } else 0
-        }
-
-        SelectionMetrics(
-            selectedMessagesCount = selectedMessagesCount,
-            selectedImagesCount = selectedImagesCount,
-            totalSelectedCount = totalSelectedCount,
-            totalDeletableCount = deletableMessagesCount + deletableImagesCount
-        )
-    }
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
@@ -85,7 +86,6 @@ fun MessagesScreenContent(
         }
     }
 
-    // Consolidate seven BackHandlers into one sequential interceptor
     val isBackHandlerActive = remember(state) {
         derivedStateOf {
             state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() ||
@@ -97,12 +97,20 @@ fun MessagesScreenContent(
 
     BackHandler(enabled = isBackHandlerActive.value) {
         when {
-            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() -> onEvent(MessagesUiEvent.ClearSelection)
+            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() -> onEvent(
+                MessagesUiEvent.ClearSelection
+            )
+
             state.showDeleteConfirmation -> onEvent(MessagesUiEvent.DismissDeleteConfirmation)
             state.replyingTo != null -> onEvent(MessagesUiEvent.ReplyTo(null))
             state.editingMessage != null -> onEvent(MessagesUiEvent.EditMessage(null))
             state.isSearchActive -> onEvent(MessagesUiEvent.ToggleSearch(false))
-            state.showPinnedMessagesDialog -> onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(false))
+            state.showPinnedMessagesDialog -> onEvent(
+                MessagesUiEvent.TogglePinnedMessagesDialog(
+                    false
+                )
+            )
+
             state.showMediaPicker -> onEvent(MessagesUiEvent.ToggleMediaPicker(false))
         }
     }
@@ -154,7 +162,8 @@ fun MessagesScreenContent(
                 onPin = {
                     val selectedId = state.selectedMessageIds.firstOrNull()
                     if (selectedId != null) {
-                        val isPinned = state.messages.find { it.id == selectedId }?.isPinned ?: false
+                        val isPinned =
+                            state.messages.find { it.id == selectedId }?.isPinned ?: false
                         onEvent(MessagesUiEvent.TogglePinMessage(selectedId, !isPinned))
                         onEvent(MessagesUiEvent.ClearSelection)
                     }
@@ -173,9 +182,11 @@ fun MessagesScreenContent(
         bottomBar = {
             InputBar(
                 messageInput = when {
-                    state.editingMessage != null -> state.editingMessage.editedText.orEmpty().ifEmpty {
-                        state.editingMessage.text
-                    }
+                    state.editingMessage != null -> state.editingMessage.editedText.orEmpty()
+                        .ifEmpty {
+                            state.editingMessage.text
+                        }
+
                     state.sharedText != null -> state.sharedText
                     else -> emptyString()
                 },
