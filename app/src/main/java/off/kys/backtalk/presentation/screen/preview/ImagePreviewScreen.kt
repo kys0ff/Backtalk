@@ -22,7 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,10 +68,9 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
 
         val window = (context as? Activity)?.window
 
-        LaunchedEffect(isUiVisible, window) {
+        DisposableEffect(isUiVisible, window) {
             window?.let { win ->
                 WindowCompat.setDecorFitsSystemWindows(win, false)
-
                 val insetsController = WindowCompat.getInsetsController(win, win.decorView)
                 insetsController.systemBarsBehavior =
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -80,6 +79,13 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
                     insetsController.show(WindowInsetsCompat.Type.systemBars())
                 } else {
                     insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+
+            onDispose {
+                window?.let { win ->
+                    val insetsController = WindowCompat.getInsetsController(win, win.decorView)
+                    insetsController.show(WindowInsetsCompat.Type.systemBars())
                 }
             }
         }
@@ -128,17 +134,31 @@ class ImagePreviewScreen(val imagePath: String) : Screen {
                                                 type = "text/plain"
                                                 putExtra(Intent.EXTRA_TEXT, imagePath)
                                             }
-                                            context.startActivity(Intent.createChooser(shareIntent, null))
+                                            context.startActivity(
+                                                Intent.createChooser(
+                                                    shareIntent,
+                                                    null
+                                                )
+                                            )
                                         } else {
                                             val file = File(imagePath)
                                             if (file.exists()) {
-                                                val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                                                val uri = FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.provider",
+                                                    file
+                                                )
                                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                                     type = "image/*"
                                                     putExtra(Intent.EXTRA_STREAM, uri)
                                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                                 }
-                                                context.startActivity(Intent.createChooser(shareIntent, null))
+                                                context.startActivity(
+                                                    Intent.createChooser(
+                                                        shareIntent,
+                                                        null
+                                                    )
+                                                )
                                             }
                                         }
                                     }
