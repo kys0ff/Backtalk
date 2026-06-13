@@ -116,6 +116,7 @@ dependencies {
     implementation(libs.bundles.camerax)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+    implementation(libs.coil.gif)
     implementation(libs.gau)
     implementation(libs.haze)
     ksp(libs.room.compiler)

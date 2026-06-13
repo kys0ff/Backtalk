@@ -520,6 +520,24 @@ private fun GalleryItem(
                 }
             }
         }
+
+        if (item.type == "image/gif") {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(6.dp),
+                color = Color.Black.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(
+                    text = "GIF",
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 

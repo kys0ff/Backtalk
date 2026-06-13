@@ -194,14 +194,21 @@ class MessagesViewModel(
 
     private fun sendMediaMessages(uris: List<String>, type: String, description: String?) {
         val replyTo = _uiState.value.replyingTo
-        val removeMetadata = preferences.removeImageMetadataEnabled && type.startsWith("image/")
         val smartPointing = preferences.smartImagePointingEnabled
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
+                var actualMediaType = type
                 val mediaPaths = uris.mapNotNull { uri ->
                     val sourceUri = uri.toUri()
-                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
+                    
+                    val currentType = if (type == "image/*") {
+                        application.contentResolver.getType(sourceUri) ?: type
+                    } else type
+                    
+                    actualMediaType = currentType
+                    
+                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(currentType)
                         ?: "jpg"
 
                     val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
@@ -228,6 +235,10 @@ class MessagesViewModel(
                         }
                     }
 
+                    val removeMetadata = preferences.removeImageMetadataEnabled && 
+                                       currentType.startsWith("image/") && 
+                                       currentType != "image/gif"
+
                     if (removeMetadata) {
                         MediaUtils.stripImageMetadata(destFile)
                     }
@@ -240,7 +251,7 @@ class MessagesViewModel(
                     chunks.forEachIndexed { index, chunk ->
                         val isLastChunk = index == chunks.size - 1
                         val defaultCaption = when {
-                            type.startsWith("image/") -> application.getString(R.string.chat_media_image)
+                            actualMediaType.startsWith("image/") -> application.getString(R.string.chat_media_image)
                             else -> application.getString(R.string.chat_media_general)
                         }
 
@@ -253,7 +264,7 @@ class MessagesViewModel(
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
                                 mediaPaths = chunk,
-                                mediaType = type
+                                mediaType = actualMediaType
                             )
                         )
                     }

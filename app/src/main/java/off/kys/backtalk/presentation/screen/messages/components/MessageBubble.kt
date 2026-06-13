@@ -395,6 +395,7 @@ private fun MessageInnerContent(
                 StaggeredImageGrid(
                     images = images,
                     selectedImages = selectedImagePaths,
+                    isGif = message.mediaType == "image/gif",
                     onImageClick = { imagePath ->
                         if (selectedImagePaths.isNotEmpty()) {
                             onToggleImageSelect(imagePath)
@@ -497,6 +498,7 @@ fun StaggeredImageGrid(
     modifier: Modifier = Modifier,
     images: List<String>,
     selectedImages: Set<String> = emptySet(),
+    isGif: Boolean = false,
     onImageClick: (String) -> Unit,
     onImageLongClick: (String) -> Unit = {},
     hapticFeedbackEnabled: Boolean
@@ -515,6 +517,7 @@ fun StaggeredImageGrid(
                 GridImage(
                     path = images[0],
                     isSelected = images[0] in selectedImages,
+                    isGif = isGif,
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
                         .widthIn(max = gridWidth)
@@ -536,6 +539,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = path,
                             isSelected = path in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(0.75f),
@@ -555,6 +559,7 @@ fun StaggeredImageGrid(
                     GridImage(
                         path = images[0],
                         isSelected = images[0] in selectedImages,
+                        isGif = isGif,
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(0.75f),
@@ -569,6 +574,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[1],
                             isSelected = images[1] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -580,6 +586,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[2],
                             isSelected = images[2] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -604,6 +611,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[0],
                             isSelected = images[0] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f),
@@ -614,6 +622,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[2],
                             isSelected = images[2] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1.5f),
@@ -629,6 +638,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[1],
                             isSelected = images[1] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1.5f),
@@ -639,6 +649,7 @@ fun StaggeredImageGrid(
                         GridImage(
                             path = images[3],
                             isSelected = images[3] in selectedImages,
+                            isGif = isGif,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .aspectRatio(1f),
@@ -660,6 +671,7 @@ private fun GridImage(
     imageModifier: Modifier = Modifier,
     path: String,
     isSelected: Boolean = false,
+    isGif: Boolean = false,
     onClick: (String) -> Unit,
     onLongClick: (String) -> Unit = {},
     contentScale: ContentScale = ContentScale.Crop,
@@ -699,6 +711,24 @@ private fun GridImage(
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                     modifier = Modifier.applySize("image")
                 ) {}
+            }
+        }
+
+        if (isGif) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp),
+                color = Color.Black.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(
+                    text = "GIF",
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
