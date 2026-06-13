@@ -42,6 +42,12 @@ fun VoiceMessageBubbleContent(
     val rawWidth = (waveformData.size * (barWidth.value + gapWidth.value)).dp
     val dynamicWidth = rawWidth.coerceIn(40.dp, 200.dp)
 
+    val displayTime = if (isPlaying || progress > 0f) {
+        (duration * progress).toLong()
+    } else {
+        duration
+    }
+
     Row(
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
@@ -75,7 +81,7 @@ fun VoiceMessageBubbleContent(
         )
 
         Text(
-            text = formatDuration(duration),
+            text = formatDuration(displayTime),
             style = MaterialTheme.typography.labelSmall,
             color = contentColor.copy(alpha = 0.7f)
         )

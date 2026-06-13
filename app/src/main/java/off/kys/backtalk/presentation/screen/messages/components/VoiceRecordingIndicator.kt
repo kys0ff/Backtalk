@@ -31,7 +31,7 @@ fun VoiceRecordingIndicator(
         Text(
             text = durationText,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error
+            color = MaterialTheme.colorScheme.primary
         )
         WaveformVisualizer(
             waveformData = amplitudes,
