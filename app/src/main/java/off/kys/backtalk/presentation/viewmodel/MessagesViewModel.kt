@@ -98,6 +98,7 @@ class MessagesViewModel(
                 deleteSelectedImages()
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
             }
+
             is MessagesUiEvent.DismissDeleteConfirmation -> {
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
             }
@@ -159,19 +160,30 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(shouldScrollToPinned = false)
             }
 
-            is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(event.messageId, event.imagePath)
-            is MessagesUiEvent.ToggleImageSelection -> toggleImageSelection(event.messageId, event.imagePath)
+            is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(
+                event.messageId,
+                event.imagePath
+            )
+
+            is MessagesUiEvent.ToggleImageSelection -> toggleImageSelection(
+                event.messageId,
+                event.imagePath
+            )
+
             is MessagesUiEvent.DeleteSelectedImages -> {
                 _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
             }
+
             is MessagesUiEvent.ClearImageSelection -> clearImageSelection()
             MessagesUiEvent.DismissChangelog -> {
                 preferences.lastSeenChangelogVersion = BuildConfig.VERSION_NAME
                 _uiState.value = _uiState.value.copy(showChangelogDialog = false)
             }
+
             MessagesUiEvent.RefreshSettings -> {
                 _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
             }
+
             is MessagesUiEvent.SetSharedText -> {
                 Log.d(this::class.java.simpleName, "onEvent: Shared text:\n ${event.text}")
                 _uiState.value = _uiState.value.copy(
@@ -180,9 +192,11 @@ class MessagesViewModel(
                     replyingTo = null
                 )
             }
+
             MessagesUiEvent.ClearSharedText -> {
                 _uiState.value = _uiState.value.copy(sharedText = null)
             }
+
             is MessagesUiEvent.SetSharedImage -> {
                 _uiState.value = _uiState.value.copy(
                     sharedImageUris = event.uris,
@@ -190,6 +204,7 @@ class MessagesViewModel(
                     replyingTo = null
                 )
             }
+
             MessagesUiEvent.ClearSharedImage -> {
                 _uiState.value = _uiState.value.copy(sharedImageUris = emptyList())
             }
@@ -205,13 +220,19 @@ class MessagesViewModel(
                 var actualMediaType = type
                 val mediaPaths = uris.mapNotNull { uri ->
                     val sourceUri = uri.toUri()
-                    
+
                     val currentType = if (type == "image/*") {
-                        application.contentResolver.getType(sourceUri) ?: type
+                        application.contentResolver.getType(sourceUri)
+                            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                                MimeTypeMap.getFileExtensionFromUrl(uri)
+                                    .orEmpty()
+                                    .ifEmpty { uri.substringAfterLast('.', "") }
+                            )
+                            ?: type
                     } else type
-                    
+
                     actualMediaType = currentType
-                    
+
                     val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(currentType)
                         ?: "jpg"
 
@@ -239,9 +260,9 @@ class MessagesViewModel(
                         }
                     }
 
-                    val removeMetadata = preferences.removeImageMetadataEnabled && 
-                                       currentType.startsWith("image/") && 
-                                       currentType != "image/gif"
+                    val removeMetadata = preferences.removeImageMetadataEnabled &&
+                            currentType.startsWith("image/") &&
+                            currentType != "image/gif"
 
                     if (removeMetadata) {
                         MediaUtils.stripImageMetadata(destFile)
@@ -460,7 +481,7 @@ class MessagesViewModel(
         val currentMap = _uiState.value.selectedImagePaths
         val currentSet = currentMap[messageId] ?: emptySet()
         val newSet = if (imagePath in currentSet) currentSet - imagePath else currentSet + imagePath
-        
+
         _uiState.value = _uiState.value.copy(
             selectedImagePaths = if (newSet.isEmpty()) currentMap - messageId else currentMap + (messageId to newSet)
         )
@@ -475,7 +496,8 @@ class MessagesViewModel(
             ids.forEach { id ->
                 val message = messages.find { it.id == id }
                 if (message != null) {
-                    val isWithinWindow = (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+                    val isWithinWindow =
+                        (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
                     if (isWithinWindow) {
                         useCases.deleteMessageById(id)
                     }
@@ -495,7 +517,8 @@ class MessagesViewModel(
             selectedImagePaths.forEach { (messageId, paths) ->
                 val message = messages.find { it.id == messageId }
                 if (messageId !in selectedMessageIds && message != null) {
-                    val isWithinWindow = (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+                    val isWithinWindow =
+                        (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
                     if (isWithinWindow) {
                         useCases.removeImagesFromMessage(messageId, paths)
                     }

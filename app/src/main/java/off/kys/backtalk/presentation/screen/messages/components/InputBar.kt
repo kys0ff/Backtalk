@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -28,6 +29,10 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.content.MediaType
+import androidx.compose.foundation.content.TransferableContent
+import androidx.compose.foundation.content.contentReceiver
+import androidx.compose.foundation.content.hasMediaType
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -48,8 +53,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -91,7 +100,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -99,17 +107,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.util.AudioRecorder
-import off.kys.backtalk.util.emptyString
+import off.kys.backtalk.util.HashUtils
+import off.kys.backtalk.util.MediaUtils
 import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -117,7 +129,7 @@ import kotlin.math.roundToInt
 
 private const val TAG = "InputBar"
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,
@@ -173,11 +185,7 @@ fun InputBar(
     }
 
     var recordingStartTime by remember { mutableLongStateOf(0L) }
-    var textValue by remember {
-        mutableStateOf(
-            TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
-        )
-    }
+    val textFieldState = rememberTextFieldState(messageInput)
 
     val showPermissionRationale = remember { mutableStateOf(false) }
 
@@ -270,9 +278,8 @@ fun InputBar(
     }
 
     LaunchedEffect(messageInput) {
-        if (messageInput != textValue.text) {
-            textValue =
-                TextFieldValue(text = messageInput, selection = TextRange(messageInput.length))
+        if (messageInput != textFieldState.text.toString()) {
+            textFieldState.setTextAndPlaceCursorAtEnd(messageInput)
         }
     }
 
@@ -282,8 +289,8 @@ fun InputBar(
         timePickerState = timePickerState,
         onStageChange = { nextStage -> schedulingStage.value = nextStage },
         onSchedule = { time ->
-            onMessageSchedule(textValue.text, time)
-            textValue = TextFieldValue(emptyString())
+            onMessageSchedule(textFieldState.text.toString(), time)
+            textFieldState.clearText()
             context.toast(R.string.message_scheduled_success)
         }
     )
@@ -303,7 +310,7 @@ fun InputBar(
             )
 
             LinkPreviewSection(
-                text = textValue.text,
+                text = textFieldState.text.toString(),
                 previewEnabled = preferences.linkPreviewEnabled
             )
 
@@ -320,30 +327,89 @@ fun InputBar(
 
                 ChatTextField(
                     modifier = Modifier.weight(1f),
-                    textValue = textValue,
-                    onValueChange = { textValue = it },
+                    textFieldState = textFieldState,
                     isRecording = isRecording,
                     amplitudes = amplitudes,
                     durationText = durationText,
                     sendWithEnter = preferences.sendWithEnter,
                     onSend = {
-                        if (textValue.text.isNotBlank()) {
-                            onMessageSend(textValue.text)
-                            textValue = TextFieldValue(emptyString())
+                        if (textFieldState.text.isNotBlank()) {
+                            onMessageSend(textFieldState.text.toString())
+                            textFieldState.clearText()
+                        }
+                    },
+                    onContentReceived = { transferableContent ->
+                        if (transferableContent.hasMediaType(MediaType.Image)) {
+                            val clipData = transferableContent.clipEntry.clipData
+                            for (i in 0 until clipData.itemCount) {
+                                val item = clipData.getItemAt(i)
+                                val uri = item.uri
+                                if (uri != null) {
+                                    scope.launch(Dispatchers.IO) {
+                                        val mimeType =
+                                            context.contentResolver.getType(uri) ?: "image/jpeg"
+                                        val extension = MimeTypeMap.getSingleton()
+                                            .getExtensionFromMimeType(mimeType) ?: "jpg"
+                                        val mediaDir =
+                                            File(context.filesDir, "media").apply { mkdirs() }
+
+                                        val smartPointing = preferences.smartImagePointingEnabled
+                                        val fileName = if (smartPointing) {
+                                            val hash =
+                                                context.contentResolver.openInputStream(uri)?.use {
+                                                    HashUtils.calculateSha256(it)
+                                                } ?: System.currentTimeMillis().toString()
+                                            "media_$hash.$extension"
+                                        } else {
+                                            "media_${System.currentTimeMillis()}_${uri.lastPathSegment}.$extension"
+                                        }
+
+                                        val destFile = File(mediaDir, fileName)
+
+                                        if (!(smartPointing && destFile.exists())) {
+                                            context.contentResolver.openInputStream(uri)
+                                                ?.use { input ->
+                                                    destFile.outputStream().use { output ->
+                                                        input.copyTo(output)
+                                                    }
+                                                }
+
+                                            val removeMetadata =
+                                                preferences.removeImageMetadataEnabled &&
+                                                        mimeType.startsWith("image/") &&
+                                                        mimeType != "image/gif"
+                                            if (removeMetadata) {
+                                                MediaUtils.stripImageMetadata(destFile)
+                                            }
+                                        }
+
+                                        withContext(Dispatchers.Main) {
+                                            onSharedImageSend(
+                                                listOf(
+                                                    Uri.fromFile(destFile).toString()
+                                                ), ""
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            null
+                        } else {
+                            transferableContent
                         }
                     }
                 )
 
                 ActionButtons(
-                    showSend = textValue.text.isNotBlank() && !isRecording,
+                    showSend = textFieldState.text.isNotBlank() && !isRecording,
                     onSendClick = {
-                        if (textValue.text.isNotBlank()) {
-                            onMessageSend(textValue.text)
-                            textValue = TextFieldValue(emptyString())
+                        if (textFieldState.text.isNotBlank()) {
+                            onMessageSend(textFieldState.text.toString())
+                            textFieldState.clearText()
                         }
                     },
                     onScheduleClick = {
-                        if (textValue.text.isNotBlank() && editingMessage == null) {
+                        if (textFieldState.text.isNotBlank() && editingMessage == null) {
                             if (preferences.hapticFeedbackEnabled) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
@@ -406,22 +472,24 @@ fun InputBar(
             }
 
             AnimatedVisibility(
-                visible = textValue.selection.length > 0,
+                visible = textFieldState.selection.length > 0,
                 enter = expandVertically(expandFrom = Alignment.Bottom) + fadeIn(),
                 exit = shrinkVertically(shrinkTowards = Alignment.Bottom) + fadeOut()
             ) {
                 FormattingToolbar(onFormattingClick = { startSym, endSym ->
-                    val selection = textValue.selection
-                    val text = textValue.text
-                    val selectedText = text.substring(selection.start, selection.end)
-                    val newText = text.replaceRange(
-                        selection.start,
-                        selection.end,
-                        "$startSym$selectedText$endSym"
-                    )
-                    val newCursorPos =
-                        selection.start + startSym.length + selectedText.length + endSym.length
-                    textValue = TextFieldValue(text = newText, selection = TextRange(newCursorPos))
+                    textFieldState.edit {
+                        val currentSelection = selection
+                        val selectedText =
+                            toString().substring(currentSelection.start, currentSelection.end)
+                        replace(
+                            currentSelection.start,
+                            currentSelection.end,
+                            "$startSym$selectedText$endSym"
+                        )
+                        val newCursorPos =
+                            currentSelection.start + startSym.length + selectedText.length + endSym.length
+                        selection = TextRange(newCursorPos)
+                    }
                 })
             }
         }
@@ -494,17 +562,17 @@ private fun AttachButtonVisibility(isVisible: Boolean, onAttachClick: () -> Unit
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ChatTextField(
     modifier: Modifier = Modifier,
-    textValue: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    textFieldState: TextFieldState,
     isRecording: Boolean,
     amplitudes: List<Float>,
     durationText: String,
     sendWithEnter: Boolean,
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    onContentReceived: ((TransferableContent) -> TransferableContent?)? = null
 ) {
     Box(
         modifier = modifier.animateContentSize(
@@ -520,19 +588,23 @@ private fun ChatTextField(
             exit = fadeOut() + slideOutHorizontally()
         ) {
             TextField(
-                value = textValue,
-                onValueChange = onValueChange,
+                state = textFieldState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .defaultMinSize(minHeight = 60.dp),
+                    .defaultMinSize(minHeight = 60.dp)
+                    .then(
+                        if (onContentReceived != null) {
+                            Modifier.contentReceiver(onContentReceived)
+                        } else Modifier
+                    ),
                 textStyle = TextStyle(textDirection = TextDirection.Content),
                 placeholder = { Text(stringResource(R.string.chat_input_hint)) },
-                maxLines = 5,
+                lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = if (sendWithEnter) ImeAction.Send else ImeAction.Default
                 ),
-                keyboardActions = KeyboardActions(onSend = { onSend() }),
+                onKeyboardAction = { onSend() },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
