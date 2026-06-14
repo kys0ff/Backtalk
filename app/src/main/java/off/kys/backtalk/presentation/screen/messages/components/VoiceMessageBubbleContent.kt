@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit
 
 @Composable
 fun VoiceMessageBubbleContent(
+    modifier: Modifier = Modifier,
     duration: Long,
     waveformData: List<Float>,
     contentColor: Color,
@@ -49,7 +50,7 @@ fun VoiceMessageBubbleContent(
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
             .animateContentSize(),
         verticalAlignment = Alignment.CenterVertically,

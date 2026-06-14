@@ -33,6 +33,7 @@ data class MessagesUiState(
     val blinkMessageId: MessageId? = null,
     val filteredMessages: List<MessageEntity> = emptyList(),
     val showMediaPicker: Boolean = false,
+    val showSharedMediaSheet: Boolean = false,
     val shouldScrollToBottom: Boolean = false,
     val selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
     val showChangelogDialog: Boolean = false,

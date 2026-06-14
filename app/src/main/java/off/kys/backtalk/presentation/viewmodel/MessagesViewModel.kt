@@ -143,6 +143,10 @@ class MessagesViewModel(
                 _uiState.value = _uiState.value.copy(showMediaPicker = event.show)
             }
 
+            is MessagesUiEvent.ToggleSharedMediaSheet -> {
+                _uiState.value = _uiState.value.copy(showSharedMediaSheet = event.show)
+            }
+
             is MessagesUiEvent.SendMediaMessages -> {
                 sendMediaMessages(event.uris, event.type, event.description)
             }

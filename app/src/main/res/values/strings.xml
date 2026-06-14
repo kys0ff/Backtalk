@@ -442,4 +442,13 @@
     <string name="link_preview_error_default">Couldn\'t load preview</string>
     <string name="link_preview_retry">Retry</string>
 
+    <!-- Shared Media -->
+    <string name="shared_media_title">Shared Content</string>
+    <string name="shared_media_tab_media">Media</string>
+    <string name="shared_media_tab_voice">Voices</string>
+    <string name="shared_media_tab_links">Links</string>
+    <string name="shared_media_empty_media">No media found</string>
+    <string name="shared_media_empty_voice">No voice messages found</string>
+    <string name="shared_media_empty_links">No links found</string>
+
 </resources>

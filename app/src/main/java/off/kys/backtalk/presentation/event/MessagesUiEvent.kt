@@ -143,6 +143,11 @@ sealed interface MessagesUiEvent {
     data class ToggleMediaPicker(val show: Boolean) : MessagesUiEvent
 
     /**
+     * UI event to toggle the shared media bottom sheet.
+     */
+    data class ToggleSharedMediaSheet(val show: Boolean) : MessagesUiEvent
+
+    /**
      * UI event to send media messages.
      */
     data class SendMediaMessages(val uris: List<String>, val type: String, val description: String? = null) : MessagesUiEvent

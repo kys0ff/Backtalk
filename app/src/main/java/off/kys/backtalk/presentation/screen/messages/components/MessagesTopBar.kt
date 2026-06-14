@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -94,6 +95,7 @@ fun MessagesTopBar(
     onToggleSearch: (Boolean) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onNavigateSearch: (Boolean) -> Unit,
+    onSharedMedia: () -> Unit,
     isImageSelectionOnly: Boolean = false,
     canDelete: Boolean = true
 ) {
@@ -156,6 +158,7 @@ fun MessagesTopBar(
                     onThreads = onThreads,
                     onReminders = onReminders,
                     onStatistics = onStatistics,
+                    onSharedMedia = onSharedMedia,
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors
                 )
@@ -398,6 +401,7 @@ private fun DefaultTopBar(
     onThreads: () -> Unit,
     onReminders: () -> Unit,
     onStatistics: () -> Unit,
+    onSharedMedia: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors
 ) {
@@ -405,10 +409,17 @@ private fun DefaultTopBar(
 
     TopAppBar(
         title = {
-            Text(
-                text = stringResource(R.string.chat_title),
-                style = MaterialTheme.typography.titleLarge
-            )
+            Surface(
+                onClick = onSharedMedia,
+                color = Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.chat_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
         },
         actions = {
             HintTooltip(stringResource(R.string.common_search)) {

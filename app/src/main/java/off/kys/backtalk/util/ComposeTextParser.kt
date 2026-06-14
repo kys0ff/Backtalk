@@ -43,10 +43,10 @@ object ComposeTextParser {
         StyleDef("`", SpanStyle(fontFamily = FontFamily.Monospace))
     )
 
-    private val MARKDOWN_LINK_REGEX = Regex("""\[([^]]+)]\(([^)]+)\)""")
-    private val NAKED_URL_REGEX = Regex("""(https?://[^\s)\]]+)""")
-    private val MENTION_REGEX = Regex("""@(\w+)""")
-    private val HASHTAG_REGEX = Regex("""#(\w+)""")
+    val MARKDOWN_LINK_REGEX = Regex("""\[([^]]+)]\(([^)]+)\)""")
+    val NAKED_URL_REGEX = Regex("""(https?://[^\s)\]]+)""")
+    val MENTION_REGEX = Regex("""@(\w+)""")
+    val HASHTAG_REGEX = Regex("""#(\w+)""")
 
     fun toAnnotatedString(
         text: String,

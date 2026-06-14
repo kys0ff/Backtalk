@@ -91,7 +91,8 @@ fun MessagesScreenContent(
             state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() ||
                     state.showDeleteConfirmation || state.replyingTo != null ||
                     state.editingMessage != null || state.isSearchActive ||
-                    state.showPinnedMessagesDialog || state.showMediaPicker
+                    state.showPinnedMessagesDialog || state.showMediaPicker ||
+                    state.showSharedMediaSheet
         }
     }
 
@@ -112,6 +113,7 @@ fun MessagesScreenContent(
             )
 
             state.showMediaPicker -> onEvent(MessagesUiEvent.ToggleMediaPicker(false))
+            state.showSharedMediaSheet -> onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false))
         }
     }
 
@@ -175,6 +177,7 @@ fun MessagesScreenContent(
                 onToggleSearch = { active -> onEvent(MessagesUiEvent.ToggleSearch(active)) },
                 onSearchQueryChange = { query -> onEvent(MessagesUiEvent.UpdateSearchQuery(query)) },
                 onNavigateSearch = { up -> onEvent(MessagesUiEvent.NavigateSearch(up)) },
+                onSharedMedia = { onEvent(MessagesUiEvent.ToggleSharedMediaSheet(true)) },
                 isImageSelectionOnly = selectionMetrics.selectedMessagesCount == 0 && selectionMetrics.selectedImagesCount > 0,
                 canDelete = selectionMetrics.totalDeletableCount > 0
             )
@@ -238,6 +241,17 @@ fun MessagesScreenContent(
                     )
                 },
                 onDismiss = { onEvent(MessagesUiEvent.ToggleMediaPicker(false)) }
+            )
+        }
+
+        if (state.showSharedMediaSheet) {
+            SharedMediaSheet(
+                onDismiss = { onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false)) },
+                onScrollToMessage = { id ->
+                    onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false))
+                    scrollToAndBlink(id)
+                    onEvent(MessagesUiEvent.ScrollToMessage(id))
+                }
             )
         }
 

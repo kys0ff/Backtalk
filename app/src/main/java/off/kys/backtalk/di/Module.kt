@@ -47,6 +47,7 @@ import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
 import off.kys.backtalk.presentation.viewmodel.RemindersViewModel
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
+import off.kys.backtalk.presentation.viewmodel.SharedMediaViewModel
 import off.kys.backtalk.presentation.viewmodel.StatisticsViewModel
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
@@ -173,6 +174,7 @@ private fun Module.viewModelModule() {
     viewModel { StatisticsViewModel(get()) }
     viewModel { RemindersViewModel(get()) }
     viewModel { ChangelogViewModel(get()) }
+    viewModel { SharedMediaViewModel(get(), get()) }
 }
 
 /**
