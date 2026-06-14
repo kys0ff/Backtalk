@@ -142,7 +142,7 @@ val generateCaptionStringsAssetTask =
     tasks.register<GenerateCaptionStringsAssetTask>("generateCaptionStringsAsset")
 
 val generateChangelogTask =
-    tasks.register<GenerateChangelogTask>("generateChangelog") { currentVersion.set(appVersion) }
+    tasks.register<GenerateChangelogTask>("generateChangelog")
 
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
     dependsOn(generateChangelogTask)

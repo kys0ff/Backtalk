@@ -1,3 +1,9 @@
+a035ca1 fix: implement Serializable for message entities and domain models
+6baec1e feat: add media support to thread components and refine message visibility
+68e6db6 chore: bump version to 0.3.5
+e5f6079 docs: update changelog
+967d28c feat: add Spanish and Arabic translations for Shared Media
+7dacc88 feat: enhance MessageBubble selection visuals and media loading performance
 82a7037 feat: migrate InputBar to TextFieldState and add rich content support
 23afb34 feat: add shared media sheet with media, voice, and link tabs
 8bf7665 refactor: configure Coil ImageRequests with explicit caching and crossfade in LinkPreview
