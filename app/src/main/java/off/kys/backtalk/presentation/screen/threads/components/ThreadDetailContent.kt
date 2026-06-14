@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,10 +34,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
 import off.kys.backtalk.util.emptyString
+import org.koin.compose.koinInject
 
 @Composable
 fun ThreadDetailContent(
@@ -97,6 +100,20 @@ private fun MainThreadItem(
 ) {
     val dateFormatter = LocalDateFormatter.current
     val textToCopyOrShare = message.editedText ?: message.text
+    val captionsRegistry = koinInject<CaptionWordsRegistry>()
+
+    val isDefaultCaption = captionsRegistry.isRestricted(textToCopyOrShare)
+
+    val images = remember(message) {
+        val list = mutableListOf<String>()
+        message.mediaPath?.let { list.add(it) }
+        message.mediaPaths?.let { list.addAll(it) }
+        list
+    }
+
+    val hasImages = images.isNotEmpty()
+    val hasVoice = message.voicePath != null
+    val shouldShowText = textToCopyOrShare.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
 
     Column(
         modifier = Modifier
@@ -134,11 +151,15 @@ private fun MainThreadItem(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        SmartText(
-            text = textToCopyOrShare,
-            style = MaterialTheme.typography.headlineSmall,
-            lineHeight = MaterialTheme.typography.headlineSmall.lineHeight,
-        )
+        if (shouldShowText) {
+            SmartText(
+                text = textToCopyOrShare,
+                style = MaterialTheme.typography.headlineSmall,
+                lineHeight = MaterialTheme.typography.headlineSmall.lineHeight,
+            )
+        }
+
+        ThreadMediaContent(message = message)
 
         repliedTo?.let {
             QuotedMessage(
@@ -204,6 +225,20 @@ private fun ThreadMessageItem(
 ) {
     val dateFormatter = LocalDateFormatter.current
     val textToCopyOrShare = message.editedText ?: message.text
+    val captionsRegistry = koinInject<CaptionWordsRegistry>()
+
+    val isDefaultCaption = captionsRegistry.isRestricted(textToCopyOrShare)
+
+    val images = remember(message) {
+        val list = mutableListOf<String>()
+        message.mediaPath?.let { list.add(it) }
+        message.mediaPaths?.let { list.addAll(it) }
+        list
+    }
+
+    val hasImages = images.isNotEmpty()
+    val hasVoice = message.voicePath != null
+    val shouldShowText = textToCopyOrShare.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
 
     Row(
         modifier = Modifier
@@ -262,11 +297,15 @@ private fun ThreadMessageItem(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            SmartText(
-                text = textToCopyOrShare,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            if (shouldShowText) {
+                SmartText(
+                    text = textToCopyOrShare,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            ThreadMediaContent(message = message)
 
             Row(
                 modifier = Modifier

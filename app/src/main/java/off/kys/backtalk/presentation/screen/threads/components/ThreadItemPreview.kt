@@ -4,12 +4,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import off.kys.backtalk.common.lock.LocalDateFormatter
+import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.model.Thread
+import off.kys.backtalk.util.AudioPlayer
+import off.kys.backtalk.util.DateFormatter
+import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
+import org.koin.dsl.module
+
+@Composable
+private fun PreviewWrapper(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val preferences = remember { BacktalkPreferences(context) }
+    val dateFormatter = remember { DateFormatter(context, preferences) }
+    val captionWordsRegistry = remember { CaptionWordsRegistry(context) }
+    val audioPlayer = remember { AudioPlayer() }
+
+    KoinApplication(
+        configuration = koinConfiguration(
+            declaration = {
+                modules(module {
+                    single { preferences }
+                    single { dateFormatter }
+                    single { captionWordsRegistry }
+                    single { audioPlayer }
+                })
+            }
+        )
+    ) {
+        MaterialTheme {
+            CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
+                Surface {
+                    content()
+                }
+            }
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -34,16 +75,14 @@ fun ThreadItemWithQuotePreview() {
         repliedTo = originalMessage
     )
     
-    MaterialTheme {
-        Surface {
-            ThreadItem(
-                thread = thread,
-                onClick = {},
-                onThreadCopy = {},
-                onThreadShare = {},
-                modifier = Modifier.padding(8.dp)
-            )
-        }
+    PreviewWrapper {
+        ThreadItem(
+            thread = thread,
+            onClick = {},
+            onThreadCopy = {},
+            onThreadShare = {},
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
 
@@ -64,16 +103,14 @@ fun MainThreadItemWithQuotePreview() {
         repliedToId = MessageId(1L)
     )
     
-    MaterialTheme {
-        Surface {
-            ThreadDetailContent(
-                modifier = Modifier.padding(8.dp),
-                thread = Thread(replyMessage, emptyList(), originalMessage),
-                onCopy = {},
-                onShare = {},
-                onReplyClick = {},
-                getReplyCount = { 0 }
-            )
-        }
+    PreviewWrapper {
+        ThreadDetailContent(
+            modifier = Modifier.padding(8.dp),
+            thread = Thread(replyMessage, emptyList(), originalMessage),
+            onCopy = {},
+            onShare = {},
+            onReplyClick = {},
+            getReplyCount = { 0 }
+        )
     }
 }

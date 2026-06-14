@@ -26,9 +26,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.screen.messages.components.SmartText
+import org.koin.compose.koinInject
 
 @Composable
 fun ThreadItem(
@@ -41,7 +43,16 @@ fun ThreadItem(
     getReplyCount: ((MessageEntity) -> Int)? = null
 ) {
     val dateFormatter = LocalDateFormatter.current
-    val text = thread.root.editedText ?: thread.root.text
+    val captionsRegistry = koinInject<CaptionWordsRegistry>()
+
+    val rootMessage = thread.root
+    val text = rootMessage.editedText ?: rootMessage.text
+
+    val hasImages = !rootMessage.mediaPath.isNullOrEmpty() || !rootMessage.mediaPaths.isNullOrEmpty()
+    val hasVoice = rootMessage.voicePath != null
+
+    val isDefaultCaption = captionsRegistry.isRestricted(text)
+    val shouldShowText = text.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
 
     Column(
         modifier = modifier
@@ -86,12 +97,16 @@ fun ThreadItem(
                     )
                 }
 
-                SmartText(
-                    text = text,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 5,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (shouldShowText) {
+                    SmartText(
+                        text = text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 5,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                ThreadMediaContent(message = rootMessage)
 
                 thread.repliedTo?.let { repliedTo ->
                     QuotedMessage(

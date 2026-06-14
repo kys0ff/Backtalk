@@ -100,7 +100,7 @@ fun SharedImageDialog(
                                 model = uri,
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(120.dp)
+                                    .size(160.dp)
                                     .clip(MaterialTheme.shapes.medium),
                                 contentScale = ContentScale.Crop
                             )

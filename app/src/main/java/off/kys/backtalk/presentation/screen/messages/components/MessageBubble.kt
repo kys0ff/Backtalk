@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
@@ -187,8 +186,8 @@ fun MessageBubbleContent(
 
     val hasImages =
         !messageEntity.mediaPath.isNullOrEmpty() || !messageEntity.mediaPaths.isNullOrEmpty()
-    val hasText = messageText.isNotEmpty() && !(hasImages && isDefaultCaption)
     val hasVoice = messageEntity.voicePath != null
+    val hasText = messageText.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
     val hasRepliedMessage = repliedMessageEntity != null
     val hasTags = messageEntity.isReminder || messageEntity.isPinned
     val isImageOnly = hasImages && !hasText && !hasVoice && !hasRepliedMessage && !hasTags
@@ -509,10 +508,11 @@ fun StaggeredImageGrid(
 ) {
     if (images.isEmpty()) return
 
-    val gridWidth = 280.dp
+    val gridWidth = 350.dp
     val spacing = 6.dp
     val containerModifier = modifier
-        .width(gridWidth)
+        .widthIn(max = gridWidth)
+        .fillMaxWidth()
         .clip(MaterialTheme.shapes.large)
 
     Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
@@ -525,7 +525,7 @@ fun StaggeredImageGrid(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
                         .widthIn(max = gridWidth)
-                        .heightIn(max = 360.dp),
+                        .heightIn(max = 450.dp),
                     imageModifier = Modifier,
                     onClick = onImageClick,
                     onLongClick = onImageLongClick,
