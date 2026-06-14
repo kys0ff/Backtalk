@@ -446,4 +446,13 @@
     <string name="link_preview_error_default">تعذر تحميل المعاينة</string>
     <string name="link_preview_retry">إعادة المحاولة</string>
 
+    <!-- Shared Media -->
+    <string name="shared_media_title">المحتوى المشترك</string>
+    <string name="shared_media_tab_media">وسائط</string>
+    <string name="shared_media_tab_voice">صوتيات</string>
+    <string name="shared_media_tab_links">روابط</string>
+    <string name="shared_media_empty_media">لم يتم العثور على وسائط</string>
+    <string name="shared_media_empty_voice">لم يتم العثور على رسائل صوتية</string>
+    <string name="shared_media_empty_links">لم يتم العثور على روابط</string>
+
 </resources>

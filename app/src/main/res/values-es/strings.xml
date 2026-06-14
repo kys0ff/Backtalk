@@ -439,4 +439,13 @@
     <string name="link_preview_error_default">No se pudo cargar la vista previa</string>
     <string name="link_preview_retry">Reintentar</string>
 
+    <!-- Shared Media -->
+    <string name="shared_media_title">Contenido compartido</string>
+    <string name="shared_media_tab_media">Multimedia</string>
+    <string name="shared_media_tab_voice">Audios</string>
+    <string name="shared_media_tab_links">Enlaces</string>
+    <string name="shared_media_empty_media">No se encontraron archivos multimedia</string>
+    <string name="shared_media_empty_voice">No se encontraron mensajes de voz</string>
+    <string name="shared_media_empty_links">No se encontraron enlaces</string>
+
 </resources>
