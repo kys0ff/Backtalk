@@ -3,6 +3,7 @@ package off.kys.backtalk.presentation.screen.messages.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -13,6 +14,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -66,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
@@ -680,9 +684,16 @@ private fun GridImage(
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
 
+    val imageScale by animateFloatAsState(
+        targetValue = if (isSelected) 1.1f else 1.0f,
+        animationSpec = tween(durationMillis = 200),
+        label = "ImageScaleAnimation"
+    )
+
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .combinedClickable(
                 onClick = { onClick(path) },
                 onLongClick = {
@@ -695,21 +706,26 @@ private fun GridImage(
     ) {
         SizeRegistryScope {
             AsyncImage(
-                modifier = imageModifier.observeSize("image"),
+                modifier = imageModifier
+                    .observeSize("image")
+                    .scale(imageScale),
                 model = ImageRequest.Builder(context)
-                    .data(File(path))
-                    .crossfade(true)
+                    .data(path)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .crossfade(200)
                     .build(),
                 contentDescription = null,
-                placeholder = painterResource(R.drawable.round_progress_activity_24),
                 error = painterResource(R.drawable.round_broken_image_24),
                 contentScale = contentScale,
             )
 
             if (isSelected) {
                 Surface(
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    modifier = Modifier.applySize("image")
+                    color = Color.Black.copy(alpha = 0.25f),
+                    modifier = Modifier
+                        .applySize("image")
+                        .scale(imageScale)
                 ) {}
             }
         }
@@ -718,8 +734,8 @@ private fun GridImage(
             Surface(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(8.dp),
-                color = Color.Black.copy(alpha = 0.5f),
+                    .padding(6.dp),
+                color = Color.Black.copy(alpha = 0.6f),
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
@@ -734,25 +750,31 @@ private fun GridImage(
 
         AnimatedVisibility(
             visible = isSelected,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut(),
+            enter = fadeIn(animationSpec = tween(150)) + scaleIn(
+                initialScale = 0.7f,
+                animationSpec = tween(150)
+            ),
+            exit = fadeOut(animationSpec = tween(150)) + scaleOut(
+                targetScale = 0.7f,
+                animationSpec = tween(150)
+            ),
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Surface(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(6.dp),
                 shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                tonalElevation = 2.dp
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                tonalElevation = 4.dp
             ) {
                 Box(
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.round_check_24),
                         contentDescription = stringResource(R.string.common_selected),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
