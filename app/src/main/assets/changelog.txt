@@ -1,3 +1,12 @@
+82a7037 feat: migrate InputBar to TextFieldState and add rich content support
+23afb34 feat: add shared media sheet with media, voice, and link tabs
+8bf7665 refactor: configure Coil ImageRequests with explicit caching and crossfade in LinkPreview
+3dbb082 fix: restore system UI visibility when exiting ImagePreviewScreen
+994334e feat: add GIF support to messages and media picker
+de0909b feat: update MessagesTopBar selection styling and animate background color transitions
+744962e feat: show elapsed time in VoiceMessageBubble and update recording indicator color
+d58d320 refactor: move custom Gradle tasks to buildSrc
+ca545dc refactor: remove redundant video associated permissions, statistics logic and strings
 fa1b2a9 feat: add cache size display and refactor SettingsItem UI hierarchy
 1ff2380 feat: add "Clear cache" option to troubleshooting settings
 1e03b45 refactor: remove unused developer and onboarding mock strings from localized resources
