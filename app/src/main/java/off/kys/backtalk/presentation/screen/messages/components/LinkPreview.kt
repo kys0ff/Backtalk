@@ -56,6 +56,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -212,16 +214,14 @@ suspend fun fetchLinkMetadata(url: String, context: Context): LinkMetadata =
         fun JsonObject.optString(key: String): String? =
             this[key]?.jsonPrimitive?.content?.ifBlank { null }
 
-        fun JsonObject.imageUrl(): String? {
-            return when (val img = this["image"]) {
-                is JsonObject -> img.optString("url")
-                is JsonArray -> when (val first = img.firstOrNull()) {
-                    is JsonObject -> first.optString("url")
-                    else -> first?.jsonPrimitive?.content?.ifBlank { null }
-                }
-
-                else -> img?.jsonPrimitive?.content?.ifBlank { null }
+        fun JsonObject.imageUrl(): String? = when (val img = this["image"]) {
+            is JsonObject -> img.optString("url")
+            is JsonArray -> when (val first = img.firstOrNull()) {
+                is JsonObject -> first.optString("url")
+                else -> first?.jsonPrimitive?.content?.ifBlank { null }
             }
+
+            else -> img?.jsonPrimitive?.content?.ifBlank { null }
         }
 
         fun JsonObject.toLdSnippet() = LdSnippet(
@@ -374,20 +374,45 @@ fun LinkPreviewCard(
 
 @Composable
 private fun LinkPreviewContent(metadata: LinkMetadata) {
+    val context = LocalContext.current
+
+    // Explicitly configure ImageRequests to enable explicit disk cache policies.
+    val previewImageRequest = remember(metadata.imageUrl) {
+        ImageRequest.Builder(context)
+            .data(metadata.imageUrl)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .crossfade(true)
+            .build()
+    }
+
+    val faviconImageRequest = remember(metadata.faviconUrl) {
+        ImageRequest.Builder(context)
+            .data(metadata.faviconUrl)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .crossfade(true)
+            .build()
+    }
+
     BoxWithConstraints {
         val useVerticalLayout = maxWidth >= 280.dp && metadata.imageUrl != null
 
         if (useVerticalLayout) {
             Column {
                 AsyncImage(
-                    model = metadata.imageUrl,
+                    model = previewImageRequest,
                     contentDescription = metadata.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                 )
-                LinkPreviewTextContent(metadata, isCompact = false)
+                LinkPreviewTextContent(
+                    metadata = metadata,
+                    faviconRequest = faviconImageRequest,
+                    isCompact = false
+                )
             }
         } else {
             Row(
@@ -397,7 +422,7 @@ private fun LinkPreviewContent(metadata: LinkMetadata) {
             ) {
                 if (metadata.imageUrl != null) {
                     AsyncImage(
-                        model = metadata.imageUrl,
+                        model = previewImageRequest,
                         contentDescription = metadata.title,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -405,7 +430,12 @@ private fun LinkPreviewContent(metadata: LinkMetadata) {
                             .clip(MaterialTheme.shapes.small),
                     )
                 }
-                LinkPreviewTextContent(metadata, isCompact = true, modifier = Modifier.weight(1f))
+                LinkPreviewTextContent(
+                    metadata = metadata,
+                    faviconRequest = faviconImageRequest,
+                    isCompact = true,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -414,6 +444,7 @@ private fun LinkPreviewContent(metadata: LinkMetadata) {
 @Composable
 private fun LinkPreviewTextContent(
     metadata: LinkMetadata,
+    faviconRequest: ImageRequest,
     isCompact: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -426,9 +457,9 @@ private fun LinkPreviewTextContent(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                metadata.faviconUrl?.let {
+                if (metadata.faviconUrl != null) {
                     AsyncImage(
-                        model = it,
+                        model = faviconRequest,
                         contentDescription = null,
                         modifier = Modifier
                             .size(12.dp)
