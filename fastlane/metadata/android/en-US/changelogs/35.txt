@@ -1,0 +1,6 @@
+- External Sharing: Share images and text from other apps with preview and caption support.
+- Rich Media: Added GIF support and detailed link previews with metadata.
+- Shared Media: New sheet to browse media, voice notes, and links in one place.
+- Spanish Support: Full Spanish localization is now available.
+- Improvements: Modernized input bar, RTL voice waveforms and dragging, and background update checks.
+- Maintenance: "Clear cache" option, fixed voice playback, and refined message scheduling.

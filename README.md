@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.3.2-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.3.5-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -28,6 +28,18 @@ thoughts—with a strong focus on privacy and simplicity.
 
 > *Backtalk — because sometimes the most important conversation is the one where you talk back to
 yourself.*
+
+---
+
+## Philosophy
+
+Backtalk is guided by a strict set of architectural principles to ensure it remains a fast, private, and focused sanctuary for raw thought. 
+
+- **The Immutable Timeline**: A single, continuous stream. No folders, no fragments.
+- **Lightweight & Fast**: Optimized for near-zero capture latency.
+- **Local-First Privacy**: Your data belongs to your hardware, period.
+
+Read the full [Backtalk Philosophy](./PHILOSOPHY.md) to learn more about why we build the way we do.
 
 ---
 
@@ -53,13 +65,13 @@ yourself.*
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.3.2)
+## Recent Changes (v0.3.5)
 
-- **Changelog Screen**: A new dedicated screen to keep track of every update and improvement.
-- **Security Enhancements**: Added "Lock on screen off", customizable timeouts, and biometric checks for sensitive actions.
-- **Media Overhaul**: Multi-image support, media captions, SVG support, and a beautiful staggered grid layout.
-- **Advanced Statistics**: Visualize your habits with a new usage heatmap and activity streaks.
-- **UX & Localization**: "Send with Enter" support, per-app language settings, and improved Arabic localization.
+- **External Sharing**: Share images and text from other apps directly into your self-chats with previews.
+- **Rich Media & Links**: GIF support, detailed link previews with metadata, and a new shared media browser.
+- **Spanish Support**: Full Spanish localization is now available, along with refined Arabic translations.
+- **UX & Voice**: Improved voice recording UI with RTL dragging support, RTL waveforms, and a modernized input bar.
+- **Maintenance**: Troubleshooting tools like "Clear cache", background update checks, and improved message scheduling.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 

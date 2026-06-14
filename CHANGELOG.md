@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2026-06-14
+
+### Added
+- **External Sharing**: Support for receiving shared images and text from external apps with a preview and caption dialog.
+- **Rich Media**:
+    - Added GIF support to messages and media picker.
+    - New shared media sheet with tabs for media, voice notes, and links.
+    - Rich link preview component with metadata scraping and caching.
+- **Localization**: Added full Spanish localization and expanded Arabic translations for troubleshooting and media.
+- **Voice Messages**:
+    - Real-time elapsed time display and improved recording indicator.
+    - RTL support for voice message waveform rendering and recording gestures.
+- **Settings & Maintenance**:
+    - Added "Clear cache" option and cache size display in troubleshooting settings.
+    - Background update checks and optimized WorkManager scheduling.
+    - New toggle for link previews and hashtag bar visibility.
+- **UX Improvements**:
+    - Tooltips for send and voice record buttons in the input bar.
+    - Enhanced message bubble selection visuals and animated background transitions.
+    - Support for restricted message captions via `CaptionWordsRegistry`.
+
+### Changed
+- **Input Architecture**: Migrated InputBar to `TextFieldState` for better rich content support and performance.
+- **UI Refinement**: Updated icons for attachments/links and refined the media selection overlay styling.
+- **Background Work**: Centralized WorkManager scheduling in `WorkScheduler` for more reliable reminders and updates.
+
+### Fixed
+- **Message Scheduling**: Resolved "today" scheduling mismatches and improved timezone handling.
+- **Voice Playback**: Fixed voice message playback issues and migrated notes to persistent storage.
+- **Authentication**: Updated app lock logic to be lifecycle-aware, preventing premature lockouts.
+- **Stability**: Resolved startup crashes related to update checks and refined reminder scheduling logic.
+
+### Refactored
+- **Modularization**: Decoupled InputBar components and moved custom Gradle tasks to `buildSrc`.
+- **UI Hierarchy**: Cleaned up `SettingsItem` and `TagFilterBar` layouts for better RTL consistency and overflow handling.
+
+### Build
+- **Automation**: Refactored changelog generation to use version tags and dynamically fetch git tags.
+- **Maintenance**: Bumped version to 0.3.5.
+
+---
+
 ## [0.3.2] - 2026-06-04
 
 ### Added
