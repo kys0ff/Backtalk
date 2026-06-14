@@ -42,4 +42,4 @@ data class MessageEntity(
     val mediaPath: String? = null,
     val mediaPaths: List<String>? = null,
     val mediaType: String? = null
-)
+) : java.io.Serializable

@@ -10,7 +10,7 @@ import kotlin.random.Random
  */
 @Serializable
 @JvmInline
-value class MessageId(val value: Long) {
+value class MessageId(val value: Long) : java.io.Serializable {
 
     /**
      * Returns the underlying long value.

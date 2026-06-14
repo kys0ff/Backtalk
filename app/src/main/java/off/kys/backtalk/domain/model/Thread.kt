@@ -12,7 +12,7 @@ data class Thread(
     val root: MessageEntity,
     val replies: List<MessageEntity>,
     val repliedTo: MessageEntity? = null
-) {
+) : java.io.Serializable {
     /**
      * The total number of messages in the thread.
      */
