@@ -7,7 +7,8 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
-val appVersion: String = "0.3.2"
+val appVersion: String = "0.3.5"
+val appVersionCode: Int = 35
 
 android {
     namespace = "off.kys.backtalk"
@@ -18,7 +19,7 @@ android {
         minSdk = 23
         //noinspection OldTargetApi
         targetSdk = 35
-        versionCode = 32
+        versionCode = appVersionCode
         versionName = appVersion
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
