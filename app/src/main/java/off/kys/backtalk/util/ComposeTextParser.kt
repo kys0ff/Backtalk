@@ -14,19 +14,7 @@ import androidx.compose.ui.text.withStyle
 
 /**
  * A utility object responsible for parsing Markdown-like syntax into a Jetpack Compose [AnnotatedString].
- *
- * Supported syntax includes:
- * - **Bold**: `**text**`
- * - __Underline__: `__text__`
- * - ~~Strikethrough~~: `~~text~~`
- * - *Italic*: `*text*`
- * - `Monospace`: `` `text` ``
- * - Markdown Links: `[Display Name](https://example.com)`
- * - Naked URLs: `https://example.com`
- * - Mentions: `@username` (converted to a clickable [LinkAnnotation.Clickable])
- *
- * The parser handles nested styles recursively and allows for customization of link appearances
- * and click behaviors via [TextLinkStyles] and [LinkAnnotation] listeners.
+ * Now upgraded to support line-level block elements like lists and task checkboxes.
  */
 object ComposeTextParser {
 
@@ -48,12 +36,78 @@ object ComposeTextParser {
     val MENTION_REGEX = Regex("""@(\w+)""")
     val HASHTAG_REGEX = Regex("""#(\w+)""")
 
+    // Block level Regex matchers for lines
+    private val CHECKBOX_UNCHECKED_REGEX = Regex("""^(\s*)[-*+]\s+\[\s]\s+(.*)""")
+    private val CHECKBOX_CHECKED_REGEX = Regex("""^(\s*)[-*+]\s+\[[xX]]\s+(.*)""")
+    private val UNORDERED_LIST_REGEX = Regex("""^(\s*)[-*+]\s+(.*)""")
+    private val ORDERED_LIST_REGEX = Regex("""^(\s*)(\d+\.)\s+(.*)""")
+
     fun toAnnotatedString(
         text: String,
         linkStyles: TextLinkStyles? = null,
         onAnnotationClicked: ((LinkAnnotation) -> Unit)? = null
     ): AnnotatedString = buildAnnotatedString {
-        parseRecursive(text, this, linkStyles, onAnnotationClicked)
+        val lines = text.split("\n")
+        lines.forEachIndexed { index, line ->
+            parseLine(line, this, linkStyles, onAnnotationClicked)
+            if (index < lines.lastIndex) {
+                append("\n")
+            }
+        }
+    }
+
+    private fun parseLine(
+        line: String,
+        builder: AnnotatedString.Builder,
+        linkStyles: TextLinkStyles?,
+        onAnnotationClicked: ((LinkAnnotation) -> Unit)?
+    ) {
+        // 1. Check for Unchecked Checkbox (- [ ])
+        val uncheckedMatch = CHECKBOX_UNCHECKED_REGEX.matchEntire(line)
+        if (uncheckedMatch != null) {
+            val indent = uncheckedMatch.groupValues[1]
+            val content = uncheckedMatch.groupValues[2]
+            builder.append("$indent☐  ")
+            parseRecursive(content, builder, linkStyles, onAnnotationClicked)
+            return
+        }
+
+        // 2. Check for Checked Checkbox (- [x])
+        val checkedMatch = CHECKBOX_CHECKED_REGEX.matchEntire(line)
+        if (checkedMatch != null) {
+            val indent = checkedMatch.groupValues[1]
+            val content = checkedMatch.groupValues[2]
+            builder.append("$indent☑  ")
+            // Optional flavor: Wrap checked text content in a strikethrough style
+            builder.withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) {
+                parseRecursive(content, this, linkStyles, onAnnotationClicked)
+            }
+            return
+        }
+
+        // 3. Check for Unordered List Item (- or *)
+        val unorderedMatch = UNORDERED_LIST_REGEX.matchEntire(line)
+        if (unorderedMatch != null) {
+            val indent = unorderedMatch.groupValues[1]
+            val content = unorderedMatch.groupValues[2]
+            builder.append("$indent•  ")
+            parseRecursive(content, builder, linkStyles, onAnnotationClicked)
+            return
+        }
+
+        // 4. Check for Ordered List Item (1.)
+        val orderedMatch = ORDERED_LIST_REGEX.matchEntire(line)
+        if (orderedMatch != null) {
+            val indent = orderedMatch.groupValues[1]
+            val numberToken = orderedMatch.groupValues[2]
+            val content = orderedMatch.groupValues[3]
+            builder.append("$indent$numberToken  ")
+            parseRecursive(content, builder, linkStyles, onAnnotationClicked)
+            return
+        }
+
+        // Plain line fallback
+        parseRecursive(line, builder, linkStyles, onAnnotationClicked)
     }
 
     private fun parseRecursive(
@@ -75,8 +129,7 @@ object ComposeTextParser {
         for (i in text.indices) {
             for (styleDef in STYLES) {
                 if (text.startsWith(styleDef.delimiter, i)) {
-                    val closingIndex =
-                        findClosingTag(text, i + styleDef.delimiter.length, styleDef.delimiter)
+                    val closingIndex = findClosingTag(text, i + styleDef.delimiter.length, styleDef.delimiter)
                     if (closingIndex != -1) {
                         earliestMatch = i
                         bestStyle = styleDef
@@ -140,10 +193,8 @@ object ComposeTextParser {
                 val delimiter = bestStyle.delimiter
                 builder.withStyle(bestStyle.style) {
                     parseRecursive(
-                        text.substring(
-                            earliestMatch + delimiter.length,
-                            bestClosingIndex
-                        ), this, linkStyles, onAnnotationClicked
+                        text.substring(earliestMatch + delimiter.length, bestClosingIndex),
+                        this, linkStyles, onAnnotationClicked
                     )
                 }
                 parseRecursive(
