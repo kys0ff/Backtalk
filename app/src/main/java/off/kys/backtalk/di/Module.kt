@@ -42,6 +42,7 @@ import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
+import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
@@ -175,6 +176,19 @@ private fun Module.viewModelModule() {
     viewModel { RemindersViewModel(get()) }
     viewModel { ChangelogViewModel(get()) }
     viewModel { SharedMediaViewModel(get(), get()) }
+    viewModel {
+        InputBarViewModel(
+            application = androidApplication(),
+            preferences = get(),
+            onMessageSend = it.get(),
+            onVoiceSend = it.get(),
+            onMessageSchedule = it.get(),
+            onSharedImageSendAction = it.get(),
+            onAttachClickAction = it.get(),
+            onCancelReplyAction = it.get(),
+            onCancelEditAction = it.get()
+        )
+    }
 }
 
 /**

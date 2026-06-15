@@ -1,14 +1,11 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import android.Manifest
-import android.app.AlarmManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
-import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -29,10 +26,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.content.MediaType
 import androidx.compose.foundation.content.TransferableContent
 import androidx.compose.foundation.content.contentReceiver
-import androidx.compose.foundation.content.hasMediaType
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -56,8 +51,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -75,13 +68,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -107,60 +94,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.presentation.components.HintTooltip
-import off.kys.backtalk.util.AudioRecorder
-import off.kys.backtalk.util.HashUtils
-import off.kys.backtalk.util.MediaUtils
+import off.kys.backtalk.presentation.event.InputBarEvent
+import off.kys.backtalk.presentation.viewmodel.InputBarEffect
+import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
-import java.io.File
 import java.time.Instant
 import java.time.ZoneId
-import java.util.Locale
 import kotlin.math.roundToInt
-
-private const val TAG = "InputBar"
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,
+    viewModel: InputBarViewModel,
     messageInput: String,
     replyingTo: MessageEntity?,
     editingMessage: MessageEntity?,
-    onCancelReply: () -> Unit,
-    onCancelEdit: () -> Unit,
-    onMessageSend: (String) -> Unit,
-    onVoiceSend: (String, Long, List<Float>) -> Unit,
-    onMessageSchedule: (String, Long) -> Unit,
-    onAttachClick: () -> Unit,
     sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
-    onSharedImageSend: (List<String>, String) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val audioRecorder = remember { AudioRecorder(context) }
     val haptic = LocalHapticFeedback.current
     val preferences = koinInject<BacktalkPreferences>()
     val layoutDirection = LocalLayoutDirection.current
+    val state by viewModel.uiState.collectAsState()
 
-    var isRecording by remember { mutableStateOf(false) }
-    var secondsElapsed by remember { mutableIntStateOf(0) }
-    var showTapHint by remember { mutableStateOf(false) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    val amplitudes by audioRecorder.amplitudes.collectAsState()
     val shakeOffset = remember { Animatable(0f) }
 
-    val schedulingStage = remember { mutableStateOf(SchedulingStage.Hidden) }
     val datePickerState = rememberDatePickerState(
         selectableDates = remember {
             object : SelectableDates {
@@ -181,47 +147,44 @@ fun InputBar(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) Log.i(TAG, "InputBar: Microphone permission is granted")
+        if (isGranted) viewModel.onEvent(InputBarEvent.StartRecording)
     }
 
-    var recordingStartTime by remember { mutableLongStateOf(0L) }
-    val textFieldState = rememberTextFieldState(messageInput)
-
-    val showPermissionRationale = remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = isRecording) {
-        if (isRecording) {
-            secondsElapsed = 0
-            while (isRecording) {
-                delay(1000L)
-                secondsElapsed++
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                InputBarEffect.TriggerShake -> {
+                    repeat(4) { index ->
+                        shakeOffset.animateTo(
+                            targetValue = if (index % 2 == 0) 15f else -15f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioHighBouncy,
+                                stiffness = Spring.StiffnessHigh
+                            )
+                        )
+                    }
+                    shakeOffset.animateTo(0f)
+                }
             }
         }
     }
 
-    val durationText = remember(secondsElapsed) {
-        val minutes = secondsElapsed / 60
-        val seconds = secondsElapsed % 60
-        String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+    LaunchedEffect(replyingTo) {
+        viewModel.onEvent(InputBarEvent.UpdateReplyingTo(replyingTo))
     }
-
-    fun checkAndRequestExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = context.getSystemService(AlarmManager::class.java)
-            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                showPermissionRationale.value = true
-            } else {
-                schedulingStage.value = SchedulingStage.SelectingDate
-            }
-        } else {
-            schedulingStage.value = SchedulingStage.SelectingDate
+    LaunchedEffect(editingMessage) {
+        viewModel.onEvent(InputBarEvent.UpdateEditingMessage(editingMessage))
+    }
+    LaunchedEffect(messageInput) {
+        if (messageInput != state.textFieldState.text.toString()) {
+            state.textFieldState.setTextAndPlaceCursorAtEnd(messageInput)
         }
     }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) checkAndRequestExactAlarmPermission()
+        if (isGranted) viewModel.onEvent(InputBarEvent.RequestExactAlarmPermission)
     }
 
     fun handleScheduleClick() {
@@ -233,25 +196,10 @@ fun InputBar(
             ) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
-                checkAndRequestExactAlarmPermission()
+                viewModel.onEvent(InputBarEvent.RequestExactAlarmPermission)
             }
         } else {
-            checkAndRequestExactAlarmPermission()
-        }
-    }
-
-    fun triggerDeniedShake() {
-        scope.launch {
-            repeat(4) { index ->
-                shakeOffset.animateTo(
-                    targetValue = if (index % 2 == 0) 15f else -15f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioHighBouncy,
-                        stiffness = Spring.StiffnessHigh
-                    )
-                )
-            }
-            shakeOffset.animateTo(0f)
+            viewModel.onEvent(InputBarEvent.RequestExactAlarmPermission)
         }
     }
 
@@ -261,36 +209,31 @@ fun InputBar(
                 Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            isRecording = true
-            recordingStartTime = System.currentTimeMillis()
-            audioRecorder.startRecording()
+            viewModel.onEvent(InputBarEvent.StartRecording)
         } else {
-            triggerDeniedShake()
+            viewModel.onEvent(InputBarEvent.ShowTapHint)
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
 
-    LaunchedEffect(key1 = showTapHint) {
-        if (showTapHint) {
-            delay(2000)
-            showTapHint = false
-        }
-    }
-
-    LaunchedEffect(messageInput) {
-        if (messageInput != textFieldState.text.toString()) {
-            textFieldState.setTextAndPlaceCursorAtEnd(messageInput)
-        }
-    }
-
     MessageSchedulingDialogs(
-        stage = schedulingStage.value,
+        stage = state.schedulingStage,
         datePickerState = datePickerState,
         timePickerState = timePickerState,
-        onStageChange = { nextStage -> schedulingStage.value = nextStage },
+        onStageChange = { nextStage ->
+            viewModel.onEvent(
+                InputBarEvent.ChangeSchedulingStage(
+                    nextStage
+                )
+            )
+        },
         onSchedule = { time ->
-            onMessageSchedule(textFieldState.text.toString(), time)
-            textFieldState.clearText()
+            viewModel.onEvent(
+                InputBarEvent.ScheduleMessage(
+                    state.textFieldState.text.toString(),
+                    time
+                )
+            )
             context.toast(R.string.message_scheduled_success)
         }
     )
@@ -303,15 +246,15 @@ fun InputBar(
     ) {
         Column(modifier = modifier) {
             InputBarReplyHeader(
-                replyingTo = replyingTo,
-                editingMessage = editingMessage,
-                onCancelReply = onCancelReply,
-                onCancelEdit = onCancelEdit
+                replyingTo = state.replyingTo,
+                editingMessage = state.editingMessage,
+                onCancelReply = { viewModel.onEvent(InputBarEvent.CancelReply) },
+                onCancelEdit = { viewModel.onEvent(InputBarEvent.CancelEdit) }
             )
 
             LinkPreviewSection(
-                text = textFieldState.text.toString(),
-                previewEnabled = preferences.linkPreviewEnabled
+                text = state.textFieldState.text.toString(),
+                previewEnabled = state.linkPreviewEnabled
             )
 
             Row(
@@ -321,163 +264,90 @@ fun InputBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AttachButtonVisibility(
-                    isVisible = !isRecording,
-                    onAttachClick = onAttachClick
+                    isVisible = !state.isRecording,
+                    onAttachClick = { viewModel.onEvent(InputBarEvent.AttachClicked) }
                 )
 
                 ChatTextField(
                     modifier = Modifier.weight(1f),
-                    textFieldState = textFieldState,
-                    isRecording = isRecording,
-                    amplitudes = amplitudes,
-                    durationText = durationText,
+                    textFieldState = state.textFieldState,
+                    isRecording = state.isRecording,
+                    amplitudes = state.amplitudes,
+                    durationText = state.durationText,
                     sendWithEnter = preferences.sendWithEnter,
                     onSend = {
-                        if (textFieldState.text.isNotBlank()) {
-                            onMessageSend(textFieldState.text.toString())
-                            textFieldState.clearText()
-                        }
+                        viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString()))
                     },
                     onContentReceived = { transferableContent ->
-                        if (transferableContent.hasMediaType(MediaType.Image)) {
-                            val clipData = transferableContent.clipEntry.clipData
-                            for (i in 0 until clipData.itemCount) {
-                                val item = clipData.getItemAt(i)
-                                val uri = item.uri
-                                if (uri != null) {
-                                    scope.launch(Dispatchers.IO) {
-                                        val mimeType =
-                                            context.contentResolver.getType(uri) ?: "image/jpeg"
-                                        val extension = MimeTypeMap.getSingleton()
-                                            .getExtensionFromMimeType(mimeType) ?: "jpg"
-                                        val mediaDir =
-                                            File(context.filesDir, "media").apply { mkdirs() }
-
-                                        val smartPointing = preferences.smartImagePointingEnabled
-                                        val fileName = if (smartPointing) {
-                                            val hash =
-                                                context.contentResolver.openInputStream(uri)?.use {
-                                                    HashUtils.calculateSha256(it)
-                                                } ?: System.currentTimeMillis().toString()
-                                            "media_$hash.$extension"
-                                        } else {
-                                            "media_${System.currentTimeMillis()}_${uri.lastPathSegment}.$extension"
-                                        }
-
-                                        val destFile = File(mediaDir, fileName)
-
-                                        if (!(smartPointing && destFile.exists())) {
-                                            context.contentResolver.openInputStream(uri)
-                                                ?.use { input ->
-                                                    destFile.outputStream().use { output ->
-                                                        input.copyTo(output)
-                                                    }
-                                                }
-
-                                            val removeMetadata =
-                                                preferences.removeImageMetadataEnabled &&
-                                                        mimeType.startsWith("image/") &&
-                                                        mimeType != "image/gif"
-                                            if (removeMetadata) {
-                                                MediaUtils.stripImageMetadata(destFile)
-                                            }
-                                        }
-
-                                        withContext(Dispatchers.Main) {
-                                            onSharedImageSend(
-                                                listOf(
-                                                    Uri.fromFile(destFile).toString()
-                                                ), ""
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            null
-                        } else {
-                            transferableContent
-                        }
+                        viewModel.onEvent(InputBarEvent.ContentReceived(transferableContent))
+                        null
                     }
                 )
 
                 ActionButtons(
-                    showSend = textFieldState.text.isNotBlank() && !isRecording,
+                    showSend = state.isSendButtonVisible,
                     onSendClick = {
-                        if (textFieldState.text.isNotBlank()) {
-                            onMessageSend(textFieldState.text.toString())
-                            textFieldState.clearText()
-                        }
+                        viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString()))
                     },
                     onScheduleClick = {
-                        if (textFieldState.text.isNotBlank() && editingMessage == null) {
+                        if (state.textFieldState.text.isNotBlank() && state.editingMessage == null) {
                             if (preferences.hapticFeedbackEnabled) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                             handleScheduleClick()
                         }
                     },
-                    showTapHint = showTapHint,
+                    showTapHint = state.showTapHint,
                     shakeOffset = shakeOffset.value,
-                    offsetX = offsetX,
+                    offsetX = state.offsetX,
                     onShowTapHint = {
-                        showTapHint = true
-                        triggerDeniedShake()
+                        viewModel.onEvent(InputBarEvent.ShowTapHint)
                     },
                     onDragStart = {
-                        showTapHint = false
+                        viewModel.onEvent(InputBarEvent.ClearTapHint)
                         startRecordingInternal()
                     },
                     onDrag = { change, dragAmount ->
-                        if (isRecording) {
+                        if (state.isRecording) {
                             change.consume()
-                            if (layoutDirection == LayoutDirection.Rtl) {
-                                offsetX = (offsetX + dragAmount.x).coerceAtLeast(0f)
-                                if (offsetX > 300f) {
-                                    isRecording = false
-                                    audioRecorder.cancelRecording()
-                                    offsetX = 0f
-                                }
+                            val newOffsetX = if (layoutDirection == LayoutDirection.Rtl) {
+                                (state.offsetX + dragAmount.x).coerceAtLeast(0f)
                             } else {
-                                offsetX = (offsetX + dragAmount.x).coerceAtMost(0f)
-                                if (offsetX < -300f) {
-                                    isRecording = false
-                                    audioRecorder.cancelRecording()
-                                    offsetX = 0f
-                                }
+                                (state.offsetX + dragAmount.x).coerceAtMost(0f)
+                            }
+                            viewModel.onEvent(InputBarEvent.UpdateOffsetX(newOffsetX))
+
+                            if (layoutDirection == LayoutDirection.Rtl && newOffsetX > 300f) {
+                                viewModel.onEvent(InputBarEvent.CancelRecording)
+                                viewModel.onEvent(InputBarEvent.UpdateOffsetX(0f))
+                            } else if (layoutDirection != LayoutDirection.Rtl && newOffsetX < -300f) {
+                                viewModel.onEvent(InputBarEvent.CancelRecording)
+                                viewModel.onEvent(InputBarEvent.UpdateOffsetX(0f))
                             }
                         }
                     },
                     onDragEnd = {
-                        if (isRecording) {
-                            isRecording = false
-                            val file = audioRecorder.stopRecording()
-                            if (file != null) {
-                                onVoiceSend(
-                                    file.absolutePath,
-                                    System.currentTimeMillis() - recordingStartTime,
-                                    amplitudes
-                                )
-                            }
+                        if (state.isRecording) {
+                            viewModel.onEvent(InputBarEvent.StopAndSendRecording)
                         }
-                        offsetX = 0f
+                        viewModel.onEvent(InputBarEvent.UpdateOffsetX(0f))
                     },
                     onDragCancel = {
-                        if (isRecording) {
-                            isRecording = false
-                            audioRecorder.cancelRecording()
+                        if (state.isRecording) {
+                            viewModel.onEvent(InputBarEvent.CancelRecording)
                         }
-                        offsetX = 0f
+                        viewModel.onEvent(InputBarEvent.UpdateOffsetX(0f))
                     }
                 )
             }
 
             AnimatedVisibility(
-                visible = textFieldState.selection.length > 0,
+                visible = state.textFieldState.selection.length > 0,
                 enter = expandVertically(expandFrom = Alignment.Bottom) + fadeIn(),
                 exit = shrinkVertically(shrinkTowards = Alignment.Bottom) + fadeOut()
             ) {
                 FormattingToolbar(onFormattingClick = { startSym, endSym ->
-                    textFieldState.edit {
+                    state.textFieldState.edit {
                         val currentSelection = selection
                         val selectedText =
                             toString().substring(currentSelection.start, currentSelection.end)
@@ -495,11 +365,11 @@ fun InputBar(
         }
     }
 
-    if (showPermissionRationale.value) {
+    if (state.showPermissionRationale) {
         PermissionRationaleDialog(
-            onDismiss = { showPermissionRationale.value = false },
+            onDismiss = { viewModel.onEvent(InputBarEvent.DismissPermissionRationale) },
             onConfirm = {
-                showPermissionRationale.value = false
+                viewModel.onEvent(InputBarEvent.DismissPermissionRationale)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                         data = Uri.fromParts("package", context.packageName, null)
@@ -515,7 +385,7 @@ fun InputBar(
             uris = sharedImageUris,
             onDismiss = onCancelSharedImage,
             onSend = { caption ->
-                onSharedImageSend(sharedImageUris, caption)
+                viewModel.onEvent(InputBarEvent.SendSharedImages(sharedImageUris, caption))
                 onCancelSharedImage()
             }
         )

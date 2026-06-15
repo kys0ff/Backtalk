@@ -34,12 +34,7 @@ import off.kys.backtalk.common.lock.LocalDateFormatter
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-
-enum class SchedulingStage {
-    Hidden,
-    SelectingDate,
-    SelectingTime
-}
+import off.kys.backtalk.presentation.status.SchedulingStage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

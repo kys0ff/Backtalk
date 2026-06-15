@@ -19,11 +19,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import kotlinx.coroutines.launch
-import off.kys.backtalk.common.Constants
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.compose.rememberHashtags
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
 import off.kys.backtalk.util.emptyString
@@ -32,6 +32,7 @@ import off.kys.backtalk.util.emptyString
 @Composable
 fun MessagesScreenContent(
     state: MessagesUiState,
+    inputBarViewModel: InputBarViewModel,
     onEvent: (event: MessagesUiEvent) -> Unit,
     onSettingsClick: () -> Unit,
     onThreadsClick: () -> Unit,
@@ -45,36 +46,6 @@ fun MessagesScreenContent(
     val scope = rememberCoroutineScope()
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
     val tags = rememberHashtags(state.messages)
-
-    val selectionMetrics =
-        remember(state.selectedMessageIds, state.selectedImagePaths, state.messages) {
-            val selectedMessagesCount = state.selectedMessageIds.size
-            val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
-
-            val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
-                it !in state.selectedMessageIds
-            }.values.sumOf { it.size }
-
-            val currentTime = System.currentTimeMillis()
-            val deletableMessagesCount = state.messages.count {
-                it.id in state.selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
-            }
-
-            val deletableImagesCount =
-                state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
-                    val message = state.messages.find { it.id == messageId }
-                    if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-                        paths.size
-                    } else 0
-                }
-
-            SelectionMetrics(
-                selectedMessagesCount = selectedMessagesCount,
-                selectedImagesCount = selectedImagesCount,
-                totalSelectedCount = totalSelectedCount,
-                totalDeletableCount = deletableMessagesCount + deletableImagesCount
-            )
-        }
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
@@ -153,7 +124,7 @@ fun MessagesScreenContent(
         topBar = {
             MessagesTopBar(
                 scrollBehavior = scrollBehavior,
-                selectedCount = selectionMetrics.totalSelectedCount,
+                selectedCount = state.selectionMetrics.totalSelectedCount,
                 isSearchActive = state.isSearchActive,
                 searchQuery = state.searchQuery,
                 searchResultsCount = state.searchResults.size,
@@ -178,12 +149,13 @@ fun MessagesScreenContent(
                 onSearchQueryChange = { query -> onEvent(MessagesUiEvent.UpdateSearchQuery(query)) },
                 onNavigateSearch = { up -> onEvent(MessagesUiEvent.NavigateSearch(up)) },
                 onSharedMedia = { onEvent(MessagesUiEvent.ToggleSharedMediaSheet(true)) },
-                isImageSelectionOnly = selectionMetrics.selectedMessagesCount == 0 && selectionMetrics.selectedImagesCount > 0,
-                canDelete = selectionMetrics.totalDeletableCount > 0
+                isImageSelectionOnly = state.selectionMetrics.selectedMessagesCount == 0 && state.selectionMetrics.selectedImagesCount > 0,
+                canDelete = state.selectionMetrics.totalDeletableCount > 0
             )
         },
         bottomBar = {
             InputBar(
+                viewModel = inputBarViewModel,
                 messageInput = when {
                     state.editingMessage != null -> state.editingMessage.editedText.orEmpty()
                         .ifEmpty {
@@ -195,27 +167,8 @@ fun MessagesScreenContent(
                 },
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
-                onCancelReply = { onEvent(MessagesUiEvent.ReplyTo(null)) },
-                onCancelEdit = { onEvent(MessagesUiEvent.EditMessage(null)) },
-                onMessageSend = { onEvent(MessagesUiEvent.SendMessage(it)) },
-                onVoiceSend = { path, duration, waveform ->
-                    onEvent(MessagesUiEvent.SendVoiceMessage(path, duration, waveform))
-                },
-                onMessageSchedule = { text, time ->
-                    onEvent(MessagesUiEvent.ScheduleMessage(text, time))
-                },
-                onAttachClick = { onEvent(MessagesUiEvent.ToggleMediaPicker(true)) },
                 sharedImageUris = state.sharedImageUris,
-                onCancelSharedImage = { onEvent(MessagesUiEvent.ClearSharedImage) },
-                onSharedImageSend = { uris, caption ->
-                    onEvent(
-                        MessagesUiEvent.SendMediaMessages(
-                            uris = uris,
-                            type = "image/*",
-                            description = caption.takeIf { it.isNotBlank() }
-                        )
-                    )
-                }
+                onCancelSharedImage = { onEvent(MessagesUiEvent.ClearSharedImage) }
             )
         },
         floatingActionButton = {
@@ -279,8 +232,8 @@ fun MessagesScreenContent(
             onToggleImageSelect = { messageId, imagePath ->
                 onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
             },
-            totalDeletableCount = selectionMetrics.totalDeletableCount,
-            totalSelectedCount = selectionMetrics.totalSelectedCount
+            totalDeletableCount = state.selectionMetrics.totalDeletableCount,
+            totalSelectedCount = state.selectionMetrics.totalSelectedCount
         )
 
         if (state.showChangelogDialog) {
@@ -290,10 +243,3 @@ fun MessagesScreenContent(
         }
     }
 }
-
-private data class SelectionMetrics(
-    val selectedMessagesCount: Int,
-    val selectedImagesCount: Int,
-    val totalSelectedCount: Int,
-    val totalDeletableCount: Int
-)

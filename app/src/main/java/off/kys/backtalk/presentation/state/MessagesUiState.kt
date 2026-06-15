@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.state
 
+import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.util.emptyString
@@ -40,4 +41,33 @@ data class MessagesUiState(
     val showTagsBar: Boolean = true,
     val sharedText: String? = null,
     val sharedImageUris: List<String> = emptyList()
-)
+) {
+    val selectionMetrics: SelectionMetrics
+        get() {
+            val selectedMessagesCount = selectedMessageIds.size
+            val selectedImagesCount = selectedImagePaths.values.sumOf { it.size }
+
+            val totalSelectedCount = selectedMessagesCount + selectedImagePaths.filterKeys {
+                it !in selectedMessageIds
+            }.values.sumOf { it.size }
+
+            val currentTime = System.currentTimeMillis()
+            val deletableMessagesCount = messages.count {
+                it.id in selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
+            }
+
+            val deletableImagesCount = selectedImagePaths.filterKeys { it !in selectedMessageIds }.entries.sumOf { (messageId, paths) ->
+                val message = messages.find { it.id == messageId }
+                if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+                    paths.size
+                } else 0
+            }
+
+            return SelectionMetrics(
+                selectedMessagesCount = selectedMessagesCount,
+                selectedImagesCount = selectedImagesCount,
+                totalSelectedCount = totalSelectedCount,
+                totalDeletableCount = deletableMessagesCount + deletableImagesCount
+            )
+        }
+}
