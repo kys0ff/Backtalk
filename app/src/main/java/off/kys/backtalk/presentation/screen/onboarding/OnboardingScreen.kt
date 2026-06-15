@@ -1,14 +1,11 @@
 package off.kys.backtalk.presentation.screen.onboarding
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -16,7 +13,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import off.kys.backtalk.presentation.event.OnboardingUiEvent
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
-import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingBottomBar
 import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingScreenContent
 import off.kys.backtalk.presentation.state.OnboardingUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
@@ -37,36 +33,25 @@ class OnboardingScreen : Screen {
             viewModel.onEvent(OnboardingUiEvent.UpdatePermissions)
         }
 
-        Scaffold(
-            bottomBar = {
-                OnboardingBottomBar(
-                    currentPage = pagerState.currentPage,
-                    pageCount = pagerState.pageCount,
-                    onNext = {
-                        if (pagerState.currentPage < pagerState.pageCount - 1) {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                        } else {
-                            viewModel.onEvent(OnboardingUiEvent.CompleteOnboarding)
-                            navigator.replaceAll(MessagesScreen())
-                        }
-                    },
-                    onSkip = {
-                        viewModel.onEvent(OnboardingUiEvent.CompleteOnboarding)
-                        navigator.replaceAll(MessagesScreen())
+        OnboardingScreenContent(
+            pagerState = pagerState,
+            state = state,
+            onNext = {
+                if (pagerState.currentPage < pagerState.pageCount - 1) {
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-                )
-            }
-        ) { paddingValues ->
-            OnboardingScreenContent(
-                modifier = Modifier.padding(paddingValues),
-                pagerState = pagerState,
-                state = state,
-                onUpdatePermissions = { viewModel.onEvent(OnboardingUiEvent.UpdatePermissions) },
-                paddingValues = paddingValues
-            )
-        }
+                } else {
+                    viewModel.onEvent(OnboardingUiEvent.CompleteOnboarding)
+                    navigator.replaceAll(MessagesScreen())
+                }
+            },
+            onSkip = {
+                viewModel.onEvent(OnboardingUiEvent.CompleteOnboarding)
+                navigator.replaceAll(MessagesScreen())
+            },
+            onUpdatePermissions = { viewModel.onEvent(OnboardingUiEvent.UpdatePermissions) }
+        )
     }
 }
 
@@ -79,23 +64,12 @@ class OnboardingScreen : Screen {
 private fun OnboardingScreenPreview() {
     val pagerState = rememberPagerState { OnboardingPage.entries.size }
     BacktalkTheme {
-        Scaffold(
-            bottomBar = {
-                OnboardingBottomBar(
-                    currentPage = pagerState.currentPage,
-                    pageCount = pagerState.pageCount,
-                    onNext = {},
-                    onSkip = {}
-                )
-            }
-        ) { paddingValues ->
-            OnboardingScreenContent(
-                modifier = Modifier.padding(paddingValues),
-                pagerState = pagerState,
-                state = OnboardingUiState(),
-                onUpdatePermissions = { },
-                paddingValues = paddingValues
-            )
-        }
+        OnboardingScreenContent(
+            pagerState = pagerState,
+            state = OnboardingUiState(),
+            onNext = {},
+            onSkip = {},
+            onUpdatePermissions = {}
+        )
     }
 }
