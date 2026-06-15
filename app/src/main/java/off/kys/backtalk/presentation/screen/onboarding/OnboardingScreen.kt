@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.screen.onboarding
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -7,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -58,6 +60,7 @@ class OnboardingScreen : Screen {
             }
         ) { paddingValues ->
             OnboardingScreenContent(
+                modifier = Modifier.padding(paddingValues),
                 pagerState = pagerState,
                 state = state,
                 onUpdatePermissions = { viewModel.onEvent(OnboardingUiEvent.UpdatePermissions) },
@@ -67,7 +70,11 @@ class OnboardingScreen : Screen {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    device = "spec:parent=pixel_5,navigation=buttons",
+    showSystemUi = true
+)
 @Composable
 private fun OnboardingScreenPreview() {
     val pagerState = rememberPagerState { OnboardingPage.entries.size }
@@ -75,17 +82,18 @@ private fun OnboardingScreenPreview() {
         Scaffold(
             bottomBar = {
                 OnboardingBottomBar(
-                    currentPage = 0,
-                    pageCount = OnboardingPage.entries.size,
+                    currentPage = pagerState.currentPage,
+                    pageCount = pagerState.pageCount,
                     onNext = {},
                     onSkip = {}
                 )
             }
         ) { paddingValues ->
             OnboardingScreenContent(
+                modifier = Modifier.padding(paddingValues),
                 pagerState = pagerState,
                 state = OnboardingUiState(),
-                onUpdatePermissions = {},
+                onUpdatePermissions = { },
                 paddingValues = paddingValues
             )
         }
