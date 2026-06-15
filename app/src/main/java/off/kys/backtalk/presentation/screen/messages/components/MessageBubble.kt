@@ -78,7 +78,6 @@ import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.screen.components.size_observer.SizeRegistryScope
-import off.kys.backtalk.presentation.screen.components.size_observer.applySize
 import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
 import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
 import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingMocks
@@ -508,14 +507,16 @@ fun StaggeredImageGrid(
 ) {
     if (images.isEmpty()) return
 
-    val gridWidth = 350.dp
-    val spacing = 6.dp
-    val containerModifier = modifier
-        .widthIn(max = gridWidth)
-        .fillMaxWidth()
-        .clip(MaterialTheme.shapes.large)
+    val maxGridWidth = 280.dp
+    val spacing = 4.dp
+    val gridShape = MaterialTheme.shapes.large
 
-    Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
+    Box(
+        modifier = modifier
+            .widthIn(max = maxGridWidth)
+            .fillMaxWidth()
+            .clip(gridShape)
+    ) {
         when (images.size) {
             1 -> {
                 GridImage(
@@ -523,30 +524,28 @@ fun StaggeredImageGrid(
                     isSelected = images[0] in selectedImages,
                     isGif = isGif,
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.large)
-                        .widthIn(max = gridWidth)
-                        .heightIn(max = 450.dp),
-                    imageModifier = Modifier,
+                        .fillMaxWidth()
+                        .heightIn(min = 160.dp, max = 320.dp),
                     onClick = onImageClick,
                     onLongClick = onImageLongClick,
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,
                     hapticFeedbackEnabled = hapticFeedbackEnabled
                 )
             }
 
             2 -> {
                 Row(
-                    modifier = containerModifier,
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(spacing)
                 ) {
-                    images.forEach { path ->
+                    images.take(2).forEach { path ->
                         GridImage(
                             path = path,
                             isSelected = path in selectedImages,
                             isGif = isGif,
                             modifier = Modifier
                                 .weight(1f)
-                                .aspectRatio(0.75f),
+                                .aspectRatio(0.8f),
                             onClick = onImageClick,
                             onLongClick = onImageLongClick,
                             hapticFeedbackEnabled = hapticFeedbackEnabled
@@ -557,7 +556,9 @@ fun StaggeredImageGrid(
 
             3 -> {
                 Row(
-                    modifier = containerModifier,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(240.dp),
                     horizontalArrangement = Arrangement.spacedBy(spacing)
                 ) {
                     GridImage(
@@ -566,7 +567,7 @@ fun StaggeredImageGrid(
                         isGif = isGif,
                         modifier = Modifier
                             .weight(1f)
-                            .aspectRatio(0.75f),
+                            .fillMaxSize(),
                         onClick = onImageClick,
                         onLongClick = onImageLongClick,
                         hapticFeedbackEnabled = hapticFeedbackEnabled
@@ -580,9 +581,8 @@ fun StaggeredImageGrid(
                             isSelected = images[1] in selectedImages,
                             isGif = isGif,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f)
-                                .aspectRatio(1.5f),
+                                .fillMaxWidth(),
                             onClick = onImageClick,
                             onLongClick = onImageLongClick,
                             hapticFeedbackEnabled = hapticFeedbackEnabled
@@ -592,9 +592,8 @@ fun StaggeredImageGrid(
                             isSelected = images[2] in selectedImages,
                             isGif = isGif,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .weight(1f)
-                                .aspectRatio(1.5f),
+                                .fillMaxWidth(),
                             onClick = onImageClick,
                             onLongClick = onImageLongClick,
                             hapticFeedbackEnabled = hapticFeedbackEnabled
@@ -604,63 +603,59 @@ fun StaggeredImageGrid(
             }
 
             else -> {
-                Row(
-                    modifier = containerModifier,
-                    horizontalArrangement = Arrangement.spacedBy(spacing)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(spacing)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(spacing)
-                    ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
                         GridImage(
                             path = images[0],
                             isSelected = images[0] in selectedImages,
                             isGif = isGif,
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .weight(1f)
                                 .aspectRatio(1f),
                             onClick = onImageClick,
                             onLongClick = onImageLongClick,
                             hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
-                        GridImage(
-                            path = images[2],
-                            isSelected = images[2] in selectedImages,
-                            isGif = isGif,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1.5f),
-                            onClick = onImageClick,
-                            onLongClick = onImageLongClick,
-                            hapticFeedbackEnabled = hapticFeedbackEnabled
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(spacing)
-                    ) {
                         GridImage(
                             path = images[1],
                             isSelected = images[1] in selectedImages,
                             isGif = isGif,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1.5f),
-                            onClick = onImageClick,
-                            onLongClick = onImageLongClick,
-                            hapticFeedbackEnabled = hapticFeedbackEnabled
-                        )
-                        GridImage(
-                            path = images[3],
-                            isSelected = images[3] in selectedImages,
-                            isGif = isGif,
-                            modifier = Modifier
-                                .fillMaxSize()
+                                .weight(1f)
                                 .aspectRatio(1f),
                             onClick = onImageClick,
                             onLongClick = onImageLongClick,
                             hapticFeedbackEnabled = hapticFeedbackEnabled
                         )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                        GridImage(
+                            path = images[2],
+                            isSelected = images[2] in selectedImages,
+                            isGif = isGif,
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f),
+                            onClick = onImageClick,
+                            onLongClick = onImageLongClick,
+                            hapticFeedbackEnabled = hapticFeedbackEnabled
+                        )
+                        Box(modifier = Modifier.weight(1f)) {
+                            GridImage(
+                                path = images[3],
+                                isSelected = images[3] in selectedImages,
+                                isGif = isGif,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f),
+                                onClick = onImageClick,
+                                onLongClick = onImageLongClick,
+                                hapticFeedbackEnabled = hapticFeedbackEnabled
+                            )
+                        }
                     }
                 }
             }
@@ -672,7 +667,6 @@ fun StaggeredImageGrid(
 @Composable
 private fun GridImage(
     modifier: Modifier = Modifier,
-    imageModifier: Modifier = Modifier,
     path: String,
     isSelected: Boolean = false,
     isGif: Boolean = false,
@@ -686,13 +680,13 @@ private fun GridImage(
 
     val imageScale by animateFloatAsState(
         targetValue = if (isSelected) 1.1f else 1.0f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = 300),
         label = "ImageScaleAnimation"
     )
 
     Box(
         modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.small)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .combinedClickable(
                 onClick = { onClick(path) },
@@ -704,30 +698,26 @@ private fun GridImage(
                 }
             )
     ) {
-        SizeRegistryScope {
-            AsyncImage(
-                modifier = imageModifier
-                    .observeSize("image")
-                    .scale(imageScale),
-                model = ImageRequest.Builder(context)
-                    .data(path)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .crossfade(200)
-                    .build(),
-                contentDescription = null,
-                error = painterResource(R.drawable.round_broken_image_24),
-                contentScale = contentScale,
-            )
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(imageScale),
+            model = ImageRequest.Builder(context)
+                .data(path)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .crossfade(150)
+                .build(),
+            contentDescription = null,
+            error = painterResource(id = R.drawable.round_broken_image_24),
+            contentScale = contentScale,
+        )
 
-            if (isSelected) {
-                Surface(
-                    color = Color.Black.copy(alpha = 0.25f),
-                    modifier = Modifier
-                        .applySize("image")
-                        .scale(imageScale)
-                ) {}
-            }
+        if (isSelected) {
+            Surface(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                modifier = Modifier.fillMaxSize()
+            ) {}
         }
 
         if (isGif) {
@@ -735,7 +725,7 @@ private fun GridImage(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(6.dp),
-                color = Color.Black.copy(alpha = 0.6f),
+                color = Color.Black.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
@@ -750,14 +740,8 @@ private fun GridImage(
 
         AnimatedVisibility(
             visible = isSelected,
-            enter = fadeIn(animationSpec = tween(150)) + scaleIn(
-                initialScale = 0.7f,
-                animationSpec = tween(150)
-            ),
-            exit = fadeOut(animationSpec = tween(150)) + scaleOut(
-                targetScale = 0.7f,
-                animationSpec = tween(150)
-            ),
+            enter = fadeIn(animationSpec = tween(100)) + scaleIn(initialScale = 0.8f, animationSpec = tween(100)),
+            exit = fadeOut(animationSpec = tween(100)) + scaleOut(targetScale = 0.8f, animationSpec = tween(100)),
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Surface(
@@ -765,10 +749,10 @@ private fun GridImage(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                tonalElevation = 4.dp
+                tonalElevation = 2.dp
             ) {
                 Box(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
