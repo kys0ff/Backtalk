@@ -69,9 +69,8 @@ fun MessagesScreenContent(
 
     BackHandler(enabled = isBackHandlerActive.value) {
         when {
-            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty() -> onEvent(
-                MessagesUiEvent.ClearSelection
-            )
+            state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty()
+                -> onEvent(MessagesUiEvent.ClearSelection)
 
             state.showDeleteConfirmation -> onEvent(MessagesUiEvent.DismissDeleteConfirmation)
             state.replyingTo != null -> onEvent(MessagesUiEvent.ReplyTo(null))

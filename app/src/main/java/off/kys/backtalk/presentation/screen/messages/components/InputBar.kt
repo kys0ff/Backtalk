@@ -461,14 +461,23 @@ private fun ChatTextField(
                 state = textFieldState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .defaultMinSize(minHeight = 60.dp)
+                    .defaultMinSize(minHeight = 48.dp)
                     .then(
                         if (onContentReceived != null) {
                             Modifier.contentReceiver(onContentReceived)
                         } else Modifier
                     ),
-                textStyle = TextStyle(textDirection = TextDirection.Content),
-                placeholder = { Text(stringResource(R.string.chat_input_hint)) },
+                textStyle = TextStyle(
+                    textDirection = TextDirection.Content
+                ),
+                placeholder = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(stringResource(R.string.chat_input_hint))
+                    }
+                },
                 lineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -477,7 +486,7 @@ private fun ChatTextField(
                 onKeyboardAction = { onSend() },
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
                 ),
                 shape = MaterialTheme.shapes.extraLarge
             )
