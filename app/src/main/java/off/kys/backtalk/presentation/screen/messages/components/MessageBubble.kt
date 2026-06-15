@@ -246,6 +246,7 @@ fun MessageBubbleContent(
                 repliedMessage = repliedMessageEntity,
                 onReplyClick = onReplyPreviewClick,
                 showOriginal = showExtraInfo,
+                selectMode = selectMode,
                 highlightQuery = highlightQuery,
                 onTagClick = onTagClick,
                 selectedImagePaths = selectedImagePaths,
@@ -333,6 +334,7 @@ private fun MessageInnerContent(
     repliedMessage: MessageEntity?,
     onReplyClick: () -> Unit,
     showOriginal: Boolean,
+    selectMode: Boolean,
     selectedImagePaths: Set<String>,
     onToggleImageSelect: (String) -> Unit,
     highlightQuery: String? = null,
@@ -399,7 +401,7 @@ private fun MessageInnerContent(
                     selectedImages = selectedImagePaths,
                     isGif = message.mediaType == "image/gif",
                     onImageClick = { imagePath ->
-                        if (selectedImagePaths.isNotEmpty()) {
+                        if (selectMode) {
                             onToggleImageSelect(imagePath)
                         } else {
                             navigator?.push(ImagePreviewScreen(imagePath))
