@@ -99,7 +99,7 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.presentation.event.InputBarEvent
-import off.kys.backtalk.presentation.viewmodel.InputBarEffect
+import off.kys.backtalk.presentation.state.InputBarEffect
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast

@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
+import off.kys.backtalk.presentation.state.InputBarEffect
 import off.kys.backtalk.presentation.state.InputBarUiState
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.util.AudioRecorder
@@ -199,8 +200,4 @@ class InputBarViewModel(
             }
         }
     }
-}
-
-sealed interface InputBarEffect {
-    data object TriggerShake : InputBarEffect
 }
