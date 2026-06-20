@@ -2,6 +2,7 @@
 <resources>
     <!-- Common -->
     <string name="common_send">Enviar</string>
+    <string name="common_reply">Responder</string>
     <string name="common_cancel">Cancelar</string>
     <string name="common_delete">Eliminar</string>
     <string name="common_copy">Copiar</string>

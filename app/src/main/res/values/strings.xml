@@ -4,6 +4,7 @@
 
     <!-- Common -->
     <string name="common_send">Send</string>
+    <string name="common_reply">Reply</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_delete">Delete</string>
     <string name="common_copy">Copy</string>

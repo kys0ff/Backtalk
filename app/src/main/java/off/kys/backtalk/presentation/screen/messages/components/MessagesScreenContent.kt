@@ -63,12 +63,14 @@ fun MessagesScreenContent(
                     state.showDeleteConfirmation || state.replyingTo != null ||
                     state.editingMessage != null || state.isSearchActive ||
                     state.showPinnedMessagesDialog || state.showMediaPicker ||
-                    state.showSharedMediaSheet
+                    state.showSharedMediaSheet || state.messageContextMenuEntity != null
         }
     }
 
     BackHandler(enabled = isBackHandlerActive.value) {
         when {
+            state.messageContextMenuEntity != null -> onEvent(MessagesUiEvent.ShowMessageContextMenu(null))
+
             state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty()
                 -> onEvent(MessagesUiEvent.ClearSelection)
 
@@ -220,12 +222,15 @@ fun MessagesScreenContent(
             onDismissRationale = { onEvent(MessagesUiEvent.DismissPermissionRationale) },
             onConfirmDelete = { onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
             onDismissDelete = { onEvent(MessagesUiEvent.DismissDeleteConfirmation) },
+            onDeleteMessage = { onEvent(MessagesUiEvent.DeleteMessage(it)) },
+            onCopyMessage = { onEvent(MessagesUiEvent.CopyMessage(it)) },
             onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
             onNavigatePinned = { onEvent(MessagesUiEvent.NavigatePinned) },
             onTogglePinnedDialog = { onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
-            onTogglePin = { message, isPinned ->
+                onTogglePin = { message, isPinned ->
                 onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
             },
+            onLongClick = { onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) },
             onScrollToMessage = { id ->
                 scrollToAndBlink(id)
                 onEvent(MessagesUiEvent.ScrollToMessage(id))

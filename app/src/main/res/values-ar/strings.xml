@@ -2,6 +2,7 @@
 <resources>
     <!-- Common -->
     <string name="common_send">إرسال</string>
+    <string name="common_reply">رد</string>
     <string name="common_cancel">إلغاء</string>
     <string name="common_delete">حذف</string>
     <string name="common_copy">نسخ</string>

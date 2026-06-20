@@ -44,7 +44,8 @@ data class MessagesUiState(
     val sharedText: String? = null,
     val sharedImageUris: List<String> = emptyList(),
     val scaffoldStatus: ScaffoldStatus = ScaffoldStatus.None,
-    val scaffoldMessage: StatusMessage? = null
+    val scaffoldMessage: StatusMessage? = null,
+    val messageContextMenuEntity: MessageEntity? = null
 ) {
     val selectionMetrics: SelectionMetrics
         get() {

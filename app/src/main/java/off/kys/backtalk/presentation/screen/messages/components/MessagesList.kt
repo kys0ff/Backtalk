@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,13 +28,17 @@ fun MessagesList(
     onEditMessage: (MessageEntity?) -> Unit,
     onReply: (MessageEntity?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
+    onDeleteMessage: (MessageEntity) -> Unit = {},
+    onCopyMessage: (MessageEntity) -> Unit = {},
+    contextMenuEntity: MessageEntity? = null,
     searchQuery: String = emptyString(),
     onTagClick: (String) -> Unit = {},
     blinkMessageId: MessageId? = null,
     onScrollToMessage: (MessageId) -> Unit = {},
     selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
     onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
-    onTogglePin: (MessageEntity, Boolean) -> Unit = { _, _ -> }
+    onTogglePin: (MessageEntity, Boolean) -> Unit = { _, _ -> },
+    onLongClick: (MessageEntity?) -> Unit = {}
 ) {
     val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
 
@@ -90,54 +95,72 @@ fun MessagesList(
                     TimestampHeader(current.timestamp)
                 }
 
-                SwipeToReplyWrapper(
-                    startIconRes = R.drawable.round_reply_24,
-                    onSwipeStart = {
-                        if (!selectionMode) {
-                            onReply(current)
-                        }
-                    },
-                    endIconRes = R.drawable.round_edit_24,
-                    onSwipeEnd = if (canEdit) {
-                        {
+                Box {
+                    SwipeToReplyWrapper(
+                        startIconRes = R.drawable.round_reply_24,
+                        onSwipeStart = {
                             if (!selectionMode) {
-                                onEditMessage(current)
-                            }
-                        }
-                    } else null
-                ) {
-                    MessageBubble(
-                        messageEntity = current,
-                        repliedMessageEntity = repliedMessage,
-                        blinkMessageId = blinkMessageId,
-                        isTop = isTop,
-                        isBottom = isBottom,
-                        selectMode = selectionMode,
-                        isSelected = isSelected,
-                        onReplyPreviewClick = {
-                            current.repliedToId?.let { id ->
-                                onScrollToMessage(id)
+                                onReply(current)
                             }
                         },
-                        onClick = {
-                            if (selectionMode) {
+                        endIconRes = R.drawable.round_edit_24,
+                        onSwipeEnd = if (canEdit) {
+                            {
+                                if (!selectionMode) {
+                                    onEditMessage(current)
+                                }
+                            }
+                        } else null
+                    ) {
+                        MessageBubble(
+                            messageEntity = current,
+                            repliedMessageEntity = repliedMessage,
+                            blinkMessageId = blinkMessageId,
+                            isTop = isTop,
+                            isBottom = isBottom,
+                            selectMode = selectionMode,
+                            isSelected = isSelected,
+                            onReplyPreviewClick = {
+                                current.repliedToId?.let { id ->
+                                    onScrollToMessage(id)
+                                }
+                            },
+                            onClick = {
+                                if (selectionMode) {
+                                    onToggleSelect(current.id)
+                                }
+                            },
+                            onLongClick = {
                                 onToggleSelect(current.id)
-                            }
-                        },
-                        onLongClick = {
-                            onToggleSelect(current.id)
-                        },
-                        onDoubleClick = {
-                            if (!selectionMode) {
-                                onTogglePin(current, !current.isPinned)
-                            }
-                        },
-                        highlightQuery = searchQuery,
-                        onTagClick = onTagClick,
-                        selectedImagePaths = selectedImagePaths[current.id] ?: emptySet(),
-                        onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) },
-                        isLocked = isLocked
-                    )
+                                if (!selectionMode) {
+                                    onLongClick(current)
+                                }
+                            },
+                            onDoubleClick = {
+                                if (!selectionMode) {
+                                    onTogglePin(current, !current.isPinned)
+                                }
+                            },
+                            highlightQuery = searchQuery,
+                            onTagClick = onTagClick,
+                            selectedImagePaths = selectedImagePaths[current.id] ?: emptySet(),
+                            onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) },
+                            isLocked = isLocked
+                        )
+                    }
+
+                    if (contextMenuEntity?.id == current.id) {
+                        MessageContextMenu(
+                            message = current,
+                            isSelected = isSelected,
+                            onDismiss = { onLongClick(null) },
+                            onReply = { onReply(current) },
+                            onEdit = { onEditMessage(current) },
+                            onDelete = { onDeleteMessage(current) },
+                            onSelect = { onToggleSelect(current.id) },
+                            onCopy = { onCopyMessage(current) }
+                        )
+                    }
                 }
             }
         }

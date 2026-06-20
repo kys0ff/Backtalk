@@ -51,11 +51,14 @@ fun MessagesContent(
     onDismissRationale: () -> Unit,
     onConfirmDelete: () -> Unit,
     onDismissDelete: () -> Unit,
+    onDeleteMessage: (MessageEntity) -> Unit,
+    onCopyMessage: (MessageEntity) -> Unit,
     onTagClick: (String) -> Unit,
     onNavigatePinned: () -> Unit,
     onTogglePinnedDialog: (Boolean) -> Unit,
     onTogglePin: (MessageEntity, Boolean) -> Unit,
     onScrollToMessage: (MessageId) -> Unit,
+    onLongClick: (MessageEntity?) -> Unit,
     onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
     totalDeletableCount: Int = 0,
     totalSelectedCount: Int = 0
@@ -81,6 +84,9 @@ fun MessagesContent(
             onEditMessage = onEditMessage,
             onReply = onReply,
             onToggleSelect = onToggleSelect,
+            onDeleteMessage = onDeleteMessage,
+            onCopyMessage = onCopyMessage,
+            contextMenuEntity = state.messageContextMenuEntity,
             searchQuery = if (state.isSearchActive) state.searchQuery else emptyString(),
             onTagClick = onTagClick,
             blinkMessageId = state.blinkMessageId,
@@ -88,6 +94,7 @@ fun MessagesContent(
             selectedImagePaths = state.selectedImagePaths,
             onToggleImageSelect = onToggleImageSelect,
             onTogglePin = onTogglePin,
+            onLongClick = onLongClick,
             contentPadding = PaddingValues(top = topPadding)
         )
 

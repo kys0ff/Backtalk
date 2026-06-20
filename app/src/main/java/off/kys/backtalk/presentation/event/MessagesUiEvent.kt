@@ -214,4 +214,19 @@ sealed interface MessagesUiEvent {
      * UI event to clear the shared image(s).
      */
     data object ClearSharedImage : MessagesUiEvent
+
+    /**
+     * UI event to show or hide the context menu for a message.
+     */
+    data class ShowMessageContextMenu(val message: MessageEntity?) : MessagesUiEvent
+
+    /**
+     * UI event to copy a specific message to the clipboard.
+     */
+    data class CopyMessage(val message: MessageEntity) : MessagesUiEvent
+
+    /**
+     * UI event to initiate deletion of a specific message.
+     */
+    data class DeleteMessage(val message: MessageEntity) : MessagesUiEvent
 }

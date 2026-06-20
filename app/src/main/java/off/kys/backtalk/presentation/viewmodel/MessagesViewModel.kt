@@ -208,6 +208,26 @@ class MessagesViewModel(
             MessagesUiEvent.ClearSharedImage -> {
                 _uiState.value = _uiState.value.copy(sharedImageUris = emptyList())
             }
+
+            is MessagesUiEvent.ShowMessageContextMenu -> {
+                _uiState.value = _uiState.value.copy(messageContextMenuEntity = event.message)
+            }
+
+            is MessagesUiEvent.CopyMessage -> {
+                viewModelScope.launch {
+                    useCases.copyMessagesByIds(setOf(event.message.id))
+                }
+                _uiState.value = _uiState.value.copy(messageContextMenuEntity = null)
+            }
+
+            is MessagesUiEvent.DeleteMessage -> {
+                clearSelection()
+                toggleSelection(event.message.id)
+                _uiState.value = _uiState.value.copy(
+                    showDeleteConfirmation = true,
+                    messageContextMenuEntity = null
+                )
+            }
         }
     }
 
