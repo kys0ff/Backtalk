@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,11 +32,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import org.koin.compose.koinInject
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A wrapper component that enables swipe-to-action (e.g., swipe-to-reply) functionality
@@ -45,6 +48,8 @@ import kotlin.math.roundToInt
  * @param onSwipeEnd Optional callback triggered when swiping from End-to-Start (reveals end action).
  * @param startIconRes The drawable resource ID for the icon displayed during a start-to-end swipe.
  * @param endIconRes The drawable resource ID for the icon displayed during an end-to-start swipe.
+ * @param showHint If true, a one-time swipe animation is performed to hint functionality.
+ * @param onHintShown Callback invoked once the hint animation has completed.
  * @param content The composable content to be wrapped and made swipeable.
  */
 @Composable
@@ -53,6 +58,8 @@ fun SwipeToReplyWrapper(
     onSwipeEnd: (() -> Unit)? = null,
     @DrawableRes startIconRes: Int,
     @DrawableRes endIconRes: Int,
+    showHint: Boolean = false,
+    onHintShown: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val preferences = koinInject<BacktalkPreferences>()
@@ -65,6 +72,34 @@ fun SwipeToReplyWrapper(
     val maxDrag = remember(density) { with(density) { 100.dp.toPx() } }
 
     val directionalOffset = remember { Animatable(0f) }
+
+    LaunchedEffect(showHint) {
+        if (showHint && onSwipeStart != null && onSwipeEnd != null) {
+            delay(500.milliseconds)
+            directionalOffset.animateTo(
+                targetValue = actionThreshold * 0.8f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
+            )
+            delay(800.milliseconds)
+            directionalOffset.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
+            )
+            delay(300.milliseconds)
+            directionalOffset.animateTo(
+                targetValue = -actionThreshold * 0.8f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
+            )
+            delay(800.milliseconds)
+            directionalOffset.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
+            )
+            onHintShown()
+        } else if (showHint) {
+            onHintShown()
+        }
+    }
 
     val isPastThreshold by remember {
         derivedStateOf { abs(directionalOffset.value) >= actionThreshold }

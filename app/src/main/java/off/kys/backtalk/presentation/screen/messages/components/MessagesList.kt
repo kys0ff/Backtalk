@@ -10,14 +10,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
+import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.util.emptyString
+import org.koin.compose.koinInject
 
 @Composable
 fun MessagesList(
@@ -40,9 +46,21 @@ fun MessagesList(
     onTogglePin: (MessageEntity, Boolean) -> Unit = { _, _ -> },
     onLongClick: (MessageEntity?) -> Unit = {}
 ) {
+    val preferences = koinInject<BacktalkPreferences>()
+    var showHintForId by remember { mutableStateOf<MessageId?>(null) }
+
     val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
 
     LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty() && !preferences.swipeHintShown) {
+            val hintMessage = messages.lastOrNull { message ->
+                val isLocked = (System.currentTimeMillis() - message.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW
+                val canEdit = message.editedAt == null && !isLocked && message.voicePath == null
+                canEdit
+            }
+            showHintForId = hintMessage?.id
+        }
+
         if (messages.isNotEmpty() && listState.firstVisibleItemIndex <= 1) {
             listState.scrollToItem(0)
         }
@@ -110,7 +128,12 @@ fun MessagesList(
                                     onEditMessage(current)
                                 }
                             }
-                        } else null
+                        } else null,
+                        showHint = showHintForId == current.id,
+                        onHintShown = {
+                            showHintForId = null
+                            preferences.swipeHintShown = true
+                        }
                     ) {
                         MessageBubble(
                             messageEntity = current,

@@ -140,6 +140,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether the hashtags bar is shown at the top of the messages list. */
     var showTagsBar by preference(BooleanPreferenceItem(prefs, KEY_SHOW_TAGS_BAR, true))
 
+    /** Whether the swipe-to-action hint has been shown. */
+    var swipeHintShown by preference(BooleanPreferenceItem(prefs, KEY_SWIPE_HINT_SHOWN, false))
+
     /** The serialized list of paired devices. */
     var pairedDevicesJson by preference(StringPreferenceItem(prefs, KEY_PAIRED_DEVICES, "[]"))
 
@@ -215,6 +218,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_SHOW_TAGS_BAR = "show_tags_bar"
+        const val KEY_SWIPE_HINT_SHOWN = "swipe_hint_shown"
         const val KEY_PAIRED_DEVICES = "paired_devices"
         const val KEY_FIRST_LAUNCH = "first_launch"
         const val KEY_DEVICE_ID = "device_id"
