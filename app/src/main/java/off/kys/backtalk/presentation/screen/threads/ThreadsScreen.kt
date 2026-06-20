@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -26,6 +25,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.components.HintTooltip
+import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
+import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.ThreadsUiEvent
 import off.kys.backtalk.presentation.screen.threads.components.ThreadItem
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
@@ -43,7 +45,9 @@ class ThreadsScreen : Screen {
         val viewModel = koinViewModel<ThreadsViewModel>()
         val state by viewModel.uiState
 
-        Scaffold(
+        StatusScaffold(
+            status = if (state.isLoading) ScaffoldStatus.Info else ScaffoldStatus.None,
+            message = if (state.isLoading) StatusMessage.Resource(R.string.common_please_wait) else null,
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.threads_title)) },

@@ -1,6 +1,5 @@
 package off.kys.backtalk.presentation.screen.sync
 
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -12,10 +11,15 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
+import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.screen.sync.components.SyncDeviceList
 import off.kys.backtalk.presentation.screen.sync.components.SyncDialogs
 import off.kys.backtalk.presentation.screen.sync.components.SyncTopBar
+import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.viewmodel.koinViewModel
@@ -38,7 +42,36 @@ class SyncScreen : Screen {
             onDispose { viewModel.onEvent(SyncEvent.StopDiscovery) }
         }
 
-        Scaffold(
+        val (scaffoldStatus, statusMessage) = remember(state.syncStatus, state.error, state.errorRes) {
+            when {
+                state.error != null || state.errorRes != null -> {
+                    ScaffoldStatus.Error to (state.errorRes?.let { StatusMessage.Resource(it) }
+                        ?: StatusMessage.Hardcoded(state.error ?: "Unknown error"))
+                }
+
+                state.syncStatus == SyncStatus.SYNCING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                    R.string.sync_status_syncing
+                )
+
+                state.syncStatus == SyncStatus.CONNECTING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                    R.string.common_please_wait
+                )
+
+                state.syncStatus == SyncStatus.PAIRING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                    R.string.sync_enter_pin
+                )
+
+                state.syncStatus == SyncStatus.COMPLETED -> ScaffoldStatus.Info to StatusMessage.Hardcoded(
+                    "Sync completed"
+                )
+
+                else -> ScaffoldStatus.None to null
+            }
+        }
+
+        StatusScaffold(
+            status = scaffoldStatus,
+            message = statusMessage,
             topBar = {
                 SyncTopBar(
                     isDiscovering = state.isDiscovering,

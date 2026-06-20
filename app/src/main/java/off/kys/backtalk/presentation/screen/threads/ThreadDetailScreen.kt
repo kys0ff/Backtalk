@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -20,6 +19,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.presentation.components.HintTooltip
+import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.screen.threads.components.ThreadDetailContent
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
 import off.kys.backtalk.util.AudioPlayer
@@ -44,7 +45,8 @@ class ThreadDetailScreen(val thread: Thread) : Screen {
             }
         }
 
-        Scaffold(
+        StatusScaffold(
+            status = ScaffoldStatus.None,
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.threads_title)) },

@@ -3,6 +3,8 @@ package off.kys.backtalk.presentation.state
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.util.emptyString
 
 /**
@@ -40,7 +42,9 @@ data class MessagesUiState(
     val showChangelogDialog: Boolean = false,
     val showTagsBar: Boolean = true,
     val sharedText: String? = null,
-    val sharedImageUris: List<String> = emptyList()
+    val sharedImageUris: List<String> = emptyList(),
+    val scaffoldStatus: ScaffoldStatus = ScaffoldStatus.None,
+    val scaffoldMessage: StatusMessage? = null
 ) {
     val selectionMetrics: SelectionMetrics
         get() {

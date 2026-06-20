@@ -11,16 +11,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +45,9 @@ import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
+import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
+import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.SettingsUiState
@@ -174,18 +174,15 @@ fun SettingsScreenContent(
         }
     }
 
-    Scaffold(
+    StatusScaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        status = if (state.backupLoading) ScaffoldStatus.Info else ScaffoldStatus.None,
+        message = if (state.backupLoading) StatusMessage.Resource(R.string.common_please_wait) else null,
         topBar = {
-            Column {
-                SettingsTopAppBar(
-                    onNavigateBack = onNavigateBack,
-                    scrollBehavior = scrollBehavior
-                )
-                if (state.backupLoading) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                }
-            }
+            SettingsTopAppBar(
+                onNavigateBack = onNavigateBack,
+                scrollBehavior = scrollBehavior
+            )
         }
     ) { padding ->
         Column(

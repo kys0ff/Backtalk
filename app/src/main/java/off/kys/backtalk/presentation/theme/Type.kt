@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.sp
  *
  * This object defines the typography configuration for the application's theme,
  * using the Material 3 design system. It specifies text styles for various
- * display, headline, title, body, and label roles.
+ * display, headline, title, body, and labelRes roles.
  */
 val Typography = Typography(
     displayLarge = TextStyle(
