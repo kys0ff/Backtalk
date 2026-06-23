@@ -28,12 +28,10 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 @Composable
 fun MessageContextMenu(
     message: MessageEntity,
-    isSelected: Boolean,
     onDismiss: () -> Unit,
     onReply: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onSelect: () -> Unit,
     onCopy: () -> Unit
 ) {
     val isLocked =
@@ -106,25 +104,6 @@ fun MessageContextMenu(
             leadingIcon = {
                 Icon(
                     painterResource(R.drawable.round_content_copy_24),
-                    contentDescription = null
-                )
-            }
-        )
-        DropdownMenuItem(
-            text = {
-                Text(
-                    stringResource(
-                        if (isSelected) R.string.common_clear else R.string.common_selected
-                    )
-                )
-            },
-            onClick = {
-                onSelect()
-                onDismiss()
-            },
-            leadingIcon = {
-                Icon(
-                    painterResource(R.drawable.round_list_24),
                     contentDescription = null
                 )
             }

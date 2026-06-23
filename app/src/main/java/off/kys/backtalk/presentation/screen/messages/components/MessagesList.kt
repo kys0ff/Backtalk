@@ -175,12 +175,10 @@ fun MessagesList(
                     if (contextMenuEntity?.id == current.id) {
                         MessageContextMenu(
                             message = current,
-                            isSelected = isSelected,
                             onDismiss = { onLongClick(null) },
                             onReply = { onReply(current) },
                             onEdit = { onEditMessage(current) },
                             onDelete = { onDeleteMessage(current) },
-                            onSelect = { onToggleSelect(current.id) },
                             onCopy = { onCopyMessage(current) }
                         )
                     }

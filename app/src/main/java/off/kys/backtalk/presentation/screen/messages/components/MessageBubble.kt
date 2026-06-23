@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -233,11 +234,13 @@ fun MessageBubbleContent(
                             onDoubleClick()
                         }
                     },
-                    onLongClick = {
-                        if (hapticFeedbackEnabled) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onLongClick = if (selectMode) null else {
+                        {
+                            if (hapticFeedbackEnabled) {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                            onLongClick()
                         }
-                        onLongClick()
                     }
                 )
         ) {
@@ -452,26 +455,40 @@ private fun MessageInnerContent(
                     messageText.isNotEmpty() && !(images.isNotEmpty() && isDefaultCaption)
 
                 if (shouldShowText) {
-                    if (message.editedText != null && showOriginal) {
-                        SmartTextContent(
-                            text = message.text,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = contentColor.copy(alpha = 0.6f),
-                            textDecoration = TextDecoration.LineThrough,
-                            highlightQuery = highlightQuery,
-                            onMentionClicked = onTagClick,
-                            externalLinkWarningEnabled = false
-                        )
+                    val textContent = @Composable {
+                        Column {
+                            if (message.editedText != null && showOriginal) {
+                                SmartText(
+                                    text = message.text,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = contentColor.copy(alpha = 0.6f),
+                                    textDecoration = TextDecoration.LineThrough,
+                                    highlightQuery = highlightQuery,
+                                    onMentionClicked = onTagClick,
+                                    externalLinkWarningEnabled = false,
+                                    clickableLink = !selectMode
+                                )
+                            }
+
+                            SmartText(
+                                text = messageText,
+                                color = contentColor,
+                                style = MaterialTheme.typography.bodyLarge,
+                                highlightQuery = highlightQuery,
+                                onMentionClicked = onTagClick,
+                                externalLinkWarningEnabled = false,
+                                clickableLink = !selectMode
+                            )
+                        }
                     }
 
-                    SmartTextContent(
-                        text = messageText,
-                        color = contentColor,
-                        style = MaterialTheme.typography.bodyLarge,
-                        highlightQuery = highlightQuery,
-                        onMentionClicked = onTagClick,
-                        externalLinkWarningEnabled = false
-                    )
+                    if (selectMode) {
+                        SelectionContainer {
+                            textContent()
+                        }
+                    } else {
+                        textContent()
+                    }
 
                     val firstUrl = remember(messageText) { messageText.getFirstLinkOrNull() }
                     if (firstUrl != null) {

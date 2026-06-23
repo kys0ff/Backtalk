@@ -79,7 +79,8 @@ fun SmartText(
     lineHeight: TextUnit = TextUnit.Unspecified,
     highlightQuery: String? = null,
     overflow: TextOverflow = TextOverflow.Visible,
-    onMentionClicked: (String) -> Unit = {}
+    onMentionClicked: (String) -> Unit = {},
+    externalLinkWarningEnabled: Boolean? = null
 ) {
     val preferences = koinInject<BacktalkPreferences>()
     SmartTextContent(
@@ -95,12 +96,12 @@ fun SmartText(
         highlightQuery = highlightQuery,
         overflow = overflow,
         onMentionClicked = onMentionClicked,
-        externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+        externalLinkWarningEnabled = externalLinkWarningEnabled ?: preferences.externalLinkWarningEnabled
     )
 }
 
 @Composable
-fun SmartTextContent(
+private fun SmartTextContent(
     text: String,
     modifier: Modifier = Modifier,
     clickableLink: Boolean = true,
@@ -163,19 +164,23 @@ fun SmartTextContent(
         text = annotatedString,
         onTextLayout = { textLayoutResult = it },
         modifier = modifier
-            .pointerInput(annotatedString) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    val layout = textLayoutResult ?: return@awaitEachGesture
-                    val offset = layout.getOffsetForPosition(down.position)
-                    val link = annotatedString.getLinkAnnotations(offset, offset).firstOrNull()
-                    if (link != null) {
-                        pressedLink = link
-                        waitForUpOrCancellation()
-                        pressedLink = null
+            .then(
+                if (clickableLink) {
+                    Modifier.pointerInput(annotatedString) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            val layout = textLayoutResult ?: return@awaitEachGesture
+                            val offset = layout.getOffsetForPosition(down.position)
+                            val link = annotatedString.getLinkAnnotations(offset, offset).firstOrNull()
+                            if (link != null) {
+                                pressedLink = link
+                                waitForUpOrCancellation()
+                                pressedLink = null
+                            }
+                        }
                     }
-                }
-            }
+                } else Modifier
+            )
             .drawBehind {
                 val layout = textLayoutResult ?: return@drawBehind
 
