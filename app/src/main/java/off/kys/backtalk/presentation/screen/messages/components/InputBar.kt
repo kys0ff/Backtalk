@@ -384,45 +384,11 @@ private fun ChatTextField(
         contentAlignment = Alignment.CenterStart
     ) {
         if (isRecording) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color.Red)
-                )
-                Text(
-                    text = durationText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val lastAmplitudes = amplitudes.takeLast(12)
-                    lastAmplitudes.forEach { amp ->
-                        Box(
-                            modifier = Modifier
-                                .width(2.dp)
-                                .height((amp * 24f).coerceIn(2f, 24f).dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                        )
-                    }
-                }
-
-                Text(
-                    text = stringResource(R.string.chat_input_slide_to_cancel),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
+            VoiceRecordingIndicator(
+                amplitudes = amplitudes,
+                durationText = durationText,
+                modifier = Modifier.fillMaxWidth()
+            )
         } else {
             BasicTextField(
                 state = textFieldState,
@@ -465,9 +431,6 @@ private fun ActionButtons(
     layoutDirection: LayoutDirection
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-
-    // Maintain a local mutable accumulator inside the pointer tracker context
-    // to instantly verify threshold conditions during swift drag movements.
     var dragAccumulator by remember { mutableFloatStateOf(0f) }
 
     Box(
@@ -529,14 +492,12 @@ private fun ActionButtons(
                             onDrag = { change, dragAmount ->
                                 change.consume()
 
-                                // Sliding left cancel gesture maps directly to negative dragAmount.x in LTR environments
                                 val delta = dragAmount.x
                                 dragAccumulator += delta
 
                                 val directedX = if (layoutDirection == LayoutDirection.Rtl) -dragAccumulator else dragAccumulator
                                 onDragUpdate(directedX)
 
-                                // Instantly trigger cancel execution if the user exceeds the distance threshold
                                 if (abs(dragAccumulator) >= maxDragX) {
                                     onCancelRecording()
                                 }
