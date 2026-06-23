@@ -2,6 +2,7 @@ package off.kys.backtalk.presentation.event
 
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.model.MessageUiModel
 
 /**
  * Sealed interface representing the different UI events related to messages.
@@ -33,14 +34,14 @@ sealed interface MessagesUiEvent {
      *
      * @param message The message to edit, or null if no message is being edited.
      */
-    data class EditMessage(val message: MessageEntity?) : MessagesUiEvent
+    data class EditMessage(val message: MessageUiModel?) : MessagesUiEvent
 
     /**
      * UI event to reply to a message.
      *
      * @param message The message to reply to, or null if no message is being replied to.
      */
-    data class ReplyTo(val message: MessageEntity?) : MessagesUiEvent
+    data class ReplyTo(val message: MessageUiModel?) : MessagesUiEvent
 
     /**
      * UI event to select a message.
@@ -218,15 +219,15 @@ sealed interface MessagesUiEvent {
     /**
      * UI event to show or hide the context menu for a message.
      */
-    data class ShowMessageContextMenu(val message: MessageEntity?) : MessagesUiEvent
+    data class ShowMessageContextMenu(val message: MessageUiModel?) : MessagesUiEvent
 
     /**
      * UI event to copy a specific message to the clipboard.
      */
-    data class CopyMessage(val message: MessageEntity) : MessagesUiEvent
+    data class CopyMessage(val message: MessageUiModel) : MessagesUiEvent
 
     /**
      * UI event to initiate deletion of a specific message.
      */
-    data class DeleteMessage(val message: MessageEntity) : MessagesUiEvent
+    data class DeleteMessage(val message: MessageUiModel) : MessagesUiEvent
 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
 import off.kys.backtalk.common.AppLanguage
+import off.kys.backtalk.common.AppTimeFormat
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -158,7 +159,7 @@ class SettingsViewModel(
         _state.update { it.copy(dateFormat = dateFormat) }
     }
 
-    private fun onTimeFormatChange(timeFormat: off.kys.backtalk.common.AppTimeFormat) {
+    private fun onTimeFormatChange(timeFormat: AppTimeFormat) {
         preferences.timeFormat = timeFormat
         _state.update { it.copy(timeFormat = timeFormat) }
     }

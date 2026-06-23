@@ -17,47 +17,51 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.util.emptyString
 import org.koin.compose.koinInject
 
 @Composable
 fun MessagesList(
-    messages: List<MessageEntity>,
-    selectedMessageIds: Set<MessageId>,
+    messages: PersistentList<MessageUiModel>,
+    repliedMessagesMap: PersistentMap<MessageId, MessageUiModel>,
+    selectedMessageIds: PersistentSet<MessageId>,
     listState: LazyListState,
     contentPadding: PaddingValues,
-    onEditMessage: (MessageEntity?) -> Unit,
-    onReply: (MessageEntity?) -> Unit,
+    onEditMessage: (MessageUiModel?) -> Unit,
+    onReply: (MessageUiModel?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
-    onDeleteMessage: (MessageEntity) -> Unit = {},
-    onCopyMessage: (MessageEntity) -> Unit = {},
-    contextMenuEntity: MessageEntity? = null,
+    onDeleteMessage: (MessageUiModel) -> Unit = {},
+    onCopyMessage: (MessageUiModel) -> Unit = {},
+    contextMenuEntity: MessageUiModel? = null,
     searchQuery: String = emptyString(),
     onTagClick: (String) -> Unit = {},
     blinkMessageId: MessageId? = null,
     onScrollToMessage: (MessageId) -> Unit = {},
-    selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
+    selectedImagePaths: PersistentMap<MessageId, PersistentSet<String>> = persistentMapOf(),
     onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
-    onTogglePin: (MessageEntity, Boolean) -> Unit = { _, _ -> },
-    onLongClick: (MessageEntity?) -> Unit = {}
+    onTogglePin: (MessageUiModel, Boolean) -> Unit = { _, _ -> },
+    onLongClick: (MessageUiModel?) -> Unit = {}
 ) {
     val preferences = koinInject<BacktalkPreferences>()
     var showHintForId by remember { mutableStateOf<MessageId?>(null) }
 
     val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
 
+    val reversedMessages = remember(messages) { messages.reversed() }
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty() && !preferences.swipeHintShown) {
-            val hintMessage = messages.lastOrNull { message ->
-                val isLocked = (System.currentTimeMillis() - message.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW
-                val canEdit = message.editedAt == null && !isLocked && message.voicePath == null
-                canEdit
-            }
+            val hintMessage = messages.lastOrNull { message -> message.canEdit }
             showHintForId = hintMessage?.id
         }
 
@@ -73,15 +77,13 @@ fun MessagesList(
         state = listState,
         reverseLayout = true
     ) {
-        val reversed = messages.reversed()
-
         items(
-            count = reversed.size,
-            key = { reversed[it].id() }
+            count = reversedMessages.size,
+            key = { reversedMessages[it].id.value }
         ) { index ->
-            val current = reversed[index]
-            val next = reversed.getOrNull(index - 1)
-            val prev = reversed.getOrNull(index + 1)
+            val current = reversedMessages[index]
+            val next = reversedMessages.getOrNull(index - 1)
+            val prev = reversedMessages.getOrNull(index + 1)
 
             val showTimestamp =
                 prev == null || current.timestamp - prev.timestamp > Constants.TIME_GAP_FOR_HEADER
@@ -92,18 +94,21 @@ fun MessagesList(
             val isBottom =
                 next == null || next.timestamp - current.timestamp > Constants.TIME_GAP_FOR_GROUPING
 
-            val repliedMessage =
-                current.repliedToId?.let { id ->
-                    messages.find { it.id == id }
-                }
+            val repliedMessage = repliedMessagesMap[current.id]
 
             val isSelected = current.id in selectedMessageIds
 
-            val isLocked = (System.currentTimeMillis() - current.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW
-
-            val canEdit = current.editedAt == null &&
-            !isLocked &&
-            current.voicePath == null
+            val currentOnReply = remember(current) { { onReply(current) } }
+            val currentOnEdit = remember(current) { { onEditMessage(current) } }
+            val currentOnLongClick = remember(current) { { onLongClick(current) } }
+            val currentOnTogglePin = remember(current) { { onTogglePin(current, !current.isPinned) } }
+            val currentOnToggleSelect = remember(current) { { onToggleSelect(current.id) } }
+            val currentOnScrollToMessage = remember(current) {
+                { current.repliedToId?.let { onScrollToMessage(it) } ?: Unit }
+            }
+            val currentOnToggleImageSelect = remember(current) {
+                { path: String -> onToggleImageSelect(current.id, path) }
+            }
 
             Column(
                 modifier = Modifier.animateItem(),
@@ -118,14 +123,14 @@ fun MessagesList(
                         startIconRes = R.drawable.round_reply_24,
                         onSwipeStart = {
                             if (!selectionMode) {
-                                onReply(current)
+                                currentOnReply()
                             }
                         },
                         endIconRes = R.drawable.round_edit_24,
-                        onSwipeEnd = if (canEdit) {
+                        onSwipeEnd = if (current.canEdit) {
                             {
                                 if (!selectionMode) {
-                                    onEditMessage(current)
+                                    currentOnEdit()
                                 }
                             }
                         } else null,
@@ -136,39 +141,35 @@ fun MessagesList(
                         }
                     ) {
                         MessageBubble(
-                            messageEntity = current,
-                            repliedMessageEntity = repliedMessage,
+                            message = current,
+                            repliedMessage = repliedMessage,
                             blinkMessageId = blinkMessageId,
                             isTop = isTop,
                             isBottom = isBottom,
                             selectMode = selectionMode,
                             isSelected = isSelected,
-                            onReplyPreviewClick = {
-                                current.repliedToId?.let { id ->
-                                    onScrollToMessage(id)
-                                }
-                            },
+                            onReplyPreviewClick = currentOnScrollToMessage,
                             onClick = {
                                 if (selectionMode) {
-                                    onToggleSelect(current.id)
+                                    currentOnToggleSelect()
                                 }
                             },
                             onLongClick = {
-                                onToggleSelect(current.id)
+                                currentOnToggleSelect()
                                 if (!selectionMode) {
-                                    onLongClick(current)
+                                    currentOnLongClick()
                                 }
                             },
                             onDoubleClick = {
                                 if (!selectionMode) {
-                                    onTogglePin(current, !current.isPinned)
+                                    currentOnTogglePin()
                                 }
                             },
                             highlightQuery = searchQuery,
                             onTagClick = onTagClick,
-                            selectedImagePaths = selectedImagePaths[current.id] ?: emptySet(),
-                            onToggleImageSelect = { path -> onToggleImageSelect(current.id, path) },
-                            isLocked = isLocked
+                            selectedImagePaths = selectedImagePaths[current.id] ?: persistentSetOf(),
+                            onToggleImageSelect = currentOnToggleImageSelect,
+                            hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
                         )
                     }
 

@@ -41,7 +41,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,42 +62,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.lock.LocalDateFormatter
-import off.kys.backtalk.common.pref.BacktalkPreferences
-import off.kys.backtalk.common.registry.CaptionWordsRegistry
-import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.screen.components.size_observer.SizeRegistryScope
 import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
 import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
-import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingMocks
 import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
-import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.util.AudioPlayer
-import off.kys.backtalk.util.DateFormatter
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
-import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
-import org.koin.dsl.koinConfiguration
-import org.koin.dsl.module
 import java.io.File
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(
-    messageEntity: MessageEntity,
-    repliedMessageEntity: MessageEntity?,
+    message: MessageUiModel,
+    repliedMessage: MessageUiModel?,
     blinkMessageId: MessageId?,
     isTop: Boolean,
     isBottom: Boolean,
@@ -112,13 +101,11 @@ fun MessageBubble(
     onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {},
-    isLocked: Boolean = false
+    hapticFeedbackEnabled: Boolean
 ) {
-    val preferences = koinInject<BacktalkPreferences>()
-
     MessageBubbleContent(
-        messageEntity = messageEntity,
-        repliedMessageEntity = repliedMessageEntity,
+        message = message,
+        repliedMessage = repliedMessage,
         blinkMessageId = blinkMessageId,
         isTop = isTop,
         isBottom = isBottom,
@@ -132,16 +119,15 @@ fun MessageBubble(
         onToggleImageSelect = onToggleImageSelect,
         highlightQuery = highlightQuery,
         onTagClick = onTagClick,
-        isLocked = isLocked,
-        hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
+        hapticFeedbackEnabled = hapticFeedbackEnabled
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubbleContent(
-    messageEntity: MessageEntity,
-    repliedMessageEntity: MessageEntity?,
+    message: MessageUiModel,
+    repliedMessage: MessageUiModel?,
     blinkMessageId: MessageId?,
     isTop: Boolean,
     isBottom: Boolean,
@@ -155,7 +141,6 @@ fun MessageBubbleContent(
     onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {},
-    isLocked: Boolean = false,
     hapticFeedbackEnabled: Boolean
 ) {
     var showExtraInfo by remember { mutableStateOf(false) }
@@ -163,10 +148,9 @@ fun MessageBubbleContent(
     val interactionSource = remember { MutableInteractionSource() }
     val scope = rememberCoroutineScope()
 
-    val isBlinking = blinkMessageId == messageEntity.id
+    val isBlinking = blinkMessageId == message.id
     val scale = remember { Animatable(1f) }
     val blinkAlpha = remember { Animatable(0f) }
-    val captionsRegistry = koinInject<CaptionWordsRegistry>()
 
     LaunchedEffect(isBlinking) {
         if (isBlinking) {
@@ -181,17 +165,6 @@ fun MessageBubbleContent(
         }
     }
 
-    val messageText = messageEntity.editedText ?: messageEntity.text
-    val isDefaultCaption = captionsRegistry.isRestricted(messageText)
-
-    val hasImages =
-        !messageEntity.mediaPath.isNullOrEmpty() || !messageEntity.mediaPaths.isNullOrEmpty()
-    val hasVoice = messageEntity.voicePath != null
-    val hasText = messageText.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
-    val hasRepliedMessage = repliedMessageEntity != null
-    val hasTags = messageEntity.isReminder || messageEntity.isPinned
-    val isImageOnly = hasImages && !hasText && !hasVoice && !hasRepliedMessage && !hasTags
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,10 +176,10 @@ fun MessageBubbleContent(
             isSelected = isSelected,
             isTop = isTop,
             isBottom = isBottom,
-            isReminder = messageEntity.isReminder,
+            isReminder = message.isReminder,
             blinkAlpha = blinkAlpha.value,
             scale = scale.value,
-            isImageOnly = isImageOnly,
+            isImageOnly = message.isImageOnly,
             modifier = Modifier
                 .wrapContentWidth()
                 .combinedClickable(
@@ -245,8 +218,8 @@ fun MessageBubbleContent(
                 )
         ) {
             MessageInnerContent(
-                message = messageEntity,
-                repliedMessage = repliedMessageEntity,
+                message = message,
+                repliedMessage = repliedMessage,
                 onReplyClick = onReplyPreviewClick,
                 showOriginal = showExtraInfo,
                 selectMode = selectMode,
@@ -260,12 +233,12 @@ fun MessageBubbleContent(
 
         MessageFooter(
             isVisible = showExtraInfo,
-            timestamp = messageEntity.timestamp,
-            editedAt = messageEntity.editedAt,
-            isReminder = messageEntity.isReminder,
-            originalTimestamp = messageEntity.originalCreationTimestamp,
-            targetTimestamp = messageEntity.scheduledTimestamp,
-            isLocked = isLocked
+            timestamp = message.timestamp,
+            editedAt = message.editedAt,
+            isReminder = message.isReminder,
+            originalTimestamp = message.originalCreationTimestamp,
+            targetTimestamp = message.scheduledTimestamp,
+            isLocked = message.isLocked
         )
     }
 }
@@ -333,8 +306,8 @@ private fun MessageSurface(
 
 @Composable
 private fun MessageInnerContent(
-    message: MessageEntity,
-    repliedMessage: MessageEntity?,
+    message: MessageUiModel,
+    repliedMessage: MessageUiModel?,
     onReplyClick: () -> Unit,
     showOriginal: Boolean,
     selectMode: Boolean,
@@ -347,10 +320,13 @@ private fun MessageInnerContent(
     val innerContentId = "message_inner_content"
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
-    val captionsRegistry = koinInject<CaptionWordsRegistry>()
 
     SizeRegistryScope {
-        Column(modifier = Modifier.observeSize(innerContentId)) {
+        Column(
+            modifier = Modifier
+                .widthIn(min = 100.dp)
+                .observeSize(innerContentId)
+        ) {
             AnimatedVisibility(
                 visible = message.isReminder || message.isPinned,
                 enter = expandVertically() + fadeIn(),
@@ -382,9 +358,9 @@ private fun MessageInnerContent(
             if (repliedMessage != null) {
                 ReplyPreview(
                     modifier = Modifier.applyWidth(innerContentId),
-                    text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message) else if (repliedMessage.mediaPath != null || !repliedMessage.mediaPaths.isNullOrEmpty()) stringResource(
-                        R.string.chat_reply_image_preview
-                    ) else repliedMessage.text,
+                    text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message)
+                    else if (repliedMessage.hasImages) stringResource(R.string.chat_reply_image_preview)
+                    else repliedMessage.visibleText,
                     voicePath = repliedMessage.voicePath,
                     onPreviewClick = onReplyClick
                 )
@@ -413,16 +389,12 @@ private fun MessageInnerContent(
                     onImageLongClick = { imagePath -> onToggleImageSelect(imagePath) },
                     hapticFeedbackEnabled = hapticFeedbackEnabled
                 )
-                val messageText = message.editedText ?: message.text
-                val isDefaultCaption = captionsRegistry.isRestricted(messageText)
-                val hasActualText = messageText.isNotEmpty() && !isDefaultCaption
-
-                if (hasActualText || message.voicePath != null) {
+                if (message.hasText || message.hasVoice) {
                     Spacer(modifier = Modifier.height(4.dp))
                 }
             }
 
-            if (message.voicePath != null) {
+            if (message.hasVoice && message.voicePath != null) {
                 val audioPlayer = koinInject<AudioPlayer>()
                 val isPlayingState by audioPlayer.isPlaying.collectAsStateWithLifecycle()
                 val progressState by audioPlayer.progress.collectAsStateWithLifecycle()
@@ -432,7 +404,7 @@ private fun MessageInnerContent(
 
                 VoiceMessageBubbleContent(
                     duration = message.voiceDuration ?: 0L,
-                    waveformData = message.waveformData ?: emptyList(),
+                    waveformData = message.waveformData ?: persistentListOf(),
                     contentColor = contentColor,
                     isPlaying = isThisPlaying,
                     progress = if (isThisPlaying) progressState else 0f,
@@ -448,67 +420,61 @@ private fun MessageInnerContent(
                         }
                     }
                 )
-            } else {
-                val messageText = message.editedText ?: message.text
-                val isDefaultCaption = captionsRegistry.isRestricted(messageText)
-                val shouldShowText =
-                    messageText.isNotEmpty() && !(images.isNotEmpty() && isDefaultCaption)
-
-                if (shouldShowText) {
-                    val textContent = @Composable {
-                        Column {
-                            if (message.editedText != null && showOriginal) {
-                                SmartText(
-                                    text = message.text,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = contentColor.copy(alpha = 0.6f),
-                                    textDecoration = TextDecoration.LineThrough,
-                                    highlightQuery = highlightQuery,
-                                    onMentionClicked = onTagClick,
-                                    externalLinkWarningEnabled = false,
-                                    clickableLink = !selectMode
-                                )
-                            }
-
+            } else if (message.hasText) {
+                val textContent = @Composable {
+                    Column {
+                        if (message.editedText != null && showOriginal) {
                             SmartText(
-                                text = messageText,
-                                color = contentColor,
-                                style = MaterialTheme.typography.bodyLarge,
+                                text = message.text,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = contentColor.copy(alpha = 0.6f),
+                                textDecoration = TextDecoration.LineThrough,
                                 highlightQuery = highlightQuery,
                                 onMentionClicked = onTagClick,
                                 externalLinkWarningEnabled = false,
                                 clickableLink = !selectMode
                             )
                         }
-                    }
 
-                    if (selectMode) {
-                        SelectionContainer {
-                            textContent()
-                        }
-                    } else {
-                        textContent()
-                    }
-
-                    val firstUrl = remember(messageText) { messageText.getFirstLinkOrNull() }
-                    if (firstUrl != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        LinkPreviewCard(
-                            url = firstUrl,
-                            modifier = Modifier.applyWidth(innerContentId)
+                        SmartText(
+                            text = message.visibleText,
+                            color = contentColor,
+                            style = MaterialTheme.typography.bodyLarge,
+                            highlightQuery = highlightQuery,
+                            onMentionClicked = onTagClick,
+                            externalLinkWarningEnabled = false,
+                            clickableLink = !selectMode
                         )
                     }
                 }
 
-                if (message.editedText != null) {
-                    Text(
-                        text = stringResource(R.string.chat_status_edited),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontStyle = FontStyle.Italic,
-                        color = contentColor.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(top = 2.dp)
+                if (selectMode) {
+                    SelectionContainer {
+                        textContent()
+                    }
+                } else {
+                    textContent()
+                }
+
+                val firstUrl =
+                    remember(message.visibleText) { message.visibleText.getFirstLinkOrNull() }
+                if (firstUrl != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinkPreviewCard(
+                        url = firstUrl,
+                        modifier = Modifier.applyWidth(innerContentId)
                     )
                 }
+            }
+
+            if (message.editedText != null) {
+                Text(
+                    text = stringResource(R.string.chat_status_edited),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontStyle = FontStyle.Italic,
+                    color = contentColor.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(top = 2.dp)
+                )
             }
         }
     }
@@ -759,8 +725,14 @@ private fun GridImage(
 
         AnimatedVisibility(
             visible = isSelected,
-            enter = fadeIn(animationSpec = tween(100)) + scaleIn(initialScale = 0.8f, animationSpec = tween(100)),
-            exit = fadeOut(animationSpec = tween(100)) + scaleOut(targetScale = 0.8f, animationSpec = tween(100)),
+            enter = fadeIn(animationSpec = tween(100)) + scaleIn(
+                initialScale = 0.8f,
+                animationSpec = tween(100)
+            ),
+            exit = fadeOut(animationSpec = tween(100)) + scaleOut(
+                targetScale = 0.8f,
+                animationSpec = tween(100)
+            ),
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Surface(
@@ -915,190 +887,4 @@ private fun MessageFooter(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MessageBubblePreview() {
-    val context = LocalContext.current
-    val preferences = remember { BacktalkPreferences(context) }
-    val dateFormatter = remember { DateFormatter(context, preferences) }
-
-    KoinApplication(
-        configuration = koinConfiguration(
-            declaration = {
-                modules(module {
-                    single { preferences }
-                    single { dateFormatter }
-                }
-                )
-            }
-        ),
-        content = {
-            BacktalkTheme {
-                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
-                    Box(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        MessageBubbleContent(
-                            messageEntity = OnboardingMocks.message1,
-                            repliedMessageEntity = null,
-                            blinkMessageId = null,
-                            isTop = true,
-                            isBottom = true,
-                            selectMode = false,
-                            isSelected = false,
-                            onReplyPreviewClick = {},
-                            onClick = {},
-                            onLongClick = {},
-                            hapticFeedbackEnabled = true
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
-@Preview(
-    showBackground = true,
-    wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE,
-)
-@Composable
-private fun MessageBubbleReplyPreview() {
-    val context = LocalContext.current
-    val preferences = remember { BacktalkPreferences(context) }
-    val dateFormatter = remember { DateFormatter(context, preferences) }
-
-    KoinApplication(
-        configuration = koinConfiguration(
-            declaration = {
-                modules(
-                    module {
-                        single { preferences }
-                        single { dateFormatter }
-                    }
-                )
-            }
-        ),
-        content = {
-            BacktalkTheme {
-                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
-                    Box(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        MessageBubbleContent(
-                            messageEntity = OnboardingMocks.message2,
-                            repliedMessageEntity = OnboardingMocks.message1.copy(text = "Yeah Sure"),
-                            blinkMessageId = null,
-                            isTop = true,
-                            isBottom = true,
-                            selectMode = false,
-                            isSelected = false,
-                            onReplyPreviewClick = {},
-                            onClick = {},
-                            onLongClick = {},
-                            hapticFeedbackEnabled = true
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MessageBubbleImagePreview() {
-    val context = LocalContext.current
-    val preferences = remember { BacktalkPreferences(context) }
-    val dateFormatter = remember { DateFormatter(context, preferences) }
-
-    KoinApplication(
-        configuration = koinConfiguration(
-            declaration = {
-                modules(
-                    module {
-                        single { preferences }
-                        single { dateFormatter }
-                    }
-                )
-            }
-        ),
-        content = {
-            BacktalkTheme {
-                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
-                    Box(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        MessageBubbleContent(
-                            messageEntity = OnboardingMocks.imageMessage,
-                            repliedMessageEntity = null,
-                            blinkMessageId = null,
-                            isTop = true,
-                            isBottom = true,
-                            selectMode = false,
-                            isSelected = false,
-                            onReplyPreviewClick = {},
-                            onClick = {},
-                            onLongClick = {},
-                            hapticFeedbackEnabled = true
-                        )
-                    }
-                }
-            }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MessageBubbleVoicePreview() {
-    val context = LocalContext.current
-    val preferences = remember { BacktalkPreferences(context) }
-    val dateFormatter = remember { DateFormatter(context, preferences) }
-
-    KoinApplication(
-        configuration = koinConfiguration(
-            declaration = {
-                modules(
-                    module {
-                        single { preferences }
-                        single { dateFormatter }
-                    }
-                )
-            }
-        ),
-        content = {
-            BacktalkTheme {
-                CompositionLocalProvider(LocalDateFormatter provides dateFormatter) {
-                    Box(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    ) {
-                        MessageBubbleContent(
-                            messageEntity = OnboardingMocks.voiceMessage,
-                            repliedMessageEntity = null,
-                            blinkMessageId = null,
-                            isTop = true,
-                            isBottom = true,
-                            selectMode = false,
-                            isSelected = false,
-                            onReplyPreviewClick = {},
-                            onClick = {},
-                            onLongClick = {},
-                            hapticFeedbackEnabled = true
-                        )
-                    }
-                }
-            }
-        }
-    )
 }

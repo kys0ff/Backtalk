@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 
@@ -76,7 +77,9 @@ fun ReplyPreview(
                     Text(
                         text = text,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.background,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 2
                     )
                 }
             } else {
@@ -84,6 +87,7 @@ fun ReplyPreview(
                     text = text,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.background,
+                    overflow = TextOverflow.Ellipsis,
                     maxLines = 2
                 )
             }

@@ -27,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import java.util.concurrent.TimeUnit
 
+import kotlinx.collections.immutable.PersistentList
+
 @Composable
 fun VoiceMessageBubbleContent(
     modifier: Modifier = Modifier,
     duration: Long,
-    waveformData: List<Float>,
+    waveformData: PersistentList<Float>,
     contentColor: Color,
     isPlaying: Boolean,
     progress: Float,

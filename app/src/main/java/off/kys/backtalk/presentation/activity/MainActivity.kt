@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
@@ -48,7 +49,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         val preferences = viewModel.preferences
-        val messagesUiState by messagesViewModel.uiState
 
         isAuthenticated = !preferences.lockEnabled
         isAuthChecked = !preferences.lockEnabled
@@ -56,12 +56,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition {
-            !isAuthChecked || (isAuthenticated && messagesUiState.isLoading)
+            !isAuthChecked || (isAuthenticated && messagesViewModel.uiState.value.isLoading)
         }
 
         enableEdgeToEdge()
 
         setBiometricContent {
+            val messagesUiState by messagesViewModel.uiState.collectAsStateWithLifecycle()
+            isAuthenticated = !preferences.lockEnabled || isAuthChecked // Simplified for splash sync
+
             val biometricManager = LocalBiometricManager.current
             val appLockManager = LocalAppLockManager.current
 

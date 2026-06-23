@@ -10,7 +10,49 @@ import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getAssetFile
 
+import kotlinx.collections.immutable.toPersistentList
+import off.kys.backtalk.common.Constants
+import off.kys.backtalk.presentation.model.MessageUiModel
+
 object OnboardingMocks {
+    private fun MessageEntity.toMockUiModel(): MessageUiModel {
+        val visibleText = editedText ?: text
+        return MessageUiModel(
+            id = id,
+            text = text,
+            timestamp = timestamp,
+            repliedToId = repliedToId,
+            editedText = editedText,
+            editedAt = editedAt,
+            voicePath = voicePath,
+            voiceDuration = voiceDuration,
+            waveformData = waveformData?.toPersistentList(),
+            isReminder = isReminder,
+            originalCreationTimestamp = originalCreationTimestamp,
+            scheduledTimestamp = scheduledTimestamp,
+            isPinned = isPinned,
+            mediaPath = mediaPath,
+            mediaPaths = mediaPaths?.toPersistentList(),
+            mediaType = mediaType,
+            isDefaultCaption = false,
+            isLocked = false,
+            canEdit = voicePath == null,
+            hasImages = !mediaPath.isNullOrEmpty() || !mediaPaths.isNullOrEmpty(),
+            hasVoice = voicePath != null,
+            hasText = visibleText.isNotEmpty(),
+            hasRepliedMessage = repliedToId != null,
+            hasTags = isReminder || isPinned,
+            isImageOnly = false,
+            visibleText = visibleText
+        )
+    }
+
+    val messageUi1 @Composable get() = message1.toMockUiModel()
+    val messageUi2 @Composable get() = message2.toMockUiModel()
+    val voiceMessageUi @Composable get() = voiceMessage.toMockUiModel()
+    val reminderMessageUi @Composable get() = reminderMessage.toMockUiModel()
+    val imageMessageUi @Composable get() = imageMessage.toMockUiModel()
+
     val message1
         @Composable get() = MessageEntity(
             id = MessageId(1),

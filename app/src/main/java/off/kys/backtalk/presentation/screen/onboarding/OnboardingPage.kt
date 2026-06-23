@@ -56,8 +56,8 @@ enum class OnboardingPage(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 MessageBubble(
-                    messageEntity = OnboardingMocks.message1,
-                    repliedMessageEntity = null,
+                    message = OnboardingMocks.messageUi1,
+                    repliedMessage = null,
                     blinkMessageId = null,
                     isTop = true,
                     isBottom = true,
@@ -65,11 +65,12 @@ enum class OnboardingPage(
                     isSelected = false,
                     onReplyPreviewClick = {},
                     onClick = {},
-                    onLongClick = {}
+                    onLongClick = {},
+                    hapticFeedbackEnabled = false
                 )
                 MessageBubble(
-                    messageEntity = OnboardingMocks.message2,
-                    repliedMessageEntity = OnboardingMocks.message1,
+                    message = OnboardingMocks.messageUi2,
+                    repliedMessage = OnboardingMocks.messageUi1,
                     blinkMessageId = null,
                     isTop = true,
                     isBottom = true,
@@ -77,11 +78,12 @@ enum class OnboardingPage(
                     isSelected = false,
                     onReplyPreviewClick = {},
                     onClick = {},
-                    onLongClick = {}
+                    onLongClick = {},
+                    hapticFeedbackEnabled = false
                 )
                 MessageBubble(
-                    messageEntity = OnboardingMocks.reminderMessage,
-                    repliedMessageEntity = null,
+                    message = OnboardingMocks.reminderMessageUi,
+                    repliedMessage = null,
                     blinkMessageId = null,
                     isTop = true,
                     isBottom = true,
@@ -89,11 +91,12 @@ enum class OnboardingPage(
                     isSelected = false,
                     onReplyPreviewClick = {},
                     onClick = {},
-                    onLongClick = {}
+                    onLongClick = {},
+                    hapticFeedbackEnabled = false
                 )
                 MessageBubble(
-                    messageEntity = OnboardingMocks.imageMessage,
-                    repliedMessageEntity = null,
+                    message = OnboardingMocks.imageMessageUi,
+                    repliedMessage = null,
                     blinkMessageId = null,
                     isTop = true,
                     isBottom = true,
@@ -101,7 +104,8 @@ enum class OnboardingPage(
                     isSelected = false,
                     onReplyPreviewClick = {},
                     onClick = {},
-                    onLongClick = {}
+                    onLongClick = {},
+                    hapticFeedbackEnabled = false
                 )
             }
         }
@@ -119,8 +123,8 @@ enum class OnboardingPage(
                 contentAlignment = Alignment.Center
             ) {
                 MessageBubble(
-                    messageEntity = OnboardingMocks.voiceMessage,
-                    repliedMessageEntity = null,
+                    message = OnboardingMocks.voiceMessageUi,
+                    repliedMessage = null,
                     blinkMessageId = null,
                     isTop = true,
                     isBottom = true,
@@ -128,7 +132,8 @@ enum class OnboardingPage(
                     isSelected = false,
                     onReplyPreviewClick = {},
                     onClick = {},
-                    onLongClick = {}
+                    onLongClick = {},
+                    hapticFeedbackEnabled = false
                 )
             }
         }

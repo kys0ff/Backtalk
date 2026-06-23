@@ -2,14 +2,14 @@ package off.kys.backtalk.presentation.event
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.content.TransferableContent
-import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.status.SchedulingStage
 
 sealed interface InputBarEvent {
     data class SendMessage(val text: String) : InputBarEvent
     data class ScheduleMessage(val text: String, val timestamp: Long) : InputBarEvent
-    data class UpdateReplyingTo(val message: MessageEntity?) : InputBarEvent
-    data class UpdateEditingMessage(val message: MessageEntity?) : InputBarEvent
+    data class UpdateReplyingTo(val message: MessageUiModel?) : InputBarEvent
+    data class UpdateEditingMessage(val message: MessageUiModel?) : InputBarEvent
     data object CancelReply : InputBarEvent
     data object CancelEdit : InputBarEvent
     data object AttachClicked : InputBarEvent

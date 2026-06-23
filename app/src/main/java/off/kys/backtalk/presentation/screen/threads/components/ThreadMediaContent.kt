@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
+import kotlinx.collections.immutable.toPersistentList
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.presentation.screen.messages.components.StaggeredImageGrid
@@ -66,7 +67,7 @@ fun ThreadMediaContent(
 
             VoiceMessageBubbleContent(
                 duration = message.voiceDuration ?: 0L,
-                waveformData = message.waveformData ?: emptyList(),
+                waveformData = message.waveformData?.toPersistentList() ?: emptyList<Float>().toPersistentList(),
                 contentColor = if (contentColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else contentColor,
                 isPlaying = isThisPlaying,
                 progress = if (isThisPlaying) progressState else 0f,

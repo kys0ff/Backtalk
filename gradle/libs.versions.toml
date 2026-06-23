@@ -5,6 +5,7 @@ desugar_jdk_libs = "2.1.5"
 gau = "1.0.0"
 haze = "1.7.2"
 kotlin = "2.4.0"
+kotlinxCollectionsImmutableVersion = "0.3.8"
 kotlinxSerialization = "1.11.0"
 coreKtx = "1.19.0"
 junit = "4.13.2"
@@ -80,6 +81,7 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 koin-test = { module = "io.insert-koin:koin-test" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
 
 [bundles]
 # Group them into a bundle

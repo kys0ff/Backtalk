@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -36,7 +37,7 @@ class MessagesScreen : Screen {
             koinViewModel<MessagesViewModel>(viewModelStoreOwner = screenOwner)
         val inputBarViewModel = rememberInputBarViewModel(viewModel)
         val audioPlayer = koinInject<AudioPlayer>()
-        val state by viewModel.uiState
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
 
         val lifecycleOwner = LocalLifecycleOwner.current
         LaunchedEffect(lifecycleOwner) {

@@ -3,14 +3,26 @@ package off.kys.backtalk.presentation.viewmodel
 import android.app.Application
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import off.kys.backtalk.BuildConfig
@@ -18,11 +30,14 @@ import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.presentation.state.SelectionMetrics
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
 import off.kys.backtalk.util.WorkScheduler
@@ -33,11 +48,6 @@ import java.io.File
 
 /**
  * ViewModel for the Messages screen.
- *
- * This ViewModel handles the UI logic and state management for displaying,
- * sending, editing, deleting, and selecting messages.
- *
- * @param useCases The bundle of use cases related to messages.
  */
 class MessagesViewModel(
     private val useCases: MessagesUseCases,
@@ -46,33 +56,24 @@ class MessagesViewModel(
 ) : AndroidViewModel(application), KoinComponent {
 
     private val alarmScheduler: AlarmScheduler by inject()
+    private val captionRegistry: CaptionWordsRegistry by inject()
 
-    private val _uiState = mutableStateOf(MessagesUiState())
-
-    /**
-     * The current UI state of the Messages screen, represented as a [State] of [MessagesUiState].
-     */
-    val uiState: State<MessagesUiState> = _uiState
+    private val _uiState = MutableStateFlow(MessagesUiState())
+    val uiState: StateFlow<MessagesUiState> = _uiState.asStateFlow()
 
     private var blinkJob: Job? = null
 
     init {
         onEvent(MessagesUiEvent.LoadMessages)
-        checkChangelog()
-    }
-
-    private fun checkChangelog() {
         if (preferences.lastSeenChangelogVersion != BuildConfig.VERSION_NAME) {
-            _uiState.value = _uiState.value.copy(showChangelogDialog = true)
+            updateChangelog(true)
         }
     }
 
-    /**
-     * Handles UI events related to messages.
-     *
-     * @param event The UI event to handle.
-     * @see MessagesUiEvent
-     */
+    private fun updateChangelog(show: Boolean) {
+        _uiState.update { it.copy(showChangelogDialog = show) }
+    }
+
     fun onEvent(event: MessagesUiEvent) {
         when (event) {
             is MessagesUiEvent.LoadMessages -> loadMessages()
@@ -90,17 +91,17 @@ class MessagesViewModel(
             is MessagesUiEvent.ClearSelection -> clearSelection()
 
             is MessagesUiEvent.DeleteSelected -> {
-                _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
+                _uiState.update { it.copy(showDeleteConfirmation = true) }
             }
 
             is MessagesUiEvent.ConfirmDeleteSelected -> {
                 deleteSelected()
                 deleteSelectedImages()
-                _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
+                _uiState.update { it.copy(showDeleteConfirmation = false) }
             }
 
             is MessagesUiEvent.DismissDeleteConfirmation -> {
-                _uiState.value = _uiState.value.copy(showDeleteConfirmation = false)
+                _uiState.update { it.copy(showDeleteConfirmation = false) }
             }
 
             is MessagesUiEvent.CopySelected -> copySelected()
@@ -110,29 +111,31 @@ class MessagesViewModel(
             is MessagesUiEvent.NavigateSearch -> navigateSearch(event.up)
             is MessagesUiEvent.ScheduleMessage -> scheduleMessage(event.text, event.scheduledTime)
             MessagesUiEvent.DismissPermissionRationale -> {
-                _uiState.value = _uiState.value.copy(showPermissionRationale = false)
+                _uiState.update { it.copy(showPermissionRationale = false) }
             }
 
             is MessagesUiEvent.SelectTag -> {
                 val newTag = if (_uiState.value.selectedTag == event.tag) null else event.tag
-                _uiState.value = _uiState.value.copy(selectedTag = newTag)
+                _uiState.update { it.copy(selectedTag = newTag) }
                 updateFilteredMessages()
             }
 
             is MessagesUiEvent.TogglePinMessage -> togglePinMessage(event.id, event.isPinned)
             is MessagesUiEvent.NavigatePinned -> navigatePinned()
             is MessagesUiEvent.TogglePinnedMessagesDialog -> {
-                _uiState.value = _uiState.value.copy(showPinnedMessagesDialog = event.show)
+                _uiState.update { it.copy(showPinnedMessagesDialog = event.show) }
             }
 
             is MessagesUiEvent.ScrollToMessage -> {
                 val state = _uiState.value
                 val pinnedIndex = state.pinnedMessages.indexOfFirst { it.id == event.id }
-                _uiState.value = state.copy(
-                    showPinnedMessagesDialog = false,
-                    selectedTag = null,
-                    activePinnedMessageIndex = if (pinnedIndex != -1) pinnedIndex else state.activePinnedMessageIndex
-                )
+                _uiState.update {
+                    it.copy(
+                        showPinnedMessagesDialog = false,
+                        selectedTag = null,
+                        activePinnedMessageIndex = if (pinnedIndex != -1) pinnedIndex else state.activePinnedMessageIndex
+                    )
+                }
                 updateFilteredMessages()
             }
 
@@ -141,11 +144,11 @@ class MessagesViewModel(
             }
 
             is MessagesUiEvent.ToggleMediaPicker -> {
-                _uiState.value = _uiState.value.copy(showMediaPicker = event.show)
+                _uiState.update { it.copy(showMediaPicker = event.show) }
             }
 
             is MessagesUiEvent.ToggleSharedMediaSheet -> {
-                _uiState.value = _uiState.value.copy(showSharedMediaSheet = event.show)
+                _uiState.update { it.copy(showSharedMediaSheet = event.show) }
             }
 
             is MessagesUiEvent.SendMediaMessages -> {
@@ -153,11 +156,11 @@ class MessagesViewModel(
             }
 
             MessagesUiEvent.ConsumedScrollToBottom -> {
-                _uiState.value = _uiState.value.copy(shouldScrollToBottom = false)
+                _uiState.update { it.copy(shouldScrollToBottom = false) }
             }
 
             MessagesUiEvent.ConsumedScrollToPinned -> {
-                _uiState.value = _uiState.value.copy(shouldScrollToPinned = false)
+                _uiState.update { it.copy(shouldScrollToPinned = false) }
             }
 
             is MessagesUiEvent.RemoveImageFromMessage -> removeImageFromMessage(
@@ -171,62 +174,67 @@ class MessagesViewModel(
             )
 
             is MessagesUiEvent.DeleteSelectedImages -> {
-                _uiState.value = _uiState.value.copy(showDeleteConfirmation = true)
+                _uiState.update { it.copy(showDeleteConfirmation = true) }
             }
 
             is MessagesUiEvent.ClearImageSelection -> clearImageSelection()
             MessagesUiEvent.DismissChangelog -> {
                 preferences.lastSeenChangelogVersion = BuildConfig.VERSION_NAME
-                _uiState.value = _uiState.value.copy(showChangelogDialog = false)
+                _uiState.update { it.copy(showChangelogDialog = false) }
             }
 
             MessagesUiEvent.RefreshSettings -> {
-                _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
+                _uiState.update { it.copy(showTagsBar = preferences.showTagsBar) }
             }
 
             is MessagesUiEvent.SetSharedText -> {
-                Log.d(this::class.java.simpleName, "onEvent: Shared text:\n ${event.text}")
-                _uiState.value = _uiState.value.copy(
-                    sharedText = event.text,
-                    editingMessage = null,
-                    replyingTo = null
-                )
+                _uiState.update {
+                    it.copy(
+                        sharedText = event.text,
+                        editingMessage = null,
+                        replyingTo = null
+                    )
+                }
             }
 
             MessagesUiEvent.ClearSharedText -> {
-                _uiState.value = _uiState.value.copy(sharedText = null)
+                _uiState.update { it.copy(sharedText = null) }
             }
 
             is MessagesUiEvent.SetSharedImage -> {
-                _uiState.value = _uiState.value.copy(
-                    sharedImageUris = event.uris,
-                    editingMessage = null,
-                    replyingTo = null
-                )
+                _uiState.update {
+                    it.copy(
+                        sharedImageUris = event.uris.toPersistentList(),
+                        editingMessage = null,
+                        replyingTo = null
+                    )
+                }
             }
 
             MessagesUiEvent.ClearSharedImage -> {
-                _uiState.value = _uiState.value.copy(sharedImageUris = emptyList())
+                _uiState.update { it.copy(sharedImageUris = persistentListOf()) }
             }
 
             is MessagesUiEvent.ShowMessageContextMenu -> {
-                _uiState.value = _uiState.value.copy(messageContextMenuEntity = event.message)
+                _uiState.update { it.copy(messageContextMenuEntity = event.message) }
             }
 
             is MessagesUiEvent.CopyMessage -> {
                 viewModelScope.launch {
                     useCases.copyMessagesByIds(setOf(event.message.id))
                 }
-                _uiState.value = _uiState.value.copy(messageContextMenuEntity = null)
+                _uiState.update { it.copy(messageContextMenuEntity = null) }
             }
 
             is MessagesUiEvent.DeleteMessage -> {
                 clearSelection()
                 toggleSelection(event.message.id)
-                _uiState.value = _uiState.value.copy(
-                    showDeleteConfirmation = true,
-                    messageContextMenuEntity = null
-                )
+                _uiState.update {
+                    it.copy(
+                        showDeleteConfirmation = true,
+                        messageContextMenuEntity = null
+                    )
+                }
             }
         }
     }
@@ -240,72 +248,37 @@ class MessagesViewModel(
                 var actualMediaType = type
                 val mediaPaths = uris.mapNotNull { uri ->
                     val sourceUri = uri.toUri()
-
                     val currentType = if (type == "image/*") {
-                        application.contentResolver.getType(sourceUri)
-                            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                                MimeTypeMap.getFileExtensionFromUrl(uri)
-                                    .orEmpty()
-                                    .ifEmpty { uri.substringAfterLast('.', "") }
-                            )
-                            ?: type
+                        application.contentResolver.getType(sourceUri) ?: type
                     } else type
-
                     actualMediaType = currentType
-
-                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(currentType)
-                        ?: "jpg"
-
+                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(currentType) ?: "jpg"
                     val mediaDir = File(application.filesDir, "media").apply { mkdirs() }
-
                     val fileName = if (smartPointing) {
-                        val hash = application.contentResolver.openInputStream(sourceUri)?.use {
+                        application.contentResolver.openInputStream(sourceUri)?.use {
                             HashUtils.calculateSha256(it)
                         } ?: System.currentTimeMillis().toString()
-                        "media_$hash.$extension"
                     } else {
                         "media_${System.currentTimeMillis()}_${sourceUri.lastPathSegment}.$extension"
                     }
-
                     val destFile = File(mediaDir, fileName)
-
-                    // If smart pointing and file exists, reuse it
-                    if (smartPointing && destFile.exists()) {
-                        return@mapNotNull destFile.absolutePath
-                    }
-
+                    if (smartPointing && destFile.exists()) return@mapNotNull destFile.absolutePath
                     application.contentResolver.openInputStream(sourceUri)?.use { input ->
-                        destFile.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
+                        destFile.outputStream().use { input.copyTo(it) }
                     }
-
-                    val removeMetadata = preferences.removeImageMetadataEnabled &&
-                            currentType.startsWith("image/") &&
-                            currentType != "image/gif"
-
-                    if (removeMetadata) {
+                    if (preferences.removeImageMetadataEnabled && currentType.startsWith("image/") && currentType != "image/gif") {
                         MediaUtils.stripImageMetadata(destFile)
                     }
-
                     destFile.absolutePath
                 }
 
                 if (mediaPaths.isNotEmpty()) {
-                    val chunks = mediaPaths.chunked(4)
-                    chunks.forEachIndexed { index, chunk ->
-                        val isLastChunk = index == chunks.size - 1
-                        val defaultCaption = when {
-                            actualMediaType.startsWith("image/") -> application.getString(R.string.chat_media_image)
-                            else -> application.getString(R.string.chat_media_general)
-                        }
-
+                    mediaPaths.chunked(4).forEachIndexed { index, chunk ->
+                        val isLastChunk = index == (mediaPaths.size / 4)
                         useCases.insertMessage(
                             MessageEntity(
                                 id = MessageId.generate(),
-                                text = if (isLastChunk) {
-                                    if (description.isNullOrBlank()) defaultCaption else description
-                                } else emptyString(),
+                                text = if (isLastChunk) description ?: emptyString() else emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
                                 mediaPaths = chunk,
@@ -327,10 +300,10 @@ class MessagesViewModel(
     private fun blinkMessage(id: MessageId?) {
         blinkJob?.cancel()
         blinkJob = viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(blinkMessageId = id)
+            _uiState.update { it.copy(blinkMessageId = id) }
             if (id != null) {
                 delay(1920)
-                _uiState.value = _uiState.value.copy(blinkMessageId = null)
+                _uiState.update { it.copy(blinkMessageId = null) }
             }
         }
     }
@@ -344,38 +317,19 @@ class MessagesViewModel(
     private fun navigatePinned() {
         val state = _uiState.value
         if (state.pinnedMessages.isEmpty()) return
-
-        val nextIndex = if (state.pinnedMessages.size > 1) {
-            (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
-        } else {
-            0
-        }
-
-        _uiState.value = state.copy(
-            activePinnedMessageIndex = nextIndex,
-            shouldScrollToPinned = true,
-            selectedTag = null
-        )
+        val nextIndex = (state.activePinnedMessageIndex + 1) % state.pinnedMessages.size
+        _uiState.update { it.copy(activePinnedMessageIndex = nextIndex, shouldScrollToPinned = true, selectedTag = null) }
         updateFilteredMessages()
     }
 
-    /**
-     * Loads all messages from the repository and updates the UI state.
-     */
     private fun scheduleMessage(text: String, scheduledTime: Long) {
         if (!alarmScheduler.canScheduleExactAlarms()) {
-            _uiState.value = _uiState.value.copy(showPermissionRationale = true)
+            _uiState.update { it.copy(showPermissionRationale = true) }
             return
         }
-
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
-        val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
-            useCases.scheduleMessage(
-                text = trimmedText,
-                scheduledTime = scheduledTime,
-                repliedToId = replyTo?.id
-            )
+            useCases.scheduleMessage(text = trimmedText, scheduledTime = scheduledTime, repliedToId = _uiState.value.replyingTo?.id)
         }
         updateReply(null)
     }
@@ -383,34 +337,127 @@ class MessagesViewModel(
     private var isMigrationDone = false
 
     private fun loadMessages() {
-        _uiState.value = _uiState.value.copy(showTagsBar = preferences.showTagsBar)
+        _uiState.update { it.copy(showTagsBar = preferences.showTagsBar) }
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
                 if (!isMigrationDone) {
                     migrateVoiceMessages(messages)
                     isMigrationDone = true
                 }
-
-                val sortedMessages = messages.sortedBy { it.timestamp }
-                val pinnedMessages = sortedMessages.filter { it.isPinned }.reversed()
-
-                _uiState.value = _uiState.value.copy(
-                    messages = sortedMessages,
-                    pinnedMessages = pinnedMessages,
-                    isLoading = false,
-                    shouldScrollToPinned = false,
-                    activePinnedMessageIndex = if (pinnedMessages.isEmpty()) 0 else _uiState.value.activePinnedMessageIndex % pinnedMessages.size
-                )
-                updateFilteredMessages()
+                
+                withContext(Dispatchers.Default) {
+                    val uiModels = messages.sortedBy { it.timestamp }.map { it.toUiModel() }.toPersistentList()
+                    val pinned = uiModels.filter { it.isPinned }.reversed().toPersistentList()
+                    val hashtags = extractHashtags(uiModels).toPersistentList()
+                    val repliedMessagesMap = resolveRepliedMessages(uiModels, messages).toPersistentMap()
+                    
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { state ->
+                            val newState = state.copy(
+                                messages = uiModels,
+                                pinnedMessages = pinned,
+                                hashtags = hashtags,
+                                repliedMessagesMap = repliedMessagesMap,
+                                isLoading = false,
+                                activePinnedMessageIndex = if (pinned.isEmpty()) 0 else state.activePinnedMessageIndex % pinned.size
+                            )
+                            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+                        }
+                        updateFilteredMessages()
+                    }
+                }
             }
         }
+    }
+
+    private fun extractHashtags(messages: List<MessageUiModel>): List<String> {
+        val hashtagRegex = Regex("""#(\w+)""")
+        return messages.flatMap { message ->
+            hashtagRegex.findAll(message.visibleText).map { it.groupValues[1] }.toList()
+        }.distinct().sorted()
+    }
+
+    private fun resolveRepliedMessages(uiModels: List<MessageUiModel>, entities: List<MessageEntity>): Map<MessageId, MessageUiModel> {
+        val allMessages = uiModels.associateBy { it.id }
+        return uiModels.mapNotNull { message ->
+            message.repliedToId?.let { repliedId ->
+                val repliedMessage = allMessages[repliedId]
+                if (repliedMessage != null) {
+                    message.id to repliedMessage
+                } else null
+            }
+        }.toMap()
+    }
+
+    private fun calculateSelectionMetrics(state: MessagesUiState): SelectionMetrics {
+        val selectedMessagesCount = state.selectedMessageIds.size
+        val selectedImagesCount = state.selectedImagePaths.values.sumOf { it.size }
+
+        val totalSelectedCount = selectedMessagesCount + state.selectedImagePaths.filterKeys {
+            it !in state.selectedMessageIds
+        }.values.sumOf { it.size }
+
+        val deletableMessagesCount = state.messages.count {
+            it.id in state.selectedMessageIds && it.isLocked.not()
+        }
+
+        val deletableImagesCount = state.selectedImagePaths.filterKeys { it !in state.selectedMessageIds }.entries.sumOf { (messageId, paths) ->
+            val message = state.messages.find { it.id == messageId }
+            if (message != null && message.isLocked.not()) {
+                paths.size
+            } else 0
+        }
+
+        return SelectionMetrics(
+            selectedMessagesCount = selectedMessagesCount,
+            selectedImagesCount = selectedImagesCount,
+            totalSelectedCount = totalSelectedCount,
+            totalDeletableCount = deletableMessagesCount + deletableImagesCount
+        )
+    }
+
+    private fun MessageEntity.toUiModel(): MessageUiModel {
+        val currentTime = System.currentTimeMillis()
+        val visibleText = editedText ?: text
+        val isDefaultCaption = captionRegistry.isRestricted(visibleText)
+        val hasImages = !mediaPath.isNullOrEmpty() || !mediaPaths.isNullOrEmpty()
+        val hasVoice = voicePath != null
+        val hasText = visibleText.isNotEmpty() && !((hasImages || hasVoice) && isDefaultCaption)
+        
+        return MessageUiModel(
+            id = id,
+            text = text,
+            timestamp = timestamp,
+            repliedToId = repliedToId,
+            editedText = editedText,
+            editedAt = editedAt,
+            voicePath = voicePath,
+            voiceDuration = voiceDuration,
+            waveformData = waveformData?.toPersistentList(),
+            isReminder = isReminder,
+            originalCreationTimestamp = originalCreationTimestamp,
+            scheduledTimestamp = scheduledTimestamp,
+            isPinned = isPinned,
+            mediaPath = mediaPath,
+            mediaPaths = mediaPaths?.toPersistentList(),
+            mediaType = mediaType,
+            isDefaultCaption = isDefaultCaption,
+            isLocked = (currentTime - timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW,
+            canEdit = editedAt == null && (currentTime - timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW && voicePath == null,
+            hasImages = hasImages,
+            hasVoice = hasVoice,
+            hasText = hasText,
+            hasRepliedMessage = repliedToId != null,
+            hasTags = isReminder || isPinned,
+            isImageOnly = hasImages && !hasText && !hasVoice && repliedToId == null && !isReminder && !isPinned,
+            visibleText = visibleText
+        )
     }
 
     private fun migrateVoiceMessages(messages: List<MessageEntity>) {
         viewModelScope.launch(Dispatchers.IO) {
             val cachePath = application.cacheDir.absolutePath
             val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
-
             messages.filter { it.voicePath?.startsWith(cachePath) == true }.forEach { message ->
                 val oldFile = File(message.voicePath!!)
                 if (oldFile.exists()) {
@@ -427,131 +474,93 @@ class MessagesViewModel(
 
     private fun updateFilteredMessages() {
         val state = _uiState.value
-        val filtered = if (state.selectedTag == null) {
-            state.messages
-        } else {
-            state.messages.filter { message ->
-                val text = message.editedText ?: message.text
-                text.contains("#${state.selectedTag}", ignoreCase = true)
-            }.ifEmpty { state.messages }
-        }
-        _uiState.value = _uiState.value.copy(filteredMessages = filtered)
+        val filtered = if (state.selectedTag == null) state.messages
+        else state.messages.filter { it.visibleText.contains("#${state.selectedTag}", ignoreCase = true) }.ifEmpty { state.messages }.toPersistentList()
+        _uiState.update { it.copy(filteredMessages = filtered) }
     }
 
-    /**
-     * Sends a message with the given text or updates an existing message if editing.
-     *
-     * @param text The text of the message to send or the new text for the edited message.
-     */
     private fun sendMessage(text: String) {
         val editingMessage = _uiState.value.editingMessage
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
-
-        if (_uiState.value.sharedText != null) {
-            _uiState.value = _uiState.value.copy(sharedText = null)
-        }
-
+        
         if (editingMessage != null) {
-            val currentTime = System.currentTimeMillis()
-            if ((currentTime - editingMessage.timestamp) >= Constants.MESSAGE_EDIT_DELETE_WINDOW) {
+            if (editingMessage.isLocked) {
                 updateEditingMessage(null)
                 return
             }
             viewModelScope.launch {
-                val previousVisibleText = editingMessage.editedText ?: editingMessage.text
-                useCases.insertMessage(
-                    editingMessage.copy(
-                        editedText = trimmedText,
-                        text = previousVisibleText,
-                        editedAt = System.currentTimeMillis()
-                    )
-                )
+                val entity = useCases.getMessageById(editingMessage.id) ?: return@launch
+                useCases.insertMessage(entity.copy(editedText = trimmedText, editedAt = System.currentTimeMillis()))
             }
             updateEditingMessage(null)
             return
         }
 
-        val replyTo = _uiState.value.replyingTo
         viewModelScope.launch {
-            useCases.insertMessage(
-                MessageEntity(
-                    id = MessageId.generate(),
-                    text = trimmedText,
-                    timestamp = System.currentTimeMillis(),
-                    repliedToId = replyTo?.id
-                )
-            )
+            useCases.insertMessage(MessageEntity(id = MessageId.generate(), text = trimmedText, timestamp = System.currentTimeMillis(), repliedToId = _uiState.value.replyingTo?.id))
             WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
-            _uiState.value = _uiState.value.copy(shouldScrollToBottom = true, sharedText = null)
+            _uiState.update { it.copy(shouldScrollToBottom = true, sharedText = null) }
         }
         updateReply(null)
     }
 
     private fun removeImageFromMessage(messageId: MessageId, imagePath: String) {
         val message = _uiState.value.messages.find { it.id == messageId }
-        val currentTime = System.currentTimeMillis()
-        if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-            viewModelScope.launch {
-                useCases.removeImageFromMessage(messageId, imagePath)
-            }
+        if (message != null && !message.isLocked) {
+            viewModelScope.launch { useCases.removeImageFromMessage(messageId, imagePath) }
         }
     }
 
     private fun toggleImageSelection(messageId: MessageId, imagePath: String) {
-        val currentMap = _uiState.value.selectedImagePaths
-        val currentSet = currentMap[messageId] ?: emptySet()
-        val newSet = if (imagePath in currentSet) currentSet - imagePath else currentSet + imagePath
-
-        _uiState.value = _uiState.value.copy(
-            selectedImagePaths = if (newSet.isEmpty()) currentMap - messageId else currentMap + (messageId to newSet)
-        )
+        _uiState.update { state ->
+            val currentMap = state.selectedImagePaths
+            val currentSet = currentMap[messageId] ?: persistentSetOf()
+            val newSet = if (imagePath in currentSet) currentSet.remove(imagePath) else currentSet.add(imagePath)
+            val newMap = if (newSet.isEmpty()) currentMap.remove(messageId) else currentMap.put(messageId, newSet)
+            val newState = state.copy(selectedImagePaths = newMap)
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
     }
 
     private fun deleteSelected() {
         val ids = _uiState.value.selectedMessageIds
         val messages = _uiState.value.messages
-        val currentTime = System.currentTimeMillis()
-
         viewModelScope.launch {
             ids.forEach { id ->
                 val message = messages.find { it.id == id }
-                if (message != null) {
-                    val isWithinWindow =
-                        (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
-                    if (isWithinWindow) {
-                        useCases.deleteMessageById(id)
-                    }
+                if (message != null && !message.isLocked) {
+                    useCases.deleteMessageById(id)
                 }
             }
         }
-        _uiState.value = _uiState.value.copy(selectedMessageIds = emptySet())
+        _uiState.update { state ->
+            val newState = state.copy(selectedMessageIds = persistentSetOf())
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
     }
 
     private fun deleteSelectedImages() {
         val selectedImagePaths = _uiState.value.selectedImagePaths
-        val selectedMessageIds = _uiState.value.selectedMessageIds
         val messages = _uiState.value.messages
-        val currentTime = System.currentTimeMillis()
-
         viewModelScope.launch {
             selectedImagePaths.forEach { (messageId, paths) ->
                 val message = messages.find { it.id == messageId }
-                if (messageId !in selectedMessageIds && message != null) {
-                    val isWithinWindow =
-                        (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
-                    if (isWithinWindow) {
-                        useCases.removeImagesFromMessage(messageId, paths)
-                    }
+                if (messageId !in _uiState.value.selectedMessageIds && message != null && !message.isLocked) {
+                    useCases.removeImagesFromMessage(messageId, paths)
                 }
             }
         }
-        _uiState.value = _uiState.value.copy(selectedImagePaths = emptyMap())
+        _uiState.update { state ->
+            val newState = state.copy(selectedImagePaths = persistentMapOf())
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
     }
 
     private fun clearImageSelection() {
-        _uiState.value = _uiState.value.copy(
-            selectedImagePaths = emptyMap()
-        )
+        _uiState.update { state ->
+            val newState = state.copy(selectedImagePaths = persistentMapOf())
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
     }
 
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>) {
@@ -561,150 +570,86 @@ class MessagesViewModel(
                 val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
                 val sourceFile = File(path)
                 val destFile = File(voiceDir, "voice_${System.currentTimeMillis()}.m4a")
-
-                sourceFile.inputStream().use { input ->
-                    destFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
+                sourceFile.inputStream().use { input -> destFile.outputStream().use { input.copyTo(it) } }
                 sourceFile.delete()
 
-                useCases.insertMessage(
-                    MessageEntity(
-                        id = MessageId.generate(),
-                        text = application.getString(R.string.chat_media_voice),
-                        timestamp = System.currentTimeMillis(),
-                        repliedToId = replyTo?.id,
-                        voicePath = destFile.absolutePath,
-                        voiceDuration = duration,
-                        waveformData = waveform
-                    )
-                )
+                useCases.insertMessage(MessageEntity(id = MessageId.generate(), text = application.getString(R.string.chat_media_voice), timestamp = System.currentTimeMillis(), repliedToId = replyTo?.id, voicePath = destFile.absolutePath, voiceDuration = duration, waveformData = waveform))
                 WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
-                withContext(Dispatchers.Main) {
-                    _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
-                }
+                withContext(Dispatchers.Main) { _uiState.update { it.copy(shouldScrollToBottom = true) } }
             }
         }
         updateReply(null)
     }
 
-    /**
-     * Updates the UI state with the given message as the message being edited.
-     *
-     * @param message The message to set as the editing message, or null to stop editing.
-     */
-    private fun updateEditingMessage(message: MessageEntity?) {
-        _uiState.value = _uiState.value.copy(editingMessage = message, replyingTo = null)
+    private fun updateEditingMessage(message: MessageUiModel?) {
+        _uiState.update { it.copy(editingMessage = message, replyingTo = null) }
     }
 
-    /**
-     * Updates the UI state with the given message as the message being replied to.
-     *
-     * @param message The message to set as the replying to, or null to stop replying.
-     */
-    private fun updateReply(message: MessageEntity?) {
-        _uiState.value = _uiState.value.copy(replyingTo = message, editingMessage = null)
+    private fun updateReply(message: MessageUiModel?) {
+        _uiState.update { it.copy(replyingTo = message, editingMessage = null) }
     }
 
-    /**
-     * Toggles the selection of a message with the given ID.
-     *
-     * @param id The ID of the message to toggle selection for.
-     */
     private fun toggleSelection(id: MessageId) {
-        val current = _uiState.value.selectedMessageIds
-        _uiState.value = _uiState.value.copy(
-            selectedMessageIds =
-                if (id in current) current - id else current + id
-        )
-    }
-
-    /**
-     * Clears the selection of all messages and images.
-     */
-    private fun clearSelection() {
-        _uiState.value = _uiState.value.copy(
-            selectedMessageIds = emptySet(),
-            selectedImagePaths = emptyMap()
-        )
-    }
-
-    /**
-     * Copies the selected messages to the clipboard.
-     */
-    private fun copySelected() {
-        val selectedIds = _uiState.value.selectedMessageIds
-        viewModelScope.launch {
-            useCases.copyMessagesByIds(selectedIds)
+        _uiState.update { state ->
+            val current = state.selectedMessageIds
+            val newSet = if (id in current) current.remove(id) else current.add(id)
+            val newState = state.copy(selectedMessageIds = newSet)
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
         }
+    }
+
+    private fun clearSelection() {
+        _uiState.update { state ->
+            val newState = state.copy(selectedMessageIds = persistentSetOf(), selectedImagePaths = persistentMapOf())
+            newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
+    }
+
+    private fun copySelected() {
+        viewModelScope.launch { useCases.copyMessagesByIds(_uiState.value.selectedMessageIds) }
         clearSelection()
     }
 
-    /**
-     * Toggles the search mode.
-     *
-     * @param active Whether the search mode should be active.
-     */
     private fun toggleSearch(active: Boolean) {
-        _uiState.value = _uiState.value.copy(
-            isSearchActive = active,
-            searchQuery = if (active) _uiState.value.searchQuery else emptyString(),
-            searchResults = if (active) _uiState.value.searchResults else emptyList(),
-            currentSearchResultIndex = if (active) _uiState.value.currentSearchResultIndex else -1
-        )
+        _uiState.update {
+            it.copy(
+                isSearchActive = active,
+                searchQuery = if (active) it.searchQuery else emptyString(),
+                searchResults = if (active) it.searchResults else persistentListOf(),
+                currentSearchResultIndex = if (active) it.currentSearchResultIndex else -1
+            )
+        }
     }
 
-    /**
-     * Updates the search query and performs a search.
-     *
-     * @param query The new search query.
-     */
     private fun updateSearchQuery(query: String) {
-        val previousQuery = _uiState.value.searchQuery
-
-        if (query == previousQuery) return
-
-        val results = if (query.isBlank()) {
-            emptyList()
-        } else {
-            val terms = query.trim().lowercase().split(Regex("\\s+"))
-
-            _uiState.value.messages.asSequence()
-                .filter { message ->
-                    val text = (message.editedText ?: message.text).lowercase()
-                    terms.all { term -> text.contains(term) }
-                }
-                .map { it.id }
-                .toList()
-                .reversed()
+        if (query == _uiState.value.searchQuery) return
+        viewModelScope.launch(Dispatchers.Default) {
+            val results = if (query.isBlank()) persistentListOf()
+            else {
+                val terms = query.trim().lowercase().split(Regex("\\s+"))
+                _uiState.value.messages.asSequence()
+                    .filter { message -> terms.all { term -> message.visibleText.lowercase().contains(term) } }
+                    .map { it.id }.toList().reversed().toPersistentList()
+            }
+            _uiState.update {
+                it.copy(
+                    searchQuery = query,
+                    searchResults = results,
+                    currentSearchResultIndex = if (results.isNotEmpty()) 0 else -1
+                )
+            }
         }
-
-        _uiState.value = _uiState.value.copy(
-            searchQuery = query,
-            searchResults = results,
-            currentSearchResultIndex = if (results.isNotEmpty()) 0 else -1
-        )
     }
 
-    /**
-     * Navigates through search results.
-     *
-     * @param up Whether to navigate to the previous result (up) or next result (down).
-     */
     private fun navigateSearch(up: Boolean) {
-        val state = _uiState.value
-        if (state.searchResults.isEmpty()) return
-
-        val newIndex = if (up) {
-            (state.currentSearchResultIndex + 1) % state.searchResults.size
-        } else {
-            (state.currentSearchResultIndex - 1 + state.searchResults.size) % state.searchResults.size
+        _uiState.update {
+            if (it.searchResults.isEmpty()) return@update it
+            val newIndex = if (up) (it.currentSearchResultIndex + 1) % it.searchResults.size
+            else (it.currentSearchResultIndex - 1 + it.searchResults.size) % it.searchResults.size
+            it.copy(
+                currentSearchResultIndex = newIndex,
+                scrollToSearchTrigger = it.scrollToSearchTrigger + 1
+            )
         }
-
-        _uiState.value = state.copy(
-            currentSearchResultIndex = newIndex,
-            scrollToSearchTrigger = state.scrollToSearchTrigger + 1
-        )
     }
 }

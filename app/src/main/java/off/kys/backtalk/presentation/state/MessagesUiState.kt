@@ -1,10 +1,15 @@
 package off.kys.backtalk.presentation.state
 
-import off.kys.backtalk.common.Constants
-import off.kys.backtalk.data.local.entity.MessageEntity
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.util.emptyString
 
 /**
@@ -16,63 +21,37 @@ import off.kys.backtalk.util.emptyString
  * @param selectedMessageIds The set of message IDs that are currently selected.
  */
 data class MessagesUiState(
-    val messages: List<MessageEntity> = emptyList(),
-    val replyingTo: MessageEntity? = null,
-    val editingMessage: MessageEntity? = null,
-    val selectedMessageIds: Set<MessageId> = emptySet(),
+    val messages: PersistentList<MessageUiModel> = persistentListOf(),
+    val replyingTo: MessageUiModel? = null,
+    val editingMessage: MessageUiModel? = null,
+    val selectedMessageIds: PersistentSet<MessageId> = persistentSetOf(),
     val isSearchActive: Boolean = false,
     val searchQuery: String = emptyString(),
-    val searchResults: List<MessageId> = emptyList(),
+    val searchResults: PersistentList<MessageId> = persistentListOf(),
     val currentSearchResultIndex: Int = -1,
     val showPermissionRationale: Boolean = false,
     val showDeleteConfirmation: Boolean = false,
     val isLoading: Boolean = true,
     val selectedTag: String? = null,
-    val pinnedMessages: List<MessageEntity> = emptyList(),
+    val pinnedMessages: PersistentList<MessageUiModel> = persistentListOf(),
     val activePinnedMessageIndex: Int = 0,
     val shouldScrollToPinned: Boolean = false,
     val scrollToSearchTrigger: Long = 0L,
     val showPinnedMessagesDialog: Boolean = false,
     val blinkMessageId: MessageId? = null,
-    val filteredMessages: List<MessageEntity> = emptyList(),
+    val filteredMessages: PersistentList<MessageUiModel> = persistentListOf(),
     val showMediaPicker: Boolean = false,
     val showSharedMediaSheet: Boolean = false,
     val shouldScrollToBottom: Boolean = false,
-    val selectedImagePaths: Map<MessageId, Set<String>> = emptyMap(),
+    val selectedImagePaths: PersistentMap<MessageId, PersistentSet<String>> = persistentMapOf(),
     val showChangelogDialog: Boolean = false,
     val showTagsBar: Boolean = true,
     val sharedText: String? = null,
-    val sharedImageUris: List<String> = emptyList(),
+    val sharedImageUris: PersistentList<String> = persistentListOf(),
     val scaffoldStatus: ScaffoldStatus = ScaffoldStatus.None,
     val scaffoldMessage: StatusMessage? = null,
-    val messageContextMenuEntity: MessageEntity? = null
-) {
-    val selectionMetrics: SelectionMetrics
-        get() {
-            val selectedMessagesCount = selectedMessageIds.size
-            val selectedImagesCount = selectedImagePaths.values.sumOf { it.size }
-
-            val totalSelectedCount = selectedMessagesCount + selectedImagePaths.filterKeys {
-                it !in selectedMessageIds
-            }.values.sumOf { it.size }
-
-            val currentTime = System.currentTimeMillis()
-            val deletableMessagesCount = messages.count {
-                it.id in selectedMessageIds && (currentTime - it.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW
-            }
-
-            val deletableImagesCount = selectedImagePaths.filterKeys { it !in selectedMessageIds }.entries.sumOf { (messageId, paths) ->
-                val message = messages.find { it.id == messageId }
-                if (message != null && (currentTime - message.timestamp) < Constants.MESSAGE_EDIT_DELETE_WINDOW) {
-                    paths.size
-                } else 0
-            }
-
-            return SelectionMetrics(
-                selectedMessagesCount = selectedMessagesCount,
-                selectedImagesCount = selectedImagesCount,
-                totalSelectedCount = totalSelectedCount,
-                totalDeletableCount = deletableMessagesCount + deletableImagesCount
-            )
-        }
-}
+    val messageContextMenuEntity: MessageUiModel? = null,
+    val selectionMetrics: SelectionMetrics = SelectionMetrics(),
+    val hashtags: PersistentList<String> = persistentListOf(),
+    val repliedMessagesMap: PersistentMap<MessageId, MessageUiModel> = persistentMapOf()
+)

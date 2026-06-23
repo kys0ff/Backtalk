@@ -24,7 +24,6 @@ import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
-import off.kys.backtalk.util.compose.rememberHashtags
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
 import off.kys.backtalk.util.emptyString
 
@@ -45,7 +44,7 @@ fun MessagesScreenContent(
     val messagesScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
-    val tags = rememberHashtags(state.messages)
+    val tags = state.hashtags
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {

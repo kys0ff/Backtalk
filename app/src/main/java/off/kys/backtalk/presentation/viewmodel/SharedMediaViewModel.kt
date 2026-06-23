@@ -16,6 +16,8 @@ import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.ComposeTextParser
 import java.io.File
 
+import kotlinx.collections.immutable.toPersistentList
+
 /**
  * ViewModel for the Shared Media screen/component.
  *
@@ -48,7 +50,7 @@ class SharedMediaViewModel(
                 id = message.id,
                 path = path,
                 duration = message.voiceDuration ?: 0L,
-                waveformData = message.waveformData ?: emptyList(),
+                waveformData = message.waveformData?.toPersistentList() ?: emptyList<Float>().toPersistentList(),
                 isPlaying = isPlaying && (audioPath == path),
                 progress = if (audioPath == path) progress else 0f
             )

@@ -20,24 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.util.emptyString
 
 /**
  * Composable function that displays the primary content of the messages screen, including
  * the list of messages and relevant dialogs for permissions and deletions.
- *
- * @param modifier The [Modifier] to be applied to the layout.
- * @param state The current UI state containing messages, selection data, and visibility flags for dialogs.
- * @param listState The [LazyListState] used to control and observe the scroll position of the message list.
- * @param onEditMessage Callback invoked when a message is selected for editing.
- * @param onReply Callback invoked when a user intends to reply to a specific message.
- * @param onToggleSelect Callback invoked to toggle the selection status of a message by its [MessageId].
- * @param onDismissRationale Callback to dismiss the permission rationale dialog.
- * @param onConfirmDelete Callback invoked to confirm and execute the deletion of selected messages.
- * @param onDismissDelete Callback to dismiss the delete confirmation dialog.
  */
 @Composable
 fun MessagesContent(
@@ -45,20 +35,20 @@ fun MessagesContent(
     state: MessagesUiState,
     tags: List<String>,
     listState: LazyListState,
-    onEditMessage: (MessageEntity?) -> Unit,
-    onReply: (MessageEntity?) -> Unit,
+    onEditMessage: (MessageUiModel?) -> Unit,
+    onReply: (MessageUiModel?) -> Unit,
     onToggleSelect: (MessageId) -> Unit,
     onDismissRationale: () -> Unit,
     onConfirmDelete: () -> Unit,
     onDismissDelete: () -> Unit,
-    onDeleteMessage: (MessageEntity) -> Unit,
-    onCopyMessage: (MessageEntity) -> Unit,
+    onDeleteMessage: (MessageUiModel) -> Unit,
+    onCopyMessage: (MessageUiModel) -> Unit,
     onTagClick: (String) -> Unit,
     onNavigatePinned: () -> Unit,
     onTogglePinnedDialog: (Boolean) -> Unit,
-    onTogglePin: (MessageEntity, Boolean) -> Unit,
+    onTogglePin: (MessageUiModel, Boolean) -> Unit,
     onScrollToMessage: (MessageId) -> Unit,
-    onLongClick: (MessageEntity?) -> Unit,
+    onLongClick: (MessageUiModel?) -> Unit,
     onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
     totalDeletableCount: Int = 0,
     totalSelectedCount: Int = 0
@@ -79,6 +69,7 @@ fun MessagesContent(
     Box(modifier = modifier.fillMaxSize()) {
         MessagesList(
             messages = state.filteredMessages,
+            repliedMessagesMap = state.repliedMessagesMap,
             selectedMessageIds = state.selectedMessageIds,
             listState = listState,
             onEditMessage = onEditMessage,
