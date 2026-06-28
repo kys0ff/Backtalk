@@ -322,11 +322,7 @@ private fun MessageInnerContent(
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
 
     SizeRegistryScope {
-        Column(
-            modifier = Modifier
-                .widthIn(min = 100.dp)
-                .observeSize(innerContentId)
-        ) {
+        Column(modifier = Modifier.observeSize(innerContentId)) {
             AnimatedVisibility(
                 visible = message.isReminder || message.isPinned,
                 enter = expandVertically() + fadeIn(),
@@ -357,7 +353,7 @@ private fun MessageInnerContent(
 
             if (repliedMessage != null) {
                 ReplyPreview(
-                    modifier = Modifier.applyWidth(innerContentId),
+                    modifier = Modifier.applyWidth(innerContentId, minWidth = 150.dp),
                     text = if (repliedMessage.voicePath != null) stringResource(R.string.chat_voice_message)
                     else if (repliedMessage.hasImages) stringResource(R.string.chat_reply_image_preview)
                     else repliedMessage.visibleText,
@@ -462,7 +458,7 @@ private fun MessageInnerContent(
                     Spacer(modifier = Modifier.height(8.dp))
                     LinkPreviewCard(
                         url = firstUrl,
-                        modifier = Modifier.applyWidth(innerContentId)
+                        modifier = Modifier.applyWidth(innerContentId, minWidth = 220.dp)
                     )
                 }
             }
