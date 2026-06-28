@@ -5,7 +5,7 @@ desugar_jdk_libs = "2.1.5"
 gau = "1.0.0"
 haze = "1.7.2"
 kotlin = "2.4.0"
-kotlinxCollectionsImmutableVersion = "0.3.8"
+kotlinxCollectionsImmutableVersion = "0.5.0"
 kotlinxSerialization = "1.11.0"
 coreKtx = "1.19.0"
 junit = "4.13.2"
@@ -19,7 +19,7 @@ mockk = "1.14.11"
 coroutines-test = "1.11.0"
 activityCompose = "1.13.0"
 composeBom = "2026.06.00"
-ksp = "2.3.2"
+ksp = "2.3.9"
 room = "2.8.4"
 voyager = "2.2.21-1.10.3"
 koin-bom = "4.2.2"
@@ -82,13 +82,6 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 koin-test = { module = "io.insert-koin:koin-test" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
-
-[bundles]
-# Group them into a bundle
-room = ["room-runtime", "room-ktx"]
-voyager = ["voyager-navigator", "voyager-koin", "voyager-transitions"]
-koin = ["koin-core", "koin-android", "koin-androidx-compose"]
-camerax = ["androidx-camera-camera2", "androidx-camera-lifecycle", "androidx-camera-view"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

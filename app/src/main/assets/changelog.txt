@@ -1,63 +1,16 @@
-2506ddb docs: update docs and fastlane metadata for the 0.3.5 release and created PHILOSOPHY.md
-000ecb6 build: dynamically fetch latest git tag in GenerateChangelogTask
-a035ca1 fix: implement Serializable for message entities and domain models
-6baec1e feat: add media support to thread components and refine message visibility
-68e6db6 chore: bump version to 0.3.5
-e5f6079 docs: update changelog
-967d28c feat: add Spanish and Arabic translations for Shared Media
-7dacc88 feat: enhance MessageBubble selection visuals and media loading performance
-82a7037 feat: migrate InputBar to TextFieldState and add rich content support
-23afb34 feat: add shared media sheet with media, voice, and link tabs
-8bf7665 refactor: configure Coil ImageRequests with explicit caching and crossfade in LinkPreview
-3dbb082 fix: restore system UI visibility when exiting ImagePreviewScreen
-994334e feat: add GIF support to messages and media picker
-de0909b feat: update MessagesTopBar selection styling and animate background color transitions
-744962e feat: show elapsed time in VoiceMessageBubble and update recording indicator color
-d58d320 refactor: move custom Gradle tasks to buildSrc
-ca545dc refactor: remove redundant video associated permissions, statistics logic and strings
-fa1b2a9 feat: add cache size display and refactor SettingsItem UI hierarchy
-1ff2380 feat: add "Clear cache" option to troubleshooting settings
-1e03b45 refactor: remove unused developer and onboarding mock strings from localized resources
-5da99c8 chore: update Spanish and Arabic translations for image sending and onboarding
-2c456de docs: update changelog for InputBar and RTL improvements
-5afb204 refactor: use Popup for voice recording hint and refine InputBar gesture handling
-4177849 feat: add tooltips to send and voice record buttons in InputBar
-1cca4c4 feat: add RTL support to voice message waveform rendering
-1800fbf refactor: modularize InputBar and add RTL support for voice recording
-e75f139 feat: update icons for attachments and link previews
-826f194 feat: implement CaptionWordsRegistry for restricted message captions
-b0e381c feat: add Gradle task for caption string generation and clean up UI components
-662d6af feat #24: add support for sharing multiple images via external intent
-7caf391 feat #24: add support for sharing images from external apps with a preview and caption dialog
-ee09c0a feat #24: add support for receiving shared text from external apps
-f2fb910 refactor: migrate link extraction logic to String extension
-4468dde feat: add rich link preview component with metadata scraping and caching
-e0fee2d feat: add toggle for link previews in settings
-7d0535c feat: add link preview support to messages and input bar
-986877f fix #27: solve "today" message scheduling mismatch and timezone handling, clean up unused code
-11bd349 feat: animate selection count and localize strings in MessagesTopBar
-d688a3b refactor: simplify ReminderWorker logic and remove manual timestamp tracking
-a019d0f feat: add background update checks and optimize WorkManager scheduling
-bb20702 refactor: use toUri extension and suppress BatteryLife lint in SettingsViewModel
-b14db9d feat: add setting to toggle hashtags bar visibility
-4339860 refactor: move TagFilterBar to MessagesContent and implement dynamic top padding
-a21c7cc refactor: update SettingsItem layout and handle label text overflow
-fc5ae0c feat: hide TagFilterBar and pinned messages during selection mode
-eba2eb3 feat #28: add Spanish localization
-7e53119 feat: add troubleshooting and battery optimization strings for Arabic locale
-86b1f02 style: refine MessageSchedulingDialogs UI and validation logic
-81dc88c feat #27: add validation and success feedback to message scheduling
-5c300cd feat: add battery optimization troubleshooting to Settings
-8e80441 refactor: centralize WorkManager scheduling in WorkScheduler and update reminder logic
-1e796c0 fix #26: implement voice message playback and migrate voice notes to persistent storage
-9d98d8c fix: update app lock authentication logic to be lifecycle-aware
-2b9044c feat: update reminder logic to account for the last sent message
-27d568d fix: update backup file MIME type to octet-stream and clean up imports
-29edac6 ui: refine GridImage selection overlay and checkmark styling
-dc164c0 style: set text direction based on content for tags and media captions
-eee15ec build: update changelog generation output and execution logic
-0b5024b build: refactor changelog generation to use version tags and generated assets
-dd85e62 refactor: reference GitHub repo from Constants and convert properties to compile-time constants
-8b20757 fix: update reminder scheduling logic and resolve startup crash by adding safety to update check
-07839ef refactor: use emptyString utility and clean up color comments in ChangelogCommon
-c9da660 feat: enhance changelog parsing and UI with semantic styling
+695b9e6 refactor: use VoiceRecordingIndicator and clean up InputBar gesture logic
+d1162c8 refactor: migrate message UI components to MessageUiModel
+8cbdf5e feat #37: implement SelectionContainer and disable gestures in selectMode for MessageBubble
+7112231 style: improve SettingsToggle accessibility and UI styling
+1cb11a7 feat #35: implement automated onboarding swipe hint for message rows
+f38e405 feat #35: implement message long-click context menu
+eb7568a build: update Kotlin, Compose BOM, and various library dependencies
+f413f54 feat: implement StatusScaffold and integrate status banners for loading and error states
+cc68dc0 refactor: use selectMode flag for image selection logic in MessageBubble
+18a3fcf ui: redesign image attachment grid
+18bdf00 feat #34: add support for lists and checkboxes to ComposeTextParser
+f44134e refactor: extract UI models and InputBarEffect into separate files
+87323b0 refactor: reorganize onboarding UI and extract pager content component
+1a8f9ba fix #32: resolve navigation bar overlapping in OnboardingScreen
+b83362b fix #33: update InputBar layout and placeholder alignment
+77d99c5 refactor: Migrate InputBar logic to InputBarViewModel and introduce UI state and move selection metrics calculation to `MessagesUiState`

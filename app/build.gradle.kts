@@ -1,3 +1,6 @@
+
+import off.kys.backtalk.build.GenerateCaptionStringsAssetTask
+import off.kys.backtalk.build.GenerateChangelogTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -17,8 +20,7 @@ android {
     defaultConfig {
         applicationId = "off.kys.backtalk"
         minSdk = 23
-        //noinspection OldTargetApi
-        targetSdk = 35
+        targetSdk = 37
         versionCode = appVersionCode
         versionName = appVersion
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
@@ -52,15 +54,15 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -82,7 +84,7 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
+        jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
@@ -103,10 +105,15 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.bundles.voyager)
+    implementation(libs.voyager.navigator)
+    implementation(libs.voyager.koin)
+    implementation(libs.voyager.transitions)
     implementation(platform(libs.koin.bom))
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.room)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.process)
@@ -116,7 +123,9 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.concurrent.futures)
-    implementation(libs.bundles.camerax)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
     implementation(libs.coil.gif)
@@ -141,10 +150,16 @@ dependencies {
 }
 
 val generateCaptionStringsAssetTask =
-    tasks.register<GenerateCaptionStringsAssetTask>("generateCaptionStringsAsset")
+    tasks.register<GenerateCaptionStringsAssetTask>("generateCaptionStringsAsset") {
+        group = "build"
+        description = "Generates the caption strings asset file."
+    }
 
 val generateChangelogTask =
-    tasks.register<GenerateChangelogTask>("generateChangelog")
+    tasks.register<GenerateChangelogTask>("generateChangelog") {
+        group = "build"
+        description = "Generates the changelog file."
+    }
 
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
     dependsOn(generateChangelogTask)

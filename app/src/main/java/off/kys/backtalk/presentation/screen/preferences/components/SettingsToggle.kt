@@ -41,12 +41,7 @@ fun SettingsToggle(
         supportingContent = supportingText?.let {
             { Text(text = it) }
         },
-        leadingContent = {
-            Icon(
-                painter = icon,
-                contentDescription = null
-            )
-        },
+        leadingContent = { SettingsIcon(icon) },
         trailingContent = {
             Switch(
                 checked = checked,

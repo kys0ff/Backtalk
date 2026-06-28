@@ -48,6 +48,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
@@ -174,6 +175,9 @@ fun InputBar(
 
     fun handleScheduleClick() {
         if (state.textFieldState.text.isNotBlank()) {
+            if (preferences.hapticFeedbackEnabled) {
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            }
             viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingDate))
         } else {
             scope.launch {
@@ -444,7 +448,14 @@ private fun ActionButtons(
         ) {
             IconButton(
                 onClick = onSendMessage,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier
+                    .size(40.dp)
+                    .combinedClickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(bounded = false),
+                        onClick = onSendMessage,
+                        onLongClick = onLongClick
+                    )
             ) {
                 Icon(
                     painter = painterResource(R.drawable.round_send_24),
