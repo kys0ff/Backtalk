@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -48,11 +49,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +65,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -71,6 +76,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -85,8 +92,10 @@ import off.kys.backtalk.presentation.state.InputBarEffect
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull
+import off.kys.backtalk.util.toast
 import org.koin.compose.koinInject
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -120,13 +129,11 @@ fun InputBar(
         selectableDates = remember {
             object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    val todayUtc = Instant.now()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate()
-                        .atStartOfDay(ZoneId.of("UTC"))
-                        .toInstant()
-                        .toEpochMilli()
-                    return utcTimeMillis >= todayUtc
+                    // Grab today's local date, then determine what UTC midnight matches it
+                    val localToday = LocalDate.now(ZoneId.systemDefault())
+                    val todayUtcMillis =
+                        localToday.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+                    return utcTimeMillis >= todayUtcMillis
                 }
             }
         }
@@ -155,6 +162,10 @@ fun InputBar(
                         shakeOffset.animateTo(-10f, tween(40))
                     }
                     shakeOffset.animateTo(0f, tween(40))
+                }
+
+                is InputBarEffect.ShowError -> {
+                    context.toast(effect.messageRes)
                 }
             }
         }
@@ -299,29 +310,28 @@ fun InputBar(
                 viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
             },
             confirmButton = {
-                TextButton(onClick = {
-                    val date = Instant.ofEpochMilli(
-                        datePickerState.selectedDateMillis ?: System.currentTimeMillis()
-                    ).atZone(ZoneId.systemDefault()).toLocalDate()
-                    val time = LocalTime.of(timePickerState.hour, timePickerState.minute)
-                    val scheduledDateTime = LocalDateTime.of(date, time)
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()
+                TextButton(
+                    onClick = {
+                        val selectedUtcMillis =
+                            datePickerState.selectedDateMillis ?: System.currentTimeMillis()
+                        val date = Instant.ofEpochMilli(selectedUtcMillis)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                        val time = LocalTime.of(timePickerState.hour, timePickerState.minute)
+                        val scheduledDateTime = LocalDateTime.of(date, time)
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
+                            .toEpochMilli()
 
-                    if (scheduledDateTime > System.currentTimeMillis()) {
                         viewModel.onEvent(
                             InputBarEvent.ScheduleMessage(
                                 state.textFieldState.text.toString(),
                                 scheduledDateTime
                             )
                         )
-                        viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
-                    } else {
-                        // TODO: Show error
                     }
-                }) {
-                    Text(stringResource(R.string.common_ok))
+                ) {
+                    Text(stringResource(R.string.common_confirm))
                 }
             }
         ) {
@@ -401,10 +411,25 @@ private fun ChatTextField(
                     .contentReceiver {
                         onContentReceived(it)
                         it
+                    }
+                    .onKeyEvent {
+                        if (it.key == Key.Enter && it.isCtrlPressed) {
+                            onSend()
+                            true
+                        } else {
+                            false
+                        }
                     },
-                lineLimits = TextFieldLineLimits.MultiLine(1, 5),
+                lineLimits = if (sendWithEnter) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(
+                    1,
+                    5
+                ),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                onKeyboardAction = { if (sendWithEnter) onSend() },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = if (sendWithEnter) ImeAction.Send else ImeAction.Default,
+                    keyboardType = KeyboardType.Text
+                ),
+                onKeyboardAction = { onSend() },
                 decorator = { innerTextField ->
                     if (textFieldState.text.isEmpty()) {
                         Text(
@@ -446,8 +471,7 @@ private fun ActionButtons(
             enter = scaleIn() + fadeIn(),
             exit = scaleOut() + fadeOut()
         ) {
-            IconButton(
-                onClick = onSendMessage,
+            Box(
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
@@ -455,7 +479,8 @@ private fun ActionButtons(
                         indication = ripple(bounded = false),
                         onClick = onSendMessage,
                         onLongClick = onLongClick
-                    )
+                    ),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(R.drawable.round_send_24),
@@ -506,7 +531,8 @@ private fun ActionButtons(
                                 val delta = dragAmount.x
                                 dragAccumulator += delta
 
-                                val directedX = if (layoutDirection == LayoutDirection.Rtl) -dragAccumulator else dragAccumulator
+                                val directedX =
+                                    if (layoutDirection == LayoutDirection.Rtl) -dragAccumulator else dragAccumulator
                                 onDragUpdate(directedX)
 
                                 if (abs(dragAccumulator) >= maxDragX) {

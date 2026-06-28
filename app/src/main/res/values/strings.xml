@@ -59,6 +59,7 @@
     <string name="chat_input_send_images">Send %1$d images</string>
     <string name="chat_input_caption_hint">Add a caption…</string>
     <string name="chat_input_record_cd">Record</string>
+    <string name="chat_input_set_reminder">Set reminder</string>
     <string name="chat_input_format_bold">B</string>
     <string name="chat_input_format_italic">I</string>
     <string name="chat_input_format_underline">U</string>

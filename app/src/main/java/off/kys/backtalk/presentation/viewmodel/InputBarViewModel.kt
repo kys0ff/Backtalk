@@ -104,9 +104,16 @@ class InputBarViewModel(
     }
 
     private fun handleScheduleMessage(text: String, timestamp: Long) {
-        onMessageSchedule(text, timestamp)
-        _uiState.value.textFieldState.clearText()
-        _uiState.update { it.copy(schedulingStage = SchedulingStage.Hidden) }
+        if (timestamp > System.currentTimeMillis()) {
+            onMessageSchedule(text, timestamp)
+            _uiState.value.textFieldState.clearText()
+            _uiState.update { it.copy(schedulingStage = SchedulingStage.Hidden) }
+        } else {
+            viewModelScope.launch {
+                _effect.emit(InputBarEffect.TriggerShake)
+                _effect.emit(InputBarEffect.ShowError(off.kys.backtalk.R.string.message_scheduling_invalid_time))
+            }
+        }
     }
 
     private fun startVoiceRecording() {

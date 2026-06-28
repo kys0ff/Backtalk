@@ -56,6 +56,7 @@
     <string name="chat_input_send_images">Enviar %1$d imágenes</string>
     <string name="chat_input_caption_hint">Añadir un comentario…</string>
     <string name="chat_input_record_cd">Grabar</string>
+    <string name="chat_input_set_reminder">Establecer recordatorio</string>
     <string name="chat_input_format_bold">N</string>
     <string name="chat_input_format_italic">K</string>
     <string name="chat_input_format_underline">S</string>

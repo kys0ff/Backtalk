@@ -56,6 +56,7 @@
     <string name="chat_input_send_images">إرسال %1$d صور</string>
     <string name="chat_input_caption_hint">إضافة شرح…</string>
     <string name="chat_input_record_cd">تسجيل</string>
+    <string name="chat_input_set_reminder">ضبط تذكير</string>
     <string name="chat_input_format_bold">ع</string>
     <string name="chat_input_format_italic">م</string>
     <string name="chat_input_format_underline">خ</string>
