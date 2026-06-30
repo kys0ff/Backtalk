@@ -368,7 +368,7 @@ private fun AttachButtonVisibility(isVisible: Boolean, onClick: () -> Unit) {
             modifier = Modifier.size(48.dp)
         ) {
             Icon(
-                painter = painterResource(R.drawable.round_add_24),
+                painter = painterResource(R.drawable.round_image_24),
                 contentDescription = stringResource(R.string.common_attach),
                 tint = MaterialTheme.colorScheme.primary
             )

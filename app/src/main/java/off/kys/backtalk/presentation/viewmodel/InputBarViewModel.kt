@@ -31,6 +31,7 @@ import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 class InputBarViewModel(
     private val application: Application,
@@ -123,7 +124,7 @@ class InputBarViewModel(
         
         viewModelScope.launch {
             while (_uiState.value.isRecording) {
-                delay(1000L)
+                delay(1000L.milliseconds)
                 _uiState.update { it.copy(secondsElapsed = it.secondsElapsed + 1) }
             }
         }
@@ -147,7 +148,7 @@ class InputBarViewModel(
         _uiState.update { it.copy(showTapHint = true) }
         viewModelScope.launch {
             _effect.emit(InputBarEffect.TriggerShake)
-            delay(2000L)
+            delay(2000L.milliseconds)
             _uiState.update { it.copy(showTapHint = false) }
         }
     }
