@@ -1,6 +1,5 @@
 package off.kys.backtalk.presentation.event
 
-import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.model.MessageUiModel
 

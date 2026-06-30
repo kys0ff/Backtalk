@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.model.MessageUiModel
@@ -51,7 +52,8 @@ fun MessagesContent(
     onLongClick: (MessageUiModel?) -> Unit,
     onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
     totalDeletableCount: Int = 0,
-    totalSelectedCount: Int = 0
+    totalSelectedCount: Int = 0,
+    bottomPadding: Dp = 0.dp
 ) {
     val context = LocalContext.current
     val isSelectionMode = totalSelectedCount > 0
@@ -86,7 +88,7 @@ fun MessagesContent(
             onToggleImageSelect = onToggleImageSelect,
             onTogglePin = onTogglePin,
             onLongClick = onLongClick,
-            contentPadding = PaddingValues(top = topPadding)
+            contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding)
         )
 
         Column(

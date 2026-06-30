@@ -1,8 +1,10 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -13,10 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
@@ -45,6 +54,8 @@ fun MessagesScreenContent(
     val scope = rememberCoroutineScope()
     val showScrollToBottom = rememberScrollToBottomVisibility(messagesScrollState)
     val tags = state.hashtags
+    val density = LocalDensity.current
+    var inputBarHeight by remember { mutableStateOf(0.dp) }
 
     fun scrollToAndBlink(id: MessageId) {
         scope.launch {
@@ -155,8 +166,79 @@ fun MessagesScreenContent(
                 canDelete = state.selectionMetrics.totalDeletableCount > 0
             )
         },
-        bottomBar = {
+        bottomBar = {},
+        floatingActionButton = {}
+    ) { scaffoldPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (state.showMediaPicker) {
+                MediaPickerSheet(
+                    onMediaSelected = { uris, type, description ->
+                        onEvent(
+                            MessagesUiEvent.SendMediaMessages(
+                                uris = uris.map { it.toString() },
+                                type = type,
+                                description = description
+                            )
+                        )
+                    },
+                    onDismiss = { onEvent(MessagesUiEvent.ToggleMediaPicker(false)) }
+                )
+            }
+
+            if (state.showSharedMediaSheet) {
+                SharedMediaSheet(
+                    onDismiss = { onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false)) },
+                    onScrollToMessage = { id ->
+                        onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false))
+                        scrollToAndBlink(id)
+                        onEvent(MessagesUiEvent.ScrollToMessage(id))
+                    }
+                )
+            }
+
+            MessagesContent(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = scaffoldPadding.calculateTopPadding()),
+                state = state,
+                tags = tags,
+                listState = messagesScrollState,
+                onEditMessage = { onEvent(MessagesUiEvent.EditMessage(it)) },
+                onReply = { onEvent(MessagesUiEvent.ReplyTo(it)) },
+                onToggleSelect = { onEvent(MessagesUiEvent.ToggleSelection(it)) },
+                onDismissRationale = { onEvent(MessagesUiEvent.DismissPermissionRationale) },
+                onConfirmDelete = { onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
+                onDismissDelete = { onEvent(MessagesUiEvent.DismissDeleteConfirmation) },
+                onDeleteMessage = { onEvent(MessagesUiEvent.DeleteMessage(it)) },
+                onCopyMessage = { onEvent(MessagesUiEvent.CopyMessage(it)) },
+                onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
+                onNavigatePinned = { onEvent(MessagesUiEvent.NavigatePinned) },
+                onTogglePinnedDialog = { onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
+                    onTogglePin = { message, isPinned ->
+                    onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
+                },
+                onLongClick = { onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) },
+                onScrollToMessage = { id ->
+                    scrollToAndBlink(id)
+                    onEvent(MessagesUiEvent.ScrollToMessage(id))
+                },
+                onToggleImageSelect = { messageId, imagePath ->
+                    onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
+                },
+                totalDeletableCount = state.selectionMetrics.totalDeletableCount,
+                totalSelectedCount = state.selectionMetrics.totalSelectedCount,
+                bottomPadding = inputBarHeight
+            )
+
             InputBar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onGloballyPositioned { coordinates ->
+                        inputBarHeight = with(density) { coordinates.size.height.toDp() }
+                    },
                 viewModel = inputBarViewModel,
                 messageInput = when {
                     state.editingMessage != null -> state.editingMessage.editedText.orEmpty()
@@ -172,9 +254,11 @@ fun MessagesScreenContent(
                 sharedImageUris = state.sharedImageUris,
                 onCancelSharedImage = { onEvent(MessagesUiEvent.ClearSharedImage) }
             )
-        },
-        floatingActionButton = {
+
             ScrollToBottomFab(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = inputBarHeight + 8.dp, end = 16.dp),
                 isVisible = showScrollToBottom,
                 onClick = {
                     scope.launch {
@@ -182,69 +266,12 @@ fun MessagesScreenContent(
                     }
                 }
             )
-        }
-    ) { scaffoldPadding ->
-        if (state.showMediaPicker) {
-            MediaPickerSheet(
-                onMediaSelected = { uris, type, description ->
-                    onEvent(
-                        MessagesUiEvent.SendMediaMessages(
-                            uris = uris.map { it.toString() },
-                            type = type,
-                            description = description
-                        )
-                    )
-                },
-                onDismiss = { onEvent(MessagesUiEvent.ToggleMediaPicker(false)) }
-            )
-        }
 
-        if (state.showSharedMediaSheet) {
-            SharedMediaSheet(
-                onDismiss = { onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false)) },
-                onScrollToMessage = { id ->
-                    onEvent(MessagesUiEvent.ToggleSharedMediaSheet(false))
-                    scrollToAndBlink(id)
-                    onEvent(MessagesUiEvent.ScrollToMessage(id))
-                }
-            )
-        }
-
-        MessagesContent(
-            modifier = Modifier.padding(scaffoldPadding),
-            state = state,
-            tags = tags,
-            listState = messagesScrollState,
-            onEditMessage = { onEvent(MessagesUiEvent.EditMessage(it)) },
-            onReply = { onEvent(MessagesUiEvent.ReplyTo(it)) },
-            onToggleSelect = { onEvent(MessagesUiEvent.ToggleSelection(it)) },
-            onDismissRationale = { onEvent(MessagesUiEvent.DismissPermissionRationale) },
-            onConfirmDelete = { onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
-            onDismissDelete = { onEvent(MessagesUiEvent.DismissDeleteConfirmation) },
-            onDeleteMessage = { onEvent(MessagesUiEvent.DeleteMessage(it)) },
-            onCopyMessage = { onEvent(MessagesUiEvent.CopyMessage(it)) },
-            onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
-            onNavigatePinned = { onEvent(MessagesUiEvent.NavigatePinned) },
-            onTogglePinnedDialog = { onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
-                onTogglePin = { message, isPinned ->
-                onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
-            },
-            onLongClick = { onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) },
-            onScrollToMessage = { id ->
-                scrollToAndBlink(id)
-                onEvent(MessagesUiEvent.ScrollToMessage(id))
-            },
-            onToggleImageSelect = { messageId, imagePath ->
-                onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
-            },
-            totalDeletableCount = state.selectionMetrics.totalDeletableCount,
-            totalSelectedCount = state.selectionMetrics.totalSelectedCount
-        )
-
-        if (state.showChangelogDialog) {
-            ChangelogDialog(
-                onDismiss = { onEvent(MessagesUiEvent.DismissChangelog) }
-            )
+            if (state.showChangelogDialog) {
+                ChangelogDialog(
+                    onDismiss = { onEvent(MessagesUiEvent.DismissChangelog) }
+                )
+            }
         }
     }
 }
