@@ -1,3 +1,4 @@
+39e2c58 build: rename changelog generation task and animate text field background alpha on focus
 7e0642b ui: migrate to floating InputBar and adjust content and FAB padding
 2e7d84f refactor: update InputBar attachment icon and migrate delay values to Duration API
 7b77e43 refactor: support optional minimum bounds in size observer modifiers

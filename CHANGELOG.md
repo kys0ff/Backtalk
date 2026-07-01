@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2026-07-01
+
+### Added
+- **Rich Text Support**: Added support for lists and checkboxes in `ComposeTextParser` (#34).
+- **Status Banners**: Introduced `StatusScaffold` for global loading and error state visualization.
+- **Context Menus**: Implemented long-click context menu for messages (#35).
+- **Onboarding UX**: Added automated swipe hints for message rows during onboarding (#35).
+- **Message Selection**: Integrated `SelectionContainer` for better text selection and gesture handling in `MessageBubble` (#37).
+
+### Changed
+- **Input Architecture**:
+    - Migrated `InputBar` to a floating design and optimized content/FAB padding.
+    - Centralized logic in `InputBarViewModel` with a structured UI state.
+    - Improved keyboard routing and added reminder strings.
+
+### Fixed
+- **Layout**: Resolved navigation bar overlapping in `OnboardingScreen` (#32).
+- **InputBar**: Fixed placeholder alignment and layout issues in `InputBar` (#33).
+
+### Refactored
+- **Modularization**:
+    - Extracted UI models and `InputBarEffect` into dedicated files.
+    - Reorganized onboarding components and extracted pager content.
+    - Migrated message UI components to `MessageUiModel`.
+- **Logic**:
+    - Migrated delay values to the Kotlin `Duration` API.
+    - Integrated `VoiceRecordingIndicator` and cleaned up recording gesture logic.
+    - Supported optional minimum bounds in size observer modifiers.
+
+### Build
+- **Maintenance**:
+    - Upgraded Gradle to 9.6.0 and target SDK to 37.
+    - Updated Kotlin, Compose BOM, and core dependencies.
+    - Renamed changelog generation task and added focus animations to text fields.
+
 ## [0.3.5] - 2026-06-14
 
 ### Added

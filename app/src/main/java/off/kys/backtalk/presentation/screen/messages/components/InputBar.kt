@@ -1,9 +1,19 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -11,6 +21,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -19,16 +30,16 @@ import androidx.compose.foundation.content.TransferableContent
 import androidx.compose.foundation.content.contentReceiver
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -69,6 +80,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -81,6 +94,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
@@ -129,12 +143,13 @@ fun InputBar(
     val onCancelEdit = remember(viewModel) { { viewModel.onEvent(InputBarEvent.CancelEdit) } }
 
     val shakeOffset = remember { Animatable(0f) }
+    var isShaking by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(false) }
 
     val datePickerState = rememberDatePickerState(
         selectableDates = remember {
             object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    // Grab today's local date, then determine what UTC midnight matches it
                     val localToday = LocalDate.now(ZoneId.systemDefault())
                     val todayUtcMillis =
                         localToday.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
@@ -154,20 +169,21 @@ fun InputBar(
     )
 
     val scope = rememberCoroutineScope()
-    val density = LocalDensity.current
-    val imeHeight = WindowInsets.ime.getBottom(density)
-    val isImeVisible = imeHeight > 0
+
+    suspend fun performShake() {
+        isShaking = true
+        repeat(4) {
+            shakeOffset.animateTo(10f, tween(40))
+            shakeOffset.animateTo(-10f, tween(40))
+        }
+        shakeOffset.animateTo(0f, tween(40))
+        isShaking = false
+    }
 
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                InputBarEffect.TriggerShake -> {
-                    repeat(4) {
-                        shakeOffset.animateTo(10f, tween(40))
-                        shakeOffset.animateTo(-10f, tween(40))
-                    }
-                    shakeOffset.animateTo(0f, tween(40))
-                }
+                InputBarEffect.TriggerShake -> performShake()
 
                 is InputBarEffect.ShowError -> {
                     context.toast(effect.messageRes)
@@ -196,13 +212,7 @@ fun InputBar(
             }
             viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingDate))
         } else {
-            scope.launch {
-                repeat(4) {
-                    shakeOffset.animateTo(10f, tween(40))
-                    shakeOffset.animateTo(-10f, tween(40))
-                }
-                shakeOffset.animateTo(0f, tween(40))
-            }
+            scope.launch { performShake() }
         }
     }
 
@@ -213,22 +223,47 @@ fun InputBar(
         viewModel.onEvent(InputBarEvent.StartRecording)
     }
 
+    val borderColor by animateColorAsState(
+        targetValue = when {
+            isShaking -> MaterialTheme.colorScheme.error
+            isFocused -> MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+            else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+        },
+        animationSpec = tween(220),
+        label = "InputBarBorderColor"
+    )
+    val borderWidth by animateDpAsState(
+        targetValue = if (isFocused || isShaking) 1.4.dp else 1.dp,
+        animationSpec = tween(220),
+        label = "InputBarBorderWidth"
+    )
+    val tonalElevation by animateDpAsState(
+        targetValue = if (isFocused) 10.dp else 8.dp,
+        animationSpec = tween(220),
+        label = "InputBarElevation"
+    )
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .padding(bottom = 8.dp + with(density) { imeHeight.toDp() })
-            .let { if (isImeVisible) it else it.navigationBarsPadding() }
-            .offset { IntOffset(shakeOffset.value.roundToInt(), 0) },
+            .offset { IntOffset(shakeOffset.value.roundToInt(), 0) }
+            .navigationBarsPadding()
+            .imePadding()
+            .padding(bottom = 8.dp),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f),
-        tonalElevation = 8.dp,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-        )
+        tonalElevation = tonalElevation,
+        border = BorderStroke(width = borderWidth, color = borderColor)
     ) {
-        Column {
+        Column(
+            modifier = Modifier.animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+        ) {
             InputBarReplyHeader(
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
@@ -236,7 +271,11 @@ fun InputBar(
                 onCancelEdit = onCancelEdit
             )
 
-            if (sharedImageUris.isNotEmpty()) {
+            AnimatedVisibility(
+                visible = sharedImageUris.isNotEmpty(),
+                enter = expandVertically(tween(220)) + fadeIn(tween(220)),
+                exit = shrinkVertically(tween(180)) + fadeOut(tween(140))
+            ) {
                 SharedImageHeader(
                     uris = sharedImageUris,
                     onCancel = onCancelSharedImage
@@ -267,7 +306,8 @@ fun InputBar(
                     durationText = state.durationText,
                     sendWithEnter = remember(preferences) { preferences.sendWithEnter },
                     onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
-                    onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) }
+                    onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
+                    onFocusChanged = { isFocused = it }
                 )
 
                 ActionButtons(
@@ -275,7 +315,7 @@ fun InputBar(
                     onSendMessage = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
                     onStartRecording = ::startRecordingInternal,
                     isSendButtonVisible = state.isSendButtonVisible,
-                    maxDragX = with(density) { 110.dp.toPx() },
+                    maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
                     onCancelRecording = { viewModel.onEvent(InputBarEvent.CancelRecording) },
                     onStopAndSendRecording = { viewModel.onEvent(InputBarEvent.StopAndSendRecording) },
                     onDragUpdate = { directedX ->
@@ -354,8 +394,8 @@ private fun LinkPreviewSection(text: String, enabled: Boolean) {
     val firstUrl = remember(text) { text.getFirstLinkOrNull() }
     AnimatedVisibility(
         visible = enabled && firstUrl != null,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically() + fadeOut()
+        enter = expandVertically(tween(220)) + fadeIn(tween(220)),
+        exit = shrinkVertically(tween(180)) + fadeOut(tween(140))
     ) {
         if (firstUrl != null) {
             Box(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
@@ -369,12 +409,29 @@ private fun LinkPreviewSection(text: String, enabled: Boolean) {
 private fun AttachButtonVisibility(isVisible: Boolean, onClick: () -> Unit) {
     AnimatedVisibility(
         visible = isVisible,
-        enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut()
+        enter = fadeIn(tween(200)) + scaleIn(
+            initialScale = 0.6f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
+        ),
+        exit = fadeOut(tween(150)) + scaleOut(targetScale = 0.6f, animationSpec = tween(150))
     ) {
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
+        val pressScale by animateFloatAsState(
+            targetValue = if (isPressed) 0.88f else 1f,
+            animationSpec = spring(stiffness = Spring.StiffnessHigh),
+            label = "AttachPressScale"
+        )
+
         IconButton(
             onClick = onClick,
-            modifier = Modifier.size(48.dp)
+            interactionSource = interactionSource,
+            modifier = Modifier
+                .size(48.dp)
+                .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
         ) {
             Icon(
                 painter = painterResource(R.drawable.round_image_24),
@@ -395,12 +452,14 @@ private fun ChatTextField(
     durationText: String,
     sendWithEnter: Boolean,
     onSend: () -> Unit,
-    onContentReceived: (TransferableContent) -> Unit
+    onContentReceived: (TransferableContent) -> Unit,
+    onFocusChanged: (Boolean) -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
     val backgroundAlpha by animateFloatAsState(
         targetValue = if (isFocused) 0.2f else 0.8f,
+        animationSpec = tween(220),
         label = "TextFieldBackgroundAlpha"
     )
 
@@ -408,56 +467,73 @@ private fun ChatTextField(
         modifier = modifier
             .padding(vertical = 4.dp)
             .heightIn(min = 40.dp)
+            .animateContentSize(tween(180))
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = backgroundAlpha))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        if (isRecording) {
-            VoiceRecordingIndicator(
-                amplitudes = amplitudes,
-                durationText = durationText,
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            BasicTextField(
-                state = textFieldState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onFocusChanged { isFocused = it.isFocused }
-                    .contentReceiver {
-                        onContentReceived(it)
-                        it
-                    }
-                    .onKeyEvent {
-                        if (it.key == Key.Enter && it.isCtrlPressed) {
-                            onSend()
-                            true
-                        } else {
-                            false
+        AnimatedContent(
+            targetState = isRecording,
+            transitionSpec = {
+                (fadeIn(tween(200)) + scaleIn(
+                    initialScale = 0.96f,
+                    animationSpec = tween(200)
+                )) togetherWith
+                        (fadeOut(tween(120)))
+            },
+            label = "ChatFieldContent"
+        ) { recording ->
+            if (recording) {
+                VoiceRecordingIndicator(
+                    amplitudes = amplitudes,
+                    durationText = durationText,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                BasicTextField(
+                    state = textFieldState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged {
+                            isFocused = it.isFocused
+                            onFocusChanged(it.isFocused)
                         }
-                    },
-                lineLimits = if (sendWithEnter) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(
-                    1,
-                    5
-                ),
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = if (sendWithEnter) ImeAction.Send else ImeAction.Default,
-                    keyboardType = KeyboardType.Text
-                ),
-                onKeyboardAction = { onSend() },
-                decorator = { innerTextField ->
-                    if (textFieldState.text.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.chat_input_hint),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.outline
-                        )
+                        .contentReceiver {
+                            onContentReceived(it)
+                            it
+                        }
+                        .onKeyEvent {
+                            if (it.key == Key.Enter && it.isCtrlPressed) {
+                                onSend()
+                                true
+                            } else {
+                                false
+                            }
+                        },
+                    lineLimits = if (sendWithEnter) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(
+                        1,
+                        5
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = if (sendWithEnter) ImeAction.Send else ImeAction.Default,
+                        keyboardType = KeyboardType.Text
+                    ),
+                    onKeyboardAction = { onSend() },
+                    decorator = { innerTextField ->
+                        if (textFieldState.text.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.chat_input_hint),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -476,7 +552,8 @@ private fun ActionButtons(
     onShowTapHint: () -> Unit,
     layoutDirection: LayoutDirection
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    val sendInteractionSource = remember { MutableInteractionSource() }
+    val micInteractionSource = remember { MutableInteractionSource() }
     var dragAccumulator by remember { mutableFloatStateOf(0f) }
 
     Box(
@@ -485,14 +562,28 @@ private fun ActionButtons(
     ) {
         AnimatedVisibility(
             visible = isSendButtonVisible,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut()
+            enter = scaleIn(
+                initialScale = 0.6f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            ) + fadeIn(tween(200)),
+            exit = scaleOut(targetScale = 0.6f, animationSpec = tween(150)) + fadeOut(tween(150))
         ) {
+            val isPressed by sendInteractionSource.collectIsPressedAsState()
+            val pressScale by animateFloatAsState(
+                targetValue = if (isPressed) 0.88f else 1f,
+                animationSpec = spring(stiffness = Spring.StiffnessHigh),
+                label = "SendPressScale"
+            )
+
             Box(
                 modifier = Modifier
                     .size(40.dp)
+                    .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
                     .combinedClickable(
-                        interactionSource = interactionSource,
+                        interactionSource = sendInteractionSource,
                         indication = ripple(bounded = false),
                         onClick = onSendMessage,
                         onLongClick = onLongClick
@@ -509,17 +600,61 @@ private fun ActionButtons(
 
         AnimatedVisibility(
             visible = !isSendButtonVisible,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut()
+            enter = scaleIn(
+                initialScale = 0.6f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            ) + fadeIn(tween(200)),
+            exit = scaleOut(targetScale = 0.6f, animationSpec = tween(150)) + fadeOut(tween(150))
         ) {
             val recordButtonColor by animateColorAsState(
-                if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                targetValue = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                animationSpec = tween(220),
                 label = "RecordButtonColor"
             )
+            val recordButtonSize by animateDpAsState(
+                targetValue = if (isRecording) 44.dp else 40.dp,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                label = "RecordButtonSize"
+            )
+
+            val infiniteTransition = rememberInfiniteTransition(label = "RecordPulse")
+            val pulseScale by infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = 1.12f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(700, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "RecordPulseScale"
+            )
+
+            val isPressed by micInteractionSource.collectIsPressedAsState()
+            val pressScale by animateFloatAsState(
+                targetValue = if (isPressed) 0.9f else 1f,
+                animationSpec = spring(stiffness = Spring.StiffnessHigh),
+                label = "MicPressScale"
+            )
+
+            val dragProgress = (abs(dragAccumulator) / maxDragX).coerceIn(0f, 1f)
+            val visualOffsetX = dragAccumulator.coerceIn(-maxDragX, maxDragX)
+            val combinedScale =
+                (if (isRecording) pulseScale else 1f) * pressScale * (1f - dragProgress * 0.15f)
 
             Box(
                 modifier = Modifier
-                    .size(if (isRecording) 44.dp else 40.dp)
+                    .size(recordButtonSize)
+                    .offset { IntOffset(visualOffsetX.roundToInt(), 0) }
+                    .graphicsLayer {
+                        scaleX = combinedScale
+                        scaleY = combinedScale
+                        alpha = 1f - dragProgress * 0.4f
+                    }
                     .clip(CircleShape)
                     .background(recordButtonColor)
                     .pointerInput(layoutDirection) {
@@ -559,7 +694,7 @@ private fun ActionButtons(
                         )
                     }
                     .combinedClickable(
-                        interactionSource = interactionSource,
+                        interactionSource = micInteractionSource,
                         indication = null,
                         onClick = onShowTapHint,
                         onLongClick = onLongClick
@@ -616,7 +751,7 @@ fun TimePickerDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable (() -> Unit),
     dismissButton: @Composable (() -> Unit)? = null,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     content: @Composable () -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(
@@ -626,11 +761,10 @@ fun TimePickerDialog(
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 6.dp,
+            color = containerColor,
             modifier = Modifier
                 .width(IntrinsicSize.Min)
                 .height(IntrinsicSize.Min)
-                .background(shape = MaterialTheme.shapes.extraLarge, color = containerColor),
-            color = containerColor
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -641,7 +775,8 @@ fun TimePickerDialog(
                         .fillMaxWidth()
                         .padding(bottom = 20.dp),
                     text = title,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
                 content()
                 Row(

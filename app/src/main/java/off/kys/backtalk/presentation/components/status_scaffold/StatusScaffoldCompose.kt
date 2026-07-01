@@ -1,40 +1,55 @@
 package off.kys.backtalk.presentation.components.status_scaffold
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import off.kys.backtalk.R
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun StatusScaffold(
@@ -49,72 +64,74 @@ fun StatusScaffold(
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = MaterialTheme.colorScheme.onBackground,
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    onDismissStatus: (() -> Unit)? = null,
+    autoDismissMillis: Long? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = topBar,
-        bottomBar = bottomBar,
-        snackbarHost = snackbarHost,
-        floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = floatingActionButtonPosition,
-        containerColor = containerColor,
-        contentColor = contentColor,
-        contentWindowInsets = contentWindowInsets
-    ) { innerPadding ->
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = topBar,
+            bottomBar = bottomBar,
+            snackbarHost = snackbarHost,
+            floatingActionButton = floatingActionButton,
+            floatingActionButtonPosition = floatingActionButtonPosition,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            contentWindowInsets = contentWindowInsets
+        ) { innerPadding ->
+            content(innerPadding)
+        }
 
-        val layoutDirection = LocalLayoutDirection.current
-
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AnimatedVisibility(
-                visible = status != ScaffoldStatus.None && message != null,
-                enter = expandVertically(animationSpec = tween(300)) + fadeIn(
-                    animationSpec = tween(
-                        300
-                    )
+        AnimatedVisibility(
+            visible = status != ScaffoldStatus.None && message != null,
+            enter = expandVertically(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
                 ),
-                exit = shrinkVertically(animationSpec = tween(300)) + fadeOut(
-                    animationSpec = tween(
-                        300
-                    )
+                expandFrom = Alignment.Top
+            ) + fadeIn(animationSpec = tween(220)),
+            exit = shrinkVertically(
+                animationSpec = tween(280),
+                shrinkTowards = Alignment.Top
+            ) + fadeOut(animationSpec = tween(180)),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            if (message != null) {
+                StatusBadge(
+                    status = status,
+                    message = message,
+                    onDismiss = onDismissStatus
                 )
-            ) {
-                Box(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
-                    if (message != null) {
-                        StatusBadge(status = status, message = message)
+
+                if (autoDismissMillis != null && onDismissStatus != null) {
+                    LaunchedEffect(status, message) {
+                        delay(autoDismissMillis.milliseconds)
+                        onDismissStatus()
                     }
                 }
-            }
-
-            Box(modifier = Modifier.weight(1f)) {
-                content(
-                    PaddingValues(
-                        start = innerPadding.calculateStartPadding(layoutDirection),
-                        end = innerPadding.calculateEndPadding(layoutDirection),
-                        top = if (status == ScaffoldStatus.None || message == null) innerPadding.calculateTopPadding() else 0.dp,
-                        bottom = innerPadding.calculateBottomPadding()
-                    )
-                )
             }
         }
     }
 }
 
 @Composable
-private fun StatusBadge(status: ScaffoldStatus, message: StatusMessage) {
+private fun StatusBadge(
+    status: ScaffoldStatus,
+    message: StatusMessage,
+    onDismiss: (() -> Unit)? = null
+) {
     val targetBackgroundColor = when (status) {
         ScaffoldStatus.Info -> MaterialTheme.colorScheme.primaryContainer
-        ScaffoldStatus.Warning -> MaterialTheme.colorScheme.errorContainer
-        ScaffoldStatus.Error -> MaterialTheme.colorScheme.error
+        ScaffoldStatus.Warning -> MaterialTheme.colorScheme.tertiaryContainer
+        ScaffoldStatus.Error -> MaterialTheme.colorScheme.errorContainer
         ScaffoldStatus.None -> Color.Transparent
     }
 
     val targetTextColor = when (status) {
         ScaffoldStatus.Info -> MaterialTheme.colorScheme.onPrimaryContainer
-        ScaffoldStatus.Warning -> MaterialTheme.colorScheme.onErrorContainer
-        ScaffoldStatus.Error -> MaterialTheme.colorScheme.onError
+        ScaffoldStatus.Warning -> MaterialTheme.colorScheme.onTertiaryContainer
+        ScaffoldStatus.Error -> MaterialTheme.colorScheme.onErrorContainer
         ScaffoldStatus.None -> Color.Transparent
     }
 
@@ -127,43 +144,108 @@ private fun StatusBadge(status: ScaffoldStatus, message: StatusMessage) {
 
     val backgroundColor by animateColorAsState(
         targetValue = targetBackgroundColor,
-        animationSpec = tween(durationMillis = 250),
+        animationSpec = tween(durationMillis = 300),
         label = "BadgeBackground"
     )
 
     val textColor by animateColorAsState(
         targetValue = targetTextColor,
-        animationSpec = tween(durationMillis = 250),
+        animationSpec = tween(durationMillis = 300),
         label = "BadgeText"
     )
 
-    Box(
+    val statusBarTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+    Surface(
+        color = backgroundColor,
+        contentColor = textColor,
+        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+        tonalElevation = 3.dp,
+        shadowElevation = 6.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(vertical = 10.dp, horizontal = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (icon != null) {
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = null,
-                    tint = textColor,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(18.dp)
-                )
+            .semantics {
+                liveRegion = LiveRegionMode.Polite
             }
-            Text(
-                text = message.asString(),
-                color = textColor,
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center
-            )
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(
+                    top = statusBarTopPadding + 12.dp,
+                    bottom = 14.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                AnimatedContent(
+                    targetState = icon,
+                    transitionSpec = {
+                        (scaleIn(
+                            initialScale = 0.6f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium
+                            )
+                        ) + fadeIn(tween(200))) togetherWith
+                                (scaleOut(targetScale = 0.6f, animationSpec = tween(150)) + fadeOut(tween(150)))
+                    },
+                    label = "BadgeIcon"
+                ) { animatedIcon ->
+                    if (animatedIcon != null) {
+                        Icon(
+                            painter = painterResource(animatedIcon),
+                            contentDescription = null,
+                            tint = textColor,
+                            modifier = Modifier
+                                .padding(end = 10.dp)
+                                .size(20.dp)
+                        )
+                    }
+                }
+
+                // Crossfade the message text itself, so rapid status/message
+                // changes (e.g. Info -> Error) read as a smooth transition.
+                AnimatedContent(
+                    targetState = message.asString(),
+                    transitionSpec = {
+                        (fadeIn(tween(220)) + expandVertically(tween(220))) togetherWith
+                                (fadeOut(tween(120)))
+                    },
+                    label = "BadgeMessage",
+                    modifier = Modifier.weight(1f, fill = false)
+                ) { text ->
+                    Text(
+                        text = text,
+                        color = textColor,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                if (onDismiss != null) {
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(28.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.round_close_24),
+                            contentDescription = stringResource(R.string.common_close),
+                            tint = textColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
