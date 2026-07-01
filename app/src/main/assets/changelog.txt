@@ -1,3 +1,8 @@
+7e0642b ui: migrate to floating InputBar and adjust content and FAB padding
+2e7d84f refactor: update InputBar attachment icon and migrate delay values to Duration API
+7b77e43 refactor: support optional minimum bounds in size observer modifiers
+19b7254 feat: add reminder strings and improve keyboard routing in InputBar
+9b05190 build: upgrade Gradle to 9.6.0, target SDK 37, and update toolchain
 695b9e6 refactor: use VoiceRecordingIndicator and clean up InputBar gesture logic
 d1162c8 refactor: migrate message UI components to MessageUiModel
 8cbdf5e feat #37: implement SelectionContainer and disable gestures in selectMode for MessageBubble

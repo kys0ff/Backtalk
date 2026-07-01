@@ -3,6 +3,7 @@ package off.kys.backtalk.presentation.screen.messages.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -59,12 +60,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.Key
@@ -394,12 +397,19 @@ private fun ChatTextField(
     onSend: () -> Unit,
     onContentReceived: (TransferableContent) -> Unit
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+
+    val backgroundAlpha by animateFloatAsState(
+        targetValue = if (isFocused) 0.2f else 0.8f,
+        label = "TextFieldBackgroundAlpha"
+    )
+
     Box(
         modifier = modifier
             .padding(vertical = 4.dp)
             .heightIn(min = 40.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = backgroundAlpha))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -414,6 +424,7 @@ private fun ChatTextField(
                 state = textFieldState,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .onFocusChanged { isFocused = it.isFocused }
                     .contentReceiver {
                         onContentReceived(it)
                         it

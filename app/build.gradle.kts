@@ -1,6 +1,6 @@
 
 import off.kys.backtalk.build.GenerateCaptionStringsAssetTask
-import off.kys.backtalk.build.GenerateChangelogTask
+import off.kys.backtalk.build.GenerateChangelogAssetTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -155,13 +155,13 @@ val generateCaptionStringsAssetTask =
         description = "Generates the caption strings asset file."
     }
 
-val generateChangelogTask =
-    tasks.register<GenerateChangelogTask>("generateChangelog") {
+val generateChangelogAssetTask =
+    tasks.register<GenerateChangelogAssetTask>("generateChangelogAsset") {
         group = "build"
-        description = "Generates the changelog file."
+        description = "Generates the changelog asset file."
     }
 
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
-    dependsOn(generateChangelogTask)
+    dependsOn(generateChangelogAssetTask)
     dependsOn(generateCaptionStringsAssetTask)
 }
