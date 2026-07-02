@@ -1,3 +1,4 @@
+088e6a0 fix: implement app restart on data wipe and optimize message list auto-scroll
 75792eb feat: implement AMOLED mode and refactor keyboard padding logic
 f339524 ui: clear focus in InputBar when software keyboard is hidden
 8f601d6 ui: add a keyboardPadding modifier to InputBar

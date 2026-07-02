@@ -376,13 +376,6 @@ class SettingsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(backupLoading = true) }
             wipeAppData()
-            _state.update {
-                SettingsUiState(
-                    themeMode = preferences.themeMode,
-                    dynamicColorEnabled = preferences.dynamicColorEnabled,
-                    devModeEnabled = preferences.devModeEnabled,
-                )
-            }
             application.restartApp()
         }
     }

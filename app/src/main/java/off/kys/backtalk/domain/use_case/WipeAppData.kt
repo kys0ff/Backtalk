@@ -1,6 +1,8 @@
 package off.kys.backtalk.domain.use_case
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.domain.repository.SyncRepository
@@ -18,7 +20,7 @@ class WipeAppData(
     /**
      * Executes the wipe operation.
      */
-    suspend operator fun invoke() {
+    suspend operator fun invoke() = withContext(Dispatchers.IO) {
         // Notify and disconnect all paired devices
         syncRepository.disconnectAll()
 
