@@ -119,6 +119,8 @@
     <string name="settings_appearance">المظهر</string>
     <string name="settings_dynamic_color">ألوان Material You الديناميكية</string>
     <string name="settings_dynamic_color_desc">تكييف ألوان التطبيق مع ألوان النظام</string>
+    <string name="settings_amoled_mode">وضع AMOLED</string>
+    <string name="settings_amoled_mode_desc">استخدم خلفيات سوداء بالكامل في الوضع الداكن لتوفير البطارية</string>
     <string name="settings_privacy_security">الخصوصية والأمان</string>
     <string name="settings_enable_app_lock">تفعيل قُفْل التطبيق</string>
     <string name="settings_haptic_feedback">الاستجابة اللمسية</string>

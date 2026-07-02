@@ -116,6 +116,8 @@
     <string name="settings_appearance">Apariencia</string>
     <string name="settings_dynamic_color">Color dinámico de Material You</string>
     <string name="settings_dynamic_color_desc">Aplicar colores del sistema a la interfaz de la aplicación</string>
+    <string name="settings_amoled_mode">Modo AMOLED</string>
+    <string name="settings_amoled_mode_desc">Usar fondos negros puros en modo oscuro para ahorrar batería</string>
     <string name="settings_privacy_security">Privacidad y Seguridad</string>
     <string name="settings_enable_app_lock">Habilitar bloqueo de aplicación</string>
     <string name="settings_haptic_feedback">Respuesta háptica</string>

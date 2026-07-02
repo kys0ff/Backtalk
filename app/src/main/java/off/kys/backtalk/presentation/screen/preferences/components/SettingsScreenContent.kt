@@ -229,6 +229,18 @@ fun SettingsScreenContent(
                     thickness = 0.5.dp,
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_amoled_mode),
+                    supportingText = stringResource(R.string.settings_amoled_mode_desc),
+                    icon = painterResource(R.drawable.round_brightness_6_24),
+                    checked = state.amoledMode,
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnAmoledModeToggle(it)) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
                 SettingsItem(
                     label = stringResource(R.string.settings_date_format),
                     value = stringResource(state.dateFormat.titleResId),

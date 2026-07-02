@@ -112,6 +112,11 @@ private fun animateColorScheme(targetColorScheme: ColorScheme): ColorScheme {
         outline = animateColorAsState(targetColorScheme.outline, animationSpec, label = "outline").value,
         outlineVariant = animateColorAsState(targetColorScheme.outlineVariant, animationSpec, label = "outlineVariant").value,
         scrim = animateColorAsState(targetColorScheme.scrim, animationSpec, label = "scrim").value,
+        surfaceContainer = animateColorAsState(targetColorScheme.surfaceContainer, animationSpec, label = "surfaceContainer").value,
+        surfaceContainerLow = animateColorAsState(targetColorScheme.surfaceContainerLow, animationSpec, label = "surfaceContainerLow").value,
+        surfaceContainerLowest = animateColorAsState(targetColorScheme.surfaceContainerLowest, animationSpec, label = "surfaceContainerLowest").value,
+        surfaceContainerHigh = animateColorAsState(targetColorScheme.surfaceContainerHigh, animationSpec, label = "surfaceContainerHigh").value,
+        surfaceContainerHighest = animateColorAsState(targetColorScheme.surfaceContainerHighest, animationSpec, label = "surfaceContainerHighest").value,
     )
 }
 
@@ -122,15 +127,29 @@ private fun animateColorScheme(targetColorScheme: ColorScheme): ColorScheme {
 fun BacktalkTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
+    amoledMode: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    var colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    if (darkTheme && amoledMode) {
+        colorScheme = colorScheme.copy(
+            surface = Color.Black,
+            background = Color.Black,
+            surfaceVariant = Color.Black,
+            surfaceContainer = Color.Black,
+            surfaceContainerLow = Color.Black,
+            surfaceContainerLowest = Color.Black,
+            surfaceContainerHigh = Color(0xFF1B1B1E),
+            surfaceContainerHighest = Color(0xFF1B1B1E),
+        )
     }
 
     val animatedColorScheme = animateColorScheme(colorScheme)

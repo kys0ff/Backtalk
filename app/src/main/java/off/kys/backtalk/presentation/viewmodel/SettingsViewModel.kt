@@ -55,6 +55,7 @@ class SettingsViewModel(
                 AppCompatDelegate.getApplicationLocales().toLanguageTags()
             ),
             dynamicColorEnabled = preferences.dynamicColorEnabled,
+            amoledMode = preferences.amoledMode,
             lockEnabled = preferences.lockEnabled,
             lockOnScreenOff = preferences.lockOnScreenOff,
             lockTimeoutMillis = preferences.lockTimeoutMillis,
@@ -98,6 +99,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnTimeFormatChange -> onTimeFormatChange(event.timeFormat)
         is SettingsUiEvent.OnCustomDateFormatChange -> onCustomDateFormatChange(event.pattern)
         is SettingsUiEvent.OnDynamicColorToggle -> onDynamicColorToggle(event.enabled)
+        is SettingsUiEvent.OnAmoledModeToggle -> onAmoledModeToggle(event.enabled)
         is SettingsUiEvent.OnLockToggle -> onLockToggle(event.enabled)
         is SettingsUiEvent.OnLockOnScreenOffToggle -> onLockOnScreenOffToggle(event.enabled)
         is SettingsUiEvent.OnLockTimeoutChange -> onLockTimeoutChange(event.timeoutMillis)
@@ -172,6 +174,11 @@ class SettingsViewModel(
     private fun onDynamicColorToggle(enabled: Boolean) {
         preferences.dynamicColorEnabled = enabled
         _state.update { it.copy(dynamicColorEnabled = enabled) }
+    }
+
+    private fun onAmoledModeToggle(enabled: Boolean) {
+        preferences.amoledMode = enabled
+        _state.update { it.copy(amoledMode = enabled) }
     }
 
     private fun onLockToggle(enabled: Boolean) {

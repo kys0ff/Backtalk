@@ -17,6 +17,7 @@ data class SettingsUiState(
     val timeFormat: AppTimeFormat = AppTimeFormat.SYSTEM,
     val customDateFormat: String = "MMM d, yyyy",
     val dynamicColorEnabled: Boolean = false,
+    val amoledMode: Boolean = false,
     val lockEnabled: Boolean = false,
     val lockOnScreenOff: Boolean = false,
     val lockTimeoutMillis: Long = 0L,

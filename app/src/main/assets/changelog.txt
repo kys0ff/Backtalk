@@ -1,3 +1,4 @@
+f339524 ui: clear focus in InputBar when software keyboard is hidden
 8f601d6 ui: add a keyboardPadding modifier to InputBar
 a7c94fc refactor: clean up padding, remove input bar animations, and optimize imports
 bcc8098 ui: enhance InputBar and StatusScaffold with advanced animations

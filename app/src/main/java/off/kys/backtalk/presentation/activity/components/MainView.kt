@@ -31,6 +31,7 @@ fun MainView(
     val updateState by viewModel.mainUiState.collectAsStateWithLifecycle()
     val isDarkTheme = viewModel.preferences.themeMode.isDark(isSystemInDarkTheme())
     val dynamicColor = viewModel.preferences.dynamicColorEnabled
+    val amoledMode = viewModel.preferences.amoledMode
 
     LaunchedEffect(updateState) {
         if (updateState is MainUiState.UpToDate) {
@@ -41,7 +42,8 @@ fun MainView(
 
     BacktalkTheme(
         darkTheme = isDarkTheme,
-        dynamicColor = dynamicColor
+        dynamicColor = dynamicColor,
+        amoledMode = amoledMode
     ) {
         if (crashData != null) {
             Navigator(crashData) { navigator ->

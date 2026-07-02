@@ -61,6 +61,9 @@ class BacktalkPreferences(private val context: Context) {
         EnumPreferenceItem(prefs, KEY_THEME_MODE, ThemeMode.AUTO, ThemeMode::class.java)
     )
 
+    /** Whether AMOLED (pure black) dark mode is enabled. */
+    var amoledMode by preference(BooleanPreferenceItem(prefs, KEY_AMOLED_MODE, false))
+
     /** Whether Material You dynamic color extraction is enabled. */
     var dynamicColorEnabled by preference(
         BooleanPreferenceItem(prefs, KEY_DYNAMIC_COLOR, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -192,6 +195,7 @@ class BacktalkPreferences(private val context: Context) {
 
     companion object {
         const val KEY_THEME_MODE = "theme_mode"
+        const val KEY_AMOLED_MODE = "amoled_mode"
         const val KEY_DYNAMIC_COLOR = "dynamic_color"
         const val KEY_LOCK_ENABLED = "lock_enabled"
         const val KEY_LOCK_ON_SCREEN_OFF = "lock_on_screen_off"
