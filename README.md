@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.3.5-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.3.8-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -66,13 +66,14 @@ Read the full [Backtalk Philosophy](./PHILOSOPHY.md) to learn more about why we 
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.3.5)
+## Recent Changes (v0.3.8)
 
-- **External Sharing**: Share images and text from other apps directly into your self-chats with previews.
-- **Rich Media & Links**: GIF support, detailed link previews with metadata, and a new shared media browser.
-- **Spanish Support**: Full Spanish localization is now available, along with refined Arabic translations.
-- **UX & Voice**: Improved voice recording UI with RTL dragging support, RTL waveforms, and a modernized input bar.
-- **Maintenance**: Troubleshooting tools like "Clear cache", background update checks, and improved message scheduling.
+- **AMOLED Mode**: New dark theme option for OLED screens to save battery and improve contrast.
+- **Status Banners**: Introduced global loading, error, and info banners for better app-wide feedback.
+- **Input Experience**: Redesigned floating input bar with advanced animations and improved keyboard handling.
+- **Message Richness**: Added support for lists and checkboxes within messages for better organization.
+- **Interactions**: New long-press context menu and automated onboarding gesture hints.
+- **Modernization**: Optimized for Android 15 (SDK 37) and upgraded to Gradle 9.6.0.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 
