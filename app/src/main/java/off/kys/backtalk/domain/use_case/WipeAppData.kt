@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.domain.repository.SyncRepository
+import off.kys.backtalk.util.ignoreResult
 import java.io.File
 
 /**
@@ -42,6 +43,6 @@ class WipeAppData(
         }
 
         // Clear Cache
-        context.cacheDir.deleteRecursively()
+        ignoreResult { context.cacheDir.deleteRecursively() }
     }
 }
