@@ -1,0 +1,7 @@
+- AMOLED Mode: New dark theme option for OLED screens to save battery.
+- Status Banners: New global loading and error indicators.
+- Message Interactions: Long-press context menu and onboarding swipe hints.
+- Rich Content: Support for lists and checkboxes in messages.
+- UI Refinement: Redesigned floating input bar and image attachment grid.
+- Stability: Improved data wipe operations and message list auto-scrolling.
+- Platform: Optimized for Android 15.

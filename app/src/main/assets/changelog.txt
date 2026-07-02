@@ -1,3 +1,6 @@
+45cb5d2 refactor: introduce ignoreResult utility to explicitly discard expression returns
+bf86edb refactor: introduce ignoreResult utility to explicitly discard expression returns
+2686009 refactor: offload data wipe to IO dispatcher and remove dead state updates
 088e6a0 fix: implement app restart on data wipe and optimize message list auto-scroll
 75792eb feat: implement AMOLED mode and refactor keyboard padding logic
 f339524 ui: clear focus in InputBar when software keyboard is hidden

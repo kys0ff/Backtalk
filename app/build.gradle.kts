@@ -10,8 +10,8 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
-val appVersion: String = "0.3.5"
-val appVersionCode: Int = 35
+val appVersion: String = "0.3.8"
+val appVersionCode: Int = 38
 
 android {
     namespace = "off.kys.backtalk"

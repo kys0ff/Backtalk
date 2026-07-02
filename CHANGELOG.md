@@ -2,40 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.8] - 2026-07-01
+## [0.3.8] - 2026-07-02
 
 ### Added
-- **Rich Text Support**: Added support for lists and checkboxes in `ComposeTextParser` (#34).
-- **Status Banners**: Introduced `StatusScaffold` for global loading and error state visualization.
-- **Context Menus**: Implemented long-click context menu for messages (#35).
-- **Onboarding UX**: Added automated swipe hints for message rows during onboarding (#35).
-- **Message Selection**: Integrated `SelectionContainer` for better text selection and gesture handling in `MessageBubble` (#37).
+- **AMOLED Mode**: New dark theme option for OLED screens to save battery and improve contrast.
+- **Status Banners**: Introduced `StatusScaffold` to display global loading, error, and info banners.
+- **Message Interactions**:
+    - Implemented long-press context menu for quick message actions.
+    - Added automated onboarding swipe hints for new users to discover message gestures.
+    - Support for lists and checkboxes in message rendering.
+- **Selection Mode**: New `SelectionContainer` for message bubbles with gesture controls in selection mode.
 
 ### Changed
-- **Input Architecture**:
-    - Migrated `InputBar` to a floating design and optimized content/FAB padding.
-    - Centralized logic in `InputBarViewModel` with a structured UI state.
-    - Improved keyboard routing and added reminder strings.
+- **Input Experience**:
+    - Migrated to a floating `InputBar` design with improved animations and layout.
+    - Refactored `InputBar` logic into a dedicated `InputBarViewModel` for better state management.
+    - Improved keyboard padding logic and routing.
+- **UI Refinement**:
+    - Redesigned the image attachment grid for better visual consistency.
+    - Updated `SettingsToggle` accessibility and UI styling.
+    - Migrated UI components to use `MessageUiModel` and `MessagesUiState`.
+- **Performance**: Optimized data wipe operations by offloading to IO dispatcher.
 
 ### Fixed
-- **Layout**: Resolved navigation bar overlapping in `OnboardingScreen` (#32).
-- **InputBar**: Fixed placeholder alignment and layout issues in `InputBar` (#33).
+- **Navigation**: Resolved navigation bar overlapping issues in the Onboarding screen.
+- **Stability**: Implemented app restart on data wipe to ensure clean state and fixed message list auto-scroll logic.
+- **Layout**: Fixed `InputBar` placeholder alignment and layout issues.
 
 ### Refactored
-- **Modularization**:
-    - Extracted UI models and `InputBarEffect` into dedicated files.
-    - Reorganized onboarding components and extracted pager content.
-    - Migrated message UI components to `MessageUiModel`.
-- **Logic**:
-    - Migrated delay values to the Kotlin `Duration` API.
-    - Integrated `VoiceRecordingIndicator` and cleaned up recording gesture logic.
-    - Supported optional minimum bounds in size observer modifiers.
+- **Architecture**: Decoupled UI models and effects into separate files and reorganized onboarding UI components.
+- **Modernization**: Migrated delay values to the standard `Duration` API and introduced `ignoreResult` utility.
 
 ### Build
-- **Maintenance**:
-    - Upgraded Gradle to 9.6.0 and target SDK to 37.
-    - Updated Kotlin, Compose BOM, and core dependencies.
-    - Renamed changelog generation task and added focus animations to text fields.
+- **Tooling**: Upgraded Gradle to 9.6.0 and updated Kotlin toolchain.
+- **Platform**: Bumped target SDK to 37 (Android 15).
+- **Dependencies**: Updated Compose BOM and various core library dependencies.
+- **Maintenance**: Bumped version to 0.3.8.
+
+---
 
 ## [0.3.5] - 2026-06-14
 
