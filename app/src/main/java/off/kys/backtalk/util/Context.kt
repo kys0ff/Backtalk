@@ -6,11 +6,13 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Process
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.biometric.BiometricManager
 import off.kys.backtalk.R
 import java.io.File
+import kotlin.system.exitProcess
 
 /**
  * Displays a short [Toast] message.
@@ -122,4 +124,18 @@ fun Context.getAssetFile(assetFileName: String): File {
         }
     }
     return cacheFile
+}
+
+/**
+ * Triggers a full application restart by scheduling the launcher activity
+ * and immediately terminating the current process.
+ */
+fun Context.restartApp() {
+    packageManager.getLaunchIntentForPackage(packageName)?.apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(this)
+    }
+
+    Process.killProcess(Process.myPid())
+    exitProcess(0)
 }

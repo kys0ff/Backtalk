@@ -45,6 +45,7 @@ import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
+import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold

@@ -60,13 +60,17 @@ fun MessagesList(
     val reversedMessages = remember(messages) { messages.reversed() }
 
     LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty() && !preferences.swipeHintShown) {
-            val hintMessage = messages.lastOrNull { message -> message.canEdit }
-            showHintForId = hintMessage?.id
-        }
+        if (messages.isNotEmpty()) {
+            if (!preferences.swipeHintShown) {
+                val hintMessage = messages.lastOrNull { message -> message.canEdit }
+                showHintForId = hintMessage?.id
+            }
 
-        if (messages.isNotEmpty() && listState.firstVisibleItemIndex <= 1) {
-            listState.scrollToItem(0)
+            // Always scroll to bottom when a new message is added if we are already near the bottom
+            // or if it's the very first message.
+            if (listState.firstVisibleItemIndex <= 1) {
+                listState.animateScrollToItem(0)
+            }
         }
     }
 

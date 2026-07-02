@@ -31,6 +31,7 @@ import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.state.SettingsUiState
 import off.kys.backtalk.util.WorkScheduler
+import off.kys.backtalk.util.restartApp
 import java.io.File
 import java.security.GeneralSecurityException
 import javax.crypto.AEADBadTagException
@@ -375,15 +376,14 @@ class SettingsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(backupLoading = true) }
             wipeAppData()
-            // After wipe, state needs to be refreshed or app restarted.
-            // For now, update state with defaults from preferences (which were cleared)
             _state.update {
                 SettingsUiState(
                     themeMode = preferences.themeMode,
                     dynamicColorEnabled = preferences.dynamicColorEnabled,
-                    devModeEnabled = preferences.devModeEnabled
+                    devModeEnabled = preferences.devModeEnabled,
                 )
             }
+            application.restartApp()
         }
     }
 

@@ -33,7 +33,10 @@ fun WipeDataDialog(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
-                Text(stringResource(R.string.common_confirm))
+                Text(
+                    text = stringResource(R.string.common_confirm),
+                    color = MaterialTheme.colorScheme.onError
+                )
             }
         },
         dismissButton = {

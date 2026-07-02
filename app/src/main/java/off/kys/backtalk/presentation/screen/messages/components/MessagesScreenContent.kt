@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -28,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.components.hiddenKeyboardPadding
@@ -38,6 +40,7 @@ import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
 import off.kys.backtalk.util.emptyString
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -125,7 +128,8 @@ fun MessagesScreenContent(
 
     LaunchedEffect(state.shouldScrollToBottom) {
         if (state.shouldScrollToBottom) {
-            messagesScrollState.scrollToItem(0)
+            delay(50.milliseconds)
+            messagesScrollState.animateScrollToItem(0)
             onEvent(MessagesUiEvent.ConsumedScrollToBottom)
         }
     }
@@ -133,6 +137,14 @@ fun MessagesScreenContent(
     DisposableEffect(Unit) {
         onDispose {
             onStopAudio()
+        }
+    }
+
+    val isKeyboardVisible = WindowInsets.isImeVisible
+
+    LaunchedEffect(isKeyboardVisible) {
+        if (isKeyboardVisible && messagesScrollState.firstVisibleItemIndex <= 1) {
+            messagesScrollState.animateScrollToItem(0)
         }
     }
 
@@ -172,11 +184,14 @@ fun MessagesScreenContent(
                 isImageSelectionOnly = state.selectionMetrics.selectedMessagesCount == 0 && state.selectionMetrics.selectedImagesCount > 0,
                 canDelete = state.selectionMetrics.totalDeletableCount > 0
             )
-        },
-        bottomBar = {},
-        floatingActionButton = {}
+        }
     ) { scaffoldPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = scaffoldPadding.calculateTopPadding())
+                .imePadding()
+        ) {
             if (state.showMediaPicker) {
                 MediaPickerSheet(
                     onMediaSelected = { uris, type, description ->
@@ -204,9 +219,7 @@ fun MessagesScreenContent(
             }
 
             MessagesContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = scaffoldPadding.calculateTopPadding()),
+                modifier = Modifier.fillMaxSize(),
                 state = state,
                 tags = tags,
                 listState = messagesScrollState,
@@ -242,7 +255,6 @@ fun MessagesScreenContent(
                     .align(Alignment.BottomCenter)
                     .hiddenKeyboardPadding(bottom = 16.dp)
                     .padding(bottom = scaffoldPadding.calculateBottomPadding())
-                    .imePadding()
                     .onGloballyPositioned { coordinates ->
                         inputBarHeight = with(density) { coordinates.size.height.toDp() }
                     },
