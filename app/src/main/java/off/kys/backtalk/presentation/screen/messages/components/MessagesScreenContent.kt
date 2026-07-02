@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.presentation.components.keyboardPadding
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
@@ -240,6 +241,7 @@ fun MessagesScreenContent(
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
                     .padding(bottom = scaffoldPadding.calculateBottomPadding())
+                    .keyboardPadding(32.dp)
                     .onGloballyPositioned { coordinates ->
                         inputBarHeight = with(density) { coordinates.size.height.toDp() }
                     },
