@@ -46,11 +46,9 @@ fun InputBarReplyHeader(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                // Top padding creates breathing room below the top edge of the main Surface container
                 .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Accent indicator track on the leading edge (replaces the box look)
             Box(
                 modifier = Modifier
                     .width(3.dp)

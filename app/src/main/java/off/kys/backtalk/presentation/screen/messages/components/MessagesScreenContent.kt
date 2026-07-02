@@ -2,6 +2,7 @@ package off.kys.backtalk.presentation.screen.messages.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +37,7 @@ import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
 import off.kys.backtalk.util.emptyString
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MessagesScreenContent(
     state: MessagesUiState,
@@ -79,7 +80,11 @@ fun MessagesScreenContent(
 
     BackHandler(enabled = isBackHandlerActive.value) {
         when {
-            state.messageContextMenuEntity != null -> onEvent(MessagesUiEvent.ShowMessageContextMenu(null))
+            state.messageContextMenuEntity != null -> onEvent(
+                MessagesUiEvent.ShowMessageContextMenu(
+                    null
+                )
+            )
 
             state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty()
                 -> onEvent(MessagesUiEvent.ClearSelection)
@@ -169,10 +174,7 @@ fun MessagesScreenContent(
         bottomBar = {},
         floatingActionButton = {}
     ) { scaffoldPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             if (state.showMediaPicker) {
                 MediaPickerSheet(
                     onMediaSelected = { uris, type, description ->
@@ -217,7 +219,7 @@ fun MessagesScreenContent(
                 onTagClick = { onEvent(MessagesUiEvent.SelectTag(it)) },
                 onNavigatePinned = { onEvent(MessagesUiEvent.NavigatePinned) },
                 onTogglePinnedDialog = { onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(it)) },
-                    onTogglePin = { message, isPinned ->
+                onTogglePin = { message, isPinned ->
                     onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
                 },
                 onLongClick = { onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) },
@@ -236,6 +238,8 @@ fun MessagesScreenContent(
             InputBar(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+                    .padding(bottom = scaffoldPadding.calculateBottomPadding())
                     .onGloballyPositioned { coordinates ->
                         inputBarHeight = with(density) { coordinates.size.height.toDp() }
                     },

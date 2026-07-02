@@ -39,8 +39,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -100,6 +98,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -248,22 +248,13 @@ fun InputBar(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .offset { IntOffset(shakeOffset.value.roundToInt(), 0) }
-            .navigationBarsPadding()
-            .imePadding()
             .padding(bottom = 8.dp),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f),
         tonalElevation = tonalElevation,
         border = BorderStroke(width = borderWidth, color = borderColor)
     ) {
-        Column(
-            modifier = Modifier.animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
-        ) {
+        Column {
             InputBarReplyHeader(
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
@@ -338,7 +329,7 @@ fun InputBar(
                 TextButton(onClick = {
                     viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingTime))
                 }) {
-                    Text(stringResource(R.string.common_ok))
+                    Text(stringResource(R.string.common_confirm))
                 }
             },
             dismissButton = {
@@ -754,9 +745,9 @@ fun TimePickerDialog(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     content: @Composable () -> Unit,
 ) {
-    androidx.compose.ui.window.Dialog(
+    Dialog(
         onDismissRequest = onDismissRequest,
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
