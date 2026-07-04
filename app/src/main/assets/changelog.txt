@@ -1,3 +1,4 @@
+4918003 chore: update f-droid screenshots and rewrite README recent changes
 9eb53f1 chore: bump version to 0.3.8 (38) and rewrite CHANGELOG for release
 45cb5d2 refactor: introduce ignoreResult utility to explicitly discard expression returns
 bf86edb refactor: introduce ignoreResult utility to explicitly discard expression returns

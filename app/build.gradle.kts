@@ -1,4 +1,3 @@
-
 import off.kys.backtalk.build.GenerateCaptionStringsAssetTask
 import off.kys.backtalk.build.GenerateChangelogAssetTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -10,9 +9,6 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
 }
 
-val appVersion: String = "0.3.8"
-val appVersionCode: Int = 38
-
 android {
     namespace = "off.kys.backtalk"
     compileSdk = 37
@@ -21,8 +17,8 @@ android {
         applicationId = "off.kys.backtalk"
         minSdk = 23
         targetSdk = 37
-        versionCode = appVersionCode
-        versionName = appVersion
+        versionCode = 38
+        versionName = "0.3.8"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
