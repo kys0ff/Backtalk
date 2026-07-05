@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
 import off.kys.backtalk.presentation.screen.onboarding.OnboardingPage
-import off.kys.backtalk.presentation.state.OnboardingUiState
+import off.kys.backtalk.presentation.state.onboarding.OnboardingUiState
 import kotlin.math.absoluteValue
 
 @Composable

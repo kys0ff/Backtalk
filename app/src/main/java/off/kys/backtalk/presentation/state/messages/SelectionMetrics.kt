@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.messages
 
 data class SelectionMetrics(
     val selectedMessagesCount: Int = 0,

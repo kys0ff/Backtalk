@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
-import off.kys.backtalk.presentation.state.RemindersUiState
+import off.kys.backtalk.presentation.state.reminders.RemindersUiState
 
 /**
  * ViewModel for the reminders management screen.

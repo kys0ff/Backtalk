@@ -15,7 +15,7 @@ import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
-import off.kys.backtalk.presentation.state.MainUiState
+import off.kys.backtalk.presentation.state.main.MainUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
 import off.kys.backtalk.util.toast

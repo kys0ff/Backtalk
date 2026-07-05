@@ -48,7 +48,7 @@ import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
-import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.presentation.state.preferences.SettingsUiState
 import off.kys.backtalk.util.isSecurityEnabled
 import off.kys.backtalk.util.toast
 

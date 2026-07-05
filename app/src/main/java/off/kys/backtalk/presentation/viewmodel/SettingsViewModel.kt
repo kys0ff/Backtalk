@@ -29,7 +29,7 @@ import off.kys.backtalk.domain.use_case.ImportBackup
 import off.kys.backtalk.domain.use_case.WipeAppData
 import off.kys.backtalk.domain.use_case_bundle.BackupUseCases
 import off.kys.backtalk.presentation.event.SettingsUiEvent
-import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.presentation.state.preferences.SettingsUiState
 import off.kys.backtalk.util.WorkScheduler
 import off.kys.backtalk.util.restartApp
 import java.io.File

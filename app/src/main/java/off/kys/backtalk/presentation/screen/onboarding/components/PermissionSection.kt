@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.state.OnboardingUiState
+import off.kys.backtalk.presentation.state.onboarding.OnboardingUiState
 
 @Composable
 fun PermissionSection(

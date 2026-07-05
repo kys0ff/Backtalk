@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.state.StatisticsUiState
+import off.kys.backtalk.presentation.state.statistics.StatisticsUiState
 
 @Composable
 fun StatisticsContent(

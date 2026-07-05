@@ -1,3 +1,4 @@
+3746547 refactor: overhaul SettingsItem layout and externalize version/cache strings
 b466ff5 feat: add option to disable message context menu on long-click
 4ef0faf refactor: introduce CompositionLocals for actions and pull preferences into ViewModels
 329618a refactor: migrate InputBar preferences and interactions to ViewModel

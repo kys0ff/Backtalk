@@ -16,14 +16,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.event.MessagesUiEvent
+import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.screen.messages.LocalMessagesActions
-import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.presentation.state.messages.MessagesUiState
+import off.kys.backtalk.presentation.state.messages.MessagesListActions
+import off.kys.backtalk.presentation.state.messages.MessagesListUiState
 import off.kys.backtalk.util.emptyString
 
 /**
@@ -54,36 +59,72 @@ fun MessagesContent(
         else -> 0.dp
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        MessagesList(
+    val listActions = remember(actions) {
+        object : MessagesListActions {
+            override fun onReply(message: MessageUiModel) =
+                actions.onEvent(MessagesUiEvent.ReplyTo(message))
+
+            override fun onEdit(message: MessageUiModel) =
+                actions.onEvent(MessagesUiEvent.EditMessage(message))
+
+            override fun onDelete(message: MessageUiModel) =
+                actions.onEvent(MessagesUiEvent.DeleteMessage(message))
+
+            override fun onCopy(message: MessageUiModel) =
+                actions.onEvent(MessagesUiEvent.CopyMessage(message))
+
+            override fun onTogglePin(message: MessageUiModel) =
+                actions.onEvent(MessagesUiEvent.TogglePinMessage(message.id, !message.isPinned))
+
+            override fun onToggleSelect(messageId: MessageId) =
+                actions.onEvent(MessagesUiEvent.ToggleSelection(messageId))
+
+            override fun onLongClick(message: MessageUiModel?) =
+                actions.onEvent(MessagesUiEvent.ShowMessageContextMenu(message))
+
+            override fun onScrollToMessage(messageId: MessageId) =
+                actions.onScrollToMessage(messageId)
+
+            override fun onTagClick(tag: String) = actions.onEvent(MessagesUiEvent.SelectTag(tag))
+            override fun onToggleImageSelect(messageId: MessageId, path: String) =
+                actions.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path))
+
+            override fun onMarkSwipeHintShown() =
+                actions.onEvent(MessagesUiEvent.MarkSwipeHintShown)
+        }
+    }
+
+    val listUiState = remember(state) {
+        val showHintForId = if (!state.swipeHintShown) {
+            state.filteredMessages.lastOrNull { it.canEdit }?.id
+        } else null
+
+        val items = MessageItemUiMapper.map(
             messages = state.filteredMessages,
             repliedMessagesMap = state.repliedMessagesMap,
             selectedMessageIds = state.selectedMessageIds,
-            listState = listState,
-            hapticFeedbackEnabled = state.hapticFeedbackEnabled,
-            swipeHintShown = state.swipeHintShown,
-            externalLinkWarningEnabled = state.externalLinkWarningEnabled,
-            disableContextMenuOnLongClick = state.disableContextMenuOnLongClick,
-            onMarkSwipeHintShown = { actions.onEvent(MessagesUiEvent.MarkSwipeHintShown) },
-            contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding),
-            onEditMessage = { actions.onEvent(MessagesUiEvent.EditMessage(it)) },
-            onReply = { actions.onEvent(MessagesUiEvent.ReplyTo(it)) },
-            onToggleSelect = { actions.onEvent(MessagesUiEvent.ToggleSelection(it)) },
-            onDeleteMessage = { actions.onEvent(MessagesUiEvent.DeleteMessage(it)) },
-            onCopyMessage = { actions.onEvent(MessagesUiEvent.CopyMessage(it)) },
-            contextMenuEntity = state.messageContextMenuEntity,
-            searchQuery = if (state.isSearchActive) state.searchQuery else emptyString(),
-            onTagClick = { actions.onEvent(MessagesUiEvent.SelectTag(it)) },
-            blinkMessageId = state.blinkMessageId,
-            onScrollToMessage = { actions.onScrollToMessage(it) },
             selectedImagePaths = state.selectedImagePaths,
-            onToggleImageSelect = { messageId, imagePath ->
-                actions.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
-            },
-            onTogglePin = { message, isPinned ->
-                actions.onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
-            },
-            onLongClick = { actions.onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) }
+            blinkMessageId = state.blinkMessageId,
+            showHintForId = showHintForId
+        )
+
+        MessagesListUiState(
+            items = items,
+            selectionMode = state.selectedMessageIds.isNotEmpty() || state.selectedImagePaths.isNotEmpty(),
+            searchQuery = if (state.isSearchActive) state.searchQuery else emptyString(),
+            contextMenuEntityId = state.messageContextMenuEntity?.id,
+            hapticFeedbackEnabled = state.hapticFeedbackEnabled,
+            externalLinkWarningEnabled = state.externalLinkWarningEnabled,
+            disableContextMenuOnLongClick = state.disableContextMenuOnLongClick
+        )
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        MessagesList(
+            state = listUiState,
+            actions = listActions,
+            listState = listState,
+            contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding)
         )
 
         Column(

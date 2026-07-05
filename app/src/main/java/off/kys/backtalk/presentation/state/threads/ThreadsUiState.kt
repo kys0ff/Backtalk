@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.threads
 
 import off.kys.backtalk.domain.model.Thread
 

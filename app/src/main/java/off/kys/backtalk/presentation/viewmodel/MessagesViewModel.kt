@@ -32,8 +32,8 @@ import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
-import off.kys.backtalk.presentation.state.MessagesUiState
-import off.kys.backtalk.presentation.state.SelectionMetrics
+import off.kys.backtalk.presentation.state.messages.MessagesUiState
+import off.kys.backtalk.presentation.state.messages.SelectionMetrics
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
 import off.kys.backtalk.util.WorkScheduler

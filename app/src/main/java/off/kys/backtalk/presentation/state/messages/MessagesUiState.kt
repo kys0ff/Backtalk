@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.messages
 
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap

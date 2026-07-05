@@ -26,8 +26,8 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
-import off.kys.backtalk.presentation.state.InputBarEffect
-import off.kys.backtalk.presentation.state.InputBarUiState
+import off.kys.backtalk.presentation.state.messages.InputBarEffect
+import off.kys.backtalk.presentation.state.messages.InputBarUiState
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.HashUtils

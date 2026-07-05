@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.preferences
 
 import android.net.Uri
 import off.kys.backtalk.common.AppDateFormat
@@ -51,8 +51,4 @@ data class SettingsUiState(
     val lastSeenChangelogVersion: String = "",
     val isIgnoringBatteryOptimizations: Boolean = false,
     val cacheSize: String = "0 B"
-) {
-    companion object {
-        fun empty(): SettingsUiState = SettingsUiState()
-    }
-}
+)

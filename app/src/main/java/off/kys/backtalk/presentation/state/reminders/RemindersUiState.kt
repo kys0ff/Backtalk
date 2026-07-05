@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.reminders
 
 import off.kys.backtalk.data.local.entity.ScheduledMessageEntity
 

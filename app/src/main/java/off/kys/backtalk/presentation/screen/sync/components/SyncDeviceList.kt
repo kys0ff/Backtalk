@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.state.SyncUiState
+import off.kys.backtalk.presentation.state.preferences.SyncUiState
 import off.kys.backtalk.sync.DeviceInfo
 
 @Composable

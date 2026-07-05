@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.event.SyncEvent
-import off.kys.backtalk.presentation.state.SyncUiState
+import off.kys.backtalk.presentation.state.preferences.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.sync.DeviceInfo
 import off.kys.backtalk.sync.SyncException

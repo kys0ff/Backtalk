@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.messages
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType

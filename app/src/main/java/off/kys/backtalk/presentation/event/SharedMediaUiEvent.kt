@@ -1,6 +1,6 @@
 package off.kys.backtalk.presentation.event
 
-import off.kys.backtalk.presentation.state.VoiceItemUiModel
+import off.kys.backtalk.presentation.state.messages.VoiceItemUiModel
 
 /**
  * Sealed interface representing UI events for the shared media screen.

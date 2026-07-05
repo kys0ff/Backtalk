@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.presentation.event.OnboardingUiEvent
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
 import off.kys.backtalk.presentation.screen.onboarding.components.OnboardingScreenContent
-import off.kys.backtalk.presentation.state.OnboardingUiState
+import off.kys.backtalk.presentation.state.onboarding.OnboardingUiState
 import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
 import org.koin.compose.viewmodel.koinViewModel

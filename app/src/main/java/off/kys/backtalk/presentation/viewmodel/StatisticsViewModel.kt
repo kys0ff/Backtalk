@@ -9,10 +9,10 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.repository.MessagesRepository
-import off.kys.backtalk.presentation.state.DayActivity
-import off.kys.backtalk.presentation.state.HeatmapDay
-import off.kys.backtalk.presentation.state.StatisticsUiState
-import off.kys.backtalk.presentation.state.ThreadStat
+import off.kys.backtalk.presentation.state.statistics.DayActivity
+import off.kys.backtalk.presentation.state.statistics.HeatmapDay
+import off.kys.backtalk.presentation.state.statistics.StatisticsUiState
+import off.kys.backtalk.presentation.state.statistics.ThreadStat
 import off.kys.backtalk.util.emptyString
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek

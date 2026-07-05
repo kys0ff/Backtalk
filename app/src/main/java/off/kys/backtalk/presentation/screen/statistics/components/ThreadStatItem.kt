@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.presentation.state.ThreadStat
+import off.kys.backtalk.presentation.state.statistics.ThreadStat
 
 @Composable
 fun ThreadStatItem(

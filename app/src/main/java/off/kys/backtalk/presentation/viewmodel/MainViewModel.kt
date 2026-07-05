@@ -15,7 +15,7 @@ import off.kys.backtalk.common.Constants
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.use_case.CheckAppUpdate
 import off.kys.backtalk.presentation.event.MainUiEvent
-import off.kys.backtalk.presentation.state.MainUiState
+import off.kys.backtalk.presentation.state.main.MainUiState
 import off.kys.backtalk.util.WorkScheduler
 
 /**

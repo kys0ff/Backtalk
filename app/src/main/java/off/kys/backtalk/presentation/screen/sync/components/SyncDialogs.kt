@@ -2,7 +2,7 @@ package off.kys.backtalk.presentation.screen.sync.components
 
 import androidx.compose.runtime.Composable
 import off.kys.backtalk.presentation.event.SyncEvent
-import off.kys.backtalk.presentation.state.SyncUiState
+import off.kys.backtalk.presentation.state.preferences.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.presentation.viewmodel.SyncViewModel
 

@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.onboarding
 
 data class OnboardingUiState(
     val notificationPermissionGranted: Boolean = false,

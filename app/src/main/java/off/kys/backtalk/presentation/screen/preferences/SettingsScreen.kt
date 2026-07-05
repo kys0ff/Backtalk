@@ -15,7 +15,7 @@ import off.kys.backtalk.presentation.screen.changelog.ChangelogScreen
 import off.kys.backtalk.presentation.screen.license.LicenseScreen
 import off.kys.backtalk.presentation.screen.preferences.components.SettingsScreenContent
 import off.kys.backtalk.presentation.screen.sync.SyncScreen
-import off.kys.backtalk.presentation.state.SettingsUiState
+import off.kys.backtalk.presentation.state.preferences.SettingsUiState
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -28,7 +28,7 @@ class SettingsScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel = koinViewModel<SettingsViewModel>()
-        val state by viewModel.state.collectAsState(SettingsUiState.empty())
+        val state by viewModel.state.collectAsState(SettingsUiState())
         val navigator = LocalNavigator.currentOrThrow
         val mainActivity = LocalActivity.current as? MainActivity
 

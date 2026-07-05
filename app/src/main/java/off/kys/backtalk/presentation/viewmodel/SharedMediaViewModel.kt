@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import off.kys.backtalk.domain.use_case.GetAllMessages
 import off.kys.backtalk.presentation.event.SharedMediaUiEvent
-import off.kys.backtalk.presentation.state.LinkItemUiModel
-import off.kys.backtalk.presentation.state.MediaItemUiModel
-import off.kys.backtalk.presentation.state.SharedMediaUiState
-import off.kys.backtalk.presentation.state.VoiceItemUiModel
+import off.kys.backtalk.presentation.state.messages.LinkItemUiModel
+import off.kys.backtalk.presentation.state.messages.MediaItemUiModel
+import off.kys.backtalk.presentation.state.messages.SharedMediaUiState
+import off.kys.backtalk.presentation.state.messages.VoiceItemUiModel
 import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.ComposeTextParser
 import java.io.File

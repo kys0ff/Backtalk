@@ -15,7 +15,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
-import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.presentation.state.messages.MessagesUiState
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

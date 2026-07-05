@@ -108,7 +108,7 @@ import kotlinx.coroutines.flow.collectLatest
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
-import off.kys.backtalk.presentation.state.InputBarEffect
+import off.kys.backtalk.presentation.state.messages.InputBarEffect
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull

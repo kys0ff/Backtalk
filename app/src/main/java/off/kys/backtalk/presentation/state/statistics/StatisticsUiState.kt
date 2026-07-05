@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.statistics
 
 import androidx.compose.runtime.Immutable
 import off.kys.backtalk.domain.model.MessageId

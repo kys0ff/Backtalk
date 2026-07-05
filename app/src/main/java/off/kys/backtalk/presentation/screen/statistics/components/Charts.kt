@@ -41,8 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
-import off.kys.backtalk.presentation.state.DayActivity
-import off.kys.backtalk.presentation.state.HeatmapDay
+import off.kys.backtalk.presentation.state.statistics.DayActivity
+import off.kys.backtalk.presentation.state.statistics.HeatmapDay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle

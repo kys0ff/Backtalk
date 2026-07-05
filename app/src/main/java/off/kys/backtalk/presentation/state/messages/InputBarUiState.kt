@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.messages
 
 import androidx.compose.foundation.text.input.TextFieldState
 import off.kys.backtalk.presentation.model.MessageUiModel

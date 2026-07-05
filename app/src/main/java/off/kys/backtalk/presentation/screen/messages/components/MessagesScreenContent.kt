@@ -43,9 +43,8 @@ import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.screen.messages.LocalMessagesActions
-import off.kys.backtalk.presentation.state.MessagesUiState
+import off.kys.backtalk.presentation.state.messages.MessagesUiState
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
-import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.compose.rememberScrollToBottomVisibility
 import off.kys.backtalk.util.emptyString
 import kotlin.time.Duration.Companion.milliseconds

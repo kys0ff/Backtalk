@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.changelog
 
 import off.kys.backtalk.domain.model.ChangelogEntry
 

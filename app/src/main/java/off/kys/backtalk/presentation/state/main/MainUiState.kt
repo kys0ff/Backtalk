@@ -1,4 +1,4 @@
-package off.kys.backtalk.presentation.state
+package off.kys.backtalk.presentation.state.main
 
 import off.kys.github_app_updater_lib.model.updater.UpdateResult
 

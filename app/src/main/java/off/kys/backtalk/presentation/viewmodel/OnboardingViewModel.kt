@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.OnboardingUiEvent
-import off.kys.backtalk.presentation.state.OnboardingUiState
+import off.kys.backtalk.presentation.state.onboarding.OnboardingUiState
 
 class OnboardingViewModel(
     private val application: Application,

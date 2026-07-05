@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.presentation.screen.onboarding.OnboardingPage
-import off.kys.backtalk.presentation.state.OnboardingUiState
+import off.kys.backtalk.presentation.state.onboarding.OnboardingUiState
 
 @Composable
 fun OnboardingPageContent(

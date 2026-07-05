@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.repository.ChangelogRepository
-import off.kys.backtalk.presentation.state.ChangelogUiState
+import off.kys.backtalk.presentation.state.changelog.ChangelogUiState
 
 class ChangelogViewModel(
     private val repository: ChangelogRepository
