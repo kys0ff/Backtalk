@@ -98,6 +98,7 @@
     <string name="settings_security_title">Security</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_version">Version</string>
+    <string name="settings_version_current">Current version: %1$s</string>
     <string name="settings_changelog">Changelog</string>
     <string name="settings_changelog_desc">View the latest changes and improvements</string>
     <string name="settings_changelog_title">What\'s New</string>
@@ -160,6 +161,7 @@
     <string name="settings_troubleshooting">Troubleshooting</string>
     <string name="settings_clear_cache">Clear cache</string>
     <string name="settings_clear_cache_desc">Free up space by deleting temporary files</string>
+    <string name="settings_clear_cache_size">Current size: %1$s</string>
     <string name="settings_clear_cache_success">Cache cleared successfully</string>
     <string name="settings_disable_battery_optimization">Disable battery optimization</string>
     <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably.</string>

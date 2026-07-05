@@ -18,8 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +43,6 @@ import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
-import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
@@ -508,7 +505,7 @@ fun SettingsScreenContent(
             SettingsSection(title = stringResource(R.string.sync_title)) {
                 SettingsItem(
                     label = stringResource(R.string.sync_title),
-                    value = stringResource(R.string.sync_summary),
+                    supportingText = stringResource(R.string.sync_summary),
                     icon = painterResource(R.drawable.round_refresh_24),
                     onClick = onSyncClicked
                 )
@@ -635,7 +632,10 @@ fun SettingsScreenContent(
                 }
                 SettingsItem(
                     label = stringResource(R.string.settings_version),
-                    value = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    value = stringResource(
+                        R.string.settings_version_current,
+                        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+                    ),
                     icon = painterResource(R.drawable.round_info_24)
                 )
                 HorizontalDivider(

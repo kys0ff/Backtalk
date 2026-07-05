@@ -96,6 +96,7 @@
     <string name="settings_security_title">Seguridad</string>
     <string name="settings_theme">Tema</string>
     <string name="settings_version">Versión</string>
+    <string name="settings_version_current">Versión actual: %1$s</string>
     <string name="settings_changelog">Registro de cambios</string>
     <string name="settings_changelog_desc">Ver los últimos cambios y mejoras</string>
     <string name="settings_changelog_title">Novedades</string>
@@ -158,6 +159,7 @@
     <string name="settings_troubleshooting">Solución de problemas</string>
     <string name="settings_clear_cache">Limpiar caché</string>
     <string name="settings_clear_cache_desc">Libera espacio eliminando archivos temporales</string>
+    <string name="settings_clear_cache_size">Tamaño actual: %1$s</string>
     <string name="settings_clear_cache_success">Caché limpiada con éxito</string>
     <string name="settings_disable_battery_optimization">Desactivar optimización de batería</string>
     <string name="settings_disable_battery_optimization_desc">Asegura que las tareas en segundo plano como recordatorios y exportación automática se ejecuten de manera confiable.</string>

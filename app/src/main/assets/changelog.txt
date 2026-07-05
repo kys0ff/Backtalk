@@ -1,3 +1,4 @@
+b466ff5 feat: add option to disable message context menu on long-click
 4ef0faf refactor: introduce CompositionLocals for actions and pull preferences into ViewModels
 329618a refactor: migrate InputBar preferences and interactions to ViewModel
 8da8f27 fix: restore dynamic text direction in InputBar text style
