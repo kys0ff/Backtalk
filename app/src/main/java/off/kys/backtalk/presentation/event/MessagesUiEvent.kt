@@ -229,4 +229,9 @@ sealed interface MessagesUiEvent {
      * UI event to initiate deletion of a specific message.
      */
     data class DeleteMessage(val message: MessageUiModel) : MessagesUiEvent
+
+    /**
+     * UI event to mark the swipe hint as shown.
+     */
+    data object MarkSwipeHintShown : MessagesUiEvent
 }

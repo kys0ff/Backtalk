@@ -95,6 +95,16 @@ class InputBarViewModel(
         InputBarEvent.CancelSharedImage -> _uiState.update { it.copy(sharedImageUris = emptyList()) }
         is InputBarEvent.SendSharedImages -> handleSendSharedImages(event.uris, event.caption)
         is InputBarEvent.ContentReceived -> handleContentReceived(event.transferableContent)
+        InputBarEvent.RefreshSettings -> {
+            _uiState.update {
+                it.copy(
+                    linkPreviewEnabled = preferences.linkPreviewEnabled,
+                    isHapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
+                    sendWithEnter = preferences.sendWithEnter,
+                    is24HourFormat = preferences.timeFormat.is24Hour(application)
+                )
+            }
+        }
     }
 
     private fun observeAmplitudes() {

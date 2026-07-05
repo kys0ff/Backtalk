@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.model.MessageUiModel
+import off.kys.backtalk.presentation.event.MessagesUiEvent
+import off.kys.backtalk.presentation.screen.messages.LocalMessagesActions
 import off.kys.backtalk.presentation.state.MessagesUiState
 import off.kys.backtalk.util.emptyString
 
@@ -36,25 +36,11 @@ fun MessagesContent(
     state: MessagesUiState,
     tags: List<String>,
     listState: LazyListState,
-    onEditMessage: (MessageUiModel?) -> Unit,
-    onReply: (MessageUiModel?) -> Unit,
-    onToggleSelect: (MessageId) -> Unit,
-    onDismissRationale: () -> Unit,
-    onConfirmDelete: () -> Unit,
-    onDismissDelete: () -> Unit,
-    onDeleteMessage: (MessageUiModel) -> Unit,
-    onCopyMessage: (MessageUiModel) -> Unit,
-    onTagClick: (String) -> Unit,
-    onNavigatePinned: () -> Unit,
-    onTogglePinnedDialog: (Boolean) -> Unit,
-    onTogglePin: (MessageUiModel, Boolean) -> Unit,
-    onScrollToMessage: (MessageId) -> Unit,
-    onLongClick: (MessageUiModel?) -> Unit,
-    onToggleImageSelect: (MessageId, String) -> Unit = { _, _ -> },
     totalDeletableCount: Int = 0,
     totalSelectedCount: Int = 0,
     bottomPadding: Dp = 0.dp
 ) {
+    val actions = LocalMessagesActions.current
     val context = LocalContext.current
     val isSelectionMode = totalSelectedCount > 0
 
@@ -74,21 +60,29 @@ fun MessagesContent(
             repliedMessagesMap = state.repliedMessagesMap,
             selectedMessageIds = state.selectedMessageIds,
             listState = listState,
-            onEditMessage = onEditMessage,
-            onReply = onReply,
-            onToggleSelect = onToggleSelect,
-            onDeleteMessage = onDeleteMessage,
-            onCopyMessage = onCopyMessage,
+            hapticFeedbackEnabled = state.hapticFeedbackEnabled,
+            swipeHintShown = state.swipeHintShown,
+            externalLinkWarningEnabled = state.externalLinkWarningEnabled,
+            onMarkSwipeHintShown = { actions.onEvent(MessagesUiEvent.MarkSwipeHintShown) },
+            contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding),
+            onEditMessage = { actions.onEvent(MessagesUiEvent.EditMessage(it)) },
+            onReply = { actions.onEvent(MessagesUiEvent.ReplyTo(it)) },
+            onToggleSelect = { actions.onEvent(MessagesUiEvent.ToggleSelection(it)) },
+            onDeleteMessage = { actions.onEvent(MessagesUiEvent.DeleteMessage(it)) },
+            onCopyMessage = { actions.onEvent(MessagesUiEvent.CopyMessage(it)) },
             contextMenuEntity = state.messageContextMenuEntity,
             searchQuery = if (state.isSearchActive) state.searchQuery else emptyString(),
-            onTagClick = onTagClick,
+            onTagClick = { actions.onEvent(MessagesUiEvent.SelectTag(it)) },
             blinkMessageId = state.blinkMessageId,
-            onScrollToMessage = onScrollToMessage,
+            onScrollToMessage = { actions.onScrollToMessage(it) },
             selectedImagePaths = state.selectedImagePaths,
-            onToggleImageSelect = onToggleImageSelect,
-            onTogglePin = onTogglePin,
-            onLongClick = onLongClick,
-            contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding)
+            onToggleImageSelect = { messageId, imagePath ->
+                actions.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, imagePath))
+            },
+            onTogglePin = { message, isPinned ->
+                actions.onEvent(MessagesUiEvent.TogglePinMessage(message.id, isPinned))
+            },
+            onLongClick = { actions.onEvent(MessagesUiEvent.ShowMessageContextMenu(it)) }
         )
 
         Column(
@@ -104,8 +98,8 @@ fun MessagesContent(
                 PinnedMessageBar(
                     pinnedMessages = state.pinnedMessages,
                     activeIndex = state.activePinnedMessageIndex,
-                    onClick = onNavigatePinned,
-                    onListClick = { onTogglePinnedDialog(true) }
+                    onClick = { actions.onNavigatePinned() },
+                    onListClick = { actions.onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(true)) }
                 )
             }
 
@@ -117,7 +111,7 @@ fun MessagesContent(
                 TagFilterBar(
                     tags = tags,
                     selectedTag = state.selectedTag,
-                    onTagClick = onTagClick,
+                    onTagClick = { actions.onEvent(MessagesUiEvent.SelectTag(it)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -126,17 +120,17 @@ fun MessagesContent(
         if (state.showPinnedMessagesDialog) {
             PinnedMessagesDialog(
                 pinnedMessages = state.pinnedMessages,
-                onMessageClick = { onScrollToMessage(it.id) },
-                onUnpinClick = { onTogglePin(it, false) },
-                onDismiss = { onTogglePinnedDialog(false) }
+                onMessageClick = { actions.onScrollToMessage(it.id) },
+                onUnpinClick = { actions.onEvent(MessagesUiEvent.TogglePinMessage(it.id, false)) },
+                onDismiss = { actions.onEvent(MessagesUiEvent.TogglePinnedMessagesDialog(false)) }
             )
         }
 
         if (state.showPermissionRationale) {
             PermissionRationaleDialog(
-                onDismiss = onDismissRationale,
+                onDismiss = { actions.onEvent(MessagesUiEvent.DismissPermissionRationale) },
                 onConfirm = {
-                    onDismissRationale()
+                    actions.onEvent(MessagesUiEvent.DismissPermissionRationale)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                             data = Uri.fromParts("package", context.packageName, null)
@@ -151,8 +145,8 @@ fun MessagesContent(
             DeleteConfirmationDialog(
                 selectedCount = totalDeletableCount,
                 totalSelectedCount = totalSelectedCount,
-                onConfirm = onConfirmDelete,
-                onDismiss = onDismissDelete
+                onConfirm = { actions.onEvent(MessagesUiEvent.ConfirmDeleteSelected) },
+                onDismiss = { actions.onEvent(MessagesUiEvent.DismissDeleteConfirmation) }
             )
         }
     }

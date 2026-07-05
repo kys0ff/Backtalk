@@ -53,6 +53,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.components.HintTooltip
+import off.kys.backtalk.presentation.event.MessagesUiEvent
+import off.kys.backtalk.presentation.screen.messages.LocalMessagesActions
 import off.kys.backtalk.util.emptyString
 
 /**
@@ -65,15 +67,6 @@ import off.kys.backtalk.util.emptyString
  * @param searchQuery The current text query entered in the search field.
  * @param searchResultsCount The total number of search results found.
  * @param currentSearchIndex The current search result index for navigation.
- * @param onCloseSelection Callback to clear the message selection and return to default state.
- * @param onDelete Callback to handle the deletion of selected messages.
- * @param onCopy Callback to handle copying the content of selected messages.
- * @param onSettings Callback to navigate to the settings screen.
- * @param onThreads Callback to navigate to the threads/conversations screen.
- * @param onStatistics Callback to navigate to the statistics screen.
- * @param onToggleSearch Callback to enable or disable the search mode.
- * @param onSearchQueryChange Callback to update the current search query text.
- * @param onNavigateSearch Callback to move between search results (true for up, false for down).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,18 +77,6 @@ fun MessagesTopBar(
     searchQuery: String,
     searchResultsCount: Int,
     currentSearchIndex: Int,
-    onCloseSelection: () -> Unit,
-    onDelete: () -> Unit,
-    onCopy: () -> Unit,
-    onPin: () -> Unit,
-    onSettings: () -> Unit,
-    onThreads: () -> Unit,
-    onReminders: () -> Unit,
-    onStatistics: () -> Unit,
-    onToggleSearch: (Boolean) -> Unit,
-    onSearchQueryChange: (String) -> Unit,
-    onNavigateSearch: (Boolean) -> Unit,
-    onSharedMedia: () -> Unit,
     isImageSelectionOnly: Boolean = false,
     canDelete: Boolean = true
 ) {
@@ -128,9 +109,6 @@ fun MessagesTopBar(
                     searchQuery = searchQuery,
                     searchResultsCount = searchResultsCount,
                     currentSearchIndex = currentSearchIndex,
-                    onSearchQueryChange = onSearchQueryChange,
-                    onNavigateSearch = onNavigateSearch,
-                    onCloseSearch = { onToggleSearch(false) },
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors
                 )
@@ -139,10 +117,6 @@ fun MessagesTopBar(
             selectedCount > 0 -> {
                 SelectionTopBar(
                     selectedCount = selectedCount,
-                    onCloseSelection = onCloseSelection,
-                    onDelete = onDelete,
-                    onCopy = onCopy,
-                    onPin = onPin,
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors,
                     showPin = !isImageSelectionOnly && selectedCount == 1,
@@ -153,12 +127,6 @@ fun MessagesTopBar(
 
             else -> {
                 DefaultTopBar(
-                    onToggleSearch = { onToggleSearch(true) },
-                    onSettings = onSettings,
-                    onThreads = onThreads,
-                    onReminders = onReminders,
-                    onStatistics = onStatistics,
-                    onSharedMedia = onSharedMedia,
                     scrollBehavior = scrollBehavior,
                     colors = transparentTopAppBarColors
                 )
@@ -173,9 +141,6 @@ fun MessagesTopBar(
  * @param searchQuery The current text entered in the search field.
  * @param searchResultsCount Total number of matches found.
  * @param currentSearchIndex The 0-based index of the currently focused result.
- * @param onSearchQueryChange Callback for text updates.
- * @param onNavigateSearch Callback to move between results (true for up/previous, false for down/next).
- * @param onCloseSearch Callback to exit search mode.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,19 +148,17 @@ private fun SearchTopBar(
     searchQuery: String,
     searchResultsCount: Int,
     currentSearchIndex: Int,
-    onSearchQueryChange: (String) -> Unit,
-    onNavigateSearch: (Boolean) -> Unit,
-    onCloseSearch: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors
 ) {
     val focusRequester = remember { FocusRequester() }
+    val actions = LocalMessagesActions.current
 
     TopAppBar(
         title = {
             BasicTextField(
                 value = searchQuery,
-                onValueChange = onSearchQueryChange,
+                onValueChange = { actions.onEvent(MessagesUiEvent.UpdateSearchQuery(it)) },
                 modifier = Modifier.focusRequester(focusRequester),
                 maxLines = 1,
                 singleLine = true,
@@ -204,7 +167,7 @@ private fun SearchTopBar(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        onNavigateSearch(true)
+                        actions.onEvent(MessagesUiEvent.NavigateSearch(true))
                     }
                 ),
                 decorationBox = { innerTextField ->
@@ -221,7 +184,7 @@ private fun SearchTopBar(
         },
         navigationIcon = {
             HintTooltip(stringResource(R.string.common_back)) {
-                IconButton(onClick = onCloseSearch) {
+                IconButton(onClick = { actions.onEvent(MessagesUiEvent.ToggleSearch(false)) }) {
                     Icon(
                         painter = painterResource(R.drawable.round_arrow_back_24),
                         contentDescription = stringResource(R.string.common_back)
@@ -234,8 +197,8 @@ private fun SearchTopBar(
                 SearchActions(
                     searchResultsCount = searchResultsCount,
                     currentSearchIndex = currentSearchIndex,
-                    onClearQuery = { onSearchQueryChange(emptyString()) },
-                    onNavigateSearch = onNavigateSearch
+                    onClearQuery = { actions.onEvent(MessagesUiEvent.UpdateSearchQuery(emptyString())) },
+                    onNavigateSearch = { actions.onEvent(MessagesUiEvent.NavigateSearch(it)) }
                 )
             }
         },
@@ -303,24 +266,19 @@ private fun SearchActions(
  * Top bar displayed when one or more messages are selected.
  *
  * @param selectedCount Number of items currently selected.
- * @param onCloseSelection Callback to clear selection and return to default state.
- * @param onDelete Callback to delete selected items.
- * @param onCopy Callback to copy selected items to clipboard.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SelectionTopBar(
     selectedCount: Int,
-    onCloseSelection: () -> Unit,
-    onDelete: () -> Unit,
-    onCopy: () -> Unit,
-    onPin: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors,
     showPin: Boolean,
     showCopy: Boolean,
     canDelete: Boolean = true
 ) {
+    val actions = LocalMessagesActions.current
+
     TopAppBar(
         title = {
             AnimatedContent(
@@ -342,7 +300,7 @@ private fun SelectionTopBar(
         },
         navigationIcon = {
             HintTooltip(stringResource(R.string.common_close)) {
-                IconButton(onClick = onCloseSelection) {
+                IconButton(onClick = { actions.onCloseSelection() }) {
                     Icon(
                         painter = painterResource(R.drawable.round_close_24),
                         contentDescription = stringResource(R.string.common_close)
@@ -353,7 +311,7 @@ private fun SelectionTopBar(
         actions = {
             if (showPin) {
                 HintTooltip(stringResource(R.string.common_pin)) {
-                    IconButton(onClick = onPin) {
+                    IconButton(onClick = { actions.onPinSelected() }) {
                         Icon(
                             painter = painterResource(R.drawable.round_push_pin_24),
                             contentDescription = stringResource(R.string.common_pin),
@@ -363,7 +321,7 @@ private fun SelectionTopBar(
                 }
             }
             HintTooltip(if (canDelete) stringResource(R.string.common_delete) else stringResource(R.string.chat_selection_cannot_delete_old)) {
-                IconButton(onClick = onDelete, enabled = canDelete) {
+                IconButton(onClick = { actions.onDeleteSelected() }, enabled = canDelete) {
                     Icon(
                         painter = painterResource(R.drawable.round_delete_24),
                         contentDescription = stringResource(R.string.common_delete),
@@ -373,7 +331,7 @@ private fun SelectionTopBar(
             }
             if (showCopy) {
                 HintTooltip(stringResource(R.string.common_copy)) {
-                    IconButton(onClick = onCopy) {
+                    IconButton(onClick = { actions.onCopySelected() }) {
                         Icon(
                             painter = painterResource(R.drawable.round_content_copy_24),
                             contentDescription = stringResource(R.string.common_copy)
@@ -389,28 +347,20 @@ private fun SelectionTopBar(
 
 /**
  * The standard top bar shown during normal viewing.
- *
- * @param onToggleSearch Callback to enter search mode.
- * @param onSettings Callback to navigate to settings.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DefaultTopBar(
-    onToggleSearch: () -> Unit,
-    onSettings: () -> Unit,
-    onThreads: () -> Unit,
-    onReminders: () -> Unit,
-    onStatistics: () -> Unit,
-    onSharedMedia: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     colors: androidx.compose.material3.TopAppBarColors
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val actions = LocalMessagesActions.current
 
     TopAppBar(
         title = {
             Surface(
-                onClick = onSharedMedia,
+                onClick = { actions.onEvent(MessagesUiEvent.ToggleSharedMediaSheet(true)) },
                 color = Color.Transparent,
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -423,7 +373,7 @@ private fun DefaultTopBar(
         },
         actions = {
             HintTooltip(stringResource(R.string.common_search)) {
-                IconButton(onClick = onToggleSearch) {
+                IconButton(onClick = { actions.onEvent(MessagesUiEvent.ToggleSearch(true)) }) {
                     Icon(
                         painter = painterResource(R.drawable.round_search_24),
                         contentDescription = stringResource(R.string.common_search),
@@ -460,7 +410,7 @@ private fun DefaultTopBar(
                             icon = R.drawable.round_thread_24px,
                             onClick = {
                                 showMenu = false
-                                onThreads()
+                                actions.onThreadsClick()
                             }
                         )
                         MenuOption(
@@ -468,7 +418,7 @@ private fun DefaultTopBar(
                             icon = R.drawable.round_access_alarm_24,
                             onClick = {
                                 showMenu = false
-                                onReminders()
+                                actions.onRemindersClick()
                             }
                         )
                         MenuOption(
@@ -476,7 +426,7 @@ private fun DefaultTopBar(
                             icon = R.drawable.round_insert_chart_outlined_24,
                             onClick = {
                                 showMenu = false
-                                onStatistics()
+                                actions.onStatisticsClick()
                             }
                         )
 
@@ -490,7 +440,7 @@ private fun DefaultTopBar(
                             icon = R.drawable.round_settings_24,
                             onClick = {
                                 showMenu = false
-                                onSettings()
+                                actions.onSettingsClick()
                             }
                         )
                     }

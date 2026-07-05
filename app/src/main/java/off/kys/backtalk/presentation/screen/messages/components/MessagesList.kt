@@ -24,11 +24,9 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.persistentSetOf
 import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.util.emptyString
-import org.koin.compose.koinInject
 
 @Composable
 fun MessagesList(
@@ -36,6 +34,10 @@ fun MessagesList(
     repliedMessagesMap: PersistentMap<MessageId, MessageUiModel>,
     selectedMessageIds: PersistentSet<MessageId>,
     listState: LazyListState,
+    hapticFeedbackEnabled: Boolean,
+    swipeHintShown: Boolean,
+    externalLinkWarningEnabled: Boolean,
+    onMarkSwipeHintShown: () -> Unit,
     contentPadding: PaddingValues,
     onEditMessage: (MessageUiModel?) -> Unit,
     onReply: (MessageUiModel?) -> Unit,
@@ -52,7 +54,6 @@ fun MessagesList(
     onTogglePin: (MessageUiModel, Boolean) -> Unit = { _, _ -> },
     onLongClick: (MessageUiModel?) -> Unit = {}
 ) {
-    val preferences = koinInject<BacktalkPreferences>()
     var showHintForId by remember { mutableStateOf<MessageId?>(null) }
 
     val selectionMode = selectedMessageIds.isNotEmpty() || selectedImagePaths.isNotEmpty()
@@ -61,7 +62,7 @@ fun MessagesList(
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
-            if (!preferences.swipeHintShown) {
+            if (!swipeHintShown) {
                 val hintMessage = messages.lastOrNull { message -> message.canEdit }
                 showHintForId = hintMessage?.id
             }
@@ -141,8 +142,9 @@ fun MessagesList(
                         showHint = showHintForId == current.id,
                         onHintShown = {
                             showHintForId = null
-                            preferences.swipeHintShown = true
-                        }
+                            onMarkSwipeHintShown()
+                        },
+                        hapticFeedbackEnabled = hapticFeedbackEnabled
                     ) {
                         MessageBubble(
                             message = current,
@@ -173,7 +175,8 @@ fun MessagesList(
                             onTagClick = onTagClick,
                             selectedImagePaths = selectedImagePaths[current.id] ?: persistentSetOf(),
                             onToggleImageSelect = currentOnToggleImageSelect,
-                            hapticFeedbackEnabled = preferences.hapticFeedbackEnabled
+                            hapticFeedbackEnabled = hapticFeedbackEnabled,
+                            externalLinkWarningEnabled = externalLinkWarningEnabled
                         )
                     }
 

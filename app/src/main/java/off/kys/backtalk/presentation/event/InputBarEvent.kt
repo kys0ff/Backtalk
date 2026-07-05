@@ -34,4 +34,6 @@ sealed interface InputBarEvent {
     data class ContentReceived @OptIn(ExperimentalFoundationApi::class) constructor(
         val transferableContent: TransferableContent
     ) : InputBarEvent
+
+    data object RefreshSettings : InputBarEvent
 }

@@ -44,10 +44,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.util.ComposeTextParser
 import off.kys.backtalk.util.emptyString
-import org.koin.compose.koinInject
 import kotlin.math.abs
 
 /**
@@ -80,9 +78,8 @@ fun SmartText(
     highlightQuery: String? = null,
     overflow: TextOverflow = TextOverflow.Visible,
     onMentionClicked: (String) -> Unit = {},
-    externalLinkWarningEnabled: Boolean? = null
+    externalLinkWarningEnabled: Boolean = true
 ) {
-    val preferences = koinInject<BacktalkPreferences>()
     SmartTextContent(
         text = text,
         modifier = modifier,
@@ -96,7 +93,7 @@ fun SmartText(
         highlightQuery = highlightQuery,
         overflow = overflow,
         onMentionClicked = onMentionClicked,
-        externalLinkWarningEnabled = externalLinkWarningEnabled ?: preferences.externalLinkWarningEnabled
+        externalLinkWarningEnabled = externalLinkWarningEnabled
     )
 }
 

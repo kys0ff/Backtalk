@@ -179,7 +179,14 @@ class MessagesViewModel(
             }
 
             MessagesUiEvent.RefreshSettings -> {
-                _uiState.update { it.copy(showTagsBar = preferences.showTagsBar) }
+                _uiState.update {
+                    it.copy(
+                        showTagsBar = preferences.showTagsBar,
+                        hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
+                        swipeHintShown = preferences.swipeHintShown,
+                        externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+                    )
+                }
             }
 
             is MessagesUiEvent.SetSharedText -> {
@@ -230,6 +237,11 @@ class MessagesViewModel(
                         messageContextMenuEntity = null
                     )
                 }
+            }
+
+            MessagesUiEvent.MarkSwipeHintShown -> {
+                preferences.swipeHintShown = true
+                _uiState.update { it.copy(swipeHintShown = true) }
             }
         }
     }
@@ -369,7 +381,14 @@ class MessagesViewModel(
     private var isMigrationDone = false
 
     private fun loadMessages() {
-        _uiState.update { it.copy(showTagsBar = preferences.showTagsBar) }
+        _uiState.update {
+            it.copy(
+                showTagsBar = preferences.showTagsBar,
+                hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
+                swipeHintShown = preferences.swipeHintShown,
+                externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+            )
+        }
         viewModelScope.launch {
             useCases.getAllMessages().collect { messages ->
                 if (!isMigrationDone) {

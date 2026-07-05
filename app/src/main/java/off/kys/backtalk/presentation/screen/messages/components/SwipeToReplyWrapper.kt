@@ -34,8 +34,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import off.kys.backtalk.common.pref.BacktalkPreferences
-import org.koin.compose.koinInject
+import off.kys.backtalk.util.emptyString
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
@@ -60,9 +59,9 @@ fun SwipeToReplyWrapper(
     @DrawableRes endIconRes: Int,
     showHint: Boolean = false,
     onHintShown: () -> Unit = {},
+    hapticFeedbackEnabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val preferences = koinInject<BacktalkPreferences>()
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
     val density = LocalDensity.current
@@ -169,7 +168,7 @@ fun SwipeToReplyWrapper(
                             else -> 0f
                         }
 
-                        if (preferences.hapticFeedbackEnabled) {
+                        if (hapticFeedbackEnabled) {
                             if (abs(newOffset) >= actionThreshold && !hasVibratedThreshold) {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 hasVibratedThreshold = true

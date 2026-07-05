@@ -77,11 +77,10 @@ import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.screen.components.size_observer.SizeRegistryScope
 import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
 import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
+import off.kys.backtalk.presentation.screen.messages.LocalAudioPlayer
 import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
-import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
-import org.koin.compose.koinInject
 import java.io.File
 
 @Composable
@@ -101,7 +100,8 @@ fun MessageBubble(
     onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {},
-    hapticFeedbackEnabled: Boolean
+    hapticFeedbackEnabled: Boolean,
+    externalLinkWarningEnabled: Boolean = true
 ) {
     MessageBubbleContent(
         message = message,
@@ -119,7 +119,8 @@ fun MessageBubble(
         onToggleImageSelect = onToggleImageSelect,
         highlightQuery = highlightQuery,
         onTagClick = onTagClick,
-        hapticFeedbackEnabled = hapticFeedbackEnabled
+        hapticFeedbackEnabled = hapticFeedbackEnabled,
+        externalLinkWarningEnabled = externalLinkWarningEnabled
     )
 }
 
@@ -141,7 +142,8 @@ fun MessageBubbleContent(
     onToggleImageSelect: (String) -> Unit = {},
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {},
-    hapticFeedbackEnabled: Boolean
+    hapticFeedbackEnabled: Boolean,
+    externalLinkWarningEnabled: Boolean = true
 ) {
     var showExtraInfo by remember { mutableStateOf(false) }
     val haptic = LocalHapticFeedback.current
@@ -227,7 +229,8 @@ fun MessageBubbleContent(
                 onTagClick = onTagClick,
                 selectedImagePaths = selectedImagePaths,
                 onToggleImageSelect = onToggleImageSelect,
-                hapticFeedbackEnabled = hapticFeedbackEnabled
+                hapticFeedbackEnabled = hapticFeedbackEnabled,
+                externalLinkWarningEnabled = externalLinkWarningEnabled
             )
         }
 
@@ -315,8 +318,10 @@ private fun MessageInnerContent(
     onToggleImageSelect: (String) -> Unit,
     highlightQuery: String? = null,
     onTagClick: (String) -> Unit = {},
-    hapticFeedbackEnabled: Boolean
+    hapticFeedbackEnabled: Boolean,
+    externalLinkWarningEnabled: Boolean = true
 ) {
+    val audioPlayer = LocalAudioPlayer.current
     val innerContentId = "message_inner_content"
     val navigator = LocalNavigator.current
     val contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
@@ -391,7 +396,6 @@ private fun MessageInnerContent(
             }
 
             if (message.hasVoice && message.voicePath != null) {
-                val audioPlayer = koinInject<AudioPlayer>()
                 val isPlayingState by audioPlayer.isPlaying.collectAsStateWithLifecycle()
                 val progressState by audioPlayer.progress.collectAsStateWithLifecycle()
                 val currentPathState by audioPlayer.currentPath.collectAsStateWithLifecycle()
@@ -427,7 +431,7 @@ private fun MessageInnerContent(
                                 textDecoration = TextDecoration.LineThrough,
                                 highlightQuery = highlightQuery,
                                 onMentionClicked = onTagClick,
-                                externalLinkWarningEnabled = false,
+                                externalLinkWarningEnabled = externalLinkWarningEnabled,
                                 clickableLink = !selectMode
                             )
                         }
@@ -438,7 +442,7 @@ private fun MessageInnerContent(
                             style = MaterialTheme.typography.bodyLarge,
                             highlightQuery = highlightQuery,
                             onMentionClicked = onTagClick,
-                            externalLinkWarningEnabled = false,
+                            externalLinkWarningEnabled = externalLinkWarningEnabled,
                             clickableLink = !selectMode
                         )
                     }

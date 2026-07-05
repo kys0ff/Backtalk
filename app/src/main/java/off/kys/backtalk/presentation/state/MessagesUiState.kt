@@ -53,5 +53,8 @@ data class MessagesUiState(
     val messageContextMenuEntity: MessageUiModel? = null,
     val selectionMetrics: SelectionMetrics = SelectionMetrics(),
     val hashtags: PersistentList<String> = persistentListOf(),
-    val repliedMessagesMap: PersistentMap<MessageId, MessageUiModel> = persistentMapOf()
+    val repliedMessagesMap: PersistentMap<MessageId, MessageUiModel> = persistentMapOf(),
+    val hapticFeedbackEnabled: Boolean = true,
+    val swipeHintShown: Boolean = true,
+    val externalLinkWarningEnabled: Boolean = true
 )

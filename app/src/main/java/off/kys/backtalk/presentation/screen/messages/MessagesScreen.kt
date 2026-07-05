@@ -3,8 +3,11 @@ package off.kys.backtalk.presentation.screen.messages
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,6 +16,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.presentation.activity.MainActivity
+import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesScreenContent
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
@@ -43,19 +47,44 @@ class MessagesScreen : Screen {
         LaunchedEffect(lifecycleOwner) {
             lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.onEvent(MessagesUiEvent.RefreshSettings)
+                inputBarViewModel.onEvent(InputBarEvent.RefreshSettings)
             }
         }
 
-        MessagesScreenContent(
-            state = state,
-            inputBarViewModel = inputBarViewModel,
-            onEvent = viewModel::onEvent,
-            onSettingsClick = { navigator += SettingsScreen() },
-            onThreadsClick = { navigator += ThreadsScreen() },
-            onRemindersClick = { navigator += RemindersScreen() },
-            onStatisticsClick = { navigator += StatisticsScreen() },
-            onStopAudio = { audioPlayer.stop() }
-        )
+        val actions = remember(navigator, audioPlayer, state) {
+            MessagesActions(
+                onEvent = viewModel::onEvent,
+                onSettingsClick = { navigator += SettingsScreen() },
+                onThreadsClick = { navigator += ThreadsScreen() },
+                onRemindersClick = { navigator += RemindersScreen() },
+                onStatisticsClick = { navigator += StatisticsScreen() },
+                onStopAudio = { audioPlayer.stop() },
+                onPinSelected = {
+                    val selectedId = state.selectedMessageIds.firstOrNull()
+                    if (selectedId != null) {
+                        val isPinned =
+                            state.messages.find { it.id == selectedId }?.isPinned ?: false
+                        viewModel.onEvent(MessagesUiEvent.TogglePinMessage(selectedId, !isPinned))
+                        viewModel.onEvent(MessagesUiEvent.ClearSelection)
+                    }
+                },
+                onDeleteSelected = { viewModel.onEvent(MessagesUiEvent.DeleteSelected) },
+                onCopySelected = { viewModel.onEvent(MessagesUiEvent.CopySelected) },
+                onCloseSelection = { viewModel.onEvent(MessagesUiEvent.ClearSelection) },
+                onNavigatePinned = { viewModel.onEvent(MessagesUiEvent.NavigatePinned) }
+            )
+        }
+
+        CompositionLocalProvider(
+            LocalMessagesActions provides actions,
+            LocalAudioPlayer provides audioPlayer
+        ) {
+            MessagesScreenContent(
+                state = state,
+                inputBarViewModel = inputBarViewModel,
+                modifier = Modifier
+            )
+        }
     }
 
     @Composable

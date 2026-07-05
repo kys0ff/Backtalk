@@ -1,1 +1,2 @@
-No new commits since v0.3.8
+329618a refactor: migrate InputBar preferences and interactions to ViewModel
+8da8f27 fix: restore dynamic text direction in InputBar text style
