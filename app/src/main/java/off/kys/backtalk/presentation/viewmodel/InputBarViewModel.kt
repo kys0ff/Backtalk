@@ -10,6 +10,7 @@ import androidx.compose.foundation.content.MediaType
 import androidx.compose.foundation.content.TransferableContent
 import androidx.compose.foundation.content.hasMediaType
 import androidx.compose.foundation.text.input.clearText
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.state.InputBarEffect
@@ -46,7 +48,12 @@ class InputBarViewModel(
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(
-        InputBarUiState(linkPreviewEnabled = preferences.linkPreviewEnabled)
+        InputBarUiState(
+            linkPreviewEnabled = preferences.linkPreviewEnabled,
+            isHapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
+            sendWithEnter = preferences.sendWithEnter,
+            is24HourFormat = preferences.timeFormat.is24Hour(application)
+        )
     )
     val uiState: StateFlow<InputBarUiState> = _uiState.asStateFlow()
 
@@ -81,6 +88,7 @@ class InputBarViewModel(
         InputBarEvent.ShowTapHint -> handleShowTapHint()
         InputBarEvent.ClearTapHint -> _uiState.update { it.copy(showTapHint = false) }
         is InputBarEvent.UpdateOffsetX -> _uiState.update { it.copy(offsetX = event.x) }
+        is InputBarEvent.RequestSchedule -> handleRequestSchedule()
         is InputBarEvent.ChangeSchedulingStage -> _uiState.update { it.copy(schedulingStage = event.stage) }
         InputBarEvent.RequestExactAlarmPermission -> checkAndRequestExactAlarmPermission()
         InputBarEvent.DismissPermissionRationale -> _uiState.update { it.copy(showPermissionRationale = false) }
@@ -101,6 +109,21 @@ class InputBarViewModel(
         if (text.isNotBlank()) {
             onMessageSend(text)
             _uiState.value.textFieldState.clearText()
+        } else {
+            viewModelScope.launch { _effect.emit(InputBarEffect.TriggerShake) }
+        }
+    }
+
+    private fun handleRequestSchedule() {
+        if (_uiState.value.textFieldState.text.isNotBlank()) {
+            if (preferences.hapticFeedbackEnabled) {
+                viewModelScope.launch {
+                    _effect.emit(InputBarEffect.PerformHapticFeedback(HapticFeedbackType.LongPress))
+                }
+            }
+            _uiState.update { it.copy(schedulingStage = SchedulingStage.SelectingDate) }
+        } else {
+            viewModelScope.launch { _effect.emit(InputBarEffect.TriggerShake) }
         }
     }
 
@@ -112,12 +135,17 @@ class InputBarViewModel(
         } else {
             viewModelScope.launch {
                 _effect.emit(InputBarEffect.TriggerShake)
-                _effect.emit(InputBarEffect.ShowError(off.kys.backtalk.R.string.message_scheduling_invalid_time))
+                _effect.emit(InputBarEffect.ShowError(R.string.message_scheduling_invalid_time))
             }
         }
     }
 
     private fun startVoiceRecording() {
+        if (preferences.hapticFeedbackEnabled) {
+            viewModelScope.launch {
+                _effect.emit(InputBarEffect.PerformHapticFeedback(HapticFeedbackType.LongPress))
+            }
+        }
         _uiState.update { it.copy(isRecording = true, secondsElapsed = 0) }
         recordingStartTime = System.currentTimeMillis()
         audioRecorder.startRecording()

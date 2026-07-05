@@ -17,6 +17,9 @@ data class InputBarUiState(
     val showPermissionRationale: Boolean = false,
     val sharedImageUris: List<String> = emptyList(),
     val linkPreviewEnabled: Boolean = true,
+    val isHapticFeedbackEnabled: Boolean = true,
+    val sendWithEnter: Boolean = false,
+    val is24HourFormat: Boolean = false,
     val offsetX: Float = 0f
 ) {
     val durationText: String

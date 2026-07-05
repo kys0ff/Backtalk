@@ -74,7 +74,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +82,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
@@ -107,9 +105,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import off.kys.backtalk.R
-import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.state.InputBarEffect
@@ -117,7 +113,6 @@ import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull
 import off.kys.backtalk.util.toast
-import org.koin.compose.koinInject
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -144,7 +139,6 @@ fun InputBar(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val preferences = koinInject<BacktalkPreferences>()
     val layoutDirection = LocalLayoutDirection.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -178,15 +172,11 @@ fun InputBar(
     )
 
     val calendar = Calendar.getInstance()
-    val isSystem24HourFormat =
-        remember(preferences, context) { preferences.timeFormat.is24Hour(context) }
     val timePickerState = rememberTimePickerState(
         initialHour = calendar.get(Calendar.HOUR_OF_DAY),
         initialMinute = calendar.get(Calendar.MINUTE),
-        is24Hour = isSystem24HourFormat
+        is24Hour = state.is24HourFormat
     )
-
-    val scope = rememberCoroutineScope()
 
     suspend fun performShake() {
         isShaking = true
@@ -202,10 +192,8 @@ fun InputBar(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 InputBarEffect.TriggerShake -> performShake()
-
-                is InputBarEffect.ShowError -> {
-                    context.toast(effect.messageRes)
-                }
+                is InputBarEffect.ShowError -> context.toast(effect.messageRes)
+                is InputBarEffect.PerformHapticFeedback -> haptic.performHapticFeedback(effect.type)
             }
         }
     }
@@ -223,21 +211,7 @@ fun InputBar(
         viewModel.onEvent(InputBarEvent.UpdateEditingMessage(editingMessage))
     }
 
-    fun handleScheduleClick() {
-        if (state.textFieldState.text.isNotBlank()) {
-            if (preferences.hapticFeedbackEnabled) {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
-            viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingDate))
-        } else {
-            scope.launch { performShake() }
-        }
-    }
-
     fun startRecordingInternal() {
-        if (preferences.hapticFeedbackEnabled) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
         viewModel.onEvent(InputBarEvent.StartRecording)
     }
 
@@ -313,7 +287,7 @@ fun InputBar(
                     isRecording = state.isRecording,
                     amplitudes = state.amplitudes,
                     durationText = state.durationText,
-                    sendWithEnter = remember(preferences) { preferences.sendWithEnter },
+                    sendWithEnter = state.sendWithEnter,
                     onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
                     onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
                     onFocusChanged = { isFocused = it }
@@ -330,7 +304,7 @@ fun InputBar(
                     onDragUpdate = { directedX ->
                         viewModel.onEvent(InputBarEvent.UpdateOffsetX(directedX))
                     },
-                    onLongClick = ::handleScheduleClick,
+                    onLongClick = { viewModel.onEvent(InputBarEvent.RequestSchedule) },
                     onShowTapHint = { viewModel.onEvent(InputBarEvent.ShowTapHint) },
                     layoutDirection = layoutDirection
                 )

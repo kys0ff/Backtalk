@@ -23,6 +23,7 @@ sealed interface InputBarEvent {
     data class UpdateOffsetX(val x: Float) : InputBarEvent
 
     // Scheduling & Permissions
+    data object RequestSchedule : InputBarEvent
     data class ChangeSchedulingStage(val stage: SchedulingStage) : InputBarEvent
     data object RequestExactAlarmPermission : InputBarEvent
     data object DismissPermissionRationale : InputBarEvent
