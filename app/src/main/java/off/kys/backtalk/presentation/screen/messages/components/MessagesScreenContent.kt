@@ -207,7 +207,7 @@ private fun MessagesTopBarSection(
 }
 
 @Composable
-private fun MessagesListSection(
+private fun BoxScope.MessagesListSection(
     state: MessagesUiState,
     messagesScrollState: LazyListState,
     inputBarHeight: Dp
@@ -227,6 +227,7 @@ private fun MessagesListSection(
 
     ScrollToBottomFab(
         modifier = Modifier
+            .align(Alignment.BottomEnd)
             .padding(bottom = inputBarHeight + 8.dp, end = 16.dp),
         isVisible = showScrollToBottom,
         onClick = {
