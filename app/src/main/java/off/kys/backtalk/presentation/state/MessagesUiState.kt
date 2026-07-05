@@ -56,5 +56,6 @@ data class MessagesUiState(
     val repliedMessagesMap: PersistentMap<MessageId, MessageUiModel> = persistentMapOf(),
     val hapticFeedbackEnabled: Boolean = true,
     val swipeHintShown: Boolean = true,
-    val externalLinkWarningEnabled: Boolean = true
+    val externalLinkWarningEnabled: Boolean = true,
+    val disableContextMenuOnLongClick: Boolean = false
 )

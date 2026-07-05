@@ -63,6 +63,7 @@ fun MessagesContent(
             hapticFeedbackEnabled = state.hapticFeedbackEnabled,
             swipeHintShown = state.swipeHintShown,
             externalLinkWarningEnabled = state.externalLinkWarningEnabled,
+            disableContextMenuOnLongClick = state.disableContextMenuOnLongClick,
             onMarkSwipeHintShown = { actions.onEvent(MessagesUiEvent.MarkSwipeHintShown) },
             contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding),
             onEditMessage = { actions.onEvent(MessagesUiEvent.EditMessage(it)) },

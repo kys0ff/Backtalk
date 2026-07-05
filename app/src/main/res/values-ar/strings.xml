@@ -148,6 +148,8 @@
     <string name="settings_smart_pointing_images_desc">الإشارة إلى ملفات الصور الموجودة مسبقًا بدلًا من تكرارها عند إرسال نفس المِلَفّ مجددًا</string>
     <string name="settings_show_tags_bar">إظهار شريط الوسوم</string>
     <string name="settings_show_tags_bar_desc">عرض الوسوم (Hashtags) في أعلى المحادثة للتصفية السريعة</string>
+    <string name="settings_disable_context_menu">تعطيل القائمة السياقية</string>
+    <string name="settings_disable_context_menu_desc">تعطيل القائمة السياقية عند الضغط المطول على الرسالة</string>
     <string name="settings_license">تراخيص البرمجيات مفتوحة المصدر</string>
     <string name="settings_license_desc">المكتبات البرمجية المستخدمة في التطبيق</string>
     <string name="settings_information">معلومات</string>

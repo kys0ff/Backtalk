@@ -330,6 +330,18 @@ fun SettingsScreenContent(
                     checked = state.showTagsBar,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnShowTagsBarToggle(it)) }
                 )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsToggle(
+                    label = stringResource(R.string.settings_disable_context_menu),
+                    supportingText = stringResource(R.string.settings_disable_context_menu_desc),
+                    icon = painterResource(R.drawable.round_visibility_off_24),
+                    checked = state.disableContextMenuOnLongClick,
+                    onCheckedChange = { onEvent(SettingsUiEvent.OnDisableContextMenuToggle(it)) }
+                )
             }
 
             // Reminders Section
@@ -498,21 +510,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.sync_title),
                     value = stringResource(R.string.sync_summary),
                     icon = painterResource(R.drawable.round_refresh_24),
-                    onClick = onSyncClicked,
-                    badge = {
-                        Surface(
-                            onClick = { showExperimentalSyncDialog.value = true },
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = MaterialTheme.shapes.extraSmall,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.common_experimental),
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                color = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                        }
-                    }
+                    onClick = onSyncClicked
                 )
             }
 

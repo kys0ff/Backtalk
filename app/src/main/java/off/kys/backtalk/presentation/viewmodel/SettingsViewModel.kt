@@ -82,6 +82,7 @@ class SettingsViewModel(
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
             showTagsBar = preferences.showTagsBar,
+            disableContextMenuOnLongClick = preferences.disableContextMenuOnLongClick,
             lastSeenChangelogVersion = preferences.lastSeenChangelogVersion.orEmpty(),
             isIgnoringBatteryOptimizations = (application.getSystemService(Context.POWER_SERVICE) as PowerManager)
                 .isIgnoringBatteryOptimizations(application.packageName)
@@ -123,6 +124,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
         is SettingsUiEvent.OnShowTagsBarToggle -> onShowTagsBarToggle(event.enabled)
+        is SettingsUiEvent.OnDisableContextMenuToggle -> onDisableContextMenuToggle(event.enabled)
         is SettingsUiEvent.OnChangelogVersionUpdate -> onChangelogVersionUpdate(event.version)
         SettingsUiEvent.OnDisableBatteryOptimization -> onDisableBatteryOptimization()
         SettingsUiEvent.OnOpenDontKillMyApp -> onOpenDontKillMyApp()
@@ -305,6 +307,11 @@ class SettingsViewModel(
     private fun onShowTagsBarToggle(enabled: Boolean) {
         preferences.showTagsBar = enabled
         _state.update { it.copy(showTagsBar = enabled) }
+    }
+
+    private fun onDisableContextMenuToggle(enabled: Boolean) {
+        preferences.disableContextMenuOnLongClick = enabled
+        _state.update { it.copy(disableContextMenuOnLongClick = enabled) }
     }
 
     private fun onChangelogVersionUpdate(version: String) {

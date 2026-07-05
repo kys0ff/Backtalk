@@ -144,6 +144,8 @@
     <string name="settings_smart_pointing_images_desc">Referenciar imágenes existentes en lugar de duplicarlas al enviar el mismo archivo</string>
     <string name="settings_show_tags_bar">Mostrar barra de etiquetas</string>
     <string name="settings_show_tags_bar_desc">Mostrar hashtags en la parte superior del chat para un filtrado rápido</string>
+    <string name="settings_disable_context_menu">Desactivar menú contextual</string>
+    <string name="settings_disable_context_menu_desc">Desactivar el menú contextual al mantener presionado un mensaje</string>
     <string name="settings_license">Licencias de código abierto</string>
     <string name="settings_license_desc">Bibliotecas utilizadas en la aplicación</string>
     <string name="settings_information">Información</string>

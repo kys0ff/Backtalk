@@ -40,6 +40,7 @@ data class SettingsUiState(
     val removeImageMetadataEnabled: Boolean = false,
     val smartImagePointingEnabled: Boolean = false,
     val showTagsBar: Boolean = true,
+    val disableContextMenuOnLongClick: Boolean = false,
     val backupLoading: Boolean = false,
     val isBackupEncrypted: Boolean? = null,
     val wrongPasswordError: Boolean = false,

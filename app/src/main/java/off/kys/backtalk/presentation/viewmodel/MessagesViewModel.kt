@@ -184,7 +184,8 @@ class MessagesViewModel(
                         showTagsBar = preferences.showTagsBar,
                         hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
                         swipeHintShown = preferences.swipeHintShown,
-                        externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+                        externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
+                        disableContextMenuOnLongClick = preferences.disableContextMenuOnLongClick
                     )
                 }
             }
@@ -386,7 +387,8 @@ class MessagesViewModel(
                 showTagsBar = preferences.showTagsBar,
                 hapticFeedbackEnabled = preferences.hapticFeedbackEnabled,
                 swipeHintShown = preferences.swipeHintShown,
-                externalLinkWarningEnabled = preferences.externalLinkWarningEnabled
+                externalLinkWarningEnabled = preferences.externalLinkWarningEnabled,
+                disableContextMenuOnLongClick = preferences.disableContextMenuOnLongClick
             )
         }
         viewModelScope.launch {

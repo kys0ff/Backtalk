@@ -37,6 +37,7 @@ fun MessagesList(
     hapticFeedbackEnabled: Boolean,
     swipeHintShown: Boolean,
     externalLinkWarningEnabled: Boolean,
+    disableContextMenuOnLongClick: Boolean = false,
     onMarkSwipeHintShown: () -> Unit,
     contentPadding: PaddingValues,
     onEditMessage: (MessageUiModel?) -> Unit,
@@ -162,7 +163,7 @@ fun MessagesList(
                             },
                             onLongClick = {
                                 currentOnToggleSelect()
-                                if (!selectionMode) {
+                                if (!selectionMode && !disableContextMenuOnLongClick) {
                                     currentOnLongClick()
                                 }
                             },

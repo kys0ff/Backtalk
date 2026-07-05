@@ -143,6 +143,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether the hashtags bar is shown at the top of the messages list. */
     var showTagsBar by preference(BooleanPreferenceItem(prefs, KEY_SHOW_TAGS_BAR, true))
 
+    /** Whether the context menu on long click in messages list is disabled. */
+    var disableContextMenuOnLongClick by preference(BooleanPreferenceItem(prefs, KEY_DISABLE_CONTEXT_MENU, false))
+
     /** Whether the swipe-to-action hint has been shown. */
     var swipeHintShown by preference(BooleanPreferenceItem(prefs, KEY_SWIPE_HINT_SHOWN, false))
 
@@ -222,6 +225,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_SHOW_TAGS_BAR = "show_tags_bar"
+        const val KEY_DISABLE_CONTEXT_MENU = "disable_context_menu"
         const val KEY_SWIPE_HINT_SHOWN = "swipe_hint_shown"
         const val KEY_PAIRED_DEVICES = "paired_devices"
         const val KEY_FIRST_LAUNCH = "first_launch"
