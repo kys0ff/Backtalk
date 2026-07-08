@@ -1,3 +1,4 @@
+2ae7a10 fix: scope MessagesListSection to BoxScope and align ScrollToBottomFab
 d8523a4 refactor: organize UI state models into feature packages and extract message item state
 3746547 refactor: overhaul SettingsItem layout and externalize version/cache strings
 b466ff5 feat: add option to disable message context menu on long-click

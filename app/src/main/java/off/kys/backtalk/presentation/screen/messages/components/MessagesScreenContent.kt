@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.components.hiddenKeyboardPadding
+import off.kys.backtalk.presentation.components.imeClosedBottomInset
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
@@ -251,7 +251,7 @@ private fun BoxScope.MessageInputSection(
     InputBar(
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .hiddenKeyboardPadding(bottom = 16.dp)
+            .imeClosedBottomInset(bottom = 16.dp)
             .padding(bottom = scaffoldPadding.calculateBottomPadding())
             .onGloballyPositioned { coordinates ->
                 onInputHeightChanged(with(density) { coordinates.size.height.toDp() })
