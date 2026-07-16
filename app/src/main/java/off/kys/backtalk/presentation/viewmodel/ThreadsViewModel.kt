@@ -10,7 +10,6 @@ import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
-import off.kys.backtalk.presentation.event.ThreadsUiEvent
 import off.kys.backtalk.presentation.state.threads.ThreadsUiState
 
 class ThreadsViewModel(
@@ -24,10 +23,6 @@ class ThreadsViewModel(
 
     init {
         loadMessages()
-    }
-
-    fun onEvent(event: ThreadsUiEvent) = when (event) {
-        is ThreadsUiEvent.LoadThreads -> loadMessages()
     }
 
     private fun loadMessages() {

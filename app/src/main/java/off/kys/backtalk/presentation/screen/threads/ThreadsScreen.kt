@@ -12,7 +12,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,7 +27,6 @@ import off.kys.backtalk.presentation.components.HintTooltip
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
-import off.kys.backtalk.presentation.event.ThreadsUiEvent
 import off.kys.backtalk.presentation.screen.threads.components.ThreadItem
 import off.kys.backtalk.presentation.viewmodel.ThreadsViewModel
 import off.kys.backtalk.util.copyToClipboard
@@ -69,41 +67,36 @@ class ThreadsScreen : Screen {
                     .padding(padding)
                     .fillMaxSize()
             ) {
-                PullToRefreshBox(
-                    isRefreshing = state.isLoading,
-                    onRefresh = { viewModel.onEvent(ThreadsUiEvent.LoadThreads) }
-                ) {
-                    if (state.threads.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.threads_empty),
-                                style = MaterialTheme.typography.bodyLarge
+                if (state.threads.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.threads_empty),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                } else {
+                    LazyColumn {
+                        items(state.threads, key = { it.root.id() }) { thread ->
+                            ThreadItem(
+                                thread = thread,
+                                onClick = { navigator.push(ThreadDetailScreen(thread)) },
+                                onThreadCopy = { text ->
+                                    context.copyToClipboard(text)
+                                },
+                                onThreadShare = { text ->
+                                    context.shareText(text)
+                                },
+                                onQuoteClick = { message ->
+                                    val subThread = viewModel.getSubThread(message)
+                                    navigator.push(ThreadDetailScreen(subThread))
+                                },
+                                getReplyCount = { message ->
+                                    viewModel.getSubThread(message).size - 1
+                                }
                             )
-                        }
-                    } else {
-                        LazyColumn {
-                            items(state.threads, key = { it.root.id() }) { thread ->
-                                ThreadItem(
-                                    thread = thread,
-                                    onClick = { navigator.push(ThreadDetailScreen(thread)) },
-                                    onThreadCopy = { text ->
-                                        context.copyToClipboard(text)
-                                    },
-                                    onThreadShare = { text ->
-                                        context.shareText(text)
-                                    },
-                                    onQuoteClick = { message ->
-                                        val subThread = viewModel.getSubThread(message)
-                                        navigator.push(ThreadDetailScreen(subThread))
-                                    },
-                                    getReplyCount = { message ->
-                                        viewModel.getSubThread(message).size - 1
-                                    }
-                                )
-                            }
                         }
                     }
                 }
