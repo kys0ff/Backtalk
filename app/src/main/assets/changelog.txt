@@ -1,3 +1,6 @@
+c519d0a refactor: use SettingsIcon component in SettingsItem
+3c87eb2 refactor: remove pull-to-refresh from ThreadsScreen and delete dead UI event code
+f6e842e fix(#42): include navigation bars padding in imeClosedBottomInset to prevent 3-button-bar overlap
 2ae7a10 fix: scope MessagesListSection to BoxScope and align ScrollToBottomFab
 d8523a4 refactor: organize UI state models into feature packages and extract message item state
 3746547 refactor: overhaul SettingsItem layout and externalize version/cache strings

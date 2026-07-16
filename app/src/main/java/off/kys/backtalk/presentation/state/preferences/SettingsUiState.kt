@@ -4,6 +4,7 @@ import android.net.Uri
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.AppTimeFormat
+import off.kys.backtalk.common.ImageCompressionLevel
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 
@@ -38,6 +39,7 @@ data class SettingsUiState(
     val linkPreviewEnabled: Boolean = false,
     val sendWithEnter: Boolean = false,
     val removeImageMetadataEnabled: Boolean = false,
+    val imageCompressionLevel: ImageCompressionLevel = ImageCompressionLevel.ORIGINAL,
     val smartImagePointingEnabled: Boolean = false,
     val showTagsBar: Boolean = true,
     val disableContextMenuOnLongClick: Boolean = false,

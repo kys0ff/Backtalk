@@ -4,6 +4,7 @@ import android.net.Uri
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.AppTimeFormat
+import off.kys.backtalk.common.ImageCompressionLevel
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 
@@ -38,6 +39,7 @@ sealed class SettingsUiEvent {
     data class OnLinkPreviewToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnSendWithEnterToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnRemoveImageMetadataToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnImageCompressionLevelChange(val level: ImageCompressionLevel) : SettingsUiEvent()
     data class OnSmartImagePointingToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnShowTagsBarToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnDisableContextMenuToggle(val enabled: Boolean) : SettingsUiEvent()

@@ -278,6 +278,9 @@ class MessagesViewModel(
                     if (preferences.removeImageMetadataEnabled && currentType.startsWith("image/") && currentType != "image/gif") {
                         MediaUtils.stripImageMetadata(destFile)
                     }
+                    if (currentType.startsWith("image/") && currentType != "image/gif") {
+                        MediaUtils.compressImage(destFile, preferences.imageCompressionLevel.quality)
+                    }
                     destFile.absolutePath
                 }
 
@@ -369,7 +372,7 @@ class MessagesViewModel(
                     scaffoldStatus = status
                 )
             }
-            delay(3000)
+            delay(3000.milliseconds)
             _uiState.update {
                 it.copy(
                     scaffoldMessage = null,

@@ -147,6 +147,14 @@
     <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
     <string name="settings_show_tags_bar">Show tags bar</string>
     <string name="settings_show_tags_bar_desc">Display hashtags at the top of the chat for quick filtering</string>
+    <string name="settings_image_compression">Image compression</string>
+    <string name="settings_image_compression_desc">Choose the quality of images before sending them</string>
+    <string name="image_compression_original">Original</string>
+    <string name="image_compression_best">Best quality</string>
+    <string name="image_compression_high">High quality</string>
+    <string name="image_compression_balanced">Balanced</string>
+    <string name="image_compression_low">Save data</string>
+    <string name="image_compression_very_low">Extreme saver</string>
     <string name="settings_disable_context_menu">Disable context menu</string>
     <string name="settings_disable_context_menu_desc">Disable the context menu when long-pressing a message</string>
     <string name="settings_license">Open source licenses</string>

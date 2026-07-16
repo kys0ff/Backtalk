@@ -81,6 +81,7 @@ fun SettingsScreenContent(
     val showLockTimeoutDialog = remember { mutableStateOf(false) }
     val showDateFormatDialog = remember { mutableStateOf(false) }
     val showTimeFormatDialog = remember { mutableStateOf(false) }
+    val showImageCompressionDialog = remember { mutableStateOf(false) }
     val showChangelogDialog = remember { mutableStateOf(false) }
 
     val appLockManager = LocalAppLockManager.current
@@ -302,6 +303,18 @@ fun SettingsScreenContent(
                     icon = painterResource(R.drawable.round_description_24),
                     checked = state.removeImageMetadataEnabled,
                     onCheckedChange = { onEvent(SettingsUiEvent.OnRemoveImageMetadataToggle(it)) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
+                    label = stringResource(R.string.settings_image_compression),
+                    supportingText = stringResource(R.string.settings_image_compression_desc),
+                    value = stringResource(state.imageCompressionLevel.titleResId),
+                    icon = painterResource(R.drawable.round_image_24),
+                    onClick = { showImageCompressionDialog.value = true }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -913,6 +926,17 @@ fun SettingsScreenContent(
             selectedFormat = state.timeFormat,
             onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
             onDismiss = { showTimeFormatDialog.value = false }
+        )
+    }
+
+    if (showImageCompressionDialog.value) {
+        ImageCompressionSelectionDialog(
+            selected = state.imageCompressionLevel,
+            onDismiss = { showImageCompressionDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnImageCompressionLevelChange(it))
+                showImageCompressionDialog.value = false
+            }
         )
     }
 

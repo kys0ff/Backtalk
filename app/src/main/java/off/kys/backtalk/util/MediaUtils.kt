@@ -1,7 +1,10 @@
 package off.kys.backtalk.util
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Utility for media processing.
@@ -47,6 +50,21 @@ object MediaUtils {
             if (changed) {
                 exifInterface.saveAttributes()
             }
+        }
+    }
+
+    /**
+     * Compresses an image file to a specified quality.
+     */
+    fun compressImage(file: File, quality: Int) {
+        if (quality >= 100) return
+        
+        runCatching {
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath) ?: return
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
+            }
+            bitmap.recycle()
         }
     }
 }

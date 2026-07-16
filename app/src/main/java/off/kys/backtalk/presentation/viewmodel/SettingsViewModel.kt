@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
 import off.kys.backtalk.common.AppLanguage
 import off.kys.backtalk.common.AppTimeFormat
+import off.kys.backtalk.common.ImageCompressionLevel
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.BacktalkPreferences
@@ -80,6 +81,7 @@ class SettingsViewModel(
             linkPreviewEnabled = preferences.linkPreviewEnabled,
             sendWithEnter = preferences.sendWithEnter,
             removeImageMetadataEnabled = preferences.removeImageMetadataEnabled,
+            imageCompressionLevel = preferences.imageCompressionLevel,
             smartImagePointingEnabled = preferences.smartImagePointingEnabled,
             showTagsBar = preferences.showTagsBar,
             disableContextMenuOnLongClick = preferences.disableContextMenuOnLongClick,
@@ -122,6 +124,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnLinkPreviewToggle -> onLinkPreviewToggle(event.enabled)
         is SettingsUiEvent.OnSendWithEnterToggle -> onSendWithEnterToggle(event.enabled)
         is SettingsUiEvent.OnRemoveImageMetadataToggle -> onRemoveImageMetadataToggle(event.enabled)
+        is SettingsUiEvent.OnImageCompressionLevelChange -> onImageCompressionLevelChange(event.level)
         is SettingsUiEvent.OnSmartImagePointingToggle -> onSmartImagePointingToggle(event.enabled)
         is SettingsUiEvent.OnShowTagsBarToggle -> onShowTagsBarToggle(event.enabled)
         is SettingsUiEvent.OnDisableContextMenuToggle -> onDisableContextMenuToggle(event.enabled)
@@ -297,6 +300,11 @@ class SettingsViewModel(
     private fun onRemoveImageMetadataToggle(enabled: Boolean) {
         preferences.removeImageMetadataEnabled = enabled
         _state.update { it.copy(removeImageMetadataEnabled = enabled) }
+    }
+
+    private fun onImageCompressionLevelChange(level: ImageCompressionLevel) {
+        preferences.imageCompressionLevel = level
+        _state.update { it.copy(imageCompressionLevel = level) }
     }
 
     private fun onSmartImagePointingToggle(enabled: Boolean) {

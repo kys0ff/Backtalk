@@ -8,6 +8,7 @@ import androidx.core.content.edit
 import off.kys.backtalk.BuildConfig
 import off.kys.backtalk.common.AppDateFormat
 import off.kys.backtalk.common.AppTimeFormat
+import off.kys.backtalk.common.ImageCompressionLevel
 import off.kys.backtalk.common.RepeatFrequency
 import off.kys.backtalk.common.ThemeMode
 import off.kys.backtalk.common.pref.base.PreferenceItem
@@ -137,6 +138,16 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether to remove metadata from sent images. */
     var removeImageMetadataEnabled by preference(BooleanPreferenceItem(prefs, KEY_REMOVE_IMAGE_METADATA, false))
 
+    /** The compression level for sent images. */
+    var imageCompressionLevel by preference(
+        EnumPreferenceItem(
+            prefs,
+            KEY_IMAGE_COMPRESSION_LEVEL,
+            ImageCompressionLevel.ORIGINAL,
+            ImageCompressionLevel::class.java
+        )
+    )
+
     /** Whether to use smart pointing for image paths instead of duplicating them. */
     var smartImagePointingEnabled by preference(BooleanPreferenceItem(prefs, KEY_SMART_IMAGE_POINTING, false))
 
@@ -223,6 +234,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_LINK_PREVIEW_ENABLED = "link_preview_enabled"
         const val KEY_SEND_WITH_ENTER = "send_with_enter"
         const val KEY_REMOVE_IMAGE_METADATA = "remove_image_metadata"
+        const val KEY_IMAGE_COMPRESSION_LEVEL = "image_compression_level"
         const val KEY_SMART_IMAGE_POINTING = "smart_image_pointing"
         const val KEY_SHOW_TAGS_BAR = "show_tags_bar"
         const val KEY_DISABLE_CONTEXT_MENU = "disable_context_menu"
