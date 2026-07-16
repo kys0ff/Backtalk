@@ -1,3 +1,7 @@
+d7f7197 feat: add automatic backup retention limit and cleanup
+2f37c76 refactor: migrate InputBar error toasts to LocalStatusController
+ce498bd refactor: migrate from StatusScaffold to GlobalStatusHost
+078573e feat: implement image compression settings and processing pipeline
 c519d0a refactor: use SettingsIcon component in SettingsItem
 3c87eb2 refactor: remove pull-to-refresh from ThreadsScreen and delete dead UI event code
 f6e842e fix(#42): include navigation bars padding in imeClosedBottomInset to prevent 3-button-bar overlap

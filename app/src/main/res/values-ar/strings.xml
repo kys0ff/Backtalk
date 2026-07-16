@@ -320,6 +320,7 @@
     <string name="camera_retake">إعادة التقاط</string>
     <string name="camera_send">إرسال الصورة</string>
     <string name="camera_blocked">الكاميرا محجوبة</string>
+    <string name="media_folder_all">الكل</string>
 
     <!-- Sync & Devices -->
     <string name="sync_title">المزامنة والأجهزة</string>

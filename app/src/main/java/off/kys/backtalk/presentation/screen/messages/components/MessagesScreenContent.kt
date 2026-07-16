@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.components.imeClosedBottomInset
+import off.kys.backtalk.presentation.components.conditionalImePadding
 import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
@@ -226,13 +226,13 @@ private fun BoxScope.MessagesListSection(
         listState = messagesScrollState,
         totalDeletableCount = state.selectionMetrics.totalDeletableCount,
         totalSelectedCount = state.selectionMetrics.totalSelectedCount,
-        bottomPadding = inputBarHeight
+        bottomPadding = inputBarHeight + 8.dp
     )
 
     ScrollToBottomFab(
         modifier = Modifier
             .align(Alignment.BottomEnd)
-            .padding(bottom = inputBarHeight + 8.dp, end = 16.dp),
+            .padding(bottom = inputBarHeight + 24.dp, end = 16.dp),
         isVisible = showScrollToBottom,
         onClick = {
             scope.launch {
@@ -255,7 +255,7 @@ private fun BoxScope.MessageInputSection(
     InputBar(
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .imeClosedBottomInset(bottom = 16.dp)
+            .conditionalImePadding(16.dp)
             .padding(bottom = scaffoldPadding.calculateBottomPadding())
             .onGloballyPositioned { coordinates ->
                 onInputHeightChanged(with(density) { coordinates.size.height.toDp() })

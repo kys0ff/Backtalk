@@ -316,6 +316,7 @@
     <string name="camera_retake">Volver a tomar</string>
     <string name="camera_send">Enviar foto</string>
     <string name="camera_blocked">Cámara bloqueada</string>
+    <string name="media_folder_all">Todo</string>
 
     <!-- Sync & Devices -->
     <string name="sync_title">Sincronización y Dispositivos</string>

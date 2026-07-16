@@ -327,6 +327,7 @@
     <string name="camera_retake">Retake</string>
     <string name="camera_send">Send photo</string>
     <string name="camera_blocked">Camera Blocked</string>
+    <string name="media_folder_all">All</string>
 
     <!-- Sync & Devices -->
     <string name="sync_title">Sync &amp; Devices</string>

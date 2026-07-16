@@ -38,15 +38,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -60,6 +64,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,6 +95,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
+import off.kys.backtalk.domain.model.MediaFolder
 import off.kys.backtalk.domain.model.MediaItem
 import off.kys.backtalk.presentation.screen.camera.CameraCaptureScreen
 import off.kys.backtalk.util.emptyString
@@ -162,6 +168,47 @@ fun MediaPickerSheet(
         if (hasMediaPermission) fetchGalleryMedia(context) else emptyList()
     }
 
+    val folders = remember(mediaItems) {
+        val folderList = mutableListOf<MediaFolder>()
+        folderList.add(
+            MediaFolder(
+                id = "all",
+                name = context.getString(R.string.media_folder_all),
+                firstItemUri = mediaItems.firstOrNull()?.uri
+            )
+        )
+
+        val bucketMap = mutableMapOf<String, MediaItem>()
+        mediaItems.forEach { item ->
+            if (item.bucketId != null && !bucketMap.containsKey(item.bucketId)) {
+                bucketMap[item.bucketId] = item
+            }
+        }
+
+        bucketMap.forEach { (id, item) ->
+            folderList.add(
+                MediaFolder(
+                    id = id,
+                    name = item.bucketName ?: "Unknown",
+                    firstItemUri = item.uri
+                )
+            )
+        }
+        folderList
+    }
+
+    var selectedFolderId by remember { mutableStateOf("all") }
+
+    val filteredMediaItems by remember(mediaItems, selectedFolderId) {
+        derivedStateOf {
+            if (selectedFolderId == "all") {
+                mediaItems
+            } else {
+                mediaItems.filter { it.bucketId == selectedFolderId }
+            }
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -192,83 +239,122 @@ fun MediaPickerSheet(
                 contentPadding = PaddingValues(bottom = 80.dp, start = 4.dp, end = 4.dp)
             ) {
                 item(span = { GridItemSpan(3) }) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(3f / 2f)
-                            .padding(bottom = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            .padding(bottom = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(2f)
-                                .aspectRatio(1f)
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            if (hasCameraPermission) {
-                                CameraPreviewItem(
-                                    onClick = {
-                                        onDismiss()
-                                        navigator.push(
-                                            CameraCaptureScreen { uri ->
-                                                onMediaSelected(
-                                                    listOf(uri),
-                                                    "image/jpeg",
-                                                    null
-                                                )
-                                            }
-                                        )
-                                    }
-                                )
-                            } else {
-                                Surface(
-                                    modifier = Modifier.fillMaxSize(),
-                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    shape = RoundedCornerShape(4.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
+                            items(folders) { folder ->
+                                val isSelected = selectedFolderId == folder.id
+                                FilterChip(
+                                    selected = isSelected,
+                                    onClick = { selectedFolderId = folder.id },
+                                    label = {
                                         Text(
-                                            text = stringResource(R.string.camera_blocked),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.labelSmall
+                                            text = folder.name,
+                                            style = MaterialTheme.typography.labelLarge
                                         )
+                                    },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    border = null,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(3f / 2f),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(2f)
+                                    .aspectRatio(1f)
+                            ) {
+                                if (hasCameraPermission) {
+                                    CameraPreviewItem(
+                                        onClick = {
+                                            onDismiss()
+                                            navigator.push(
+                                                CameraCaptureScreen { uri ->
+                                                    onMediaSelected(
+                                                        listOf(uri),
+                                                        "image/jpeg",
+                                                        null
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    Surface(
+                                        modifier = Modifier.fillMaxSize(),
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        shape = RoundedCornerShape(4.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(
+                                                text = stringResource(R.string.camera_blocked),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f / 2f),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            mediaItems.take(2).fastForEach { item ->
-                                val uriIndex = selectedUris.indexOf(item.uri)
-                                GalleryItem(
-                                    item = item,
-                                    showSelection = selectedUris.isNotEmpty(),
-                                    selectedIndex = if (uriIndex != -1) uriIndex + 1 else 0,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth(),
-                                    onSelected = { uri, type ->
-                                        selectedType = type
-                                        val isAdding = uri !in selectedUris
-                                        selectedUris = if (!isAdding) {
-                                            linkedSetOf<Uri>().apply { addAll(selectedUris.filter { it != uri }) }
-                                        } else {
-                                            linkedSetOf<Uri>().apply { addAll(selectedUris); add(uri) }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1f / 2f),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                filteredMediaItems.take(2).fastForEach { item ->
+                                    val uriIndex = selectedUris.indexOf(item.uri)
+                                    GalleryItem(
+                                        item = item,
+                                        showSelection = selectedUris.isNotEmpty(),
+                                        selectedIndex = if (uriIndex != -1) uriIndex + 1 else 0,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxWidth(),
+                                        onSelected = { uri, type ->
+                                            selectedType = type
+                                            val isAdding = uri !in selectedUris
+                                            selectedUris = if (!isAdding) {
+                                                linkedSetOf<Uri>().apply {
+                                                    addAll(selectedUris.filter { it != uri })
+                                                }
+                                            } else {
+                                                linkedSetOf<Uri>().apply {
+                                                    addAll(selectedUris)
+                                                    add(uri)
+                                                }
+                                            }
+                                            if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
+                                                scope.launch { sheetState.expand() }
+                                            }
                                         }
-                                        if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
-                                            scope.launch { sheetState.expand() }
-                                        }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
-                itemsIndexed(mediaItems.drop(2)) { _, item ->
+                itemsIndexed(filteredMediaItems.drop(2)) { _, item ->
                     val uriIndex = selectedUris.indexOf(item.uri)
                     GalleryItem(
                         item = item,
@@ -279,9 +365,14 @@ fun MediaPickerSheet(
                             selectedType = type
                             val isAdding = uri !in selectedUris
                             selectedUris = if (!isAdding) {
-                                linkedSetOf<Uri>().apply { addAll(selectedUris.filter { it != uri }) }
+                                linkedSetOf<Uri>().apply {
+                                    addAll(selectedUris.filter { it != uri })
+                                }
                             } else {
-                                linkedSetOf<Uri>().apply { addAll(selectedUris); add(uri) }
+                                linkedSetOf<Uri>().apply {
+                                    addAll(selectedUris)
+                                    add(uri)
+                                }
                             }
                             if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
                                 scope.launch { sheetState.expand() }
@@ -545,7 +636,9 @@ private fun fetchGalleryMedia(context: Context): List<MediaItem> {
     val items = mutableListOf<MediaItem>()
     val projection = arrayOf(
         MediaStore.MediaColumns._ID,
-        MediaStore.MediaColumns.MIME_TYPE
+        MediaStore.MediaColumns.MIME_TYPE,
+        MediaStore.MediaColumns.BUCKET_ID,
+        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
     )
     val sortOrder = "${MediaStore.MediaColumns.DATE_ADDED} DESC"
     val queryUri = MediaStore.Files.getContentUri("external")
@@ -557,11 +650,16 @@ private fun fetchGalleryMedia(context: Context): List<MediaItem> {
         ?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
             val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)
+            val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.BUCKET_ID)
+            val bucketNameColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val mimeType = cursor.getString(mimeColumn)
+                val bucketId = cursor.getString(bucketIdColumn)
+                val bucketName = cursor.getString(bucketNameColumn)
                 val uri = ContentUris.withAppendedId(queryUri, id)
-                items.add(MediaItem(uri, mimeType))
+                items.add(MediaItem(uri, mimeType, bucketId, bucketName))
             }
         }
     return items
