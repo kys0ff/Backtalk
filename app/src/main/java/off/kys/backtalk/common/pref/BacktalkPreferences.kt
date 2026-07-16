@@ -111,6 +111,9 @@ class BacktalkPreferences(private val context: Context) {
     /** Whether auto-exports should be encrypted. */
     var autoExportEncrypted by preference(BooleanPreferenceItem(prefs, KEY_AUTO_EXPORT_ENCRYPTED, false))
 
+    /** The maximum number of auto-exports to keep. 0 means unlimited. */
+    var autoExportMaxCount by preference(LongPreferenceItem(prefs, KEY_AUTO_EXPORT_MAX_COUNT, 10L))
+
     /** The password used for auto-export encryption. */
     var autoExportPassword by preference(StringPreferenceItem(prefs, KEY_AUTO_EXPORT_PASSWORD, null))
 
@@ -225,6 +228,7 @@ class BacktalkPreferences(private val context: Context) {
         const val KEY_AUTO_EXPORT_URI = "auto_export_uri"
         const val KEY_AUTO_EXPORT_INTERVAL = "auto_export_interval"
         const val KEY_AUTO_EXPORT_ENCRYPTED = "auto_export_encrypted"
+        const val KEY_AUTO_EXPORT_MAX_COUNT = "auto_export_max_count"
         const val KEY_AUTO_EXPORT_PASSWORD = "auto_export_password"
         const val KEY_HAPTIC_FEEDBACK = "haptic_feedback"
         const val KEY_KEEP_SCREEN_ON = "keep_screen_on"

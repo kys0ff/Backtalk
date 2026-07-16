@@ -281,6 +281,9 @@
     <string name="auto_export_summary">نسخ البيانات احتياطيًا بشكل دوري في الخلفية</string>
     <string name="auto_export_interval">تكرار التصدير</string>
     <string name="auto_export_folder">مجلد النسخ الاحتياطي</string>
+    <string name="auto_export_max_count">الحد الأقصى للنسخ الاحتياطية للاحتفاظ بها</string>
+    <string name="auto_export_max_count_desc">عدد النسخ الاحتياطية الحديثة التي سيتم الاحتفاظ بها. سيتم حذف القديم منها تلقائياً.</string>
+    <string name="auto_export_max_count_unlimited">غير محدود</string>
     <string name="auto_export_password">كلمة مرور التصدير التلقائي</string>
     <string name="auto_export_encrypt">تشفير التصدير التلقائي</string>
     <string name="auto_export_no_folder">لم يتم تحديد مجلد</string>

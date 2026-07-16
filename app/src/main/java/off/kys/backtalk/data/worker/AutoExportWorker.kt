@@ -1,6 +1,7 @@
 package off.kys.backtalk.data.worker
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -39,11 +40,26 @@ class AutoExportWorker(
             val password = if (preferences.autoExportEncrypted) preferences.autoExportPassword else null
             
             exportBackup(fileUri, password).fold(
-                onSuccess = { Result.success() },
+                onSuccess = {
+                    performCleanup(directoryUri)
+                    Result.success()
+                },
                 onFailure = { Result.retry() }
             )
         } catch (_: Exception) {
             Result.failure()
+        }
+    }
+
+    private suspend fun performCleanup(directoryUri: Uri) {
+        val maxCount = preferences.autoExportMaxCount.toInt()
+        if (maxCount <= 0) return
+
+        backupRepository.getBackupFiles(directoryUri).onSuccess { files ->
+            if (files.size > maxCount) {
+                val toDelete = files.sortedByDescending { it.lastModified }.drop(maxCount)
+                toDelete.forEach { backupRepository.deleteBackup(it.uri) }
+            }
         }
     }
 }

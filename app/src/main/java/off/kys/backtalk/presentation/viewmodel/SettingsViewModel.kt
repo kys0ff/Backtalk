@@ -70,6 +70,7 @@ class SettingsViewModel(
             autoRepeatFrequency = preferences.autoRepeatFrequency,
             autoExportUri = preferences.autoExportUri,
             autoExportEncrypted = preferences.autoExportEncrypted,
+            autoExportMaxCount = preferences.autoExportMaxCount.toInt(),
             autoExportPassword = preferences.autoExportPassword,
             remindersEnabled = preferences.remindersEnabled,
             reminderInterval = preferences.reminderInterval,
@@ -113,6 +114,7 @@ class SettingsViewModel(
         is SettingsUiEvent.OnAutoExportIntervalChange -> onAutoExportIntervalChange(event.interval)
         is SettingsUiEvent.OnAutoExportFolderChange -> onAutoExportFolderChange(event.uri)
         is SettingsUiEvent.OnAutoExportEncryptionToggle -> onAutoExportEncryptionToggle(event.enabled)
+        is SettingsUiEvent.OnAutoExportMaxCountChange -> onAutoExportMaxCountChange(event.count)
         is SettingsUiEvent.OnAutoExportPasswordChange -> onAutoExportPasswordChange(event.password)
         is SettingsUiEvent.OnRemindersToggle -> onRemindersToggle(event.enabled)
         is SettingsUiEvent.OnReminderIntervalChange -> onReminderIntervalChange(event.interval)
@@ -243,6 +245,11 @@ class SettingsViewModel(
     private fun onAutoExportEncryptionToggle(enabled: Boolean) {
         preferences.autoExportEncrypted = enabled
         _state.update { it.copy(autoExportEncrypted = enabled) }
+    }
+
+    private fun onAutoExportMaxCountChange(count: Int) {
+        preferences.autoExportMaxCount = count.toLong()
+        _state.update { it.copy(autoExportMaxCount = count) }
     }
 
     private fun onAutoExportPasswordChange(password: String?) {

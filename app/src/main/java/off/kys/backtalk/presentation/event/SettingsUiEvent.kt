@@ -28,6 +28,7 @@ sealed class SettingsUiEvent {
     data class OnAutoExportIntervalChange(val interval: RepeatFrequency) : SettingsUiEvent()
     data class OnAutoExportFolderChange(val uri: Uri) : SettingsUiEvent()
     data class OnAutoExportEncryptionToggle(val enabled: Boolean) : SettingsUiEvent()
+    data class OnAutoExportMaxCountChange(val count: Int) : SettingsUiEvent()
     data class OnAutoExportPasswordChange(val password: String?) : SettingsUiEvent()
     data class OnRemindersToggle(val enabled: Boolean) : SettingsUiEvent()
     data class OnReminderIntervalChange(val interval: RepeatFrequency) : SettingsUiEvent()

@@ -28,6 +28,7 @@ data class SettingsUiState(
     val autoRepeatFrequency: RepeatFrequency = RepeatFrequency.DAILY,
     val autoExportUri: String? = null,
     val autoExportEncrypted: Boolean = false,
+    val autoExportMaxCount: Int = 10,
     val autoExportPassword: String? = null,
     val remindersEnabled: Boolean = false,
     val reminderInterval: RepeatFrequency = RepeatFrequency.DAILY,

@@ -277,6 +277,9 @@
     <string name="auto_export_summary">Hacer copias de seguridad periódicas en segundo plano</string>
     <string name="auto_export_interval">Intervalo de exportación</string>
     <string name="auto_export_folder">Carpeta de copias de seguridad</string>
+    <string name="auto_export_max_count">Máximo de copias de seguridad a mantener</string>
+    <string name="auto_export_max_count_desc">Número de copias de seguridad más recientes que se conservarán. Las más antiguas se eliminarán automáticamente.</string>
+    <string name="auto_export_max_count_unlimited">Ilimitado</string>
     <string name="auto_export_password">Contraseña de exportación automática</string>
     <string name="auto_export_encrypt">Cifrar exportación automática</string>
     <string name="auto_export_no_folder">Ninguna carpeta seleccionada</string>

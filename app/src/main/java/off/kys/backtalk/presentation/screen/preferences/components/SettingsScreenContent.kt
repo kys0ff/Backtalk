@@ -74,6 +74,7 @@ fun SettingsScreenContent(
     val showPasswordDialog = remember { mutableStateOf(false) }
     val showIntervalDialog = remember { mutableStateOf(false) }
     val showAutoExportPasswordDialog = remember { mutableStateOf(false) }
+    val showMaxBackupsDialog = remember { mutableStateOf(false) }
     val showThemeDialog = remember { mutableStateOf(false) }
     val showLanguageDialog = remember { mutableStateOf(false) }
     val showOldBackupWarning = remember { mutableStateOf(false) }
@@ -567,6 +568,14 @@ fun SettingsScreenContent(
                             icon = painterResource(R.drawable.round_refresh_24),
                             onClick = { showIntervalDialog.value = true }
                         )
+                        SettingsItem(
+                            label = stringResource(R.string.auto_export_max_count),
+                            supportingText = stringResource(R.string.auto_export_max_count_desc),
+                            value = if (state.autoExportMaxCount == 0) stringResource(R.string.auto_export_max_count_unlimited)
+                            else state.autoExportMaxCount.toString(),
+                            icon = painterResource(R.drawable.round_folder_24),
+                            onClick = { showMaxBackupsDialog.value = true }
+                        )
                         SettingsToggle(
                             label = stringResource(R.string.auto_export_encrypt),
                             icon = painterResource(R.drawable.round_lock_24),
@@ -867,6 +876,17 @@ fun SettingsScreenContent(
             onConfirm = { password ->
                 onEvent(SettingsUiEvent.OnAutoExportPasswordChange(password))
                 showAutoExportPasswordDialog.value = false
+            }
+        )
+    }
+
+    if (showMaxBackupsDialog.value) {
+        MaxBackupsSelectionDialog(
+            selected = state.autoExportMaxCount,
+            onDismiss = { showMaxBackupsDialog.value = false },
+            onSelected = {
+                onEvent(SettingsUiEvent.OnAutoExportMaxCountChange(it))
+                showMaxBackupsDialog.value = false
             }
         )
     }

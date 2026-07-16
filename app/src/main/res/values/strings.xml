@@ -288,6 +288,9 @@
     <string name="auto_export_summary">Periodically backup your data in the background</string>
     <string name="auto_export_interval">Export interval</string>
     <string name="auto_export_folder">Backup folder</string>
+    <string name="auto_export_max_count">Max backups to keep</string>
+    <string name="auto_export_max_count_desc">Number of most recent backups to retain. Older ones will be deleted automatically.</string>
+    <string name="auto_export_max_count_unlimited">Unlimited</string>
     <string name="auto_export_password">Auto export password</string>
     <string name="auto_export_encrypt">Encrypt auto export</string>
     <string name="auto_export_no_folder">No folder selected</string>

@@ -1,6 +1,7 @@
 package off.kys.backtalk.domain.repository
 
 import android.net.Uri
+import off.kys.backtalk.domain.model.BackupFile
 
 /**
  * Interface for repository handling backup file operations.
@@ -57,4 +58,20 @@ interface BackupRepository {
      * @return Result containing the Uri of the created file.
      */
     suspend fun createBackupFile(directoryUri: Uri, fileName: String): Result<Uri>
+
+    /**
+     * Retrieves all backup files in the specified [directoryUri].
+     *
+     * @param directoryUri The parent directory Uri.
+     * @return Result containing a list of [BackupFile]s.
+     */
+    suspend fun getBackupFiles(directoryUri: Uri): Result<List<BackupFile>>
+
+    /**
+     * Deletes the backup file at the specified [uri].
+     *
+     * @param uri The Uri of the file to delete.
+     * @return Result indicating success or failure.
+     */
+    suspend fun deleteBackup(uri: Uri): Result<Unit>
 }
