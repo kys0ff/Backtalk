@@ -87,7 +87,6 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -106,13 +105,14 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
+import off.kys.backtalk.presentation.components.status_scaffold.toStatusMessageRes
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.state.messages.InputBarEffect
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.getFirstLinkOrNull
-import off.kys.backtalk.util.toast
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -137,7 +137,7 @@ fun InputBar(
     sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
 ) {
-    val context = LocalContext.current
+    val statusController = LocalStatusController.current
     val haptic = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -192,7 +192,7 @@ fun InputBar(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 InputBarEffect.TriggerShake -> performShake()
-                is InputBarEffect.ShowError -> context.toast(effect.messageRes)
+                is InputBarEffect.ShowError -> statusController.error(effect.messageRes.toStatusMessageRes())
                 is InputBarEffect.PerformHapticFeedback -> haptic.performHapticFeedback(effect.type)
             }
         }

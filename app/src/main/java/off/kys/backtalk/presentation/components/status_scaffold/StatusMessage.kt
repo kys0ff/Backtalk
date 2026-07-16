@@ -29,3 +29,5 @@ sealed interface StatusMessage {
         is Res -> stringResource(resId, *args.toTypedArray())
     }
 }
+
+fun Int.toStatusMessageRes(): StatusMessage.Res = StatusMessage.Res(this)
