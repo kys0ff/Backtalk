@@ -1,5 +1,6 @@
 package off.kys.backtalk.presentation.screen.sync
 
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -12,9 +13,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
-import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.screen.sync.components.SyncDeviceList
 import off.kys.backtalk.presentation.screen.sync.components.SyncDialogs
@@ -29,6 +30,7 @@ class SyncScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val statusController = LocalStatusController.current
         val viewModel: SyncViewModel = koinViewModel()
         val state by viewModel.state.collectAsState()
         var pinInput by remember { mutableStateOf(emptyString()) }
@@ -42,36 +44,48 @@ class SyncScreen : Screen {
             onDispose { viewModel.onEvent(SyncEvent.StopDiscovery) }
         }
 
-        val (scaffoldStatus, statusMessage) = remember(state.syncStatus, state.error, state.errorRes) {
+        val (scaffoldStatus, statusMessage) = remember(
+            state.syncStatus,
+            state.error,
+            state.errorRes,
+            state.isDiscovering,
+            state.discoveredDevices
+        ) {
             when {
                 state.error != null || state.errorRes != null -> {
-                    ScaffoldStatus.Error to (state.errorRes?.let { StatusMessage.Resource(it) }
-                        ?: StatusMessage.Hardcoded(state.error ?: "Unknown error"))
+                    ScaffoldStatus.Error to (state.errorRes?.let { StatusMessage.Res(it) }
+                        ?: StatusMessage.Text(state.error ?: "Unknown error"))
                 }
 
-                state.syncStatus == SyncStatus.SYNCING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                state.syncStatus == SyncStatus.SYNCING -> ScaffoldStatus.Loading to StatusMessage.Res(
                     R.string.sync_status_syncing
                 )
 
-                state.syncStatus == SyncStatus.CONNECTING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                state.syncStatus == SyncStatus.CONNECTING -> ScaffoldStatus.Loading to StatusMessage.Res(
                     R.string.common_please_wait
                 )
 
-                state.syncStatus == SyncStatus.PAIRING -> ScaffoldStatus.Info to StatusMessage.Resource(
+                state.syncStatus == SyncStatus.PAIRING -> ScaffoldStatus.Warning to StatusMessage.Res(
                     R.string.sync_enter_pin
                 )
 
-                state.syncStatus == SyncStatus.COMPLETED -> ScaffoldStatus.Info to StatusMessage.Hardcoded(
+                state.syncStatus == SyncStatus.COMPLETED -> ScaffoldStatus.Info to StatusMessage.Text(
                     "Sync completed"
+                )
+
+                state.isDiscovering && state.discoveredDevices.isEmpty() -> ScaffoldStatus.Loading to StatusMessage.Text(
+                    "Searching for devices..."
                 )
 
                 else -> ScaffoldStatus.None to null
             }
         }
 
-        StatusScaffold(
-            status = scaffoldStatus,
-            message = statusMessage,
+        LaunchedEffect(scaffoldStatus) {
+            statusMessage?.let { statusController.show(scaffoldStatus, it) }
+        }
+
+        Scaffold(
             topBar = {
                 SyncTopBar(
                     isDiscovering = state.isDiscovering,

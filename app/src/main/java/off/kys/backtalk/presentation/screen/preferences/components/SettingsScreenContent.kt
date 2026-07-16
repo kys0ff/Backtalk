@@ -18,8 +18,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,9 +45,9 @@ import off.kys.backtalk.common.lock.AppLockManager
 import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
+import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
-import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.preferences.SettingsUiState
@@ -86,8 +88,9 @@ fun SettingsScreenContent(
 
     val appLockManager = LocalAppLockManager.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val statusController = LocalStatusController.current
 
-    androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+    DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 onEvent(SettingsUiEvent.OnRefreshBatteryStatus)
@@ -173,10 +176,15 @@ fun SettingsScreenContent(
         }
     }
 
-    StatusScaffold(
+    LaunchedEffect(state.backupLoading) {
+        statusController.show(
+            status = if (state.backupLoading) ScaffoldStatus.Info else ScaffoldStatus.None,
+            message = StatusMessage.Res(R.string.common_please_wait)
+        )
+    }
+
+    Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        status = if (state.backupLoading) ScaffoldStatus.Info else ScaffoldStatus.None,
-        message = if (state.backupLoading) StatusMessage.Resource(R.string.common_please_wait) else null,
         topBar = {
             SettingsTopAppBar(
                 onNavigateBack = onNavigateBack,

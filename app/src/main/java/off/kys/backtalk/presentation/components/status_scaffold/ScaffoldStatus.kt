@@ -27,5 +27,12 @@ enum class ScaffoldStatus {
      * Displays a critical error banner indicating a failure state, typically using
      * the theme's error and on-error color palette.
      */
-    Error
+    Error,
+
+    /**
+     * Displays a loading or ongoing activity banner, typically using the theme's
+     * primary container and on-primary container color palette, or a dedicated
+     * loading color.
+     */
+    Loading
 }

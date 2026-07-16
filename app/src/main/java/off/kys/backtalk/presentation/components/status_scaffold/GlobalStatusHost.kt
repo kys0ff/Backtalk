@@ -13,9 +13,9 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -25,15 +25,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -51,64 +51,83 @@ import kotlinx.coroutines.delay
 import off.kys.backtalk.R
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Drop this once near app root (e.g. wrapping the NavHost inside
+ * MainActivity's setContent), and every screen below it can trigger a
+ * status banner with `LocalStatusController.current.error("...")`.
+ *
+ * ```
+ * setContent {
+ *     BacktalkTheme {
+ *         GlobalStatusHost {
+ *             AppNavHost()
+ *         }
+ *     }
+ * }
+ * ```
+ */
 @Composable
-fun StatusScaffold(
-    status: ScaffoldStatus,
-    modifier: Modifier = Modifier,
-    message: StatusMessage? = null,
-    topBar: @Composable () -> Unit = {},
-    bottomBar: @Composable () -> Unit = {},
-    snackbarHost: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.End,
-    containerColor: Color = MaterialTheme.colorScheme.background,
-    contentColor: Color = MaterialTheme.colorScheme.onBackground,
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
-    onDismissStatus: (() -> Unit)? = null,
-    autoDismissMillis: Long? = null,
-    content: @Composable (PaddingValues) -> Unit
+fun GlobalStatusHost(
+    controller: StatusController = rememberStatusController(),
+    content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = topBar,
-            bottomBar = bottomBar,
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            contentWindowInsets = contentWindowInsets
-        ) { innerPadding ->
-            content(innerPadding)
+    ProvideStatusController(controller) {
+        Box(Modifier.fillMaxSize()) {
+            content()
+            StatusOverlay(
+                controller = controller,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
+    }
+}
 
-        AnimatedVisibility(
-            visible = status != ScaffoldStatus.None && message != null,
-            enter = expandVertically(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                expandFrom = Alignment.Top
-            ) + fadeIn(animationSpec = tween(220)),
-            exit = shrinkVertically(
-                animationSpec = tween(280),
-                shrinkTowards = Alignment.Top
-            ) + fadeOut(animationSpec = tween(180)),
-            modifier = Modifier.align(Alignment.TopCenter)
-        ) {
-            if (message != null) {
-                StatusBadge(
-                    status = status,
-                    message = message,
-                    onDismiss = onDismissStatus
-                )
+@Composable
+fun ProvideStatusController(
+    controller: StatusController = rememberStatusController(),
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalStatusController provides controller,
+        content = content
+    )
+}
 
-                if (autoDismissMillis != null && onDismissStatus != null) {
-                    LaunchedEffect(status, message) {
-                        delay(autoDismissMillis.milliseconds)
-                        onDismissStatus()
-                    }
+@Composable
+fun StatusOverlay(
+    controller: StatusController,
+    modifier: Modifier = Modifier
+) {
+    val uiState = controller.state
+
+    AnimatedVisibility(
+        visible = uiState.status != ScaffoldStatus.None && uiState.message != null,
+        enter = expandVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
+            expandFrom = Alignment.Top
+        ) + fadeIn(animationSpec = tween(220)),
+        exit = shrinkVertically(
+            animationSpec = tween(280),
+            shrinkTowards = Alignment.Top
+        ) + fadeOut(animationSpec = tween(180)),
+        modifier = modifier
+    ) {
+        val message = uiState.message
+        if (message != null) {
+            StatusBadge(
+                status = uiState.status,
+                message = message,
+                action = uiState.action,
+                onDismiss = controller::dismiss
+            )
+
+            if (uiState.autoDismissMillis != null) {
+                LaunchedEffect(uiState.revision) {
+                    delay(uiState.autoDismissMillis.milliseconds)
+                    controller.dismiss()
                 }
             }
         }
@@ -116,15 +135,17 @@ fun StatusScaffold(
 }
 
 @Composable
-private fun StatusBadge(
+fun StatusBadge(
     status: ScaffoldStatus,
     message: StatusMessage,
+    action: StatusAction? = null,
     onDismiss: (() -> Unit)? = null
 ) {
     val targetBackgroundColor = when (status) {
         ScaffoldStatus.Info -> MaterialTheme.colorScheme.primaryContainer
         ScaffoldStatus.Warning -> MaterialTheme.colorScheme.tertiaryContainer
         ScaffoldStatus.Error -> MaterialTheme.colorScheme.errorContainer
+        ScaffoldStatus.Loading -> MaterialTheme.colorScheme.secondaryContainer
         ScaffoldStatus.None -> Color.Transparent
     }
 
@@ -132,15 +153,17 @@ private fun StatusBadge(
         ScaffoldStatus.Info -> MaterialTheme.colorScheme.onPrimaryContainer
         ScaffoldStatus.Warning -> MaterialTheme.colorScheme.onTertiaryContainer
         ScaffoldStatus.Error -> MaterialTheme.colorScheme.onErrorContainer
+        ScaffoldStatus.Loading -> MaterialTheme.colorScheme.onSecondaryContainer
         ScaffoldStatus.None -> Color.Transparent
     }
 
-    val icon = when (status) {
-        ScaffoldStatus.Info -> R.drawable.round_info_24
-        ScaffoldStatus.Warning -> R.drawable.round_warning_24
-        ScaffoldStatus.Error -> R.drawable.round_error_24
-        ScaffoldStatus.None -> null
-    }
+    val targetBorderColor = when (status) {
+        ScaffoldStatus.Info -> MaterialTheme.colorScheme.primary
+        ScaffoldStatus.Warning -> MaterialTheme.colorScheme.tertiary
+        ScaffoldStatus.Error -> MaterialTheme.colorScheme.error
+        ScaffoldStatus.Loading -> MaterialTheme.colorScheme.secondary
+        ScaffoldStatus.None -> Color.Transparent
+    }.copy(alpha = 0.25f)
 
     val backgroundColor by animateColorAsState(
         targetValue = targetBackgroundColor,
@@ -154,6 +177,12 @@ private fun StatusBadge(
         label = "BadgeText"
     )
 
+    val borderColor by animateColorAsState(
+        targetValue = targetBorderColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "BadgeBorder"
+    )
+
     val statusBarTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Surface(
@@ -162,20 +191,18 @@ private fun StatusBadge(
         shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
         tonalElevation = 3.dp,
         shadowElevation = 6.dp,
+        border = BorderStroke(1.dp, borderColor),
         modifier = Modifier
             .fillMaxWidth()
-            .semantics {
-                liveRegion = LiveRegionMode.Polite
-            }
+            .semantics { liveRegion = LiveRegionMode.Polite }
     ) {
         Box(
-            modifier = Modifier
-                .padding(
-                    top = statusBarTopPadding + 12.dp,
-                    bottom = 14.dp,
-                    start = 16.dp,
-                    end = 16.dp
-                ),
+            modifier = Modifier.padding(
+                top = statusBarTopPadding + 12.dp,
+                bottom = 14.dp,
+                start = 16.dp,
+                end = 16.dp
+            ),
             contentAlignment = Alignment.Center
         ) {
             Row(
@@ -184,7 +211,7 @@ private fun StatusBadge(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 AnimatedContent(
-                    targetState = icon,
+                    targetState = status,
                     transitionSpec = {
                         (scaleIn(
                             initialScale = 0.6f,
@@ -193,29 +220,46 @@ private fun StatusBadge(
                                 stiffness = Spring.StiffnessMedium
                             )
                         ) + fadeIn(tween(200))) togetherWith
-                                (scaleOut(targetScale = 0.6f, animationSpec = tween(150)) + fadeOut(tween(150)))
+                            (scaleOut(targetScale = 0.6f, animationSpec = tween(150)) + fadeOut(tween(150)))
                     },
                     label = "BadgeIcon"
-                ) { animatedIcon ->
-                    if (animatedIcon != null) {
-                        Icon(
-                            painter = painterResource(animatedIcon),
-                            contentDescription = null,
-                            tint = textColor,
-                            modifier = Modifier
-                                .padding(end = 10.dp)
-                                .size(20.dp)
-                        )
+                ) { animatedStatus ->
+                    when (animatedStatus) {
+                        ScaffoldStatus.Loading -> {
+                            CircularProgressIndicator(
+                                color = textColor,
+                                strokeWidth = 2.dp,
+                                modifier = Modifier
+                                    .padding(end = 10.dp)
+                                    .size(18.dp)
+                            )
+                        }
+
+                        ScaffoldStatus.Info, ScaffoldStatus.Warning, ScaffoldStatus.Error -> {
+                            val animatedIcon = when (animatedStatus) {
+                                ScaffoldStatus.Info -> R.drawable.round_info_24
+                                ScaffoldStatus.Warning -> R.drawable.round_warning_24
+                                ScaffoldStatus.Error -> R.drawable.round_error_24
+                            }
+                            Icon(
+                                painter = painterResource(animatedIcon),
+                                contentDescription = null,
+                                tint = textColor,
+                                modifier = Modifier
+                                    .padding(end = 10.dp)
+                                    .size(20.dp)
+                            )
+                        }
+
+                        else -> {}
                     }
                 }
 
-                // Crossfade the message text itself, so rapid status/message
-                // changes (e.g. Info -> Error) read as a smooth transition.
                 AnimatedContent(
                     targetState = message.asString(),
                     transitionSpec = {
                         (fadeIn(tween(220)) + expandVertically(tween(220))) togetherWith
-                                (fadeOut(tween(120)))
+                            (fadeOut(tween(120)))
                     },
                     label = "BadgeMessage",
                     modifier = Modifier.weight(1f, fill = false)
@@ -228,6 +272,17 @@ private fun StatusBadge(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+
+                if (action != null) {
+                    TextButton(onClick = action.onClick) {
+                        Text(
+                            text = action.label,
+                            color = textColor,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
 
                 if (onDismiss != null) {

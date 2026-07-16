@@ -252,6 +252,10 @@ class MessagesViewModel(
         val smartPointing = preferences.smartImagePointingEnabled
 
         viewModelScope.launch(Dispatchers.IO) {
+            showScaffoldMessage(
+                StatusMessage.Text("Processing media..."),
+                ScaffoldStatus.Loading
+            )
             runCatching {
                 var actualMediaType = type
                 val mediaPaths = uris.mapNotNull { uri ->
@@ -354,7 +358,7 @@ class MessagesViewModel(
                 repliedToId = _uiState.value.replyingTo?.id
             )
             showScaffoldMessage(
-                StatusMessage.Resource(R.string.message_scheduled_success),
+                StatusMessage.Res(R.string.message_scheduled_success),
                 ScaffoldStatus.Info
             )
         }

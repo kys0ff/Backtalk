@@ -5,16 +5,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 
 /**
- * A wrapper class that allows passing either a hardcoded String or a String resource ID.
+ * NOTE: your original file already calls `message.asString()`, implying
+ * StatusMessage exists somewhere in your codebase already. If so, DELETE
+ * this file and just make sure your existing type has a `Text(String)`
+ * (or equivalent) variant — the extension overloads in StatusController.kt
+ * construct `StatusMessage.Text(...)` for the plain-string convenience calls.
+ *
+ * If you don't have one yet, this minimal version covers both plain
+ * strings and string resources with args.
  */
 sealed interface StatusMessage {
-    data class Hardcoded(val value: String) : StatusMessage
-    data class Resource(@StringRes val resId: Int, val args: List<Any> = emptyList()) :
-        StatusMessage
+
+    data class Text(val value: String) : StatusMessage
+
+    data class Res(
+        @StringRes val resId: Int,
+        val args: List<Any> = emptyList()
+    ) : StatusMessage
 
     @Composable
     fun asString(): String = when (this) {
-        is Hardcoded -> value
-        is Resource -> stringResource(resId, *args.toTypedArray())
+        is Text -> value
+        is Res -> stringResource(resId, *args.toTypedArray())
     }
 }

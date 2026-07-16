@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import off.kys.backtalk.R
+import off.kys.backtalk.presentation.components.status_scaffold.GlobalStatusHost
 import off.kys.backtalk.presentation.event.MainUiEvent
 import off.kys.backtalk.presentation.screen.bug.BugScreen
 import off.kys.backtalk.presentation.screen.messages.MessagesScreen
@@ -45,34 +46,36 @@ fun MainView(
         dynamicColor = dynamicColor,
         amoledMode = amoledMode
     ) {
-        if (crashData != null) {
-            Navigator(crashData) { navigator ->
-                SlideTransition(navigator)
-            }
-        } else {
-            Crossfade(targetState = isAuthenticated, label = "LoginState") { loggedIn ->
-                if (loggedIn) {
-                    val initialScreen = remember {
-                        if (viewModel.preferences.firstLaunch) OnboardingScreen() else MessagesScreen()
+        GlobalStatusHost {
+            if (crashData != null) {
+                Navigator(crashData) { navigator ->
+                    SlideTransition(navigator)
+                }
+            } else {
+                Crossfade(targetState = isAuthenticated, label = "LoginState") { loggedIn ->
+                    if (loggedIn) {
+                        val initialScreen = remember {
+                            if (viewModel.preferences.firstLaunch) OnboardingScreen() else MessagesScreen()
+                        }
+                        Navigator(initialScreen) { navigator ->
+                            SlideTransition(navigator)
+                        }
+                    } else {
+                        LockView(onRetryAuthentication = onRetryAuthentication)
                     }
-                    Navigator(initialScreen) { navigator ->
-                        SlideTransition(navigator)
-                    }
-                } else {
-                    LockView(onRetryAuthentication = onRetryAuthentication)
                 }
             }
-        }
 
-        if (!viewModel.preferences.firstLaunch) {
-            (updateState as? MainUiState.UpdateAvailable)?.let { state ->
-                val url = state.result.downloadUrls.firstOrNull()?.browserDownloadUrl
-                    ?: return@let
-                AppUpdateDialog(
-                    updateResult = state.result,
-                    onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
-                    onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(url)) }
-                )
+            if (!viewModel.preferences.firstLaunch) {
+                (updateState as? MainUiState.UpdateAvailable)?.let { state ->
+                    val url = state.result.downloadUrls.firstOrNull()?.browserDownloadUrl
+                        ?: return@let
+                    AppUpdateDialog(
+                        updateResult = state.result,
+                        onDismissRequest = { viewModel.onEvent(MainUiEvent.DismissDialog) },
+                        onUpdateClick = { viewModel.onEvent(MainUiEvent.UpdateNow(url)) }
+                    )
+                }
             }
         }
     }

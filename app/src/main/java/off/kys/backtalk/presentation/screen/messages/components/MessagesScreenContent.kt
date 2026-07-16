@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -39,7 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.presentation.components.imeClosedBottomInset
-import off.kys.backtalk.presentation.components.status_scaffold.StatusScaffold
+import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.screen.messages.LocalMessagesActions
@@ -60,6 +61,7 @@ fun MessagesScreenContent(
     val messagesScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val baseActions = LocalMessagesActions.current
+    val statusController = LocalStatusController.current
 
     // region Navigation & Actions
     fun scrollToAndBlink(id: MessageId) {
@@ -149,14 +151,16 @@ fun MessagesScreenContent(
             messagesScrollState.animateScrollToItem(0)
         }
     }
+
+    LaunchedEffect(state.scaffoldStatus) {
+        state.scaffoldMessage?.let { statusController.show(state.scaffoldStatus, it) }
+    }
     // endregion
 
     CompositionLocalProvider(LocalMessagesActions provides actions) {
         var inputBarHeight by remember { mutableStateOf(0.dp) }
 
-        StatusScaffold(
-            status = state.scaffoldStatus,
-            message = state.scaffoldMessage,
+        Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
             topBar = {
