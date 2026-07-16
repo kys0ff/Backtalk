@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.state.statistics
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import off.kys.backtalk.domain.model.MessageId
 import java.time.LocalDate
 
@@ -11,9 +13,9 @@ data class StatisticsUiState(
     val textMessagesCount: Int = 0,
     val totalVoiceDurationMs: Long = 0,
     val scheduledMessagesCount: Int = 0,
-    val activityLast7Days: List<DayActivity> = emptyList(),
-    val heatmapData: List<HeatmapDay> = emptyList(),
-    val topThreads: List<ThreadStat> = emptyList(),
+    val activityLast7Days: PersistentList<DayActivity> = persistentListOf(),
+    val heatmapData: PersistentList<HeatmapDay> = persistentListOf(),
+    val topThreads: PersistentList<ThreadStat> = persistentListOf(),
     val avgMessageLength: Int = 0,
     val imageCount: Int = 0,
     val currentStreak: Int = 0,

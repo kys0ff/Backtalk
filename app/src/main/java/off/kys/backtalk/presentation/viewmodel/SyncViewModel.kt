@@ -2,11 +2,12 @@ package off.kys.backtalk.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.R
+import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.presentation.event.SyncEvent
 import off.kys.backtalk.presentation.state.preferences.SyncUiState
 import off.kys.backtalk.presentation.status.SyncStatus
@@ -22,7 +23,7 @@ class SyncViewModel(
     init {
         viewModelScope.launch {
             syncRepository.discoveredDevices.collect { devices ->
-                _state.value = _state.value.copy(discoveredDevices = devices)
+                _state.value = _state.value.copy(discoveredDevices = devices.toPersistentList())
             }
         }
         viewModelScope.launch {
@@ -34,14 +35,14 @@ class SyncViewModel(
                 
                 if (isPairedNow && (currentState.pinToShow != null || currentState.showPinDialog)) {
                     _state.value = currentState.copy(
-                        pairedDevices = devices,
+                        pairedDevices = devices.toPersistentList(),
                         pinToShow = null,
                         showPinDialog = false,
                         deviceBeingPaired = null,
                         syncStatus = SyncStatus.COMPLETED
                     )
                 } else {
-                    _state.value = currentState.copy(pairedDevices = devices)
+                    _state.value = currentState.copy(pairedDevices = devices.toPersistentList())
                 }
             }
         }
@@ -236,7 +237,6 @@ class SyncViewModel(
     }
 
     override fun onCleared() {
-        super.onCleared()
         syncRepository.stopDiscovery()
         syncRepository.stopServer()
     }

@@ -17,10 +17,12 @@ import off.kys.backtalk.data.local.migrations.MIGRATION_6_7
 import off.kys.backtalk.data.local.migrations.MIGRATION_7_8
 import off.kys.backtalk.data.repository.BackupRepositoryImpl
 import off.kys.backtalk.data.repository.ChangelogRepositoryImpl
+import off.kys.backtalk.data.repository.MediaRepositoryImpl
 import off.kys.backtalk.data.repository.MessagesRepositoryImpl
 import off.kys.backtalk.data.repository.SyncRepositoryImpl
 import off.kys.backtalk.domain.repository.BackupRepository
 import off.kys.backtalk.domain.repository.ChangelogRepository
+import off.kys.backtalk.domain.repository.MediaRepository
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.domain.repository.SyncRepository
 import off.kys.backtalk.domain.use_case.CancelScheduledMessage
@@ -44,6 +46,7 @@ import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.presentation.viewmodel.MainViewModel
+import off.kys.backtalk.presentation.viewmodel.MediaPickerViewModel
 import off.kys.backtalk.presentation.viewmodel.MessagesViewModel
 import off.kys.backtalk.presentation.viewmodel.OnboardingViewModel
 import off.kys.backtalk.presentation.viewmodel.RemindersViewModel
@@ -110,6 +113,7 @@ private fun Module.repositoryModule() {
     single<BackupRepository> { BackupRepositoryImpl(get()) }
     single<SyncRepository> { SyncRepositoryImpl(get(), get(), get(), get(), get()) }
     single<ChangelogRepository> { ChangelogRepositoryImpl(androidContext()) }
+    single<MediaRepository> { MediaRepositoryImpl(androidContext()) }
 }
 
 /**
@@ -176,6 +180,7 @@ private fun Module.viewModelModule() {
     viewModel { RemindersViewModel(get()) }
     viewModel { ChangelogViewModel(get()) }
     viewModel { SharedMediaViewModel(get(), get()) }
+    viewModel { MediaPickerViewModel(get(), get()) }
     viewModel {
         InputBarViewModel(
             application = androidApplication(),

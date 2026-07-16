@@ -1,12 +1,10 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import android.Manifest
-import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,12 +62,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -90,38 +85,30 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
-import off.kys.backtalk.domain.model.MediaFolder
 import off.kys.backtalk.domain.model.MediaItem
+import off.kys.backtalk.presentation.event.MediaPickerEvent
 import off.kys.backtalk.presentation.screen.camera.CameraCaptureScreen
-import off.kys.backtalk.util.emptyString
+import off.kys.backtalk.presentation.viewmodel.MediaPickerViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaPickerSheet(
     onMediaSelected: (selectedMedia: List<Uri>, mediaType: String, captionText: String?) -> Unit,
     onDismiss: () -> Unit,
+    viewModel: MediaPickerViewModel = koinViewModel(),
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var selectedUris by remember { mutableStateOf(emptySet<Uri>()) }
-    var selectedType by remember { mutableStateOf("image/jpeg") }
-    var captionText by remember { mutableStateOf(emptyString()) }
-
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
 
     val mediaPermissions = remember {
         val permissions = mutableListOf<String>()
@@ -136,76 +123,36 @@ fun MediaPickerSheet(
         permissions.toTypedArray()
     }
 
-    var hasMediaPermission by remember {
-        mutableStateOf(
-            mediaPermissions.any {
-                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-            }
-        )
-    }
-
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        hasCameraPermission = permissions[Manifest.permission.CAMERA] ?: hasCameraPermission
-        hasMediaPermission = mediaPermissions.any {
+        val cameraGranted = permissions[Manifest.permission.CAMERA] ?: (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED)
+        
+        val mediaGranted = mediaPermissions.any {
             permissions[it] ?: (ContextCompat.checkSelfPermission(
                 context,
                 it
             ) == PackageManager.PERMISSION_GRANTED)
         }
+        
+        viewModel.onEvent(MediaPickerEvent.PermissionsResult(cameraGranted, mediaGranted))
     }
 
     LaunchedEffect(Unit) {
-        if (!hasCameraPermission || !hasMediaPermission) {
+        val hasCamera = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val hasMedia = mediaPermissions.any {
+            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+        
+        if (!hasCamera || !hasMedia) {
             val toRequest = mutableListOf(Manifest.permission.CAMERA)
             toRequest.addAll(mediaPermissions)
             permissionLauncher.launch(toRequest.toTypedArray())
-        }
-    }
-
-    val mediaItems = remember(hasMediaPermission) {
-        if (hasMediaPermission) fetchGalleryMedia(context) else emptyList()
-    }
-
-    val folders = remember(mediaItems) {
-        val folderList = mutableListOf<MediaFolder>()
-        folderList.add(
-            MediaFolder(
-                id = "all",
-                name = context.getString(R.string.media_folder_all),
-                firstItemUri = mediaItems.firstOrNull()?.uri
-            )
-        )
-
-        val bucketMap = mutableMapOf<String, MediaItem>()
-        mediaItems.forEach { item ->
-            if (item.bucketId != null && !bucketMap.containsKey(item.bucketId)) {
-                bucketMap[item.bucketId] = item
-            }
-        }
-
-        bucketMap.forEach { (id, item) ->
-            folderList.add(
-                MediaFolder(
-                    id = id,
-                    name = item.bucketName ?: "Unknown",
-                    firstItemUri = item.uri
-                )
-            )
-        }
-        folderList
-    }
-
-    var selectedFolderId by remember { mutableStateOf("all") }
-
-    val filteredMediaItems by remember(mediaItems, selectedFolderId) {
-        derivedStateOf {
-            if (selectedFolderId == "all") {
-                mediaItems
-            } else {
-                mediaItems.filter { it.bucketId == selectedFolderId }
-            }
+        } else {
+            viewModel.onEvent(MediaPickerEvent.PermissionsResult(true, true))
         }
     }
 
@@ -250,11 +197,11 @@ fun MediaPickerSheet(
                             contentPadding = PaddingValues(horizontal = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(folders) { folder ->
-                                val isSelected = selectedFolderId == folder.id
+                            items(uiState.folders) { folder ->
+                                val isSelected = uiState.selectedFolderId == folder.id
                                 FilterChip(
                                     selected = isSelected,
-                                    onClick = { selectedFolderId = folder.id },
+                                    onClick = { viewModel.onEvent(MediaPickerEvent.SelectFolder(folder.id)) },
                                     label = {
                                         Text(
                                             text = folder.name,
@@ -284,7 +231,7 @@ fun MediaPickerSheet(
                                     .weight(2f)
                                     .aspectRatio(1f)
                             ) {
-                                if (hasCameraPermission) {
+                                if (uiState.hasCameraPermission) {
                                     CameraPreviewItem(
                                         onClick = {
                                             onDismiss()
@@ -321,28 +268,18 @@ fun MediaPickerSheet(
                                     .aspectRatio(1f / 2f),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                filteredMediaItems.take(2).fastForEach { item ->
-                                    val uriIndex = selectedUris.indexOf(item.uri)
+                                uiState.filteredMediaItems.take(2).fastForEach { item ->
+                                    val uriIndex = uiState.selectedUris.indexOf(item.uri)
                                     GalleryItem(
                                         item = item,
-                                        showSelection = selectedUris.isNotEmpty(),
+                                        showSelection = uiState.selectedUris.isNotEmpty(),
                                         selectedIndex = if (uriIndex != -1) uriIndex + 1 else 0,
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxWidth(),
                                         onSelected = { uri, type ->
-                                            selectedType = type
-                                            val isAdding = uri !in selectedUris
-                                            selectedUris = if (!isAdding) {
-                                                linkedSetOf<Uri>().apply {
-                                                    addAll(selectedUris.filter { it != uri })
-                                                }
-                                            } else {
-                                                linkedSetOf<Uri>().apply {
-                                                    addAll(selectedUris)
-                                                    add(uri)
-                                                }
-                                            }
+                                            val isAdding = uri !in uiState.selectedUris
+                                            viewModel.onEvent(MediaPickerEvent.ToggleMediaSelection(uri, type))
                                             if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
                                                 scope.launch { sheetState.expand() }
                                             }
@@ -354,26 +291,16 @@ fun MediaPickerSheet(
                     }
                 }
 
-                itemsIndexed(filteredMediaItems.drop(2)) { _, item ->
-                    val uriIndex = selectedUris.indexOf(item.uri)
+                itemsIndexed(uiState.filteredMediaItems.drop(2)) { _, item ->
+                    val uriIndex = uiState.selectedUris.indexOf(item.uri)
                     GalleryItem(
                         item = item,
-                        showSelection = selectedUris.isNotEmpty(),
+                        showSelection = uiState.selectedUris.isNotEmpty(),
                         selectedIndex = if (uriIndex != -1) uriIndex + 1 else 0,
                         modifier = Modifier.aspectRatio(1f),
                         onSelected = { uri, type ->
-                            selectedType = type
-                            val isAdding = uri !in selectedUris
-                            selectedUris = if (!isAdding) {
-                                linkedSetOf<Uri>().apply {
-                                    addAll(selectedUris.filter { it != uri })
-                                }
-                            } else {
-                                linkedSetOf<Uri>().apply {
-                                    addAll(selectedUris)
-                                    add(uri)
-                                }
-                            }
+                            val isAdding = uri !in uiState.selectedUris
+                            viewModel.onEvent(MediaPickerEvent.ToggleMediaSelection(uri, type))
                             if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
                                 scope.launch { sheetState.expand() }
                             }
@@ -383,7 +310,7 @@ fun MediaPickerSheet(
             }
 
             this@ModalBottomSheet.AnimatedVisibility(
-                visible = selectedUris.isNotEmpty(),
+                visible = uiState.selectedUris.isNotEmpty(),
                 enter = fadeIn() + scaleIn(initialScale = 0.8f),
                 exit = fadeOut() + scaleOut(targetScale = 0.8f),
                 modifier = Modifier
@@ -395,8 +322,8 @@ fun MediaPickerSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TextField(
-                        value = captionText,
-                        onValueChange = { captionText = it },
+                        value = uiState.captionText,
+                        onValueChange = { viewModel.onEvent(MediaPickerEvent.UpdateCaption(it)) },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(stringResource(R.string.chat_input_hint)) },
                         colors = TextFieldDefaults.colors(
@@ -411,9 +338,9 @@ fun MediaPickerSheet(
                     Button(
                         onClick = {
                             onMediaSelected(
-                                selectedUris.toList(),
-                                selectedType,
-                                captionText.ifBlank { null })
+                                uiState.selectedUris.toList(),
+                                uiState.selectedType,
+                                uiState.captionText.ifBlank { null })
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
@@ -438,7 +365,7 @@ fun MediaPickerSheet(
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Text(
-                                        text = selectedUris.size.toString(),
+                                        text = uiState.selectedUris.size.toString(),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.ExtraBold
@@ -630,37 +557,4 @@ private fun GalleryItem(
             }
         }
     }
-}
-
-private fun fetchGalleryMedia(context: Context): List<MediaItem> {
-    val items = mutableListOf<MediaItem>()
-    val projection = arrayOf(
-        MediaStore.MediaColumns._ID,
-        MediaStore.MediaColumns.MIME_TYPE,
-        MediaStore.MediaColumns.BUCKET_ID,
-        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
-    )
-    val sortOrder = "${MediaStore.MediaColumns.DATE_ADDED} DESC"
-    val queryUri = MediaStore.Files.getContentUri("external")
-    val selection =
-        "(${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}) OR (${MediaStore.MediaColumns.MIME_TYPE} = ?)"
-    val selectionArgs = arrayOf("image/svg+xml")
-
-    context.contentResolver.query(queryUri, projection, selection, selectionArgs, sortOrder)
-        ?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
-            val mimeColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)
-            val bucketIdColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.BUCKET_ID)
-            val bucketNameColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
-            while (cursor.moveToNext()) {
-                val id = cursor.getLong(idColumn)
-                val mimeType = cursor.getString(mimeColumn)
-                val bucketId = cursor.getString(bucketIdColumn)
-                val bucketName = cursor.getString(bucketNameColumn)
-                val uri = ContentUris.withAppendedId(queryUri, id)
-                items.add(MediaItem(uri, mimeType, bucketId, bucketName))
-            }
-        }
-    return items
 }

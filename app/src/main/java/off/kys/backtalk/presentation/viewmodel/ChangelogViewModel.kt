@@ -2,6 +2,7 @@ package off.kys.backtalk.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,7 @@ class ChangelogViewModel(
     private fun loadChangelog() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isLoading = true) }
-            val entries = repository.getChangelogEntries()
+            val entries = repository.getChangelogEntries().toPersistentList()
             _state.update {
                 it.copy(
                     entries = entries,

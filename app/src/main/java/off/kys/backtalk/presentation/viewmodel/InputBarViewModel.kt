@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
@@ -92,7 +95,7 @@ class InputBarViewModel(
         is InputBarEvent.ChangeSchedulingStage -> _uiState.update { it.copy(schedulingStage = event.stage) }
         InputBarEvent.RequestExactAlarmPermission -> checkAndRequestExactAlarmPermission()
         InputBarEvent.DismissPermissionRationale -> _uiState.update { it.copy(showPermissionRationale = false) }
-        InputBarEvent.CancelSharedImage -> _uiState.update { it.copy(sharedImageUris = emptyList()) }
+        InputBarEvent.CancelSharedImage -> _uiState.update { it.copy(sharedImageUris = persistentListOf()) }
         is InputBarEvent.SendSharedImages -> handleSendSharedImages(event.uris, event.caption)
         is InputBarEvent.ContentReceived -> handleContentReceived(event.transferableContent)
         InputBarEvent.RefreshSettings -> {
@@ -110,7 +113,7 @@ class InputBarViewModel(
     private fun observeAmplitudes() {
         viewModelScope.launch {
             audioRecorder.amplitudes.collect { list ->
-                _uiState.update { it.copy(amplitudes = list) }
+                _uiState.update { it.copy(amplitudes = list.toPersistentList()) }
             }
         }
     }
@@ -204,7 +207,7 @@ class InputBarViewModel(
 
     private fun handleSendSharedImages(uris: List<String>, caption: String) {
         onSharedImageSendAction(uris, caption)
-        _uiState.update { it.copy(sharedImageUris = emptyList()) }
+        _uiState.update { it.copy(sharedImageUris = persistentListOf()) }
     }
 
     @OptIn(ExperimentalFoundationApi::class)

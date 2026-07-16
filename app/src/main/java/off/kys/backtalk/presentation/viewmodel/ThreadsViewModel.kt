@@ -4,8 +4,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
@@ -29,9 +32,9 @@ class ThreadsViewModel(
         viewModelScope.launch {
             useCases.getAllMessages().collectLatest { messages ->
                 allMessages = messages
-                val grouped = groupMessages(
-                    messages
-                )
+                val grouped = withContext(Dispatchers.Default) {
+                    groupMessages(messages).toPersistentList()
+                }
                 _uiState.value = _uiState.value.copy(threads = grouped)
             }
         }

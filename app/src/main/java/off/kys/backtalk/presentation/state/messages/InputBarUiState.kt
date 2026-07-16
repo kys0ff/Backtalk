@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.state.messages
 
 import androidx.compose.foundation.text.input.TextFieldState
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.status.SchedulingStage
 import java.util.Locale
@@ -11,11 +13,11 @@ data class InputBarUiState(
     val editingMessage: MessageUiModel? = null,
     val isRecording: Boolean = false,
     val secondsElapsed: Int = 0,
-    val amplitudes: List<Float> = emptyList(),
+    val amplitudes: PersistentList<Float> = persistentListOf(),
     val showTapHint: Boolean = false,
     val schedulingStage: SchedulingStage = SchedulingStage.Hidden,
     val showPermissionRationale: Boolean = false,
-    val sharedImageUris: List<String> = emptyList(),
+    val sharedImageUris: PersistentList<String> = persistentListOf(),
     val linkPreviewEnabled: Boolean = true,
     val isHapticFeedbackEnabled: Boolean = true,
     val sendWithEnter: Boolean = false,

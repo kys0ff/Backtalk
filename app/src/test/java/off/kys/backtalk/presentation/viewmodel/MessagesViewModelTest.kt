@@ -1,10 +1,12 @@
 package off.kys.backtalk.presentation.viewmodel
 
-import androidx.compose.runtime.MutableState
+import androidx.lifecycle.viewModelScope
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -15,7 +17,6 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
-import off.kys.backtalk.presentation.state.messages.MessagesUiState
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -41,11 +42,14 @@ class MessagesViewModelTest : KoinTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         
+        every { application.cacheDir } returns java.io.File("/tmp/cache")
+        every { application.filesDir } returns java.io.File("/tmp/files")
         every { useCases.getAllMessages() } returns flowOf(emptyList())
 
         startKoin {
             modules(module {
                 single { alarmScheduler }
+                single { mockk<off.kys.backtalk.common.registry.CaptionWordsRegistry>(relaxed = true) }
             })
         }
 
@@ -54,8 +58,30 @@ class MessagesViewModelTest : KoinTest {
 
     @After
     fun tearDown() {
+        viewModel.viewModelScope.cancel()
         Dispatchers.resetMain()
         stopKoin()
+    }
+
+    private fun createMessageEntity(id: MessageId, text: String): MessageEntity {
+        return MessageEntity(
+            id = id,
+            text = text,
+            timestamp = System.currentTimeMillis(),
+            repliedToId = null,
+            editedText = null,
+            editedAt = null,
+            voicePath = null,
+            voiceDuration = null,
+            waveformData = null,
+            isReminder = false,
+            originalCreationTimestamp = null,
+            scheduledTimestamp = null,
+            isPinned = false,
+            mediaPath = null,
+            mediaPaths = null,
+            mediaType = null
+        )
     }
 
     @Test
@@ -88,40 +114,21 @@ class MessagesViewModelTest : KoinTest {
     fun `ConfirmDeleteSelected event should delete messages and hide dialog`() {
         // Given
         val messageId = MessageId.generate()
-        val message = MessageEntity(
-            id = messageId,
-            text = "test",
-            timestamp = System.currentTimeMillis(),
-            repliedToId = null,
-            editedText = null,
-            editedAt = null,
-            voicePath = null,
-            voiceDuration = null,
-            waveformData = null,
-            isReminder = false,
-            originalCreationTimestamp = null,
-            scheduledTimestamp = null,
-            isPinned = false,
-            mediaPath = null,
-            mediaPaths = null,
-            mediaType = null
-        )
+        val message = createMessageEntity(messageId, "test")
         
-        // Inject message into state
-        val stateField = MessagesViewModel::class.java.getDeclaredField("_uiState")
-        stateField.isAccessible = true
-        val state = stateField.get(viewModel) as MutableState<MessagesUiState>
-        state.value = state.value.copy(messages = listOf(message))
+        every { useCases.getAllMessages() } returns flowOf(listOf(message))
+        viewModel.onEvent(MessagesUiEvent.LoadMessages)
 
         viewModel.onEvent(MessagesUiEvent.ToggleSelection(messageId))
         viewModel.onEvent(MessagesUiEvent.DeleteSelected)
         assertTrue(viewModel.uiState.value.showDeleteConfirmation)
 
         // When
+        val deleteUseCase = useCases.deleteMessageById
         viewModel.onEvent(MessagesUiEvent.ConfirmDeleteSelected)
 
         // Then
-        io.mockk.coVerify { useCases.deleteMessageById(messageId) }
+        coVerify { deleteUseCase(messageId) }
         assertFalse(viewModel.uiState.value.showDeleteConfirmation)
         assertTrue(viewModel.uiState.value.selectedMessageIds.isEmpty())
     }
@@ -152,30 +159,10 @@ class MessagesViewModelTest : KoinTest {
         val messageId = MessageId.generate()
         val path1 = "/path/to/image1.jpg"
         val path2 = "/path/to/image2.jpg"
-        val message = MessageEntity(
-            id = messageId,
-            text = "test",
-            timestamp = System.currentTimeMillis(),
-            repliedToId = null,
-            editedText = null,
-            editedAt = null,
-            voicePath = null,
-            voiceDuration = null,
-            waveformData = null,
-            isReminder = false,
-            originalCreationTimestamp = null,
-            scheduledTimestamp = null,
-            isPinned = false,
-            mediaPath = null,
-            mediaPaths = null,
-            mediaType = null
-        )
+        val message = createMessageEntity(messageId, "test")
 
-        // Inject message into state
-        val stateField = MessagesViewModel::class.java.getDeclaredField("_uiState")
-        stateField.isAccessible = true
-        val state = stateField.get(viewModel) as MutableState<MessagesUiState>
-        state.value = state.value.copy(messages = listOf(message))
+        every { useCases.getAllMessages() } returns flowOf(listOf(message))
+        viewModel.onEvent(MessagesUiEvent.LoadMessages)
 
         viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path1))
         viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path2))
@@ -184,10 +171,11 @@ class MessagesViewModelTest : KoinTest {
         viewModel.onEvent(MessagesUiEvent.DeleteSelectedImages)
 
         // Then confirm
+        val removeUseCase = useCases.removeImagesFromMessage
         viewModel.onEvent(MessagesUiEvent.ConfirmDeleteSelected)
 
         // Then verify
-        io.mockk.coVerify(timeout = 2000) { useCases.removeImagesFromMessage(messageId, match { it.contains(path1) && it.contains(path2) }) }
+        coVerify(timeout = 2000) { removeUseCase(messageId, match { it.contains(path1) && it.contains(path2) }) }
     }
 
     @Test

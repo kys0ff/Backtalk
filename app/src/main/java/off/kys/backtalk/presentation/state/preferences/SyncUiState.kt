@@ -1,11 +1,13 @@
 package off.kys.backtalk.presentation.state.preferences
 
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import off.kys.backtalk.presentation.status.SyncStatus
 import off.kys.backtalk.sync.DeviceInfo
 
 data class SyncUiState(
-    val discoveredDevices: List<DeviceInfo> = emptyList(),
-    val pairedDevices: List<DeviceInfo> = emptyList(),
+    val discoveredDevices: PersistentList<DeviceInfo> = persistentListOf(),
+    val pairedDevices: PersistentList<DeviceInfo> = persistentListOf(),
     val isDiscovering: Boolean = false,
     val incomingRequest: DeviceInfo? = null,
     val showPinDialog: Boolean = false,

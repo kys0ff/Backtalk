@@ -2,6 +2,8 @@ package off.kys.backtalk.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -15,8 +17,6 @@ import off.kys.backtalk.presentation.state.messages.VoiceItemUiModel
 import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.ComposeTextParser
 import java.io.File
-
-import kotlinx.collections.immutable.toPersistentList
 
 /**
  * ViewModel for the Shared Media screen/component.
@@ -42,7 +42,7 @@ class SharedMediaViewModel(
             message.mediaPaths.orEmpty().map { path ->
                 MediaItemUiModel(id = message.id, path = path)
             }
-        }.reversed()
+        }.reversed().toPersistentList()
 
         val voices = messages.filter { it.voicePath != null }.map { message ->
             val path = message.voicePath!!
@@ -50,11 +50,11 @@ class SharedMediaViewModel(
                 id = message.id,
                 path = path,
                 duration = message.voiceDuration ?: 0L,
-                waveformData = message.waveformData?.toPersistentList() ?: emptyList<Float>().toPersistentList(),
+                waveformData = message.waveformData?.toPersistentList() ?: persistentListOf(),
                 isPlaying = isPlaying && (audioPath == path),
                 progress = if (audioPath == path) progress else 0f
             )
-        }.reversed()
+        }.reversed().toPersistentList()
 
         val links = messages.flatMap { message ->
             val text = message.editedText ?: message.text
@@ -63,7 +63,7 @@ class SharedMediaViewModel(
             (nakedUrls + markdownUrls).map { url ->
                 LinkItemUiModel(id = message.id, url = url)
             }
-        }.reversed()
+        }.reversed().toPersistentList()
 
         SharedMediaUiState(media = media, voices = voices, links = links)
     }.stateIn(

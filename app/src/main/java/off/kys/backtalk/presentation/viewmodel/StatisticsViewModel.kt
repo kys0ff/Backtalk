@@ -2,10 +2,13 @@ package off.kys.backtalk.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.repository.MessagesRepository
@@ -41,39 +44,44 @@ class StatisticsViewModel(
             val allMessages = repository.getAllMessagesSync()
             val scheduledMessages = repository.getAllScheduledMessagesSync()
 
-            val voiceMessages = allMessages.filter { it.voicePath != null }
-            val textMessages = allMessages.filter { it.voicePath == null && it.mediaPaths == null && it.mediaPath == null }
+            withContext(Dispatchers.Default) {
+                val voiceMessages = allMessages.filter { it.voicePath != null }
+                val textMessages =
+                    allMessages.filter { it.voicePath == null && it.mediaPaths == null && it.mediaPath == null }
 
-            val mediaMessages = allMessages.filter { it.mediaPaths != null || it.mediaPath != null }
-            val imageCount = mediaMessages.filter { it.mediaType?.contains("image") == true || it.mediaType == null }
-                .sumOf { (it.mediaPaths?.size ?: 0) + (if (it.mediaPath != null) 1 else 0) }
+                val mediaMessages =
+                    allMessages.filter { it.mediaPaths != null || it.mediaPath != null }
+                val imageCount =
+                    mediaMessages.filter { it.mediaType?.contains("image") == true || it.mediaType == null }
+                        .sumOf { (it.mediaPaths?.size ?: 0) + (if (it.mediaPath != null) 1 else 0) }
 
-            val totalVoiceDuration = voiceMessages.sumOf { it.voiceDuration ?: 0L }
-            val avgLen = if (textMessages.isNotEmpty()) {
-                textMessages.sumOf { it.text.length } / textMessages.size
-            } else 0
+                val totalVoiceDuration = voiceMessages.sumOf { it.voiceDuration ?: 0L }
+                val avgLen = if (textMessages.isNotEmpty()) {
+                    textMessages.sumOf { it.text.length } / textMessages.size
+                } else 0
 
-            val activity = calculateLast7DaysActivity(allMessages)
-            val heatmapData = calculateHeatmapData(allMessages)
-            val currentStreak = calculateCurrentStreak(allMessages)
+                val activity = calculateLast7DaysActivity(allMessages).toPersistentList()
+                val heatmapData = calculateHeatmapData(allMessages).toPersistentList()
+                val currentStreak = calculateCurrentStreak(allMessages)
 
-            val topThreads = calculateTopThreads(allMessages)
+                val topThreads = calculateTopThreads(allMessages).toPersistentList()
 
-            _state.update {
-                it.copy(
-                    totalMessages = allMessages.size,
-                    voiceMessagesCount = voiceMessages.size,
-                    textMessagesCount = textMessages.size,
-                    totalVoiceDurationMs = totalVoiceDuration,
-                    scheduledMessagesCount = scheduledMessages.size,
-                    activityLast7Days = activity,
-                    heatmapData = heatmapData,
-                    topThreads = topThreads,
-                    avgMessageLength = avgLen,
-                    imageCount = imageCount,
-                    currentStreak = currentStreak,
-                    isLoading = false
-                )
+                _state.update {
+                    it.copy(
+                        totalMessages = allMessages.size,
+                        voiceMessagesCount = voiceMessages.size,
+                        textMessagesCount = textMessages.size,
+                        totalVoiceDurationMs = totalVoiceDuration,
+                        scheduledMessagesCount = scheduledMessages.size,
+                        activityLast7Days = activity,
+                        heatmapData = heatmapData,
+                        topThreads = topThreads,
+                        avgMessageLength = avgLen,
+                        imageCount = imageCount,
+                        currentStreak = currentStreak,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
