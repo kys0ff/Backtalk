@@ -45,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -161,13 +160,7 @@ private fun ChangelogHeader(
     onBackClick: () -> Unit
 ) {
     TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.settings_changelog_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
-            )
-        },
+        title = { Text(text = stringResource(R.string.settings_changelog_title)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
