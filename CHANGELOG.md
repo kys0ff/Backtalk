@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-07-18
+
+### Added
+- **Image Compression**: Introduced a processing pipeline for image attachments with customizable quality settings.
+- **Backup Retention**: Added automatic backup retention limits and cleanup logic to manage disk space.
+- **Media Picker**: Implemented folder-based filtering in the `MediaPickerSheet` for better organization.
+- **Settings**: Added an option to disable the message context menu on long-click.
+
+### Changed
+- **Status Feedback**: Migrated from `StatusScaffold` to a centralized `GlobalStatusHost` and `LocalStatusController` for consistent app-wide banners.
+- **Input Experience**:
+    - Refactored `InputBar` logic and preferences into a dedicated ViewModel.
+    - Improved `InputBar` error handling using the new status controller.
+- **UI Refinement**:
+    - Overhauled `SettingsItem` layout and externalized version/cache strings.
+    - Simplified `ChangelogScreen` UI and transitioned to `TopAppBar` title styling.
+    - Reorganized UI state models into feature-specific packages.
+    - Introduced `CompositionLocals` for UI actions to reduce prop drilling.
+- **Media Handling**: Migrated `MediaPicker` to MVVM and optimized ViewModel memory allocation.
+
+### Fixed
+- **Layout**: Resolved 3-button navigation bar overlap issues with IME-aware padding.
+- **Stability**: Fixed `ScrollToBottomFab` alignment and scoped message list sections correctly.
+- **Input**: Restored dynamic text direction support in the `InputBar`.
+
+### Refactored
+- **UI Cleanup**: Removed `Haze` library dependency and deleted unused UI event code.
+- **Navigation**: Removed pull-to-refresh from `ThreadsScreen` to streamline the interface.
+
+### Build
+- **Tooling**: Upgraded AGP to 9.3.0, Gradle to 9.6.1, and Kotlin to 2.4.10.
+- **Dependencies**: Removed redundant Compose BOM from instrumentation tests and updated various core libraries.
+- **Maintenance**: Bumped version to 0.4.0.
+
+---
+
 ## [0.3.8] - 2026-07-02
 
 ### Added

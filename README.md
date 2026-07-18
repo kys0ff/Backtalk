@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.3.8-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.4.0-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -66,14 +66,14 @@ Read the full [Backtalk Philosophy](./PHILOSOPHY.md) to learn more about why we 
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.3.8)
+## Recent Changes (v0.4.0)
 
-- **AMOLED Mode**: New dark theme option for OLED screens to save battery and improve contrast.
-- **Status Banners**: Introduced global loading, error, and info banners for better app-wide feedback.
-- **Input Experience**: Redesigned floating input bar with advanced animations and improved keyboard handling.
-- **Message Richness**: Added support for lists and checkboxes within messages for better organization.
-- **Interactions**: New long-press context menu and automated onboarding gesture hints.
-- **Modernization**: Optimized for Android 15 (SDK 37) and upgraded to Gradle 9.6.0.
+- **Image Compression**: New processing pipeline with quality settings for attachments.
+- **Backup Retention**: Automated cleanup of old backups to save storage.
+- **Media Picker**: Added folder-based filtering and optimized memory usage.
+- **Status Feedback**: Centralized global loading and error banners using `GlobalStatusHost`.
+- **Input Experience**: ViewModel-driven input bar for smoother interactions and state management.
+- **Build**: Modernized toolchain with AGP 9.3.0, Gradle 9.6.1, and Kotlin 2.4.10.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 

@@ -1,0 +1,7 @@
+- Image Compression: New processing pipeline with quality settings.
+- Backup Retention: Automated cleanup of old backups.
+- Media Picker: Added folder-based filtering and MVVM refactor.
+- Status Feedback: Migrated to GlobalStatusHost for app-wide feedback.
+- Input Experience: ViewModel-driven logic for better state management.
+- UI Overhaul: Redesigned Settings items and improved IME handling.
+- Build: Upgraded to AGP 9.3.0, Gradle 9.6.1, and Kotlin 2.4.10.
