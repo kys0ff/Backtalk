@@ -1,3 +1,4 @@
+e36f7fb refactor: migrating MediaPicker to MVVM and optimizing VM memory allocation
 7a6a96b feat: add folder-based filtering in MediaPickerSheet
 d7f7197 feat: add automatic backup retention limit and cleanup
 2f37c76 refactor: migrate InputBar error toasts to LocalStatusController

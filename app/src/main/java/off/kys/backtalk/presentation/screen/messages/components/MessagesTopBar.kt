@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -149,7 +150,7 @@ private fun SearchTopBar(
     searchResultsCount: Int,
     currentSearchIndex: Int,
     scrollBehavior: TopAppBarScrollBehavior,
-    colors: androidx.compose.material3.TopAppBarColors
+    colors: TopAppBarColors
 ) {
     val focusRequester = remember { FocusRequester() }
     val actions = LocalMessagesActions.current
@@ -272,7 +273,7 @@ private fun SearchActions(
 private fun SelectionTopBar(
     selectedCount: Int,
     scrollBehavior: TopAppBarScrollBehavior,
-    colors: androidx.compose.material3.TopAppBarColors,
+    colors: TopAppBarColors,
     showPin: Boolean,
     showCopy: Boolean,
     canDelete: Boolean = true
@@ -352,7 +353,7 @@ private fun SelectionTopBar(
 @Composable
 private fun DefaultTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    colors: androidx.compose.material3.TopAppBarColors
+    colors: TopAppBarColors
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val actions = LocalMessagesActions.current
