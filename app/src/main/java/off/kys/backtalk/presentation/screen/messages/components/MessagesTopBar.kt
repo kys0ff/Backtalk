@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -51,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.components.HintTooltip
@@ -160,10 +162,15 @@ private fun SearchTopBar(
             BasicTextField(
                 value = searchQuery,
                 onValueChange = { actions.onEvent(MessagesUiEvent.UpdateSearchQuery(it)) },
-                modifier = Modifier.focusRequester(focusRequester),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
                 maxLines = 1,
                 singleLine = true,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = LocalContentColor.current),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = LocalContentColor.current,
+                    textDirection = TextDirection.Content
+                ),
                 cursorBrush = SolidColor(LocalContentColor.current),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
@@ -172,14 +179,16 @@ private fun SearchTopBar(
                     }
                 ),
                 decorationBox = { innerTextField ->
-                    if (searchQuery.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.search_hint),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = LocalContentColor.current.copy(alpha = 0.5f)
-                        )
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.search_hint),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = LocalContentColor.current.copy(alpha = 0.5f)
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
             )
         },
