@@ -125,8 +125,7 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.coil.gif)
     implementation(libs.gau)
-    implementation(libs.haze)
-    ksp(libs.room.compiler)
+    libs.room.compiler.let { ksp(it) }
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

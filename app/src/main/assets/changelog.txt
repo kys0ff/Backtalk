@@ -1,3 +1,6 @@
+920ee49 build: remove redundant compose bom from instrumentation tests
+d42eb58 build: remove PropertyParamAnnotationDefaultTargetMode Kotlin compiler flag
+c7e4cc0 build: upgrade Gradle, Kotlin, and Compose versions and improve MessagesTopBar search field layout
 be61901 build: upgrade AGP to 9.3.0 and simplify TopAppBarColors imports in MessagesTopBar
 e36f7fb refactor: migrating MediaPicker to MVVM and optimizing VM memory allocation
 7a6a96b feat: add folder-based filtering in MediaPickerSheet

@@ -10,16 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -47,7 +42,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -56,9 +50,6 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.ChangelogEntry
@@ -87,15 +78,9 @@ class ChangelogScreen : Screen {
             derivedStateOf { listState.firstVisibleItemIndex > 0 }
         }
 
-        val hazeState = remember { HazeState() }
-
-        val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-        val topBarHeight = 64.dp + statusBarHeight
-
         Scaffold(
             topBar = {
                 ChangelogHeader(
-                    hazeState = hazeState,
                     onBackClick = { navigator.pop() }
                 )
             },
@@ -124,8 +109,7 @@ class ChangelogScreen : Screen {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .hazeSource(state = hazeState)
-                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .padding(innerPadding)
             ) {
                 if (state.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -145,7 +129,7 @@ class ChangelogScreen : Screen {
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
-                            top = topBarHeight + 16.dp,
+                            top = 16.dp,
                             start = 16.dp,
                             end = 24.dp,
                             bottom = 32.dp
@@ -161,7 +145,7 @@ class ChangelogScreen : Screen {
                         state = listState,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(top = topBarHeight + 16.dp, bottom = 16.dp, end = 4.dp)
+                            .padding(top = 16.dp, bottom = 16.dp, end = 4.dp)
                             .fillMaxHeight()
                     )
                 }
@@ -173,40 +157,27 @@ class ChangelogScreen : Screen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChangelogHeader(
-    hazeState: HazeState,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .hazeEffect(state = hazeState)
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.70f))
-    ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.settings_changelog_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.settings_changelog_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    painter = painterResource(R.drawable.round_arrow_back_24),
+                    contentDescription = stringResource(R.string.common_navigate_up)
                 )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.round_arrow_back_24),
-                        contentDescription = stringResource(R.string.common_navigate_up)
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent,
-                navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface
-            ),
-            modifier = Modifier.statusBarsPadding()
-        )
-    }
+            }
+        },
+        modifier = modifier
+    )
 }
 
 @Composable
