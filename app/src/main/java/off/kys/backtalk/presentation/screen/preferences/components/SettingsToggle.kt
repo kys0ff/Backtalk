@@ -46,16 +46,12 @@ fun SettingsToggle(
             Switch(
                 checked = checked,
                 onCheckedChange = null,
-                thumbContent = if (checked) {
-                    {
-                        Icon(
-                            painter = painterResource(R.drawable.round_check_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(SwitchDefaults.IconSize)
-                        )
-                    }
-                } else {
-                    null
+                thumbContent = {
+                    Icon(
+                        painter = painterResource(if (checked) R.drawable.round_check_24 else R.drawable.round_close_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(SwitchDefaults.IconSize)
+                    )
                 }
             )
         },

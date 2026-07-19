@@ -1,1 +1,2 @@
-No new commits since v0.4.0
+59bc30c feat: enhance Statistics UI and implement best streak metric
+02c4c85 fix #42: fix crash on OnboardingScreen and refactor padding handling in MessagesScreenContent
