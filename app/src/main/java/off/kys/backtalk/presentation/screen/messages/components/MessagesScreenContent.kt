@@ -4,13 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyListState
@@ -39,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import off.kys.backtalk.domain.model.MessageId
-import off.kys.backtalk.presentation.components.conditionalImePadding
 import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
@@ -162,15 +159,16 @@ fun MessagesScreenContent(
 
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            contentWindowInsets = WindowInsets.systemBars,
             topBar = {
                 MessagesTopBarSection(state, scrollBehavior)
-            }
+            },
         ) { scaffoldPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = scaffoldPadding.calculateTopPadding())
+                    .padding(scaffoldPadding)
+                    .consumeWindowInsets(scaffoldPadding)
                     .imePadding()
             ) {
                 MessagesListSection(
@@ -182,7 +180,6 @@ fun MessagesScreenContent(
                 MessageInputSection(
                     state = state,
                     inputBarViewModel = inputBarViewModel,
-                    scaffoldPadding = scaffoldPadding,
                     onInputHeightChanged = { inputBarHeight = it }
                 )
 
@@ -226,13 +223,13 @@ private fun BoxScope.MessagesListSection(
         listState = messagesScrollState,
         totalDeletableCount = state.selectionMetrics.totalDeletableCount,
         totalSelectedCount = state.selectionMetrics.totalSelectedCount,
-        bottomPadding = inputBarHeight + 8.dp
+        bottomPadding = inputBarHeight + 16.dp
     )
 
     ScrollToBottomFab(
         modifier = Modifier
             .align(Alignment.BottomEnd)
-            .padding(bottom = inputBarHeight + 24.dp, end = 16.dp),
+            .padding(bottom = inputBarHeight + 16.dp, end = 16.dp),
         isVisible = showScrollToBottom,
         onClick = {
             scope.launch {
@@ -246,7 +243,6 @@ private fun BoxScope.MessagesListSection(
 private fun BoxScope.MessageInputSection(
     state: MessagesUiState,
     inputBarViewModel: InputBarViewModel,
-    scaffoldPadding: PaddingValues,
     onInputHeightChanged: (Dp) -> Unit
 ) {
     val actions = LocalMessagesActions.current
@@ -255,8 +251,7 @@ private fun BoxScope.MessageInputSection(
     InputBar(
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .conditionalImePadding(16.dp)
-            .padding(bottom = scaffoldPadding.calculateBottomPadding())
+            .padding(bottom = 8.dp)
             .onGloballyPositioned { coordinates ->
                 onInputHeightChanged(with(density) { coordinates.size.height.toDp() })
             },

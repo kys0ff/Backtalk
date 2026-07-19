@@ -31,4 +31,4 @@ val LocalMessagesActions = staticCompositionLocalOf { MessagesActions() }
 /**
  * CompositionLocal to provide [AudioPlayer] down the layout tree.
  */
-val LocalAudioPlayer = staticCompositionLocalOf<AudioPlayer> { error("No AudioPlayer provided") }
+val LocalAudioPlayer = staticCompositionLocalOf { AudioPlayer() }

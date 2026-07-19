@@ -75,10 +75,7 @@ class MessagesScreen : Screen {
             )
         }
 
-        CompositionLocalProvider(
-            LocalMessagesActions provides actions,
-            LocalAudioPlayer provides audioPlayer
-        ) {
+        CompositionLocalProvider(LocalMessagesActions provides actions) {
             MessagesScreenContent(
                 state = state,
                 inputBarViewModel = inputBarViewModel,
