@@ -237,6 +237,7 @@
     <string name="statistics_text">نصية</string>
     <string name="statistics_images">صور</string>
     <string name="statistics_current_streak">سلسلة النشاط الحالية</string>
+    <string name="statistics_best_streak">أفضل سلسلة نشاط</string>
     <string name="statistics_top_threads">أبرز السلاسل</string>
     <string name="statistics_messages_count">%1$d رسالة</string>
     <string name="statistics_total_activity_percentage">%1$d%% من إجمالي النشاط</string>

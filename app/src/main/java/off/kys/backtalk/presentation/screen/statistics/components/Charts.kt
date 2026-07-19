@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,6 +46,7 @@ import off.kys.backtalk.presentation.state.statistics.HeatmapDay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
+import androidx.compose.ui.graphics.Brush
 
 @Composable
 fun ActivityBarChart(
@@ -53,6 +54,7 @@ fun ActivityBarChart(
     modifier: Modifier = Modifier
 ) {
     val barColor = MaterialTheme.colorScheme.primary
+    val barColorSecondary = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
     val labelColor = MaterialTheme.colorScheme.onSurface
     val maxCount = data.maxOfOrNull { it.count }?.coerceAtLeast(1) ?: 1
 
@@ -88,10 +90,12 @@ fun ActivityBarChart(
                 val y = canvasHeight - barHeight
 
                 drawRoundRect(
-                    color = barColor,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(barColor, barColorSecondary)
+                    ),
                     topLeft = Offset(x, y),
                     size = Size(barWidth, barHeight),
-                    cornerRadius = CornerRadius(4.dp.toPx())
+                    cornerRadius = CornerRadius(12.dp.toPx())
                 )
             }
         }
@@ -102,10 +106,11 @@ fun ActivityBarChart(
         ) {
             data.forEach { day ->
                 Text(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 8.dp),
                     text = day.dayName.take(1),
                     style = MaterialTheme.typography.labelSmall,
-                    color = labelColor
+                    fontWeight = FontWeight.Bold,
+                    color = labelColor.copy(alpha = 0.6f)
                 )
             }
         }
@@ -116,7 +121,7 @@ fun ActivityBarChart(
 fun AppUsageHeatmap(
     data: List<HeatmapDay>,
     modifier: Modifier = Modifier,
-    cellSize: Dp = 12.dp,
+    cellSize: Dp = 10.dp,
     cellSpacing: Dp = 4.dp
 ) {
     if (data.isEmpty()) return
@@ -146,7 +151,7 @@ fun AppUsageHeatmap(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         // Day labels (Static, doesn't scroll)
         Column(
@@ -158,7 +163,8 @@ fun AppUsageHeatmap(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         modifier = Modifier.height(cellSize)
                     )
                 } else {
@@ -184,7 +190,8 @@ fun AppUsageHeatmap(
                         Text(
                             text = firstDay.month.getDisplayName(TextStyle.SHORT, LocalLocale.current.platformLocale),
                             style = MaterialTheme.typography.labelSmall,
-                            color = colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             // Dynamically calculate padding based on cell constraints
                             modifier = Modifier.padding(start = ((cellSize + cellSpacing) * index))
                         )
@@ -208,7 +215,7 @@ fun AppUsageHeatmap(
                             Box(
                                 modifier = Modifier
                                     .size(cellSize)
-                                    .background(color, RoundedCornerShape(2.dp))
+                                    .background(color, RoundedCornerShape(3.dp))
                                     // Actually tell the OS what this box is for
                                     .semantics {
                                         contentDescription = "Date: ${day.date}, Count: ${day.count}"
@@ -263,8 +270,8 @@ fun MessageTypePieChart(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Canvas(modifier = Modifier.size(150.dp)) {
-                val strokeWidth = 16.dp.toPx()
+            Canvas(modifier = Modifier.size(130.dp)) {
+                val strokeWidth = 14.dp.toPx()
                 var startAngle = -90f
 
                 slices.forEach { slice ->
@@ -281,18 +288,30 @@ fun MessageTypePieChart(
                     startAngle += (slice.count.toFloat() / total) * 360f
                 }
             }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = total.toString(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    text = "Total",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(32.dp))
 
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             slices.fastForEach { slice ->
                 val percentage = (slice.count.toFloat() / total) * 100f
                 ChartLegendItem(
                     color = slice.color,
-                    label = "${slice.label}: ${percentage.toInt()}%"
+                    label = slice.label,
+                    value = "${percentage.toInt()}%"
                 )
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -305,17 +324,25 @@ data class PieSlice(
 )
 
 @Composable
-private fun ChartLegendItem(color: Color, label: String) {
+private fun ChartLegendItem(color: Color, label: String, value: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Canvas(modifier = Modifier.size(12.dp)) {
-            drawCircle(color = color)
-        }
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .background(color, RoundedCornerShape(2.dp))
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Visible
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

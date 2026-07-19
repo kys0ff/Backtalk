@@ -63,6 +63,7 @@ class StatisticsViewModel(
                 val activity = calculateLast7DaysActivity(allMessages).toPersistentList()
                 val heatmapData = calculateHeatmapData(allMessages).toPersistentList()
                 val currentStreak = calculateCurrentStreak(allMessages)
+                val bestStreak = calculateBestStreak(allMessages)
 
                 val topThreads = calculateTopThreads(allMessages).toPersistentList()
 
@@ -79,6 +80,7 @@ class StatisticsViewModel(
                         avgMessageLength = avgLen,
                         imageCount = imageCount,
                         currentStreak = currentStreak,
+                        bestStreak = bestStreak,
                         isLoading = false
                     )
                 }
@@ -125,6 +127,40 @@ class StatisticsViewModel(
         }
 
         return streak
+    }
+
+    private fun calculateBestStreak(messages: List<MessageEntity>): Int {
+        if (messages.isEmpty()) return 0
+
+        val messageDays = messages.map {
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = it.timestamp
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }.distinct().sorted()
+
+        if (messageDays.isEmpty()) return 0
+
+        var bestStreak = 0
+        var currentStreak = 1
+
+        for (i in 1 until messageDays.size) {
+            val prevDay = messageDays[i - 1]
+            val currDay = messageDays[i]
+
+            // Check if current day is exactly one day after previous day
+            if (currDay - prevDay == 24L * 60 * 60 * 1000) {
+                currentStreak++
+            } else {
+                bestStreak = maxOf(bestStreak, currentStreak)
+                currentStreak = 1
+            }
+        }
+
+        return maxOf(bestStreak, currentStreak)
     }
 
     private fun calculateLast7DaysActivity(messages: List<MessageEntity>): List<DayActivity> {

@@ -2,20 +2,16 @@ package off.kys.backtalk.presentation.screen.statistics.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,136 +25,170 @@ fun StatisticsContent(
     state: StatisticsUiState,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            bottom = 32.dp,
+            top = 16.dp
+        ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.size(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StatCard(
-                label = stringResource(R.string.statistics_total_messages),
-                value = state.totalMessages.toString(),
-                icon = painterResource(R.drawable.round_chat_bubble_outline_24),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.weight(1f)
-            )
-            StatCard(
-                label = stringResource(R.string.statistics_current_streak),
-                value = state.currentStreak.toString(),
-                icon = painterResource(R.drawable.round_mode_heat_24),
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                modifier = Modifier.weight(1f)
-            )
+        item {
+            SectionTitle(stringResource(R.string.statistics_activity_last_7_days))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                StatCard(
+                    label = stringResource(R.string.statistics_current_streak),
+                    value = state.currentStreak.toString(),
+                    icon = painterResource(R.drawable.round_mode_heat_24),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.weight(1f),
+                    subValue = "days"
+                )
+                StatCard(
+                    label = stringResource(R.string.statistics_best_streak),
+                    value = state.bestStreak.toString(),
+                    icon = painterResource(R.drawable.round_star_24),
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier.weight(1f),
+                    subValue = "days"
+                )
+            }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StatCard(
-                label = stringResource(R.string.statistics_scheduled),
-                value = state.scheduledMessagesCount.toString(),
-                icon = painterResource(R.drawable.round_access_alarm_24),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.weight(1f)
-            )
-            StatCard(
-                label = stringResource(R.string.statistics_avg_length),
-                value = state.avgMessageLength.toString(),
-                icon = painterResource(R.drawable.round_abc_24),
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                modifier = Modifier.weight(1f)
-            )
+        item {
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.4f)
+                ),
+                border = CardDefaults.outlinedCardBorder(enabled = true).copy(width = 1.dp)
+            ) {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    ActivityBarChart(data = state.activityLast7Days)
+                }
+            }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        item {
+            SectionTitle(stringResource(R.string.statistics_total_messages))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                StatCard(
+                    label = stringResource(R.string.statistics_total_messages),
+                    value = state.totalMessages.toString(),
+                    icon = painterResource(R.drawable.round_chat_bubble_outline_24),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.weight(1f)
+                )
+                StatCard(
+                    label = stringResource(R.string.statistics_scheduled),
+                    value = state.scheduledMessagesCount.toString(),
+                    icon = painterResource(R.drawable.round_access_alarm_24),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                StatCard(
+                    label = stringResource(R.string.statistics_avg_length),
+                    value = state.avgMessageLength.toString(),
+                    icon = painterResource(R.drawable.round_abc_24),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.weight(1f),
+                    subValue = "chars"
+                )
+                StatCard(
+                    label = stringResource(R.string.statistics_images),
+                    value = state.imageCount.toString(),
+                    icon = painterResource(R.drawable.round_image_24),
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        item {
             val voiceTime = formatDuration(state.totalVoiceDurationMs)
             StatCard(
                 label = stringResource(R.string.statistics_voice_duration),
                 value = voiceTime,
                 icon = painterResource(R.drawable.round_keyboard_voice_24),
-                containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                modifier = Modifier.weight(1f)
-            )
-
-            val imageCount = state.imageCount.toString()
-            StatCard(
-                label = stringResource(R.string.statistics_images),
-                value = imageCount,
-                icon = painterResource(R.drawable.round_image_24),
-                containerColor = MaterialTheme.colorScheme.surfaceTint,
-                modifier = Modifier.weight(1f)
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
-        SectionTitle(stringResource(R.string.statistics_activity_last_7_days))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-        ) {
-            Box(modifier = Modifier.padding(16.dp)) {
-                ActivityBarChart(data = state.activityLast7Days)
-            }
-        }
-
-        SectionTitle(stringResource(R.string.statistics_app_usage_heatmap))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-        ) {
-            AppUsageHeatmap(
-                data = state.heatmapData,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
-        SectionTitle(stringResource(R.string.statistics_message_types))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-        ) {
-            MessageTypePieChart(
-                slices = listOf(
-                    PieSlice(
-                        count = state.textMessagesCount,
-                        label = stringResource(R.string.statistics_text),
-                        color = MaterialTheme.colorScheme.primary
-                    ),
-                    PieSlice(
-                        count = state.voiceMessagesCount,
-                        label = stringResource(R.string.statistics_voice),
-                        color = MaterialTheme.colorScheme.secondary
-                    ),
-                    PieSlice(
-                        count = state.imageCount,
-                        label = stringResource(R.string.statistics_images),
-                        color = MaterialTheme.colorScheme.tertiary
-                    ),
+        item {
+            SectionTitle(stringResource(R.string.statistics_app_usage_heatmap))
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.4f)
                 ),
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
-        SectionTitle(stringResource(R.string.statistics_top_threads))
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            state.topThreads.forEach { thread ->
-                ThreadStatItem(thread)
+                border = CardDefaults.outlinedCardBorder(enabled = true).copy(width = 1.dp)
+            ) {
+                AppUsageHeatmap(
+                    data = state.heatmapData,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        item {
+            SectionTitle(stringResource(R.string.statistics_message_types))
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.4f)
+                ),
+                border = CardDefaults.outlinedCardBorder(enabled = true).copy(width = 1.dp)
+            ) {
+                MessageTypePieChart(
+                    slices = listOf(
+                        PieSlice(
+                            count = state.textMessagesCount,
+                            label = stringResource(R.string.statistics_text),
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        PieSlice(
+                            count = state.voiceMessagesCount,
+                            label = stringResource(R.string.statistics_voice),
+                            color = MaterialTheme.colorScheme.secondary
+                        ),
+                        PieSlice(
+                            count = state.imageCount,
+                            label = stringResource(R.string.statistics_images),
+                            color = MaterialTheme.colorScheme.tertiary
+                        ),
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+
+        item {
+            SectionTitle(stringResource(R.string.statistics_top_threads))
+        }
+
+        items(state.topThreads) { thread ->
+            ThreadStatItem(thread)
+        }
     }
 }
 

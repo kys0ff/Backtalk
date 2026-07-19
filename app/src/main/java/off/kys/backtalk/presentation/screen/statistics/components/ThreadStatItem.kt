@@ -31,11 +31,12 @@ fun ThreadStatItem(
 ) {
     OutlinedCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.4f),
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        border = CardDefaults.outlinedCardBorder(enabled = true)
+        border = CardDefaults.outlinedCardBorder(enabled = true).copy(width = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -50,7 +51,7 @@ fun ThreadStatItem(
             ) {
                 Text(
                     text = stat.threadTitle,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
@@ -60,8 +61,8 @@ fun ThreadStatItem(
 
                 Text(
                     text = stringResource(R.string.statistics_messages_count, stat.messageCount),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Black,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -72,10 +73,10 @@ fun ThreadStatItem(
                     progress = { stat.ratio },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(10.dp)
-                        .clip(RoundedCornerShape(5.dp)),
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp)),
                     color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                     strokeCap = StrokeCap.Round
                 )
                 Text(
@@ -83,8 +84,8 @@ fun ThreadStatItem(
                         R.string.statistics_total_activity_percentage,
                         (stat.ratio * 100).toInt()
                     ),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

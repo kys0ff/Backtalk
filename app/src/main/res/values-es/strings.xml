@@ -233,6 +233,7 @@
     <string name="statistics_text">Texto</string>
     <string name="statistics_images">Imágenes</string>
     <string name="statistics_current_streak">Racha actual</string>
+    <string name="statistics_best_streak">Mejor racha</string>
     <string name="statistics_top_threads">Hilos principales</string>
     <string name="statistics_messages_count">%1$d mensajes</string>
     <string name="statistics_total_activity_percentage">%1$d%% de la actividad total</string>
