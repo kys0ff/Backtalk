@@ -52,6 +52,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.contextmenu.provider.LocalTextContextMenuDropdownProvider
+import androidx.compose.foundation.text.contextmenu.provider.LocalTextContextMenuToolbarProvider
+import androidx.compose.foundation.text.contextmenu.provider.TextContextMenuDataProvider
+import androidx.compose.foundation.text.contextmenu.provider.TextContextMenuProvider
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
@@ -71,6 +75,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -81,6 +86,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -93,6 +99,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -250,9 +259,14 @@ fun InputBar(
         tonalElevation = tonalElevation,
         border = BorderStroke(width = borderWidth, color = borderColor)
     ) {
-        Column {
-            AnimatedVisibility(
-                visible = isFocused && !state.isRecording,
+        CompositionLocalProvider(
+            LocalTextToolbar provides NoOpTextToolbar,
+            LocalTextContextMenuToolbarProvider provides NoOpTextContextMenuProvider,
+            LocalTextContextMenuDropdownProvider provides NoOpTextContextMenuProvider,
+        ) {
+            Column {
+                AnimatedVisibility(
+                    visible = isFocused && !state.isRecording,
                 enter = slideInVertically { it } + fadeIn(),
                 exit = slideOutVertically { it } + fadeOut()
             ) {
@@ -264,7 +278,14 @@ fun InputBar(
                             if (selection.collapsed) {
                                 replace(selection.start, selection.start, start + end)
                             } else {
-                                replace(selection.start, selection.end, start + textFieldState.text.substring(selection.start, selection.end) + end)
+                                replace(
+                                    selection.start,
+                                    selection.end,
+                                    start + textFieldState.text.substring(
+                                        selection.start,
+                                        selection.end
+                                    ) + end
+                                )
                             }
                         }
                     },
@@ -337,6 +358,7 @@ fun InputBar(
             }
         }
     }
+}
 
     if (state.schedulingStage == SchedulingStage.SelectingDate) {
         DatePickerDialog(
@@ -514,14 +536,16 @@ private fun ChatTextField(
                             it
                         }
                         .onKeyEvent {
-                            if (it.key == Key.Enter && it.isCtrlPressed) {
-                                onSend()
-                                true
-                            } else if (it.key == Key.Backslash && it.isCtrlPressed) {
-                                onEscapeMarkdown()
-                                true
-                            } else {
-                                false
+                            when (it.key) {
+                                Key.Enter if it.isCtrlPressed -> {
+                                    onSend()
+                                    true
+                                }
+                                Key.Backslash if it.isCtrlPressed -> {
+                                    onEscapeMarkdown()
+                                    true
+                                }
+                                else -> false
                             }
                         },
                     lineLimits = if (sendWithEnter) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(
@@ -551,6 +575,41 @@ private fun ChatTextField(
                 )
             }
         }
+    }
+}
+
+private object NoOpTextContextMenuProvider : TextContextMenuProvider {
+    override suspend fun showTextContextMenu(dataProvider: TextContextMenuDataProvider) {
+        // no-op: never show the context menu
+    }
+}
+
+private object NoOpTextToolbar : TextToolbar {
+    override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+
+    override fun showMenu(
+        rect: Rect,
+        onCopyRequested: (() -> Unit)?,
+        onPasteRequested: (() -> Unit)?,
+        onCutRequested: (() -> Unit)?,
+        onSelectAllRequested: (() -> Unit)?
+    ) {
+        // no-op
+    }
+
+    override fun showMenu(
+        rect: Rect,
+        onCopyRequested: (() -> Unit)?,
+        onPasteRequested: (() -> Unit)?,
+        onCutRequested: (() -> Unit)?,
+        onSelectAllRequested: (() -> Unit)?,
+        onAutofillRequested: (() -> Unit)?
+    ) {
+        // no-op
+    }
+
+    override fun hide() {
+        // no-op
     }
 }
 
