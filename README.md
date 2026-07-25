@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/Min%20SDK-23-green" alt="Min SDK">
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-MVVM-orange" alt="Architecture">
-  <img src="https://img.shields.io/badge/Version-0.4.0-informational" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.4.1-informational" alt="Version">
   <a href="https://liberapay.com/kys0ff"><img src="https://img.shields.io/badge/Liberapay-Support%20me-F6C915" alt="Liberapay"></a>
 </p>
 
@@ -66,14 +66,13 @@ Read the full [Backtalk Philosophy](./PHILOSOPHY.md) to learn more about why we 
 - **Offline-First**: All data stays on your device, no internet required.
 - **Intuitive Gestures**: Swipe to edit or reply to messages for a seamless flow.
 
-## Recent Changes (v0.4.0)
+## Recent Changes (v0.4.1)
 
-- **Image Compression**: New processing pipeline with quality settings for attachments.
-- **Backup Retention**: Automated cleanup of old backups to save storage.
-- **Media Picker**: Added folder-based filtering and optimized memory usage.
-- **Status Feedback**: Centralized global loading and error banners using `GlobalStatusHost`.
-- **Input Experience**: ViewModel-driven input bar for smoother interactions and state management.
-- **Build**: Modernized toolchain with AGP 9.3.0, Gradle 9.6.1, and Kotlin 2.4.10.
+- **Search Enhancement**: Implemented debouncing and improved cursor handling for a smoother search experience.
+- **Rich Formatting**: Added clipboard actions and Markdown escaping support directly in the input bar.
+- **Streak Tracking**: Overhauled Statistics UI with a new "Best Streak" metric to track your journaling habits.
+- **Reliability**: Optimized backup operations on background threads and fixed onboarding crashes.
+- **Permissions**: Improved microphone permission flow for seamless voice note recording.
 
 See the full [CHANGELOG.md](./CHANGELOG.md) for more details.
 

@@ -1,3 +1,4 @@
+54197b8 chore: bump version to 0.4.1 and update changelog
 fefef2b fix: implement search debouncing and improve search text field cursor handling
 ee27bed refactor: replace multiple boolean dialog flags with a single activeDialog state
 82348c0 fix: offload backup operations to IO dispatcher and migrate settings UI to StatusController

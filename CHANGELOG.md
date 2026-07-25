@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2026-07-25
+
+### Added
+- **Search**: Implemented search debouncing and improved text field cursor handling.
+- **Formatting**: Added clipboard actions (Cut/Copy/Paste) and Markdown toggling to the formatting toolbar.
+- **Markdown**: Added full Markdown escaping support in the input bar and parser.
+- **Statistics**: Enhanced Statistics UI with a new "Best Streak" metric and improved layouts.
+- **Audio**: Implemented proper microphone permission handling for voice recording.
+
+### Fixed
+- **Stability**: Resolved a crash on the `OnboardingScreen` and improved padding handling in message lists.
+- **Performance**: Offloaded backup operations to the IO dispatcher to prevent UI stutters.
+- **UI**: Improved scaffold message dismissal logic and added configurable display durations.
+- **UX**: Suppressed default text context menus in the `InputBar` to favor custom actions.
+
+### Refactored
+- **State Management**: Replaced multiple boolean dialog flags with a single `activeDialog` state for better predictability.
+- **Cleanup**: Removed `conditionalImePadding` extension and deprecated `Modifier.kt`.
+
+### Build
+- **Tooling**: Updated Android Gradle Plugin (AGP) version.
+- **Maintenance**: Bumped version to 0.4.1 (41).
+
+---
+
 ## [0.4.0] - 2026-07-18
 
 ### Added

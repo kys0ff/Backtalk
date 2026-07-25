@@ -1,0 +1,5 @@
+- Search Enhancement: Implemented debouncing and improved cursor handling in search field.
+- Clipboard & Markdown: Added clipboard actions and Markdown escaping support in the input bar.
+- UI Improvements: Enhanced Statistics UI with a new best streak metric and refined Settings icons.
+- Stability: Fixed crashes on Onboarding screen and improved microphone permission handling for audio recording.
+- Performance: Offloaded backup operations to IO dispatcher for better responsiveness.
