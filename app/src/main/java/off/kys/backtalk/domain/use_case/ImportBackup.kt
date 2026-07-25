@@ -2,6 +2,8 @@ package off.kys.backtalk.domain.use_case
 
 import android.content.Context
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
@@ -40,7 +42,7 @@ class ImportBackup(
         uri: Uri,
         password: String?,
         clearExisting: Boolean
-    ): Result<ImportResult> =
+    ): Result<ImportResult> = withContext(Dispatchers.IO) {
         runCatching {
             val bytes = backupRepository.readBackupBytes(uri).getOrThrow()
             var isOldFormat = false
@@ -95,7 +97,7 @@ class ImportBackup(
             val voiceDir = File(context.filesDir, "voice").apply { mkdirs() }
             backupData.messages.forEach { message ->
                 var updatedMessage = message
-                
+
                 message.voicePath?.let { oldPath ->
                     val fileName = File(oldPath).name
                     val mediaBytes = mediaMap[fileName]
@@ -136,6 +138,7 @@ class ImportBackup(
 
             if (isOldFormat) ImportResult.SuccessWithWarning else ImportResult.Success
         }
+    }
 
     private fun isZip(bytes: ByteArray): Boolean =
         bytes.size >= 2 && bytes[0].toInt() == 0x50 && bytes[1].toInt() == 0x4B

@@ -1,7 +1,9 @@
 package off.kys.backtalk.domain.use_case
 
 import android.net.Uri
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.domain.model.BackupData
@@ -27,45 +29,47 @@ class ExportBackup(
      * @param uri The destination Uri.
      * @param password Optional password for encryption.
      */
-    suspend operator fun invoke(uri: Uri, password: String?): Result<Unit> = runCatching {
-        val messages = messagesRepository.getAllMessages().first()
-        val prefsMap = preferences.getExportablePreferences()
+    suspend operator fun invoke(uri: Uri, password: String?): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val messages = messagesRepository.getAllMessages().first()
+            val prefsMap = preferences.getExportablePreferences()
 
-        val backupData = BackupData(messages = messages, preferences = prefsMap)
-        val json = Json.encodeToString(backupData)
+            val backupData = BackupData(messages = messages, preferences = prefsMap)
+            val json = Json.encodeToString(backupData)
 
-        val bays = ByteArrayOutputStream()
-        ZipOutputStream(bays).use { zos ->
-            zos.putNextEntry(ZipEntry("backup.json"))
-            zos.write(json.toByteArray())
-            zos.closeEntry()
+            val bays = ByteArrayOutputStream()
+            ZipOutputStream(bays).use { zos ->
+                zos.putNextEntry(ZipEntry("backup.json"))
+                zos.write(json.toByteArray())
+                zos.closeEntry()
 
-            val allMediaPaths = messages.flatMap { message ->
-                listOfNotNull(message.voicePath, message.mediaPath) + (message.mediaPaths ?: emptyList())
-            }.filter { it.isNotBlank() }.distinct()
+                val allMediaPaths = messages.flatMap { message ->
+                    listOfNotNull(message.voicePath, message.mediaPath) + (message.mediaPaths ?: emptyList())
+                }.filter { it.isNotBlank() }.distinct()
 
-            allMediaPaths.forEach { path ->
-                val file = File(path)
-                if (file.exists()) {
-                    try {
-                        zos.putNextEntry(ZipEntry("media/${file.name}"))
-                        zos.write(file.readBytes())
-                        zos.closeEntry()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                allMediaPaths.forEach { path ->
+                    val file = File(path)
+                    if (file.exists()) {
+                        try {
+                            zos.putNextEntry(ZipEntry("media/${file.name}"))
+                            zos.write(file.readBytes())
+                            zos.closeEntry()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
+
+            val zipBytes = bays.toByteArray()
+
+            val finalContent = if (!password.isNullOrBlank()) {
+                CryptoUtils.encrypt(zipBytes, password.toCharArray())
+            } else {
+                zipBytes
+            }
+
+            backupRepository.writeBackup(uri, finalContent).getOrThrow()
         }
-
-        val zipBytes = bays.toByteArray()
-
-        val finalContent = if (!password.isNullOrBlank()) {
-            CryptoUtils.encrypt(zipBytes, password.toCharArray())
-        } else {
-            zipBytes
-        }
-
-        backupRepository.writeBackup(uri, finalContent).getOrThrow()
     }
 }

@@ -46,8 +46,9 @@ import off.kys.backtalk.common.lock.BiometricResult
 import off.kys.backtalk.common.lock.LocalAppLockManager
 import off.kys.backtalk.common.lock.rememberBiometricLauncher
 import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
-import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
+import off.kys.backtalk.presentation.components.status_scaffold.error
+import off.kys.backtalk.presentation.components.status_scaffold.info
 import off.kys.backtalk.presentation.event.SettingsUiEvent
 import off.kys.backtalk.presentation.screen.components.changelog.ChangelogDialog
 import off.kys.backtalk.presentation.state.preferences.SettingsUiState
@@ -147,7 +148,7 @@ fun SettingsScreenContent(
         if (isGranted) {
             onEvent(SettingsUiEvent.OnRemindersToggle(true))
         } else {
-            context.toast(R.string.onboarding_permission_notifications_desc)
+            statusController.warning(StatusMessage.Res(R.string.onboarding_permission_notifications_desc))
         }
     }
 
@@ -165,23 +166,24 @@ fun SettingsScreenContent(
 
     LaunchedEffect(state.error) {
         state.error?.let {
-            context.toast(it)
+            statusController.error(it)
             onEvent(SettingsUiEvent.ClearError)
         }
     }
 
     LaunchedEffect(state.successMessage) {
         state.successMessage?.let {
-            context.toast(it)
+            statusController.info(it)
             onEvent(SettingsUiEvent.ClearSuccess)
         }
     }
 
     LaunchedEffect(state.backupLoading) {
-        statusController.show(
-            status = if (state.backupLoading) ScaffoldStatus.Info else ScaffoldStatus.None,
-            message = StatusMessage.Res(R.string.common_please_wait)
-        )
+        if (state.backupLoading) {
+            statusController.loading(StatusMessage.Res(R.string.common_please_wait))
+        } else {
+            statusController.dismiss()
+        }
     }
 
     Scaffold(
