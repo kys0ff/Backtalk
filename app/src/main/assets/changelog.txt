@@ -1,3 +1,4 @@
+fefef2b fix: implement search debouncing and improve search text field cursor handling
 ee27bed refactor: replace multiple boolean dialog flags with a single activeDialog state
 82348c0 fix: offload backup operations to IO dispatcher and migrate settings UI to StatusController
 2f410d2 fix: implement scaffold message dismissal and configurable display duration

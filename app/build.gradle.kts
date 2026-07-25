@@ -17,8 +17,8 @@ android {
         applicationId = "off.kys.backtalk"
         minSdk = 23
         targetSdk = 37
-        versionCode = 40
-        versionName = "0.4.0"
+        versionCode = 41
+        versionName = "0.4.1"
         buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
