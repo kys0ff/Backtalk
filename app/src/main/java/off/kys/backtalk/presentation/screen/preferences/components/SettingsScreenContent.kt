@@ -69,28 +69,11 @@ fun SettingsScreenContent(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val context = LocalContext.current
-
-    val showExportDialog = remember { mutableStateOf(false) }
-    val showImportStrategyDialog = remember { mutableStateOf(false) }
-    val showPasswordDialog = remember { mutableStateOf(false) }
-    val showIntervalDialog = remember { mutableStateOf(false) }
-    val showAutoExportPasswordDialog = remember { mutableStateOf(false) }
-    val showMaxBackupsDialog = remember { mutableStateOf(false) }
-    val showThemeDialog = remember { mutableStateOf(false) }
-    val showLanguageDialog = remember { mutableStateOf(false) }
-    val showOldBackupWarning = remember { mutableStateOf(false) }
-    val showWipeDataDialog = remember { mutableStateOf(false) }
-    val showExperimentalSyncDialog = remember { mutableStateOf(false) }
-    val showReminderIntervalDialog = remember { mutableStateOf(false) }
-    val showLockTimeoutDialog = remember { mutableStateOf(false) }
-    val showDateFormatDialog = remember { mutableStateOf(false) }
-    val showTimeFormatDialog = remember { mutableStateOf(false) }
-    val showImageCompressionDialog = remember { mutableStateOf(false) }
-    val showChangelogDialog = remember { mutableStateOf(false) }
-
     val appLockManager = LocalAppLockManager.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val statusController = LocalStatusController.current
+
+    var activeDialog by remember { mutableStateOf<SettingsDialog?>(null) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -122,7 +105,7 @@ fun SettingsScreenContent(
     ) { uri ->
         uri?.let {
             selectedUri = it
-            showExportDialog.value = true
+            activeDialog = SettingsDialog.Export
         }
     }
 
@@ -154,13 +137,19 @@ fun SettingsScreenContent(
 
     LaunchedEffect(state.isBackupEncrypted) {
         if (state.isBackupEncrypted != null) {
-            showImportStrategyDialog.value = true
+            activeDialog = SettingsDialog.ImportStrategy
         }
     }
 
     LaunchedEffect(state.showOldBackupWarning) {
         if (state.showOldBackupWarning) {
-            showOldBackupWarning.value = true
+            activeDialog = SettingsDialog.OldBackupWarning
+        }
+    }
+
+    LaunchedEffect(state.wrongPasswordError) {
+        if (state.wrongPasswordError) {
+            activeDialog = SettingsDialog.Password
         }
     }
 
@@ -209,7 +198,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_theme),
                     value = stringResource(state.themeMode.titleResId),
                     icon = painterResource(R.drawable.round_brightness_6_24),
-                    onClick = { showThemeDialog.value = true }
+                    onClick = { activeDialog = SettingsDialog.Theme }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -220,7 +209,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_language),
                     value = stringResource(state.appLanguage.displayNameRes),
                     icon = painterResource(R.drawable.round_language_24),
-                    onClick = { showLanguageDialog.value = true }
+                    onClick = { activeDialog = SettingsDialog.Language }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -255,7 +244,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_date_format),
                     value = stringResource(state.dateFormat.titleResId),
                     icon = painterResource(R.drawable.round_calendar_today_24),
-                    onClick = { showDateFormatDialog.value = true }
+                    onClick = { activeDialog = SettingsDialog.DateFormat }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -266,7 +255,7 @@ fun SettingsScreenContent(
                     label = stringResource(R.string.settings_time_format),
                     value = stringResource(state.timeFormat.titleResId),
                     icon = painterResource(R.drawable.round_calendar_clock_24),
-                    onClick = { showTimeFormatDialog.value = true }
+                    onClick = { activeDialog = SettingsDialog.TimeFormat }
                 )
             }
 
@@ -325,7 +314,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_image_compression_desc),
                     value = stringResource(state.imageCompressionLevel.titleResId),
                     icon = painterResource(R.drawable.round_image_24),
-                    onClick = { showImageCompressionDialog.value = true }
+                    onClick = { activeDialog = SettingsDialog.ImageCompression }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -391,7 +380,7 @@ fun SettingsScreenContent(
                             label = stringResource(R.string.settings_reminder_interval),
                             value = stringResource(state.reminderInterval.titleResId),
                             icon = painterResource(R.drawable.round_refresh_24),
-                            onClick = { showReminderIntervalDialog.value = true }
+                            onClick = { activeDialog = SettingsDialog.ReminderInterval }
                         )
                     }
                 }
@@ -437,7 +426,7 @@ fun SettingsScreenContent(
                                 label = stringResource(R.string.settings_lock_timeout),
                                 value = timeoutLabel,
                                 icon = painterResource(R.drawable.round_access_alarm_24),
-                                onClick = { showLockTimeoutDialog.value = true }
+                                onClick = { activeDialog = SettingsDialog.LockTimeout }
                             )
                             AnimatedVisibility(visible = state.lockTimeoutMillis != 0L) {
                                 HorizontalDivider(
@@ -568,7 +557,7 @@ fun SettingsScreenContent(
                             label = stringResource(R.string.auto_export_interval),
                             value = stringResource(state.autoRepeatFrequency.titleResId),
                             icon = painterResource(R.drawable.round_refresh_24),
-                            onClick = { showIntervalDialog.value = true }
+                            onClick = { activeDialog = SettingsDialog.AutoExportInterval }
                         )
                         SettingsItem(
                             label = stringResource(R.string.auto_export_max_count),
@@ -576,7 +565,7 @@ fun SettingsScreenContent(
                             value = if (state.autoExportMaxCount == 0) stringResource(R.string.auto_export_max_count_unlimited)
                             else state.autoExportMaxCount.toString(),
                             icon = painterResource(R.drawable.round_folder_24),
-                            onClick = { showMaxBackupsDialog.value = true }
+                            onClick = { activeDialog = SettingsDialog.MaxBackups }
                         )
                         SettingsToggle(
                             label = stringResource(R.string.auto_export_encrypt),
@@ -585,7 +574,7 @@ fun SettingsScreenContent(
                             onCheckedChange = {
                                 onEvent(SettingsUiEvent.OnAutoExportEncryptionToggle(it))
                                 if (it && state.autoExportPassword.isNullOrBlank()) {
-                                    showAutoExportPasswordDialog.value = true
+                                    activeDialog = SettingsDialog.AutoExportPassword
                                 }
                             }
                         )
@@ -596,7 +585,7 @@ fun SettingsScreenContent(
                                     stringResource(R.string.common_not_set)
                                 else stringResource(R.string.common_password_set),
                                 icon = painterResource(R.drawable.round_security_24),
-                                onClick = { showAutoExportPasswordDialog.value = true }
+                                onClick = { activeDialog = SettingsDialog.AutoExportPassword }
                             )
                         }
                     }
@@ -680,7 +669,7 @@ fun SettingsScreenContent(
                     supportingText = stringResource(R.string.settings_changelog_desc),
                     icon = painterResource(R.drawable.round_update_24),
                     onClick = onChangelogClick,
-                    onLongClick = { showChangelogDialog.value = true }
+                    onLongClick = { activeDialog = SettingsDialog.Changelog }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -754,7 +743,7 @@ fun SettingsScreenContent(
                             if (state.lockEnabled && !appLockManager.isUnlocked(AppLockManager.Keys.SENSITIVE)) {
                                 biometricLauncher()
                             } else {
-                                showWipeDataDialog.value = true
+                                activeDialog = SettingsDialog.WipeData
                             }
                         }
                     )
@@ -777,202 +766,226 @@ fun SettingsScreenContent(
     }
 
     // Extracted & External Custom Dialog Handlers
-    if (showThemeDialog.value) {
-        ThemeSelectionDialog(
-            selected = state.themeMode,
-            onDismiss = { showThemeDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnThemeModeChange(it))
-                showThemeDialog.value = false
-            }
-        )
-    }
-
-    if (showLanguageDialog.value) {
-        LanguageSelectionDialog(
-            selected = state.appLanguage,
-            onDismiss = { showLanguageDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnLanguageChange(it))
-                showLanguageDialog.value = false
-            }
-        )
-    }
-
-    if (showExportDialog.value) {
-        ExportDialog(
-            onDismiss = {
-                showExportDialog.value = false
-                selectedUri?.let { uri ->
-                    runCatching { DocumentsContract.deleteDocument(context.contentResolver, uri) }
+    when (activeDialog) {
+        SettingsDialog.Theme -> {
+            ThemeSelectionDialog(
+                selected = state.themeMode,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnThemeModeChange(it))
+                    activeDialog = null
                 }
-                selectedUri = null
-            },
-            onConfirm = { exportPassword ->
-                showExportDialog.value = false
-                selectedUri?.let { uri ->
-                    onEvent(SettingsUiEvent.ExportBackup(uri, exportPassword))
-                }
-                selectedUri = null
-            }
-        )
-    }
+            )
+        }
 
-    if (showImportStrategyDialog.value) {
-        ImportStrategyDialog(
-            onDismiss = {
-                showImportStrategyDialog.value = false
-                onEvent(SettingsUiEvent.ResetBackupState)
-            },
-            onConfirm = { clearAndImport ->
-                showImportStrategyDialog.value = false
-                isImporting = clearAndImport
-                if (state.isBackupEncrypted == true) {
-                    showPasswordDialog.value = true
-                } else {
-                    state.selectedBackupUri?.let { uri ->
-                        onEvent(SettingsUiEvent.ImportBackup(uri, null, clearAndImport))
+        SettingsDialog.Language -> {
+            LanguageSelectionDialog(
+                selected = state.appLanguage,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnLanguageChange(it))
+                    activeDialog = null
+                }
+            )
+        }
+
+        SettingsDialog.Export -> {
+            ExportDialog(
+                onDismiss = {
+                    activeDialog = null
+                    selectedUri?.let { uri ->
+                        runCatching { DocumentsContract.deleteDocument(context.contentResolver, uri) }
+                    }
+                    selectedUri = null
+                },
+                onConfirm = { exportPassword ->
+                    activeDialog = null
+                    selectedUri?.let { uri ->
+                        onEvent(SettingsUiEvent.ExportBackup(uri, exportPassword))
+                    }
+                    selectedUri = null
+                }
+            )
+        }
+
+        SettingsDialog.ImportStrategy -> {
+            ImportStrategyDialog(
+                onDismiss = {
+                    activeDialog = null
+                    onEvent(SettingsUiEvent.ResetBackupState)
+                },
+                onConfirm = { clearAndImport ->
+                    activeDialog = null
+                    isImporting = clearAndImport
+                    if (state.isBackupEncrypted == true) {
+                        activeDialog = SettingsDialog.Password
+                    } else {
+                        state.selectedBackupUri?.let { uri ->
+                            onEvent(SettingsUiEvent.ImportBackup(uri, null, clearAndImport))
+                        }
                     }
                 }
-            }
-        )
-    }
+            )
+        }
 
-    if (showPasswordDialog.value || state.wrongPasswordError) {
-        PasswordDialog(
-            wrongPasswordError = state.wrongPasswordError,
-            onDismiss = {
-                showPasswordDialog.value = false
-                onEvent(SettingsUiEvent.ResetBackupState)
-            },
-            onConfirm = { enteredPassword ->
-                showPasswordDialog.value = false
-                state.selectedBackupUri?.let { uri ->
-                    onEvent(
-                        SettingsUiEvent.ImportBackup(
-                            uri,
-                            enteredPassword.ifBlank { null },
-                            isImporting
+        SettingsDialog.Password -> {
+            PasswordDialog(
+                wrongPasswordError = state.wrongPasswordError,
+                onDismiss = {
+                    activeDialog = null
+                    onEvent(SettingsUiEvent.ResetBackupState)
+                },
+                onConfirm = { enteredPassword ->
+                    activeDialog = null
+                    state.selectedBackupUri?.let { uri ->
+                        onEvent(
+                            SettingsUiEvent.ImportBackup(
+                                uri,
+                                enteredPassword.ifBlank { null },
+                                isImporting
+                            )
                         )
-                    )
+                    }
                 }
-            }
-        )
-    }
+            )
+        }
 
-    if (showIntervalDialog.value) {
-        IntervalSelectionDialog(
-            title = stringResource(R.string.auto_export_interval),
-            selected = state.autoRepeatFrequency,
-            onDismiss = { showIntervalDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnAutoExportIntervalChange(it))
-                showIntervalDialog.value = false
-            },
-        )
-    }
+        SettingsDialog.AutoExportInterval -> {
+            IntervalSelectionDialog(
+                title = stringResource(R.string.auto_export_interval),
+                selected = state.autoRepeatFrequency,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnAutoExportIntervalChange(it))
+                    activeDialog = null
+                },
+            )
+        }
 
-    if (showAutoExportPasswordDialog.value) {
-        AutoExportPasswordDialog(
-            onDismiss = { showAutoExportPasswordDialog.value = false },
-            onConfirm = { password ->
-                onEvent(SettingsUiEvent.OnAutoExportPasswordChange(password))
-                showAutoExportPasswordDialog.value = false
-            }
-        )
-    }
+        SettingsDialog.AutoExportPassword -> {
+            AutoExportPasswordDialog(
+                onDismiss = { activeDialog = null },
+                onConfirm = { password ->
+                    onEvent(SettingsUiEvent.OnAutoExportPasswordChange(password))
+                    activeDialog = null
+                }
+            )
+        }
 
-    if (showMaxBackupsDialog.value) {
-        MaxBackupsSelectionDialog(
-            selected = state.autoExportMaxCount,
-            onDismiss = { showMaxBackupsDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnAutoExportMaxCountChange(it))
-                showMaxBackupsDialog.value = false
-            }
-        )
-    }
+        SettingsDialog.MaxBackups -> {
+            MaxBackupsSelectionDialog(
+                selected = state.autoExportMaxCount,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnAutoExportMaxCountChange(it))
+                    activeDialog = null
+                }
+            )
+        }
 
-    if (showOldBackupWarning.value) {
-        OldBackupWarningDialog(
-            onDismiss = {
-                showOldBackupWarning.value = false
-                onEvent(SettingsUiEvent.ResetBackupState)
-            }
-        )
-    }
+        SettingsDialog.OldBackupWarning -> {
+            OldBackupWarningDialog(
+                onDismiss = {
+                    activeDialog = null
+                    onEvent(SettingsUiEvent.ResetBackupState)
+                }
+            )
+        }
 
-    if (showWipeDataDialog.value) {
-        WipeDataDialog(
-            onDismiss = { showWipeDataDialog.value = false },
-            onConfirm = {
-                showWipeDataDialog.value = false
-                onEvent(SettingsUiEvent.WipeAppData)
-            }
-        )
-    }
+        SettingsDialog.WipeData -> {
+            WipeDataDialog(
+                onDismiss = { activeDialog = null },
+                onConfirm = {
+                    activeDialog = null
+                    onEvent(SettingsUiEvent.WipeAppData)
+                }
+            )
+        }
 
-    if (showExperimentalSyncDialog.value) {
-        ExperimentalSyncDialog(
-            onDismiss = { showExperimentalSyncDialog.value = false }
-        )
-    }
+        SettingsDialog.ExperimentalSync -> {
+            ExperimentalSyncDialog(
+                onDismiss = { activeDialog = null }
+            )
+        }
 
-    if (showReminderIntervalDialog.value) {
-        IntervalSelectionDialog(
-            title = stringResource(R.string.settings_reminder_interval),
-            selected = state.reminderInterval,
-            onDismiss = { showReminderIntervalDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnReminderIntervalChange(it))
-                showReminderIntervalDialog.value = false
-            },
-        )
-    }
+        SettingsDialog.ReminderInterval -> {
+            IntervalSelectionDialog(
+                title = stringResource(R.string.settings_reminder_interval),
+                selected = state.reminderInterval,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnReminderIntervalChange(it))
+                    activeDialog = null
+                },
+            )
+        }
 
-    if (showLockTimeoutDialog.value) {
-        LockTimeoutSelectionDialog(
-            selectedTimeout = state.lockTimeoutMillis,
-            onDismiss = { showLockTimeoutDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnLockTimeoutChange(it))
-                showLockTimeoutDialog.value = false
-            }
-        )
-    }
+        SettingsDialog.LockTimeout -> {
+            LockTimeoutSelectionDialog(
+                selectedTimeout = state.lockTimeoutMillis,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnLockTimeoutChange(it))
+                    activeDialog = null
+                }
+            )
+        }
 
-    if (showDateFormatDialog.value) {
-        DateFormatSelectionDialog(
-            selectedFormat = state.dateFormat,
-            customPattern = state.customDateFormat,
-            onFormatSelected = { onEvent(SettingsUiEvent.OnDateFormatChange(it)) },
-            onCustomPatternChanged = { onEvent(SettingsUiEvent.OnCustomDateFormatChange(it)) },
-            onDismiss = { showDateFormatDialog.value = false }
-        )
-    }
+        SettingsDialog.DateFormat -> {
+            DateFormatSelectionDialog(
+                selectedFormat = state.dateFormat,
+                customPattern = state.customDateFormat,
+                onFormatSelected = { onEvent(SettingsUiEvent.OnDateFormatChange(it)) },
+                onCustomPatternChanged = { onEvent(SettingsUiEvent.OnCustomDateFormatChange(it)) },
+                onDismiss = { activeDialog = null }
+            )
+        }
 
-    if (showTimeFormatDialog.value) {
-        TimeFormatSelectionDialog(
-            selectedFormat = state.timeFormat,
-            onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
-            onDismiss = { showTimeFormatDialog.value = false }
-        )
-    }
+        SettingsDialog.TimeFormat -> {
+            TimeFormatSelectionDialog(
+                selectedFormat = state.timeFormat,
+                onFormatSelected = { onEvent(SettingsUiEvent.OnTimeFormatChange(it)) },
+                onDismiss = { activeDialog = null }
+            )
+        }
 
-    if (showImageCompressionDialog.value) {
-        ImageCompressionSelectionDialog(
-            selected = state.imageCompressionLevel,
-            onDismiss = { showImageCompressionDialog.value = false },
-            onSelected = {
-                onEvent(SettingsUiEvent.OnImageCompressionLevelChange(it))
-                showImageCompressionDialog.value = false
-            }
-        )
-    }
+        SettingsDialog.ImageCompression -> {
+            ImageCompressionSelectionDialog(
+                selected = state.imageCompressionLevel,
+                onDismiss = { activeDialog = null },
+                onSelected = {
+                    onEvent(SettingsUiEvent.OnImageCompressionLevelChange(it))
+                    activeDialog = null
+                }
+            )
+        }
 
-    if (showChangelogDialog.value) {
-        ChangelogDialog(
-            onDismiss = { showChangelogDialog.value = false }
-        )
+        SettingsDialog.Changelog -> {
+            ChangelogDialog(
+                onDismiss = { activeDialog = null }
+            )
+        }
+
+        null -> { /* No dialog active */ }
     }
+}
+
+private sealed interface SettingsDialog {
+    data object Theme : SettingsDialog
+    data object Language : SettingsDialog
+    data object Export : SettingsDialog
+    data object ImportStrategy : SettingsDialog
+    data object Password : SettingsDialog
+    data object AutoExportInterval : SettingsDialog
+    data object AutoExportPassword : SettingsDialog
+    data object MaxBackups : SettingsDialog
+    data object OldBackupWarning : SettingsDialog
+    data object WipeData : SettingsDialog
+    data object ExperimentalSync : SettingsDialog
+    data object ReminderInterval : SettingsDialog
+    data object LockTimeout : SettingsDialog
+    data object DateFormat : SettingsDialog
+    data object TimeFormat : SettingsDialog
+    data object ImageCompression : SettingsDialog
+    data object Changelog : SettingsDialog
 }
