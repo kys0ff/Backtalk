@@ -60,6 +60,7 @@ class MessagesViewModel(
     val uiState: StateFlow<MessagesUiState> = _uiState.asStateFlow()
 
     private var blinkJob: Job? = null
+    private var searchJob: Job? = null
 
     init {
         onEvent(MessagesUiEvent.LoadMessages)
@@ -287,7 +288,10 @@ class MessagesViewModel(
                         MediaUtils.stripImageMetadata(destFile)
                     }
                     if (currentType.startsWith("image/") && currentType != "image/gif") {
-                        MediaUtils.compressImage(destFile, preferences.imageCompressionLevel.quality)
+                        MediaUtils.compressImage(
+                            destFile,
+                            preferences.imageCompressionLevel.quality
+                        )
                     }
                     destFile.absolutePath
                 }
@@ -746,7 +750,14 @@ class MessagesViewModel(
 
     private fun updateSearchQuery(query: String) {
         if (query == _uiState.value.searchQuery) return
-        viewModelScope.launch(Dispatchers.Default) {
+
+        _uiState.update { it.copy(searchQuery = query) }
+
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch(Dispatchers.Default) {
+            if (query.isNotBlank()) {
+                delay(300.milliseconds)
+            }
             val results = if (query.isBlank()) persistentListOf()
             else {
                 val terms = query.trim().lowercase().split(Regex("\\s+"))
@@ -760,7 +771,6 @@ class MessagesViewModel(
             }
             _uiState.update {
                 it.copy(
-                    searchQuery = query,
                     searchResults = results,
                     currentSearchResultIndex = if (results.isNotEmpty()) 0 else -1
                 )

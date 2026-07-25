@@ -1,3 +1,5 @@
+ee27bed refactor: replace multiple boolean dialog flags with a single activeDialog state
+82348c0 fix: offload backup operations to IO dispatcher and migrate settings UI to StatusController
 2f410d2 fix: implement scaffold message dismissal and configurable display duration
 0e75ffc feat: implement clipboard actions and Markdown toggling in FormattingToolbar
 6c5ae14 feat: suppress default text context menus in InputBar

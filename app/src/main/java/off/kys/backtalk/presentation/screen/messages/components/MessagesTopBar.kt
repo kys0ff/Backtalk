@@ -50,8 +50,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
@@ -157,11 +159,27 @@ private fun SearchTopBar(
     val focusRequester = remember { FocusRequester() }
     val actions = LocalMessagesActions.current
 
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(searchQuery, TextRange(searchQuery.length)))
+    }
+
+    LaunchedEffect(searchQuery) {
+        if (textFieldValue.text != searchQuery) {
+            textFieldValue = textFieldValue.copy(
+                text = searchQuery,
+                selection = TextRange(searchQuery.length)
+            )
+        }
+    }
+
     TopAppBar(
         title = {
             BasicTextField(
-                value = searchQuery,
-                onValueChange = { actions.onEvent(MessagesUiEvent.UpdateSearchQuery(it)) },
+                value = textFieldValue,
+                onValueChange = {
+                    textFieldValue = it
+                    actions.onEvent(MessagesUiEvent.UpdateSearchQuery(it.text))
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
@@ -180,7 +198,7 @@ private fun SearchTopBar(
                 ),
                 decorationBox = { innerTextField ->
                     Box(contentAlignment = Alignment.CenterStart) {
-                        if (searchQuery.isEmpty()) {
+                        if (textFieldValue.text.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.search_hint),
                                 style = MaterialTheme.typography.bodyLarge,
