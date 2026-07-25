@@ -8,6 +8,9 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_delete">Delete</string>
     <string name="common_copy">Copy</string>
+    <string name="common_paste">Paste</string>
+    <string name="common_cut">Cut</string>
+    <string name="common_select_all">Select All</string>
     <string name="common_later">Later</string>
     <string name="common_close">Close</string>
     <string name="common_clear">Clear</string>

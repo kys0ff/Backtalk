@@ -1,3 +1,4 @@
+6c5ae14 feat: suppress default text context menus in InputBar
 ac8a31e feat #45: add Markdown escaping support in input bar and parser
 1143379 fix #47: implement microphone permission handling for audio recording and update AGP
 ca8e0da refactor: remove conditionalImePadding extension and delete Modifier.kt

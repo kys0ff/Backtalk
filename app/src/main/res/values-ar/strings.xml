@@ -6,6 +6,9 @@
     <string name="common_cancel">إلغاء</string>
     <string name="common_delete">حذف</string>
     <string name="common_copy">نسخ</string>
+    <string name="common_paste">لصق</string>
+    <string name="common_cut">قص</string>
+    <string name="common_select_all">تحديد الكل</string>
     <string name="common_later">لاحقاً</string>
     <string name="common_close">إغلاق</string>
     <string name="common_clear">مسح</string>

@@ -35,6 +35,7 @@ import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
 import off.kys.backtalk.util.escapeMarkdown
+import off.kys.backtalk.util.unescapeMarkdown
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -65,6 +66,7 @@ class InputBarViewModel(
 
     private val audioRecorder = AudioRecorder(application)
     private var recordingStartTime = 0L
+    private var lastEscapedText: String? = null
 
     init {
         observeAmplitudes()
@@ -215,18 +217,32 @@ class InputBarViewModel(
         val state = _uiState.value.textFieldState
         val currentText = state.text.toString()
         val selection = state.selection
-        
+
         if (selection.collapsed) {
-            val escapedText = currentText.escapeMarkdown()
-            state.edit {
-                replace(0, length, escapedText)
+            if (currentText == lastEscapedText) {
+                // Toggle: Unescape if it matches the last escaped text
+                val unescapedText = currentText.unescapeMarkdown()
+                state.edit { replace(0, length, unescapedText) }
+                lastEscapedText = null
+            } else {
+                val escapedText = currentText.escapeMarkdown()
+                state.edit { replace(0, length, escapedText) }
+                lastEscapedText = escapedText
             }
         } else {
             val selectedText = currentText.substring(selection.start, selection.end)
+            // For selection, we can just check if it's already "smart-escapable"
+            // but for simplicity, let's just toggle based on lastEscapedText or content
             val escapedSelectedText = selectedText.escapeMarkdown()
-            state.edit {
-                replace(selection.start, selection.end, escapedSelectedText)
+            if (escapedSelectedText == selectedText) {
+                // If escaping doesn't change it, maybe it's already escaped? 
+                // Let's try to unescape if it contains backslashes
+                val unescapedSelectedText = selectedText.unescapeMarkdown()
+                state.edit { replace(selection.start, selection.end, unescapedSelectedText) }
+            } else {
+                state.edit { replace(selection.start, selection.end, escapedSelectedText) }
             }
+            lastEscapedText = null // Reset for selection as it's more dynamic
         }
     }
 

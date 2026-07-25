@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -81,6 +82,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,6 +97,8 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -104,6 +108,7 @@ import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -115,6 +120,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import off.kys.backtalk.R
 import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusController
 import off.kys.backtalk.presentation.components.status_scaffold.toStatusMessageRes
@@ -124,6 +130,7 @@ import off.kys.backtalk.presentation.screen.messages.utils.rememberRecordAudioPe
 import off.kys.backtalk.presentation.state.messages.InputBarEffect
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
+import off.kys.backtalk.util.copyToClipboard
 import off.kys.backtalk.util.getFirstLinkOrNull
 import java.time.Instant
 import java.time.LocalDate
@@ -152,6 +159,9 @@ fun InputBar(
     val statusController = LocalStatusController.current
     val haptic = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
+    val clipboard = LocalClipboard.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     val requestRecordPermission = rememberRecordAudioPermissionHandler(
@@ -267,98 +277,169 @@ fun InputBar(
             Column {
                 AnimatedVisibility(
                     visible = isFocused && !state.isRecording,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut()
-            ) {
-                FormattingToolbar(
-                    onFormattingClick = { start, end ->
-                        val textFieldState = state.textFieldState
-                        val selection = textFieldState.selection
-                        textFieldState.edit {
-                            if (selection.collapsed) {
-                                replace(selection.start, selection.start, start + end)
-                            } else {
-                                replace(
-                                    selection.start,
-                                    selection.end,
-                                    start + textFieldState.text.substring(
+                    enter = slideInVertically { it } + fadeIn(),
+                    exit = slideOutVertically { it } + fadeOut()
+                ) {
+                    Column {
+                        Spacer(Modifier.size(6.dp))
+
+                        FormattingToolbar(
+                            onFormattingClick = { start, end ->
+                                val textFieldState = state.textFieldState
+                                val selection = textFieldState.selection
+                                val text = textFieldState.text
+                                textFieldState.edit {
+                                    if (selection.collapsed) {
+                                        replace(selection.start, selection.start, start + end)
+                                        this.selection = TextRange(selection.start + start.length)
+                                    } else {
+                                        val selectedText =
+                                            text.substring(selection.start, selection.end)
+                                        if (selectedText.startsWith(start) && selectedText.endsWith(
+                                                end
+                                            )
+                                        ) {
+                                            replace(
+                                                selection.start,
+                                                selection.end,
+                                                selectedText.substring(
+                                                    start.length,
+                                                    selectedText.length - end.length
+                                                )
+                                            )
+                                        } else {
+                                            replace(
+                                                selection.start,
+                                                selection.end,
+                                                start + selectedText + end
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            onEscapeClick = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) },
+                            onCopyClick = {
+                                val selection = state.textFieldState.selection
+                                val text = if (selection.collapsed) {
+                                    state.textFieldState.text.toString()
+                                } else {
+                                    state.textFieldState.text.substring(
                                         selection.start,
                                         selection.end
-                                    ) + end
-                                )
+                                    )
+                                }
+                                if (text.isNotEmpty()) {
+                                    context.copyToClipboard(text)
+                                }
+                            },
+                            onPasteClick = {
+                                coroutineScope.launch {
+                                    clipboard.getClipEntry()?.let { entry ->
+                                        val text = entry.clipData.getItemAt(0)?.text
+                                        if (text != null) {
+                                            val selection = state.textFieldState.selection
+                                            state.textFieldState.edit {
+                                                replace(
+                                                    selection.start,
+                                                    selection.end,
+                                                    text.toString()
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            onCutClick = {
+                                val selection = state.textFieldState.selection
+                                if (!selection.collapsed) {
+                                    val selectedText = state.textFieldState.text.substring(
+                                        selection.start,
+                                        selection.end
+                                    )
+                                    context.copyToClipboard(selectedText)
+                                    state.textFieldState.edit {
+                                        replace(selection.start, selection.end, "")
+                                    }
+                                }
+                            },
+                            onSelectAllClick = {
+                                state.textFieldState.edit {
+                                    selection = TextRange(0, length)
+                                }
+                            },
+                            onClearClick = {
+                                state.textFieldState.clearText()
                             }
-                        }
-                    },
-                    onEscapeClick = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
-                )
-            }
+                        )
+                    }
+                }
 
-            InputBarReplyHeader(
-                replyingTo = state.replyingTo,
-                editingMessage = state.editingMessage,
-                onCancelReply = onCancelReply,
-                onCancelEdit = onCancelEdit
-            )
-
-            AnimatedVisibility(
-                visible = sharedImageUris.isNotEmpty(),
-                enter = expandVertically(tween(220)) + fadeIn(tween(220)),
-                exit = shrinkVertically(tween(180)) + fadeOut(tween(140))
-            ) {
-                SharedImageHeader(
-                    uris = sharedImageUris,
-                    onCancel = onCancelSharedImage
-                )
-            }
-
-            LinkPreviewSection(
-                text = state.textFieldState.text.toString(),
-                enabled = state.linkPreviewEnabled
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                AttachButtonVisibility(
-                    isVisible = !state.isRecording,
-                    onClick = { viewModel.onEvent(InputBarEvent.AttachClicked) }
+                InputBarReplyHeader(
+                    replyingTo = state.replyingTo,
+                    editingMessage = state.editingMessage,
+                    onCancelReply = onCancelReply,
+                    onCancelEdit = onCancelEdit
                 )
 
-                ChatTextField(
-                    modifier = Modifier.weight(1f),
-                    textFieldState = state.textFieldState,
-                    isRecording = state.isRecording,
-                    amplitudes = state.amplitudes,
-                    durationText = state.durationText,
-                    sendWithEnter = state.sendWithEnter,
-                    onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
-                    onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
-                    onFocusChanged = { isFocused = it },
-                    onEscapeMarkdown = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
+                AnimatedVisibility(
+                    visible = sharedImageUris.isNotEmpty(),
+                    enter = expandVertically(tween(220)) + fadeIn(tween(220)),
+                    exit = shrinkVertically(tween(180)) + fadeOut(tween(140))
+                ) {
+                    SharedImageHeader(
+                        uris = sharedImageUris,
+                        onCancel = onCancelSharedImage
+                    )
+                }
+
+                LinkPreviewSection(
+                    text = state.textFieldState.text.toString(),
+                    enabled = state.linkPreviewEnabled
                 )
 
-                ActionButtons(
-                    isRecording = state.isRecording,
-                    onSendMessage = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
-                    onStartRecording = requestRecordPermission,
-                    isSendButtonVisible = state.isSendButtonVisible,
-                    maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
-                    onCancelRecording = { viewModel.onEvent(InputBarEvent.CancelRecording) },
-                    onStopAndSendRecording = { viewModel.onEvent(InputBarEvent.StopAndSendRecording) },
-                    onDragUpdate = { directedX ->
-                        viewModel.onEvent(InputBarEvent.UpdateOffsetX(directedX))
-                    },
-                    onLongClick = { viewModel.onEvent(InputBarEvent.RequestSchedule) },
-                    onShowTapHint = { viewModel.onEvent(InputBarEvent.ShowTapHint) },
-                    layoutDirection = layoutDirection
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    AttachButtonVisibility(
+                        isVisible = !state.isRecording,
+                        onClick = { viewModel.onEvent(InputBarEvent.AttachClicked) }
+                    )
+
+                    ChatTextField(
+                        modifier = Modifier.weight(1f),
+                        textFieldState = state.textFieldState,
+                        isRecording = state.isRecording,
+                        amplitudes = state.amplitudes,
+                        durationText = state.durationText,
+                        sendWithEnter = state.sendWithEnter,
+                        onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
+                        onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
+                        onFocusChanged = { isFocused = it },
+                        onEscapeMarkdown = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
+                    )
+
+                    ActionButtons(
+                        isRecording = state.isRecording,
+                        onSendMessage = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
+                        onStartRecording = requestRecordPermission,
+                        isSendButtonVisible = state.isSendButtonVisible,
+                        maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
+                        onCancelRecording = { viewModel.onEvent(InputBarEvent.CancelRecording) },
+                        onStopAndSendRecording = { viewModel.onEvent(InputBarEvent.StopAndSendRecording) },
+                        onDragUpdate = { directedX ->
+                            viewModel.onEvent(InputBarEvent.UpdateOffsetX(directedX))
+                        },
+                        onLongClick = { viewModel.onEvent(InputBarEvent.RequestSchedule) },
+                        onShowTapHint = { viewModel.onEvent(InputBarEvent.ShowTapHint) },
+                        layoutDirection = layoutDirection
+                    )
+                }
             }
         }
     }
-}
 
     if (state.schedulingStage == SchedulingStage.SelectingDate) {
         DatePickerDialog(
@@ -541,10 +622,12 @@ private fun ChatTextField(
                                     onSend()
                                     true
                                 }
+
                                 Key.Backslash if it.isCtrlPressed -> {
                                     onEscapeMarkdown()
                                     true
                                 }
+
                                 else -> false
                             }
                         },

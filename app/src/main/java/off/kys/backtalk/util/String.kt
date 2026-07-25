@@ -56,3 +56,23 @@ fun String.escapeMarkdown(): String {
     }
     return builder.toString()
 }
+
+/**
+ * Unescapes Markdown special characters by removing the preceding backslash.
+ */
+fun String.unescapeMarkdown(): String {
+    val specialChars = setOf('*', '_', '~', '`', '[', ']', '(', ')', '#', '+', '-', '.', '!', '\\', '@')
+    val builder = StringBuilder()
+    var i = 0
+    while (i < this.length) {
+        val char = this[i]
+        if (char == '\\' && i + 1 < this.length && this[i + 1] in specialChars) {
+            builder.append(this[i + 1])
+            i += 2
+        } else {
+            builder.append(char)
+            i++
+        }
+    }
+    return builder.toString()
+}

@@ -6,6 +6,9 @@
     <string name="common_cancel">Cancelar</string>
     <string name="common_delete">Eliminar</string>
     <string name="common_copy">Copiar</string>
+    <string name="common_paste">Pegar</string>
+    <string name="common_cut">Cortar</string>
+    <string name="common_select_all">Seleccionar todo</string>
     <string name="common_later">Más tarde</string>
     <string name="common_close">Cerrar</string>
     <string name="common_clear">Limpiar</string>
