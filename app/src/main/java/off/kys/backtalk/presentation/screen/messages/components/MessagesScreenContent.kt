@@ -149,8 +149,13 @@ fun MessagesScreenContent(
         }
     }
 
-    LaunchedEffect(state.scaffoldStatus) {
-        state.scaffoldMessage?.let { statusController.show(state.scaffoldStatus, it) }
+    LaunchedEffect(state.scaffoldStatus, state.scaffoldMessage) {
+        val message = state.scaffoldMessage
+        if (message != null) {
+            statusController.show(state.scaffoldStatus, message)
+        } else {
+            statusController.dismiss()
+        }
     }
     // endregion
 

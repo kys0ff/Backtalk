@@ -41,6 +41,7 @@ import off.kys.backtalk.util.emptyString
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -150,6 +151,8 @@ class MessagesViewModel(
                 sendMediaMessages(event.uris, event.type, event.description)
             }
 
+            MessagesUiEvent.DismissScaffoldMessage -> dismissScaffoldMessage()
+
             MessagesUiEvent.ConsumedScrollToBottom -> {
                 _uiState.update { it.copy(shouldScrollToBottom = false) }
             }
@@ -253,8 +256,9 @@ class MessagesViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             showScaffoldMessage(
-                StatusMessage.Text("Processing media..."),
-                ScaffoldStatus.Loading
+                StatusMessage.Res(R.string.chat_status_processing_media),
+                ScaffoldStatus.Loading,
+                duration = 0.milliseconds
             )
             runCatching {
                 var actualMediaType = type
@@ -307,6 +311,14 @@ class MessagesViewModel(
                 }
                 withContext(Dispatchers.Main) {
                     _uiState.value = _uiState.value.copy(shouldScrollToBottom = true)
+                    dismissScaffoldMessage()
+                }
+            }.onFailure {
+                withContext(Dispatchers.Main) {
+                    showScaffoldMessage(
+                        StatusMessage.Res(R.string.common_error),
+                        ScaffoldStatus.Error
+                    )
                 }
             }
         }
@@ -367,7 +379,11 @@ class MessagesViewModel(
 
     private var scaffoldMessageJob: Job? = null
 
-    private fun showScaffoldMessage(message: StatusMessage, status: ScaffoldStatus) {
+    private fun showScaffoldMessage(
+        message: StatusMessage,
+        status: ScaffoldStatus,
+        duration: Duration = 3000.milliseconds
+    ) {
         scaffoldMessageJob?.cancel()
         scaffoldMessageJob = viewModelScope.launch {
             _uiState.update {
@@ -376,13 +392,20 @@ class MessagesViewModel(
                     scaffoldStatus = status
                 )
             }
-            delay(3000.milliseconds)
-            _uiState.update {
-                it.copy(
-                    scaffoldMessage = null,
-                    scaffoldStatus = ScaffoldStatus.None
-                )
+            if (duration > Duration.ZERO) {
+                delay(duration)
+                dismissScaffoldMessage()
             }
+        }
+    }
+
+    private fun dismissScaffoldMessage() {
+        scaffoldMessageJob?.cancel()
+        _uiState.update {
+            it.copy(
+                scaffoldMessage = null,
+                scaffoldStatus = ScaffoldStatus.None
+            )
         }
     }
 

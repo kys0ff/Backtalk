@@ -153,6 +153,11 @@ sealed interface MessagesUiEvent {
     data class SendMediaMessages(val uris: List<String>, val type: String, val description: String? = null) : MessagesUiEvent
 
     /**
+     * UI event to dismiss the current scaffold message.
+     */
+    data object DismissScaffoldMessage : MessagesUiEvent
+
+    /**
      * UI event to notify that the scroll to bottom has been consumed.
      */
     data object ConsumedScrollToBottom : MessagesUiEvent
