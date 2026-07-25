@@ -109,6 +109,7 @@ import off.kys.backtalk.presentation.components.status_scaffold.LocalStatusContr
 import off.kys.backtalk.presentation.components.status_scaffold.toStatusMessageRes
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
+import off.kys.backtalk.presentation.screen.messages.utils.rememberRecordAudioPermissionHandler
 import off.kys.backtalk.presentation.state.messages.InputBarEffect
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
@@ -141,6 +142,11 @@ fun InputBar(
     val haptic = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val requestRecordPermission = rememberRecordAudioPermissionHandler(
+        statusController = statusController,
+        onPermissionGranted = { viewModel.onEvent(InputBarEvent.StartRecording) }
+    )
 
     val focusManager = LocalFocusManager.current
     val isKeyboardVisible = WindowInsets.isImeVisible
@@ -209,10 +215,6 @@ fun InputBar(
     LaunchedEffect(replyingTo, editingMessage) {
         viewModel.onEvent(InputBarEvent.UpdateReplyingTo(replyingTo))
         viewModel.onEvent(InputBarEvent.UpdateEditingMessage(editingMessage))
-    }
-
-    fun startRecordingInternal() {
-        viewModel.onEvent(InputBarEvent.StartRecording)
     }
 
     val borderColor by animateColorAsState(
@@ -296,7 +298,7 @@ fun InputBar(
                 ActionButtons(
                     isRecording = state.isRecording,
                     onSendMessage = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
-                    onStartRecording = ::startRecordingInternal,
+                    onStartRecording = requestRecordPermission,
                     isSendButtonVisible = state.isSendButtonVisible,
                     maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
                     onCancelRecording = { viewModel.onEvent(InputBarEvent.CancelRecording) },

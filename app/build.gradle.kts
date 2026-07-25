@@ -109,6 +109,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.process)
@@ -125,7 +126,6 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.coil.gif)
     implementation(libs.gau)
-    libs.room.compiler.let { ksp(it) }
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

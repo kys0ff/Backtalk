@@ -1,2 +1,4 @@
+ca8e0da refactor: remove conditionalImePadding extension and delete Modifier.kt
+b6318f1 feat: add close icon to SettingsToggle for unchecked state and update changelog
 59bc30c feat: enhance Statistics UI and implement best streak metric
 02c4c85 fix #42: fix crash on OnboardingScreen and refactor padding handling in MessagesScreenContent
