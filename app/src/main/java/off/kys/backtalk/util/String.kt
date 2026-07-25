@@ -41,3 +41,18 @@ fun String.getFirstLinkOrNull(): String? {
         else -> null
     }
 }
+
+/**
+ * Escapes Markdown special characters by prepending a backslash.
+ */
+fun String.escapeMarkdown(): String {
+    val specialChars = setOf('*', '_', '~', '`', '[', ']', '(', ')', '#', '+', '-', '.', '!', '\\', '@')
+    val builder = StringBuilder()
+    for (char in this) {
+        if (char in specialChars) {
+            builder.append('\\')
+        }
+        builder.append(char)
+    }
+    return builder.toString()
+}

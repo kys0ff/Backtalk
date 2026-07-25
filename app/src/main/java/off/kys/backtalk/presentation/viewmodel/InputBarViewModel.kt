@@ -13,6 +13,8 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,9 +25,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
@@ -35,6 +34,7 @@ import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
+import off.kys.backtalk.util.escapeMarkdown
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -98,6 +98,7 @@ class InputBarViewModel(
         InputBarEvent.CancelSharedImage -> _uiState.update { it.copy(sharedImageUris = persistentListOf()) }
         is InputBarEvent.SendSharedImages -> handleSendSharedImages(event.uris, event.caption)
         is InputBarEvent.ContentReceived -> handleContentReceived(event.transferableContent)
+        InputBarEvent.EscapeMarkdown -> handleEscapeMarkdown()
         InputBarEvent.RefreshSettings -> {
             _uiState.update {
                 it.copy(
@@ -208,6 +209,25 @@ class InputBarViewModel(
     private fun handleSendSharedImages(uris: List<String>, caption: String) {
         onSharedImageSendAction(uris, caption)
         _uiState.update { it.copy(sharedImageUris = persistentListOf()) }
+    }
+
+    private fun handleEscapeMarkdown() {
+        val state = _uiState.value.textFieldState
+        val currentText = state.text.toString()
+        val selection = state.selection
+        
+        if (selection.collapsed) {
+            val escapedText = currentText.escapeMarkdown()
+            state.edit {
+                replace(0, length, escapedText)
+            }
+        } else {
+            val selectedText = currentText.substring(selection.start, selection.end)
+            val escapedSelectedText = selectedText.escapeMarkdown()
+            state.edit {
+                replace(selection.start, selection.end, escapedSelectedText)
+            }
+        }
     }
 
     @OptIn(ExperimentalFoundationApi::class)

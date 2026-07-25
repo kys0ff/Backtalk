@@ -35,5 +35,6 @@ sealed interface InputBarEvent {
         val transferableContent: TransferableContent
     ) : InputBarEvent
 
+    data object EscapeMarkdown : InputBarEvent
     data object RefreshSettings : InputBarEvent
 }

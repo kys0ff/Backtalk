@@ -1,3 +1,4 @@
+1143379 fix #47: implement microphone permission handling for audio recording and update AGP
 ca8e0da refactor: remove conditionalImePadding extension and delete Modifier.kt
 b6318f1 feat: add close icon to SettingsToggle for unchecked state and update changelog
 59bc30c feat: enhance Statistics UI and implement best streak metric

@@ -124,9 +124,18 @@ object ComposeTextParser {
         var linkMatch: MatchResult? = null
         var isNakedUrl = false
         var mentionMatch: MatchResult? = null
+        var isEscape = false
 
-        // Check for basic styles
+        // Check for basic styles and escapes
         for (i in text.indices) {
+            // Priority 1: Escape character
+            if (text[i] == '\\' && i + 1 < text.length) {
+                earliestMatch = i
+                isEscape = true
+                break
+            }
+
+            // Priority 2: Formatting styles
             for (styleDef in STYLES) {
                 if (text.startsWith(styleDef.delimiter, i)) {
                     val closingIndex = findClosingTag(text, i + styleDef.delimiter.length, styleDef.delimiter)
@@ -189,6 +198,16 @@ object ComposeTextParser {
         builder.append(text.substring(0, earliestMatch))
 
         when {
+            isEscape -> {
+                builder.append(text[earliestMatch + 1])
+                parseRecursive(
+                    text.substring(earliestMatch + 2),
+                    builder,
+                    linkStyles,
+                    onAnnotationClicked
+                )
+            }
+
             bestStyle != null -> {
                 val delimiter = bestStyle.delimiter
                 builder.withStyle(bestStyle.style) {
@@ -269,6 +288,10 @@ object ComposeTextParser {
     private fun findClosingTag(text: String, startIndex: Int, delimiter: String): Int {
         var i = startIndex
         while (i <= text.length - delimiter.length) {
+            if (text[i] == '\\') {
+                i += 2
+                continue
+            }
             if (text.startsWith(delimiter, i)) {
                 val largerDelimiter = STYLES.find {
                     it.delimiter != delimiter &&

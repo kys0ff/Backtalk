@@ -21,6 +21,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -249,6 +251,27 @@ fun InputBar(
         border = BorderStroke(width = borderWidth, color = borderColor)
     ) {
         Column {
+            AnimatedVisibility(
+                visible = isFocused && !state.isRecording,
+                enter = slideInVertically { it } + fadeIn(),
+                exit = slideOutVertically { it } + fadeOut()
+            ) {
+                FormattingToolbar(
+                    onFormattingClick = { start, end ->
+                        val textFieldState = state.textFieldState
+                        val selection = textFieldState.selection
+                        textFieldState.edit {
+                            if (selection.collapsed) {
+                                replace(selection.start, selection.start, start + end)
+                            } else {
+                                replace(selection.start, selection.end, start + textFieldState.text.substring(selection.start, selection.end) + end)
+                            }
+                        }
+                    },
+                    onEscapeClick = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
+                )
+            }
+
             InputBarReplyHeader(
                 replyingTo = state.replyingTo,
                 editingMessage = state.editingMessage,
@@ -292,7 +315,8 @@ fun InputBar(
                     sendWithEnter = state.sendWithEnter,
                     onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
                     onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
-                    onFocusChanged = { isFocused = it }
+                    onFocusChanged = { isFocused = it },
+                    onEscapeMarkdown = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
                 )
 
                 ActionButtons(
@@ -438,7 +462,8 @@ private fun ChatTextField(
     sendWithEnter: Boolean,
     onSend: () -> Unit,
     onContentReceived: (TransferableContent) -> Unit,
-    onFocusChanged: (Boolean) -> Unit = {}
+    onFocusChanged: (Boolean) -> Unit = {},
+    onEscapeMarkdown: () -> Unit = {}
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -491,6 +516,9 @@ private fun ChatTextField(
                         .onKeyEvent {
                             if (it.key == Key.Enter && it.isCtrlPressed) {
                                 onSend()
+                                true
+                            } else if (it.key == Key.Backslash && it.isCtrlPressed) {
+                                onEscapeMarkdown()
                                 true
                             } else {
                                 false

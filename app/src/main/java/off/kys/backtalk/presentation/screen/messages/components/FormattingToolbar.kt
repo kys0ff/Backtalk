@@ -19,6 +19,7 @@ import off.kys.backtalk.R
 @Composable
 fun FormattingToolbar(
     onFormattingClick: (String, String) -> Unit,
+    onEscapeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -42,6 +43,9 @@ fun FormattingToolbar(
         }
         FormattingButton(label = stringResource(R.string.chat_input_format_monospace)) {
             onFormattingClick("`", "`")
+        }
+        FormattingButton(label = stringResource(R.string.chat_input_format_escape)) {
+            onEscapeClick()
         }
     }
 }

@@ -65,6 +65,7 @@
     <string name="chat_input_format_underline">U</string>
     <string name="chat_input_format_strikethrough">S</string>
     <string name="chat_input_format_monospace">M</string>
+    <string name="chat_input_format_escape" translatable="false">\\</string>
     <string name="chat_delete_selected_title">Delete messages?</string>
     <plurals name="chat_delete_selected_count_confirmation">
         <item quantity="one">Are you sure you want to delete %1$d selected message?</item>
