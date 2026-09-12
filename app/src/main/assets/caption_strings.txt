@@ -7,3 +7,6 @@
 [Multimedia]
 [Imagen]
 [Mensaje de voz]
+[媒体]
+[图片]
+[语音消息]

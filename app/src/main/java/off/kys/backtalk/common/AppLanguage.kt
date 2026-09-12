@@ -11,7 +11,8 @@ enum class AppLanguage(
     SYSTEM(emptyString(), R.string.language_system),
     ENGLISH("en", R.string.language_english),
     ARABIC("ar", R.string.language_arabic),
-    SPANISH("es", R.string.language_spanish);
+    SPANISH("es", R.string.language_spanish),
+    CHINESE("zh", R.string.language_chinese);
 
     companion object {
         fun fromTag(tag: String?): AppLanguage {

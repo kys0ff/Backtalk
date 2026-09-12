@@ -1,7 +1,125 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name" translatable="false">Backtalk</string>
-
+    <!-- Auth -->
+    <string name="auth_locked_title">Backtalk is locked</string>
+    <string name="auth_subtitle">Please authenticate to continue</string>
+    <string name="auth_title">Verify your identity</string>
+    <!-- Auto -->
+    <string name="auto_export_encrypt">Encrypt auto export</string>
+    <string name="auto_export_folder">Backup folder</string>
+    <string name="auto_export_interval">Export interval</string>
+    <string name="auto_export_max_count">Max backups to keep</string>
+    <string name="auto_export_max_count_desc">Number of most recent backups to retain. Older ones will be deleted automatically.</string>
+    <string name="auto_export_max_count_unlimited">Unlimited</string>
+    <string name="auto_export_no_folder">No folder selected</string>
+    <string name="auto_export_password">Auto export password</string>
+    <string name="auto_export_password_desc">This password will be used to encrypt your scheduled backups.</string>
+    <string name="auto_export_summary">Periodically backup your data in the background</string>
+    <string name="auto_export_title">Auto export</string>
+    <!-- Backup -->
+    <string name="backup_check_failed">Failed to check backup</string>
+    <string name="backup_clear_and_import">Clear and import</string>
+    <string name="backup_encrypted_prompt">This backup is encrypted. Please enter the password to proceed.</string>
+    <string name="backup_enter_password">Enter password</string>
+    <string name="backup_error_empty_file">Empty file</string>
+    <string name="backup_error_incorrect_password">Incorrect password. Please try again.</string>
+    <string name="backup_error_invalid_missing_json">Invalid backup: backup.json missing</string>
+    <string name="backup_error_password_required">Password required for encrypted backup</string>
+    <string name="backup_export_desc">Create an encrypted or plain backup</string>
+    <string name="backup_export_failed">Export failed</string>
+    <string name="backup_export_success">Backup exported successfully</string>
+    <string name="backup_export_title">Export backup</string>
+    <string name="backup_import_desc">Restore data from a previously exported file</string>
+    <string name="backup_import_failed">Import failed</string>
+    <string name="backup_import_strategy">Import Strategy</string>
+    <string name="backup_import_strategy_desc">Choose how to handle existing messages.</string>
+    <string name="backup_import_success">Backup imported successfully</string>
+    <string name="backup_import_title">Import backup</string>
+    <string name="backup_merge_data">Merge data</string>
+    <string name="backup_old_format_warning_message">You have imported an old backup format (.json). This format does not support voice messages and is less secure. We recommend exporting a new backup (.bkt) to ensure all your data is safe.</string>
+    <string name="backup_old_format_warning_title">Old Backup Format</string>
+    <string name="backup_password_prompt">Protect your backup with a password?</string>
+    <string name="backup_title">Backup &amp; Restore</string>
+    <!-- Bug -->
+    <string name="bug_screen_report_exception">Exception: %1$s</string>
+    <string name="bug_screen_report_header">Bug Report</string>
+    <string name="bug_screen_report_message">Message: %1$s</string>
+    <string name="bug_screen_report_stack_trace_label">Stack Trace:</string>
+    <string name="bug_screen_report_subject">Backtalk Bug Report</string>
+    <string name="bug_screen_report_thread">Thread: %1$s</string>
+    <string name="bug_screen_restart_app">Restart App</string>
+    <string name="bug_screen_share_report">Share Bug Report</string>
+    <string name="bug_screen_stack_trace_header">Stack Trace</string>
+    <string name="bug_screen_thread_label">Thread: %1$s</string>
+    <string name="bug_screen_title">Crash Logs</string>
+    <!-- Camera -->
+    <string name="camera_blocked">Camera Blocked</string>
+    <string name="camera_flash">Flash</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_send">Send photo</string>
+    <string name="camera_switch">Switch camera</string>
+    <!-- Changelog -->
+    <string name="changelog_scroll_to_top">Scroll to top</string>
+    <string name="changelog_type_build">Build</string>
+    <string name="changelog_type_chore">Chore</string>
+    <string name="changelog_type_docs">Docs</string>
+    <string name="changelog_type_feat">Feature</string>
+    <string name="changelog_type_fix">Fix</string>
+    <string name="changelog_type_merge">Merge</string>
+    <string name="changelog_type_refactor">Refactor</string>
+    <string name="changelog_type_style">Style</string>
+    <string name="changelog_type_ui">UI</string>
+    <string name="changelog_type_unknown">Info</string>
+    <!-- Chat -->
+    <string name="chat_copy_label">Copied text</string>
+    <string name="chat_copy_success">Copied to clipboard</string>
+    <plurals name="chat_delete_selected_count_confirmation">
+        <item quantity="one">Are you sure you want to delete %1$d selected message?</item>
+        <item quantity="other">Are you sure you want to delete %1$d selected messages?</item>
+    </plurals>
+    <string name="chat_delete_selected_old_warning">Note: %1$d messages older than 1 hour will not be deleted.</string>
+    <string name="chat_delete_selected_title">Delete messages?</string>
+    <string name="chat_delete_undone_warning">This action cannot be undone.</string>
+    <string name="chat_edited_at">edited at %1$s</string>
+    <string name="chat_editing_locked">Editing is locked</string>
+    <string name="chat_input_caption_hint">Add a caption…</string>
+    <string name="chat_input_format_bold">B</string>
+    <string name="chat_input_format_escape" translatable="false">\\</string>
+    <string name="chat_input_format_italic">I</string>
+    <string name="chat_input_format_monospace">M</string>
+    <string name="chat_input_format_strikethrough">S</string>
+    <string name="chat_input_format_underline">U</string>
+    <string name="chat_input_hint">Write a message…</string>
+    <string name="chat_input_hold_to_record">Hold to record</string>
+    <string name="chat_input_record_cd">Record</string>
+    <string name="chat_input_send_image">Send image</string>
+    <string name="chat_input_send_images">Send %1$d images</string>
+    <string name="chat_input_set_reminder">Set reminder</string>
+    <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
+    <string name="chat_media_general">[Media]</string>
+    <string name="chat_media_image">[Image]</string>
+    <string name="chat_media_voice">[Voice Message]</string>
+    <string name="chat_pinned_tag">Pinned</string>
+    <string name="chat_reminder_notification_channel">Reminders</string>
+    <string name="chat_reminder_notification_title">Note to self</string>
+    <string name="chat_reminder_open_settings">Open Settings</string>
+    <string name="chat_reminder_original_time">original: %1$s</string>
+    <string name="chat_reminder_permission_rationale">To deliver your "future notes" at the right time, Backtalk needs permission to show notifications and schedule exact alarms. Would you like to grant these in settings?</string>
+    <string name="chat_reminder_tag">Reminder</string>
+    <string name="chat_reminder_target_time">target: %1$s</string>
+    <string name="chat_reply_image_preview">[Image]</string>
+    <string name="chat_replying_to">Replying to</string>
+    <string name="chat_scroll_to_bottom">Scroll to bottom</string>
+    <string name="chat_selection_cannot_delete_old">Cannot delete messages older than 1 hour</string>
+    <string name="chat_selection_count">%1$d selected</string>
+    <string name="chat_sent_at">sent at %1$s</string>
+    <string name="chat_status_edited">edited</string>
+    <string name="chat_status_processing_media">Processing media…</string>
+    <string name="chat_tag_prefix">#%1$s</string>
+    <string name="chat_title">Messages</string>
+    <string name="chat_voice_message">Voice Message</string>
     <!-- Common -->
     <string name="common_attach">Attach</string>
     <string name="common_back">Back</string>
@@ -42,203 +160,7 @@
     <string name="common_unknown">Unknown</string>
     <string name="common_version_prefix">v%1$s</string>
     <string name="common_weekly">Weekly</string>
-
-    <!-- Chat -->
-    <string name="changelog_scroll_to_top">Scroll to top</string>
-    <string name="chat_copy_label">Copied text</string>
-    <string name="chat_copy_success">Copied to clipboard</string>
-    <string name="chat_delete_selected_old_warning">Note: %1$d messages older than 1 hour will not be deleted.</string>
-    <string name="chat_delete_selected_title">Delete messages?</string>
-    <string name="chat_delete_undone_warning">This action cannot be undone.</string>
-    <string name="chat_edited_at">edited at %1$s</string>
-    <string name="chat_editing_locked">Editing is locked</string>
-    <string name="chat_input_caption_hint">Add a caption…</string>
-    <string name="chat_input_format_bold">B</string>
-    <string name="chat_input_format_escape" translatable="false">\\</string>
-    <string name="chat_input_format_italic">I</string>
-    <string name="chat_input_format_monospace">M</string>
-    <string name="chat_input_format_strikethrough">S</string>
-    <string name="chat_input_format_underline">U</string>
-    <string name="chat_input_hint">Write a message…</string>
-    <string name="chat_input_hold_to_record">Hold to record</string>
-    <string name="chat_input_record_cd">Record</string>
-    <string name="chat_input_send_image">Send image</string>
-    <string name="chat_input_send_images">Send %1$d images</string>
-    <string name="chat_input_set_reminder">Set reminder</string>
-    <string name="chat_input_slide_to_cancel">&lt; Slide to cancel</string>
-    <string name="chat_media_general">[Media]</string>
-    <string name="chat_media_image">[Image]</string>
-    <string name="chat_media_voice">[Voice Message]</string>
-    <string name="chat_pinned_tag">Pinned</string>
-    <string name="chat_reminder_tag">Reminder</string>
-    <string name="chat_reply_image_preview">[Image]</string>
-    <string name="chat_replying_to">Replying to</string>
-    <string name="chat_scroll_to_bottom">Scroll to bottom</string>
-    <string name="chat_selection_cannot_delete_old">Cannot delete messages older than 1 hour</string>
-    <string name="chat_selection_count">%1$d selected</string>
-    <string name="chat_sent_at">sent at %1$s</string>
-    <string name="chat_status_edited">edited</string>
-    <string name="chat_status_processing_media">Processing media…</string>
-    <string name="chat_tag_prefix">#%1$s</string>
-    <string name="chat_title">Messages</string>
-    <string name="chat_voice_message">Voice Message</string>
-    <plurals name="chat_delete_selected_count_confirmation">
-        <item quantity="one">Are you sure you want to delete %1$d selected message?</item>
-        <item quantity="other">Are you sure you want to delete %1$d selected messages?</item>
-    </plurals>
-
-    <!-- Link Safety -->
-    <string name="link_safety_cancel">Cancel</string>
-    <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>
-    <string name="link_safety_open">Open</string>
-    <string name="link_safety_title">External Link</string>
-
-    <!-- Search -->
-    <string name="search_hint">Search messages…</string>
-    <string name="search_next">Next result</string>
-    <string name="search_no_results">0 of 0</string>
-    <string name="search_previous">Previous result</string>
-    <string name="search_results_count">%1$d of %2$d</string>
-
-    <!-- Auth -->
-    <string name="auth_locked_title">Backtalk is locked</string>
-    <string name="auth_subtitle">Please authenticate to continue</string>
-    <string name="auth_title">Verify your identity</string>
-
-    <!-- Settings -->
-    <string name="settings_stay_awake">Stay awake</string>
-    <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
-    <string name="settings_amoled_mode">AMOLED Mode</string>
-    <string name="settings_amoled_mode_desc">Use pure black backgrounds in dark mode to save battery</string>
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_app_lock_desc">Require biometrics on startup</string>
-    <string name="settings_auto_check_updates">Check for updates automatically</string>
-    <string name="settings_auto_check_updates_desc">Periodically check if a newer version is available</string>
-    <string name="settings_changelog">Changelog</string>
-    <string name="settings_changelog_desc">View the latest changes and improvements</string>
-    <string name="settings_changelog_error">Error loading changelog or no changes found.</string>
-    <string name="settings_changelog_onboarding_desc">Revisit the app features and guides</string>
-    <string name="settings_changelog_see_onboarding">See onboarding again</string>
-    <string name="settings_changelog_title">What\'s New</string>
-    <string name="settings_chat">Chat</string>
-    <string name="settings_check_updates_desc">See if you are running the latest build</string>
-    <string name="settings_check_updates_now">Check for updates now</string>
-    <string name="settings_checking_updates">Checking for updates…</string>
-    <string name="settings_choose_theme">Choose Theme</string>
-    <string name="settings_clear_cache">Clear cache</string>
-    <string name="settings_clear_cache_desc">Free up space by deleting temporary files</string>
-    <string name="settings_clear_cache_size">Current size: %1$s</string>
-    <string name="settings_clear_cache_success">Cache cleared successfully</string>
-    <string name="settings_date_format">Date format</string>
-    <string name="settings_disable_battery_optimization">Disable battery optimization</string>
-    <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably.</string>
-    <string name="settings_disable_context_menu">Disable context menu</string>
-    <string name="settings_disable_context_menu_desc">Disable the context menu when long-pressing a message</string>
-    <string name="settings_dynamic_color">Material You Dynamic Color</string>
-    <string name="settings_dynamic_color_desc">Apply system colors to the app interface</string>
-    <string name="settings_enable_app_lock">Enable app lock</string>
-    <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
-    <string name="settings_experimental_sync_title">Experimental Feature</string>
-    <string name="settings_external_link_warning">External link warning</string>
-    <string name="settings_external_link_warning_desc">Show a confirmation dialog before opening links in your browser</string>
-    <string name="settings_haptic_feedback">Haptic feedback</string>
-    <string name="settings_haptic_feedback_desc">Vibrate on interactions like swipe-to-reply or long-press</string>
-    <string name="settings_image_compression">Image compression</string>
-    <string name="settings_image_compression_desc">Choose the quality of images before sending them</string>
-    <string name="settings_information">Information</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_license">Open source licenses</string>
-    <string name="settings_license_desc">Libraries used in the application</string>
-    <string name="settings_link_preview">Link preview</string>
-    <string name="settings_link_preview_desc">Show a preview card for the first link in a message</string>
-    <string name="settings_lock_on_screen_off">Lock on screen off</string>
-    <string name="settings_lock_on_screen_off_desc">Lock the app immediately when the phone screen is turned off</string>
-    <string name="settings_lock_timeout">Lock timeout</string>
-    <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
-    <string name="settings_privacy_security">Privacy &amp; Security</string>
-    <string name="settings_reminder_interval">Frequency</string>
-    <string name="settings_reminders">Reminders</string>
-    <string name="settings_reminders_desc">Get notified to write about your day</string>
-    <string name="settings_remove_image_metadata">Remove image metadata</string>
-    <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
-    <string name="settings_secure_screen">Screen security</string>
-    <string name="settings_secure_screen_summary">Hide content in recent apps and prevent screenshots</string>
-    <string name="settings_security_title">Security</string>
-    <string name="settings_send_with_enter">Send with Enter</string>
-    <string name="settings_send_with_enter_desc">Replace the new line key with a send key in the chat input</string>
-    <string name="settings_show_secret_category">Show developer options</string>
-    <string name="settings_show_secret_category_desc">Disable to hide this section</string>
-    <string name="settings_show_tags_bar">Show tags bar</string>
-    <string name="settings_show_tags_bar_desc">Display hashtags at the top of the chat for quick filtering</string>
-    <string name="settings_smart_pointing_images">Smart pointing for images</string>
-    <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_time_format">Time format</string>
-    <string name="settings_title">Settings</string>
-    <string name="settings_trim_messages">Trim sent messages</string>
-    <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
-    <string name="settings_up_to_date">You are running the latest version.</string>
-    <string name="settings_version">Version</string>
-    <string name="settings_version_current">Current version: %1$s</string>
-    <string name="changelog_type_build">Build</string>
-    <string name="changelog_type_chore">Chore</string>
-    <string name="changelog_type_docs">Docs</string>
-    <string name="changelog_type_feat">Feature</string>
-    <string name="changelog_type_fix">Fix</string>
-    <string name="changelog_type_merge">Merge</string>
-    <string name="changelog_type_refactor">Refactor</string>
-    <string name="changelog_type_style">Style</string>
-    <string name="changelog_type_ui">UI</string>
-    <string name="changelog_type_unknown">Info</string>
-    <string name="image_compression_balanced">Balanced</string>
-    <string name="image_compression_best">Best quality</string>
-    <string name="image_compression_high">High quality</string>
-    <string name="image_compression_low">Save data</string>
-    <string name="image_compression_original">Original</string>
-    <string name="image_compression_very_low">Extreme saver</string>
-
-    <!-- Troubleshooting -->
-    <string name="settings_troubleshooting">Troubleshooting</string>
-    <string name="settings_dont_kill_my_app">Don\'t Kill My App!</string>
-    <string name="settings_dont_kill_my_app_desc">Device-specific instructions to prevent background process termination</string>
-    <string name="settings_battery_optimization_ignored">Ignored</string>
-    <string name="settings_battery_optimization_not_ignored">Not ignored</string>
-
-    <!-- Developer Settings -->
-    <string name="settings_developer">Developer</string>
-    <string name="settings_dev_click">You found me. Now go away.</string>
-    <string name="settings_dev_click_fine">fine…</string>
-    <string name="settings_dev_name" translatable="false">kys0ff</string>
-    <string name="settings_secret_category">Developer Options</string>
-    <string name="settings_simulate_crash">Simulate crash</string>
-    <string name="settings_simulate_crash_desc">Force an application crash to test the custom bug report screen</string>
-    <string name="settings_simulate_crash_sample_message">This is a sample bug report for demonstration.</string>
-    <string name="settings_wipe_data">Wipe all app data</string>
-    <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
-    <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
-    <string name="settings_wipe_data_desc">Clear database, cache, and all preferences</string>
-
-    <!-- Lock Timeout -->
-    <string name="lock_timeout_10m">10 minutes</string>
-    <string name="lock_timeout_15s">15 seconds</string>
-    <string name="lock_timeout_1m">1 minute</string>
-    <string name="lock_timeout_30m">30 minutes</string>
-    <string name="lock_timeout_30s">30 seconds</string>
-    <string name="lock_timeout_5m">5 minutes</string>
-    <string name="lock_timeout_immediately">Immediately</string>
-
-    <!-- Themes -->
-    <string name="theme_dark">Dark</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_system">System default</string>
-
-    <!-- Languages -->
-    <string name="language_arabic">Arabic (العربية)</string>
-    <string name="language_english">English</string>
-    <string name="language_spanish">Spanish (Español)</string>
-    <string name="language_system">System Default</string>
-
-    <!-- Date & Time Formats -->
+    <!-- Date -->
     <string name="date_format_custom">Custom…</string>
     <string name="date_format_custom_hint">e.g. EEEE, MMM d</string>
     <string name="date_format_custom_title">Custom Date Format</string>
@@ -248,154 +170,56 @@
     <string name="date_format_mdy_slash">MM/DD/YYYY</string>
     <string name="date_format_system">System default</string>
     <string name="date_format_ymd_dash">YYYY-MM-DD</string>
-    <string name="time_format_12h">12-hour</string>
-    <string name="time_format_24h">24-hour</string>
-    <string name="time_format_system">System default</string>
-
-    <!-- Statistics -->
-    <string name="statistics_activity_last_7_days">Activity (Last 7 Days)</string>
-    <string name="statistics_app_usage_heatmap">App Usage Heatmap</string>
-    <string name="statistics_avg_length">Avg. Length</string>
-    <string name="statistics_best_streak">Best Streak</string>
-    <string name="statistics_chart_date_count_cd">Date: %1$s, Count: %2$d</string>
-    <string name="statistics_current_streak">Current Streak</string>
-    <string name="statistics_duration_minutes_seconds">%1$dm %2$ds</string>
-    <string name="statistics_duration_seconds">%1$ds</string>
-    <string name="statistics_images">Images</string>
-    <string name="statistics_media_voice_thread">Media/Voice Thread</string>
-    <string name="statistics_message_types">Message Types</string>
-    <string name="statistics_messages_count">%1$d messages</string>
-    <string name="statistics_scheduled">Scheduled</string>
-    <string name="statistics_text">Text</string>
-    <string name="statistics_total">Total</string>
-    <string name="statistics_title">Statistics</string>
-    <string name="statistics_top_threads">Top Threads</string>
-    <string name="statistics_total_activity_percentage">%1$d%% of total activity</string>
-    <string name="statistics_total_messages">Total Messages</string>
-    <string name="statistics_voice">Voice</string>
-    <string name="statistics_voice_duration">Voice Duration</string>
-
-    <!-- Updates -->
-    <string name="update_dialog_action_now">Update now</string>
-    <string name="update_dialog_message">Version %1$s is now available.\n\n%2$s</string>
-    <string name="update_dialog_title">Update available</string>
-
-    <!-- Backup & Restore -->
-    <string name="backup_check_failed">Failed to check backup</string>
-    <string name="backup_clear_and_import">Clear and import</string>
-    <string name="backup_encrypted_prompt">This backup is encrypted. Please enter the password to proceed.</string>
-    <string name="backup_enter_password">Enter password</string>
-    <string name="backup_error_empty_file">Empty file</string>
-    <string name="backup_error_incorrect_password">Incorrect password. Please try again.</string>
-    <string name="backup_error_invalid_missing_json">Invalid backup: backup.json missing</string>
-    <string name="backup_error_password_required">Password required for encrypted backup</string>
-    <string name="backup_export_desc">Create an encrypted or plain backup</string>
-    <string name="backup_export_failed">Export failed</string>
-    <string name="backup_export_success">Backup exported successfully</string>
-    <string name="backup_export_title">Export backup</string>
-    <string name="backup_import_desc">Restore data from a previously exported file</string>
-    <string name="backup_import_failed">Import failed</string>
-    <string name="backup_import_strategy">Import Strategy</string>
-    <string name="backup_import_strategy_desc">Choose how to handle existing messages.</string>
-    <string name="backup_import_success">Backup imported successfully</string>
-    <string name="backup_import_title">Import backup</string>
-    <string name="backup_merge_data">Merge data</string>
-    <string name="backup_old_format_warning_message">You have imported an old backup format (.json). This format does not support voice messages and is less secure. We recommend exporting a new backup (.bkt) to ensure all your data is safe.</string>
-    <string name="backup_old_format_warning_title">Old Backup Format</string>
-    <string name="backup_password_prompt">Protect your backup with a password?</string>
-    <string name="backup_title">Backup &amp; Restore</string>
-
-    <!-- Auto Export -->
-    <string name="auto_export_encrypt">Encrypt auto export</string>
-    <string name="auto_export_folder">Backup folder</string>
-    <string name="auto_export_interval">Export interval</string>
-    <string name="auto_export_max_count">Max backups to keep</string>
-    <string name="auto_export_max_count_desc">Number of most recent backups to retain. Older ones will be deleted automatically.</string>
-    <string name="auto_export_max_count_unlimited">Unlimited</string>
-    <string name="auto_export_no_folder">No folder selected</string>
-    <string name="auto_export_password">Auto export password</string>
-    <string name="auto_export_password_desc">This password will be used to encrypt your scheduled backups.</string>
-    <string name="auto_export_summary">Periodically backup your data in the background</string>
-    <string name="auto_export_title">Auto export</string>
-
-    <!-- Threads -->
-    <string name="threads_at_you">\@you</string>
-    <string name="threads_at_you_timestamp">\@you · %1$s</string>
-    <string name="threads_empty">No threads found</string>
-    <string name="threads_replies_count">Replies · %1$d</string>
-    <string name="threads_title">Threads</string>
-    <string name="threads_you">You</string>
-
-    <!-- Reminders -->
-    <string name="reminders_cancel_confirm_msg">Are you sure you want to cancel this scheduled reminder?</string>
-    <string name="reminders_cancel_confirm_title">Cancel reminder?</string>
-    <string name="reminders_empty">No scheduled reminders</string>
-    <string name="reminders_title">Reminders</string>
-    <string name="chat_reminder_notification_channel">Reminders</string>
-    <string name="chat_reminder_notification_title">Note to self</string>
-    <string name="chat_reminder_open_settings">Open Settings</string>
-    <string name="chat_reminder_original_time">original: %1$s</string>
-    <string name="chat_reminder_permission_rationale">To deliver your "future notes" at the right time, Backtalk needs permission to show notifications and schedule exact alarms. Would you like to grant these in settings?</string>
-    <string name="chat_reminder_target_time">target: %1$s</string>
-
-    <!-- Message Scheduling -->
+    <!-- Error -->
+    <string name="error_pairing_failed">Pairing request failed</string>
+    <string name="error_pin_verification_failed">PIN verification failed</string>
+    <string name="error_pull_sync_failed">Pull sync failed</string>
+    <string name="error_sync_failed">Sync failed</string>
+    <string name="error_update_url">Could not open update URL</string>
+    <!-- Image -->
+    <string name="image_compression_balanced">Balanced</string>
+    <string name="image_compression_best">Best quality</string>
+    <string name="image_compression_high">High quality</string>
+    <string name="image_compression_low">Save data</string>
+    <string name="image_compression_original">Original</string>
+    <string name="image_compression_very_low">Extreme saver</string>
+    <string name="image_preview_visual_preview">Visual preview</string>
+    <!-- Language -->
+    <string name="language_arabic">Arabic (العربية)</string>
+    <string name="language_chinese">Chinese (Simplified) (简体中文)</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Spanish (Español)</string>
+    <string name="language_system">System Default</string>
+    <!-- Link -->
+    <string name="link_preview_error_default">Couldn\'t load preview</string>
+    <string name="link_preview_load_failed">Failed to load preview</string>
+    <string name="link_preview_retry">Retry</string>
+    <string name="link_safety_cancel">Cancel</string>
+    <string name="link_safety_message">You are leaving the app to visit an external website. Make sure you trust this source before proceeding.</string>
+    <string name="link_safety_open">Open</string>
+    <string name="link_safety_title">External Link</string>
+    <!-- Lock -->
+    <string name="lock_timeout_10m">10 minutes</string>
+    <string name="lock_timeout_15s">15 seconds</string>
+    <string name="lock_timeout_1m">1 minute</string>
+    <string name="lock_timeout_30m">30 minutes</string>
+    <string name="lock_timeout_30s">30 seconds</string>
+    <string name="lock_timeout_5m">5 minutes</string>
+    <string name="lock_timeout_immediately">Immediately</string>
+    <!-- Media -->
+    <string name="media_folder_all">All</string>
+    <!-- Message -->
     <string name="message_scheduled_success">Message scheduled</string>
     <string name="message_scheduling_invalid_time">Time must be in the future</string>
     <string name="message_scheduling_select_time">Select time</string>
-
-    <!-- Camera -->
-    <string name="camera_blocked">Camera Blocked</string>
-    <string name="camera_flash">Flash</string>
-    <string name="camera_retake">Retake</string>
-    <string name="camera_send">Send photo</string>
-    <string name="camera_switch">Switch camera</string>
-    <string name="media_folder_all">All</string>
-
-    <!-- Sync & Devices -->
-    <string name="sync_available_devices">Available Devices</string>
-    <string name="sync_disconnect">Disconnect</string>
-    <string name="sync_disconnect_confirm">Disconnect from "%1$s"?</string>
-    <string name="sync_enter_pin">Enter PIN</string>
-    <string name="sync_no_devices_found">No devices found</string>
-    <string name="sync_now">Sync Now</string>
-    <string name="sync_paired_devices">Paired Devices</string>
-    <string name="sync_pairing_pin_msg">Enter this PIN on the other device:</string>
-    <string name="sync_pairing_pin_title">Pairing PIN</string>
-    <string name="sync_pairing_request_msg">A pairing request has been received from</string>
-    <string name="sync_pairing_request_title">Incoming Pairing Request</string>
-    <string name="sync_pin_label">Enter the 6-digit PIN shown on the other device</string>
-    <string name="sync_pull">Pull Sync</string>
-    <string name="sync_show_pin">Show PIN</string>
-    <string name="sync_start_discovery">Start Discovery</string>
-    <string name="sync_status_completed">Sync completed</string>
-    <string name="sync_status_last_synced">Last synced: %1$s</string>
-    <string name="sync_status_offline">Offline</string>
-    <string name="sync_status_online">Online</string>
-    <string name="sync_status_searching">Searching for devices…</string>
-    <string name="sync_status_syncing">Syncing…</string>
-    <string name="sync_stop_discovery">Stop Discovery</string>
-    <string name="sync_summary">Sync messages between devices on the same Wi-Fi</string>
-    <string name="sync_title">Sync &amp; Devices</string>
-    <string name="sync_already_paired_msg">You are already paired with "%1$s". Do you want to unpair and start a fresh pairing?</string>
-    <string name="sync_already_paired_title">Already Paired</string>
-    <string name="sync_unpair_and_restart">Unpair and Start Fresh</string>
-
-    <!-- Sync Errors -->
-    <string name="sync_error_connection_failed">Connection failed. Make sure both devices are on the same Wi-Fi.</string>
-    <string name="sync_error_device_not_found">Device not found</string>
-    <string name="sync_error_invalid_pin">Invalid PIN. Please try again.</string>
-    <string name="sync_error_pairing_refused">Pairing request was refused by the other device</string>
-    <string name="sync_error_protocol_error">Protocol error</string>
-    <string name="sync_error_sync_failed">Sync failed</string>
-    <string name="sync_error_timeout">The connection timed out</string>
-    <string name="sync_error_unauthorized">Unauthorized access</string>
-    <string name="sync_error_unknown">An unknown error occurred</string>
-    <string name="sync_error_unknown_message">Unknown error</string>
-
     <!-- Onboarding -->
     <string name="onboarding_get_started">Get Started</string>
     <string name="onboarding_messaging_desc">Organize your thoughts, tasks, and links in a familiar chat interface.</string>
     <string name="onboarding_messaging_title">Messaging yourself</string>
+    <string name="onboarding_mock_message_1">Hello myself! I should remember to drink more water today.</string>
+    <string name="onboarding_mock_message_2">Good point. Stay hydrated! 💧</string>
+    <string name="onboarding_mock_reminder">Long press the send button to schedule a reminder like this one!</string>
+    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_permission_alarms">Exact Alarms</string>
     <string name="onboarding_permission_alarms_desc">Required for precise delivery of your scheduled reminders.</string>
@@ -434,37 +258,24 @@
     <string name="onboarding_voice_title">Voice Notes</string>
     <string name="onboarding_welcome_desc">Your private, local-first note-taking and messaging app. Everything stays on your device.</string>
     <string name="onboarding_welcome_title">Welcome to Backtalk</string>
-
-    <!-- Onboarding Mocks -->
-    <string name="onboarding_mock_message_1">Hello myself! I should remember to drink more water today.</string>
-    <string name="onboarding_mock_message_2">Good point. Stay hydrated! 💧</string>
-    <string name="onboarding_mock_reminder">Long press the send button to schedule a reminder like this one!</string>
-    <string name="onboarding_mock_voice_path" translatable="false">mock_path</string>
-
-    <!-- Pinned Messages -->
+    <!-- Pinned -->
     <string name="pinned_message">Pinned Message</string>
     <string name="pinned_message_jump_label">Jump to pinned message</string>
-    <string name="pinned_message_with_index">Pinned Message (%1$d/%2$d)</string>
-    <string name="pinned_messages_empty">No pinned messages</string>
-    <string name="pinned_messages_title">Pinned Messages</string>
-    <string name="pinned_messages_unpin_cd">Unpin message</string>
     <plurals name="pinned_message_view_all">
         <item quantity="one">View pinned message</item>
         <item quantity="other">View all %1$d pinned messages</item>
     </plurals>
-
-    <!-- Image Preview -->
-    <string name="image_preview_visual_preview">Visual preview</string>
-
-    <!-- Errors -->
-    <string name="error_pairing_failed">Pairing request failed</string>
-    <string name="error_pin_verification_failed">PIN verification failed</string>
-    <string name="error_pull_sync_failed">Pull sync failed</string>
-    <string name="error_sync_failed">Sync failed</string>
-    <string name="error_update_url">Could not open update URL</string>
-
-    <!-- Reminder Messages -->
+    <string name="pinned_message_with_index">Pinned Message (%1$d/%2$d)</string>
+    <string name="pinned_messages_empty">No pinned messages</string>
+    <string name="pinned_messages_title">Pinned Messages</string>
+    <string name="pinned_messages_unpin_cd">Unpin message</string>
+    <!-- Reminder -->
     <string name="reminder_message_1">How was your day? Take a moment to talk to yourself.</string>
+    <string name="reminder_message_10">Reflect on a small win from your day.</string>
+    <string name="reminder_message_11">Is there something you want to let go of today?</string>
+    <string name="reminder_message_12">What made you smile today?</string>
+    <string name="reminder_message_13">Take a moment to check in with your goals.</string>
+    <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
     <string name="reminder_message_2">Got something on your mind? Write it down.</string>
     <string name="reminder_message_3">Your future self will thank you for today\'s notes.</string>
     <string name="reminder_message_4">Time for a quick check-in with yourself.</string>
@@ -473,33 +284,112 @@
     <string name="reminder_message_7">Take a deep breath and write a few lines.</string>
     <string name="reminder_message_8">What is one thing you learned today?</string>
     <string name="reminder_message_9">How are you feeling right now? Put it into words.</string>
-    <string name="reminder_message_10">Reflect on a small win from your day.</string>
-    <string name="reminder_message_11">Is there something you want to let go of today?</string>
-    <string name="reminder_message_12">What made you smile today?</string>
-    <string name="reminder_message_13">Take a moment to check in with your goals.</string>
-    <string name="reminder_message_14">Your thoughts deserve to be heard. Write them down.</string>
     <string name="reminder_message_title">Reflection Time</string>
     <string name="reminder_notification_channel">Daily Reminders</string>
-
-    <!-- Bug Screen -->
-    <string name="bug_screen_report_exception">Exception: %1$s</string>
-    <string name="bug_screen_report_header">Bug Report</string>
-    <string name="bug_screen_report_message">Message: %1$s</string>
-    <string name="bug_screen_report_stack_trace_label">Stack Trace:</string>
-    <string name="bug_screen_report_subject">Backtalk Bug Report</string>
-    <string name="bug_screen_report_thread">Thread: %1$s</string>
-    <string name="bug_screen_restart_app">Restart App</string>
-    <string name="bug_screen_share_report">Share Bug Report</string>
-    <string name="bug_screen_stack_trace_header">Stack Trace</string>
-    <string name="bug_screen_thread_label">Thread: %1$s</string>
-    <string name="bug_screen_title">Crash Logs</string>
-
-    <!-- Link Preview -->
-    <string name="link_preview_error_default">Couldn\'t load preview</string>
-    <string name="link_preview_load_failed">Failed to load preview</string>
-    <string name="link_preview_retry">Retry</string>
-
-    <!-- Shared Media -->
+    <!-- Reminders -->
+    <string name="reminders_cancel_confirm_msg">Are you sure you want to cancel this scheduled reminder?</string>
+    <string name="reminders_cancel_confirm_title">Cancel reminder?</string>
+    <string name="reminders_empty">No scheduled reminders</string>
+    <string name="reminders_title">Reminders</string>
+    <!-- Search -->
+    <string name="search_hint">Search messages…</string>
+    <string name="search_next">Next result</string>
+    <string name="search_no_results">0 of 0</string>
+    <string name="search_previous">Previous result</string>
+    <string name="search_results_count">%1$d of %2$d</string>
+    <!-- Settings -->
+    <string name="settings_amoled_mode">AMOLED Mode</string>
+    <string name="settings_amoled_mode_desc">Use pure black backgrounds in dark mode to save battery</string>
+    <string name="settings_app_lock_desc">Require biometrics on startup</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_auto_check_updates">Check for updates automatically</string>
+    <string name="settings_auto_check_updates_desc">Periodically check if a newer version is available</string>
+    <string name="settings_battery_optimization_ignored">Ignored</string>
+    <string name="settings_battery_optimization_not_ignored">Not ignored</string>
+    <string name="settings_changelog">Changelog</string>
+    <string name="settings_changelog_desc">View the latest changes and improvements</string>
+    <string name="settings_changelog_error">Error loading changelog or no changes found.</string>
+    <string name="settings_changelog_onboarding_desc">Revisit the app features and guides</string>
+    <string name="settings_changelog_see_onboarding">See onboarding again</string>
+    <string name="settings_changelog_title">What\'s New</string>
+    <string name="settings_chat">Chat</string>
+    <string name="settings_check_updates_desc">See if you are running the latest build</string>
+    <string name="settings_check_updates_now">Check for updates now</string>
+    <string name="settings_checking_updates">Checking for updates…</string>
+    <string name="settings_choose_theme">Choose Theme</string>
+    <string name="settings_clear_cache">Clear cache</string>
+    <string name="settings_clear_cache_desc">Free up space by deleting temporary files</string>
+    <string name="settings_clear_cache_size">Current size: %1$s</string>
+    <string name="settings_clear_cache_success">Cache cleared successfully</string>
+    <string name="settings_date_format">Date format</string>
+    <string name="settings_dev_click">You found me. Now go away.</string>
+    <string name="settings_dev_click_fine">fine…</string>
+    <string name="settings_dev_name" translatable="false">kys0ff</string>
+    <string name="settings_developer">Developer</string>
+    <string name="settings_disable_battery_optimization">Disable battery optimization</string>
+    <string name="settings_disable_battery_optimization_desc">Ensures background tasks like reminders and auto-export run reliably.</string>
+    <string name="settings_disable_context_menu">Disable context menu</string>
+    <string name="settings_disable_context_menu_desc">Disable the context menu when long-pressing a message</string>
+    <string name="settings_dont_kill_my_app">Don\'t Kill My App!</string>
+    <string name="settings_dont_kill_my_app_desc">Device-specific instructions to prevent background process termination</string>
+    <string name="settings_dynamic_color">Material You Dynamic Color</string>
+    <string name="settings_dynamic_color_desc">Apply system colors to the app interface</string>
+    <string name="settings_enable_app_lock">Enable app lock</string>
+    <string name="settings_experimental_sync_message">Sync &amp; Devices is currently an experimental feature. It may contain bugs or exhibit unwanted behaviors. Use at your own risk. It is highly recommended to back up your data before using this feature.</string>
+    <string name="settings_experimental_sync_title">Experimental Feature</string>
+    <string name="settings_external_link_warning">External link warning</string>
+    <string name="settings_external_link_warning_desc">Show a confirmation dialog before opening links in your browser</string>
+    <string name="settings_haptic_feedback">Haptic feedback</string>
+    <string name="settings_haptic_feedback_desc">Vibrate on interactions like swipe-to-reply or long-press</string>
+    <string name="settings_image_compression">Image compression</string>
+    <string name="settings_image_compression_desc">Choose the quality of images before sending them</string>
+    <string name="settings_information">Information</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_license">Open source licenses</string>
+    <string name="settings_license_desc">Libraries used in the application</string>
+    <string name="settings_link_preview">Link preview</string>
+    <string name="settings_link_preview_desc">Show a preview card for the first link in a message</string>
+    <string name="settings_lock_on_screen_off">Lock on screen off</string>
+    <string name="settings_lock_on_screen_off_desc">Lock the app immediately when the phone screen is turned off</string>
+    <string name="settings_lock_timeout">Lock timeout</string>
+    <string name="settings_lock_timeout_desc">How long the app stays unlocked in the background</string>
+    <string name="settings_privacy_security">Privacy &amp; Security</string>
+    <string name="settings_reminder_interval">Frequency</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_reminders_desc">Get notified to write about your day</string>
+    <string name="settings_remove_image_metadata">Remove image metadata</string>
+    <string name="settings_remove_image_metadata_desc">Strip EXIF data and other sensitive metadata from images before sending</string>
+    <string name="settings_secret_category">Developer Options</string>
+    <string name="settings_secure_screen">Screen security</string>
+    <string name="settings_secure_screen_summary">Hide content in recent apps and prevent screenshots</string>
+    <string name="settings_security_title">Security</string>
+    <string name="settings_send_with_enter">Send with Enter</string>
+    <string name="settings_send_with_enter_desc">Replace the new line key with a send key in the chat input</string>
+    <string name="settings_show_secret_category">Show developer options</string>
+    <string name="settings_show_secret_category_desc">Disable to hide this section</string>
+    <string name="settings_show_tags_bar">Show tags bar</string>
+    <string name="settings_show_tags_bar_desc">Display hashtags at the top of the chat for quick filtering</string>
+    <string name="settings_simulate_crash">Simulate crash</string>
+    <string name="settings_simulate_crash_desc">Force an application crash to test the custom bug report screen</string>
+    <string name="settings_simulate_crash_sample_message">This is a sample bug report for demonstration.</string>
+    <string name="settings_smart_pointing_images">Smart pointing for images</string>
+    <string name="settings_smart_pointing_images_desc">Reference existing images instead of duplicating them when sending the same file</string>
+    <string name="settings_stay_awake">Stay awake</string>
+    <string name="settings_stay_awake_desc">Prevents the display from entering sleep mode during active charging or development sessions.</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_time_format">Time format</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_trim_messages">Trim sent messages</string>
+    <string name="settings_trim_messages_desc">Remove leading and trailing whitespace from messages by default</string>
+    <string name="settings_troubleshooting">Troubleshooting</string>
+    <string name="settings_up_to_date">You are running the latest version.</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_version_current">Current version: %1$s</string>
+    <string name="settings_wipe_data">Wipe all app data</string>
+    <string name="settings_wipe_data_confirm_message">This will permanently delete all your messages, scheduled messages, voice notes, and reset all settings. This action cannot be undone.</string>
+    <string name="settings_wipe_data_confirm_title">Wipe all data?</string>
+    <string name="settings_wipe_data_desc">Clear database, cache, and all preferences</string>
+    <!-- Shared -->
     <string name="shared_media_empty_links">No links found</string>
     <string name="shared_media_empty_media">No media found</string>
     <string name="shared_media_empty_voice">No voice messages found</string>
@@ -507,5 +397,83 @@
     <string name="shared_media_tab_media">Media</string>
     <string name="shared_media_tab_voice">Voices</string>
     <string name="shared_media_title">Shared Content</string>
-
+    <!-- Statistics -->
+    <string name="statistics_activity_last_7_days">Activity (Last 7 Days)</string>
+    <string name="statistics_app_usage_heatmap">App Usage Heatmap</string>
+    <string name="statistics_avg_length">Avg. Length</string>
+    <string name="statistics_best_streak">Best Streak</string>
+    <string name="statistics_chart_date_count_cd">Date: %1$s, Count: %2$d</string>
+    <string name="statistics_current_streak">Current Streak</string>
+    <string name="statistics_duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="statistics_duration_seconds">%1$ds</string>
+    <string name="statistics_images">Images</string>
+    <string name="statistics_media_voice_thread">Media/Voice Thread</string>
+    <string name="statistics_message_types">Message Types</string>
+    <string name="statistics_messages_count">%1$d messages</string>
+    <string name="statistics_scheduled">Scheduled</string>
+    <string name="statistics_text">Text</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_top_threads">Top Threads</string>
+    <string name="statistics_total">Total</string>
+    <string name="statistics_total_activity_percentage">%1$d%% of total activity</string>
+    <string name="statistics_total_messages">Total Messages</string>
+    <string name="statistics_voice">Voice</string>
+    <string name="statistics_voice_duration">Voice Duration</string>
+    <!-- Sync -->
+    <string name="sync_already_paired_msg">You are already paired with "%1$s". Do you want to unpair and start a fresh pairing?</string>
+    <string name="sync_already_paired_title">Already Paired</string>
+    <string name="sync_available_devices">Available Devices</string>
+    <string name="sync_disconnect">Disconnect</string>
+    <string name="sync_disconnect_confirm">Disconnect from "%1$s"?</string>
+    <string name="sync_enter_pin">Enter PIN</string>
+    <string name="sync_error_connection_failed">Connection failed. Make sure both devices are on the same Wi-Fi.</string>
+    <string name="sync_error_device_not_found">Device not found</string>
+    <string name="sync_error_invalid_pin">Invalid PIN. Please try again.</string>
+    <string name="sync_error_pairing_refused">Pairing request was refused by the other device</string>
+    <string name="sync_error_protocol_error">Protocol error</string>
+    <string name="sync_error_sync_failed">Sync failed</string>
+    <string name="sync_error_timeout">The connection timed out</string>
+    <string name="sync_error_unauthorized">Unauthorized access</string>
+    <string name="sync_error_unknown">An unknown error occurred</string>
+    <string name="sync_error_unknown_message">Unknown error</string>
+    <string name="sync_no_devices_found">No devices found</string>
+    <string name="sync_now">Sync Now</string>
+    <string name="sync_paired_devices">Paired Devices</string>
+    <string name="sync_pairing_pin_msg">Enter this PIN on the other device:</string>
+    <string name="sync_pairing_pin_title">Pairing PIN</string>
+    <string name="sync_pairing_request_msg">A pairing request has been received from</string>
+    <string name="sync_pairing_request_title">Incoming Pairing Request</string>
+    <string name="sync_pin_label">Enter the 6-digit PIN shown on the other device</string>
+    <string name="sync_pull">Pull Sync</string>
+    <string name="sync_show_pin">Show PIN</string>
+    <string name="sync_start_discovery">Start Discovery</string>
+    <string name="sync_status_completed">Sync completed</string>
+    <string name="sync_status_last_synced">Last synced: %1$s</string>
+    <string name="sync_status_offline">Offline</string>
+    <string name="sync_status_online">Online</string>
+    <string name="sync_status_searching">Searching for devices…</string>
+    <string name="sync_status_syncing">Syncing…</string>
+    <string name="sync_stop_discovery">Stop Discovery</string>
+    <string name="sync_summary">Sync messages between devices on the same Wi-Fi</string>
+    <string name="sync_title">Sync &amp; Devices</string>
+    <string name="sync_unpair_and_restart">Unpair and Start Fresh</string>
+    <!-- Theme -->
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">System default</string>
+    <!-- Threads -->
+    <string name="threads_at_you">\@you</string>
+    <string name="threads_at_you_timestamp">\@you · %1$s</string>
+    <string name="threads_empty">No threads found</string>
+    <string name="threads_replies_count">Replies · %1$d</string>
+    <string name="threads_title">Threads</string>
+    <string name="threads_you">You</string>
+    <!-- Time -->
+    <string name="time_format_12h">12-hour</string>
+    <string name="time_format_24h">24-hour</string>
+    <string name="time_format_system">System default</string>
+    <!-- Update -->
+    <string name="update_dialog_action_now">Update now</string>
+    <string name="update_dialog_message">Version %1$s is now available.\n\n%2$s</string>
+    <string name="update_dialog_title">Update available</string>
 </resources>
