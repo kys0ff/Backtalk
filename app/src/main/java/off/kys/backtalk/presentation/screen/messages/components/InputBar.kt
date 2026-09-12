@@ -119,6 +119,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import off.kys.backtalk.R
@@ -128,6 +129,7 @@ import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.screen.messages.utils.rememberRecordAudioPermissionHandler
 import off.kys.backtalk.presentation.state.messages.InputBarEffect
+import off.kys.backtalk.presentation.state.messages.InputBarUiState
 import off.kys.backtalk.presentation.status.SchedulingStage
 import off.kys.backtalk.presentation.viewmodel.InputBarViewModel
 import off.kys.backtalk.util.copyToClipboard
@@ -156,24 +158,62 @@ fun InputBar(
     sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(messageInput) {
+        if (messageInput.isNotEmpty()) {
+            state.textFieldState.setTextAndPlaceCursorAtEnd(messageInput)
+        } else {
+            state.textFieldState.clearText()
+        }
+    }
+
+    LaunchedEffect(replyingTo, editingMessage) {
+        viewModel.onEvent(InputBarEvent.UpdateReplyingTo(replyingTo))
+        viewModel.onEvent(InputBarEvent.UpdateEditingMessage(editingMessage))
+    }
+
+    StatelessInputBar(
+        modifier = modifier,
+        state = state,
+        onEvent = viewModel::onEvent,
+        effect = viewModel.effect,
+        sharedImageUris = sharedImageUris,
+        onCancelSharedImage = onCancelSharedImage
+    )
+}
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
+@Composable
+fun StatelessInputBar(
+    state: InputBarUiState,
+    onEvent: (InputBarEvent) -> Unit,
+    effect: SharedFlow<InputBarEffect>,
+    modifier: Modifier = Modifier,
+    sharedImageUris: List<String> = emptyList(),
+    onCancelSharedImage: () -> Unit = {},
+) {
     val statusController = LocalStatusController.current
     val haptic = LocalHapticFeedback.current
     val layoutDirection = LocalLayoutDirection.current
     val clipboard = LocalClipboard.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     val requestRecordPermission = rememberRecordAudioPermissionHandler(
         statusController = statusController,
-        onPermissionGranted = { viewModel.onEvent(InputBarEvent.StartRecording) }
+        onPermissionGranted = { onEvent(InputBarEvent.StartRecording) }
     )
 
     val focusManager = LocalFocusManager.current
     val isKeyboardVisible = WindowInsets.isImeVisible
 
-    val onCancelReply = remember(viewModel) { { viewModel.onEvent(InputBarEvent.CancelReply) } }
-    val onCancelEdit = remember(viewModel) { { viewModel.onEvent(InputBarEvent.CancelEdit) } }
+    val onCancelReply = remember { { onEvent(InputBarEvent.CancelReply) } }
+    val onCancelEdit = remember { { onEvent(InputBarEvent.CancelEdit) } }
 
     val shakeOffset = remember { Animatable(0f) }
     var isShaking by remember { mutableStateOf(false) }
@@ -215,27 +255,14 @@ fun InputBar(
         isShaking = false
     }
 
-    LaunchedEffect(viewModel.effect) {
-        viewModel.effect.collectLatest { effect ->
+    LaunchedEffect(effect) {
+        effect.collectLatest { effect ->
             when (effect) {
                 InputBarEffect.TriggerShake -> performShake()
                 is InputBarEffect.ShowError -> statusController.error(effect.messageRes.toStatusMessageRes())
                 is InputBarEffect.PerformHapticFeedback -> haptic.performHapticFeedback(effect.type)
             }
         }
-    }
-
-    LaunchedEffect(messageInput) {
-        if (messageInput.isNotEmpty()) {
-            state.textFieldState.setTextAndPlaceCursorAtEnd(messageInput)
-        } else {
-            state.textFieldState.clearText()
-        }
-    }
-
-    LaunchedEffect(replyingTo, editingMessage) {
-        viewModel.onEvent(InputBarEvent.UpdateReplyingTo(replyingTo))
-        viewModel.onEvent(InputBarEvent.UpdateEditingMessage(editingMessage))
     }
 
     val borderColor by animateColorAsState(
@@ -317,7 +344,7 @@ fun InputBar(
                                     }
                                 }
                             },
-                            onEscapeClick = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) },
+                            onEscapeClick = { onEvent(InputBarEvent.EscapeMarkdown) },
                             onCopyClick = {
                                 val selection = state.textFieldState.selection
                                 val text = if (selection.collapsed) {
@@ -405,7 +432,7 @@ fun InputBar(
                 ) {
                     AttachButtonVisibility(
                         isVisible = !state.isRecording,
-                        onClick = { viewModel.onEvent(InputBarEvent.AttachClicked) }
+                        onClick = { onEvent(InputBarEvent.AttachClicked) }
                     )
 
                     ChatTextField(
@@ -415,25 +442,25 @@ fun InputBar(
                         amplitudes = state.amplitudes,
                         durationText = state.durationText,
                         sendWithEnter = state.sendWithEnter,
-                        onSend = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
-                        onContentReceived = { viewModel.onEvent(InputBarEvent.ContentReceived(it)) },
+                        onSend = { onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
+                        onContentReceived = { onEvent(InputBarEvent.ContentReceived(it)) },
                         onFocusChanged = { isFocused = it },
-                        onEscapeMarkdown = { viewModel.onEvent(InputBarEvent.EscapeMarkdown) }
+                        onEscapeMarkdown = { onEvent(InputBarEvent.EscapeMarkdown) }
                     )
 
                     ActionButtons(
                         isRecording = state.isRecording,
-                        onSendMessage = { viewModel.onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
+                        onSendMessage = { onEvent(InputBarEvent.SendMessage(state.textFieldState.text.toString())) },
                         onStartRecording = requestRecordPermission,
                         isSendButtonVisible = state.isSendButtonVisible,
                         maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
-                        onCancelRecording = { viewModel.onEvent(InputBarEvent.CancelRecording) },
-                        onStopAndSendRecording = { viewModel.onEvent(InputBarEvent.StopAndSendRecording) },
+                        onCancelRecording = { onEvent(InputBarEvent.CancelRecording) },
+                        onStopAndSendRecording = { onEvent(InputBarEvent.StopAndSendRecording) },
                         onDragUpdate = { directedX ->
-                            viewModel.onEvent(InputBarEvent.UpdateOffsetX(directedX))
+                            onEvent(InputBarEvent.UpdateOffsetX(directedX))
                         },
-                        onLongClick = { viewModel.onEvent(InputBarEvent.RequestSchedule) },
-                        onShowTapHint = { viewModel.onEvent(InputBarEvent.ShowTapHint) },
+                        onLongClick = { onEvent(InputBarEvent.RequestSchedule) },
+                        onShowTapHint = { onEvent(InputBarEvent.ShowTapHint) },
                         layoutDirection = layoutDirection
                     )
                 }
@@ -444,18 +471,18 @@ fun InputBar(
     if (state.schedulingStage == SchedulingStage.SelectingDate) {
         DatePickerDialog(
             onDismissRequest = {
-                viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
+                onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingTime))
+                    onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.SelectingTime))
                 }) {
                     Text(stringResource(R.string.common_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
-                    viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
+                    onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
                 }) {
                     Text(stringResource(R.string.common_cancel))
                 }
@@ -468,7 +495,7 @@ fun InputBar(
     if (state.schedulingStage == SchedulingStage.SelectingTime) {
         TimePickerDialog(
             onDismissRequest = {
-                viewModel.onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
+                onEvent(InputBarEvent.ChangeSchedulingStage(SchedulingStage.Hidden))
             },
             confirmButton = {
                 TextButton(
@@ -484,7 +511,7 @@ fun InputBar(
                             .toInstant()
                             .toEpochMilli()
 
-                        viewModel.onEvent(
+                        onEvent(
                             InputBarEvent.ScheduleMessage(
                                 state.textFieldState.text.toString(),
                                 scheduledDateTime
