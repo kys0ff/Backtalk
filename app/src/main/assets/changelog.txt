@@ -1,2 +1,3 @@
+c61120c refactor: extract StatelessInputBar and create onboarding mock components
 b83657c refactor: extract mock content from OnboardingPage enum and simplify pager layout
 663f922 feat #53: add rules and interactive reminder steps to onboarding
