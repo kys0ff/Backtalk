@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -20,7 +19,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,11 +31,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
 import off.kys.backtalk.domain.model.ChangelogEntry
-import off.kys.backtalk.presentation.theme.BacktalkTheme
 import off.kys.backtalk.presentation.viewmodel.ChangelogViewModel
 import off.kys.backtalk.util.capitalize
 import org.koin.compose.viewmodel.koinViewModel
@@ -50,7 +46,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChangelogDialog(
     onDismiss: () -> Unit,
-    onSeeOnboarding: () -> Unit
+    onSeeOnboarding: (() -> Unit)?
 ) {
     val viewModel = koinViewModel<ChangelogViewModel>()
     val state by viewModel.state.collectAsState()
@@ -76,7 +72,7 @@ private fun ChangelogDialogContent(
     entries: List<ChangelogEntry>,
     isLoading: Boolean,
     onDismiss: () -> Unit,
-    onSeeOnboarding: () -> Unit
+    onSeeOnboarding: (() -> Unit)?
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -143,7 +139,7 @@ private fun ChangelogDialogContent(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Surface(
+                    if (onSeeOnboarding != null) Surface(
                         onClick = onSeeOnboarding,
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -261,7 +257,7 @@ private fun ChangelogRow(entry: ChangelogEntry) {
             if (entry.isParsedSuccessfully) {
                 val label = getLabelForType(entry.type)
                 val tagText = if (issue != null) "$label $issue" else label
-                
+
                 ChangelogTag(
                     text = tagText,
                     containerColor = containerColor,
@@ -283,27 +279,6 @@ private fun ChangelogRow(entry: ChangelogEntry) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.padding(top = 2.dp)
-                )
-            }
-        }
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun ChangelogDialogPreview() {
-    BacktalkTheme(dynamicColor = false) {
-        Scaffold { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                ChangelogDialogContent(
-                    entries = emptyList(),
-                    isLoading = false,
-                    onDismiss = {},
-                    onSeeOnboarding = {}
                 )
             }
         }

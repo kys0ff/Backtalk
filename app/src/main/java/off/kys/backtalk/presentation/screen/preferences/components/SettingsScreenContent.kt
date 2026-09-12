@@ -689,6 +689,16 @@ fun SettingsScreenContent(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 SettingsItem(
+                    label = stringResource(R.string.settings_changelog_see_onboarding),
+                    icon = painterResource(R.drawable.round_info_24),
+                    onClick = onSeeOnboarding
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                SettingsItem(
                     label = stringResource(R.string.settings_developer),
                     value = stringResource(R.string.settings_dev_name),
                     icon = painterResource(R.drawable.round_person_24),
@@ -964,10 +974,7 @@ fun SettingsScreenContent(
         SettingsDialog.Changelog -> {
             ChangelogDialog(
                 onDismiss = { activeDialog = null },
-                onSeeOnboarding = {
-                    activeDialog = null
-                    onSeeOnboarding()
-                }
+                onSeeOnboarding = null
             )
         }
 
