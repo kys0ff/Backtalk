@@ -308,7 +308,11 @@ private fun MessagesOverlaySection(
 
     if (state.showChangelogDialog) {
         ChangelogDialog(
-            onDismiss = { actions.onEvent(MessagesUiEvent.DismissChangelog) }
+            onDismiss = { actions.onEvent(MessagesUiEvent.DismissChangelog) },
+            onSeeOnboarding = {
+                actions.onEvent(MessagesUiEvent.SeeOnboarding)
+                actions.onNavigateToOnboarding()
+            }
         )
     }
 }

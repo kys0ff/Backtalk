@@ -63,6 +63,7 @@ fun SettingsScreenContent(
     onNavigateBack: () -> Unit,
     onSyncClicked: () -> Unit,
     onChangelogClick: () -> Unit,
+    onSeeOnboarding: () -> Unit,
     onLicenseClicked: () -> Unit,
     onSimulateCrashClicked: () -> Unit,
     onCheckUpdates: () -> Unit
@@ -962,7 +963,11 @@ fun SettingsScreenContent(
 
         SettingsDialog.Changelog -> {
             ChangelogDialog(
-                onDismiss = { activeDialog = null }
+                onDismiss = { activeDialog = null },
+                onSeeOnboarding = {
+                    activeDialog = null
+                    onSeeOnboarding()
+                }
             )
         }
 

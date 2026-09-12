@@ -33,6 +33,7 @@
     <string name="common_not_available">N/D</string>
     <string name="common_confirm">Confirmar</string>
     <string name="common_experimental">Experimental</string>
+    <string name="common_recommended">Recomendado</string>
     <string name="common_error">Error</string>
 
     <!-- Chat -->
@@ -105,6 +106,7 @@
     <string name="settings_changelog_desc">Ver los últimos cambios y mejoras</string>
     <string name="settings_changelog_title">Novedades</string>
     <string name="settings_changelog_error">Error al cargar el registro de cambios o no se encontraron cambios.</string>
+    <string name="settings_changelog_see_onboarding">Ver la introducción de nuevo</string>
     <string name="changelog_type_feat">Función</string>
     <string name="changelog_type_fix">Corrección</string>
     <string name="changelog_type_refactor">Refactorización</string>

@@ -33,6 +33,7 @@
     <string name="common_not_available">غير متوفر</string>
     <string name="common_confirm">تأكيد</string>
     <string name="common_experimental">تجريبي</string>
+    <string name="common_recommended">مُوصى به</string>
     <string name="common_error">خطأ</string>
 
     <!-- Chat -->
@@ -108,6 +109,7 @@
     <string name="settings_changelog_desc">عرض أحدث التغييرات والتحسينات</string>
     <string name="settings_changelog_title">ما الجديد</string>
     <string name="settings_changelog_error">خطأ في تحميل سجل التغييرات أو لم يتم العثور على تغييرات.</string>
+    <string name="settings_changelog_see_onboarding">مشاهدة شاشات الترحيب مرة أخرى</string>
     <string name="changelog_type_feat">ميزة</string>
     <string name="changelog_type_fix">إصلاح</string>
     <string name="changelog_type_refactor">إعادة هيكلة</string>

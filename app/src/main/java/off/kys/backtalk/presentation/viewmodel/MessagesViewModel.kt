@@ -182,6 +182,11 @@ class MessagesViewModel(
                 _uiState.update { it.copy(showChangelogDialog = false) }
             }
 
+            MessagesUiEvent.SeeOnboarding -> {
+                preferences.lastSeenChangelogVersion = BuildConfig.VERSION_NAME
+                _uiState.update { it.copy(showChangelogDialog = false) }
+            }
+
             MessagesUiEvent.RefreshSettings -> {
                 _uiState.update {
                     it.copy(

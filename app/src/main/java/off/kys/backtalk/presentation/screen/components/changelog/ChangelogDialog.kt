@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,8 +29,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import off.kys.backtalk.R
@@ -47,6 +50,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ChangelogDialog(
     onDismiss: () -> Unit,
+    onSeeOnboarding: () -> Unit
 ) {
     val viewModel = koinViewModel<ChangelogViewModel>()
     val state by viewModel.state.collectAsState()
@@ -54,7 +58,8 @@ fun ChangelogDialog(
     ChangelogDialogContent(
         entries = state.entries,
         isLoading = state.isLoading,
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
+        onSeeOnboarding = onSeeOnboarding
     )
 }
 
@@ -64,12 +69,14 @@ fun ChangelogDialog(
  * @param entries The list of parsed changelog entries to display.
  * @param isLoading Whether the changelog is currently loading.
  * @param onDismiss Callback executed when the dialog should be dismissed.
+ * @param onSeeOnboarding Callback executed when the "See Onboarding" button is clicked.
  */
 @Composable
 private fun ChangelogDialogContent(
     entries: List<ChangelogEntry>,
     isLoading: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSeeOnboarding: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -77,7 +84,8 @@ private fun ChangelogDialogContent(
             Icon(
                 painter = painterResource(R.drawable.round_update_24),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp)
             )
         },
         title = {
@@ -88,51 +96,130 @@ private fun ChangelogDialogContent(
         },
         text = {
             if (isLoading) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
             } else if (entries.isEmpty()) {
                 Text(
                     text = stringResource(R.string.settings_changelog_error),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
             } else {
                 val listState = rememberLazyListState()
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 400.dp)
-                ) {
-                    LazyColumn(
-                        state = listState,
+                Column {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(end = 14.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                            .heightIn(max = 400.dp)
                     ) {
-                        items(entries) { entry ->
-                            ChangelogRow(entry = entry)
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(entries) { entry ->
+                                ChangelogRow(entry = entry)
+                            }
                         }
+
+                        FastScrollHandler(
+                            state = listState,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .fillMaxHeight()
+                                .padding(vertical = 4.dp)
+                        )
                     }
 
-                    FastScrollHandler(
-                        state = listState,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .fillMaxHeight()
-                            .padding(vertical = 4.dp)
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Surface(
+                        onClick = onSeeOnboarding,
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.round_info_24),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = stringResource(R.string.settings_changelog_see_onboarding),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    RecommendedBadge()
+                                }
+                                Text(
+                                    text = "Revisit the app features and guides",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                painter = painterResource(R.drawable.round_arrow_back_24),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .rotate(180f)
+                            )
+                        }
+                    }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(android.R.string.ok))
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.common_ok),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     )
+}
+
+@Composable
+private fun RecommendedBadge() {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = MaterialTheme.shapes.extraSmall,
+        modifier = Modifier.padding(start = 8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.common_recommended).uppercase(),
+            maxLines = 1,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
+    }
 }
 
 /**
@@ -216,6 +303,7 @@ fun ChangelogDialogPreview() {
                     entries = emptyList(),
                     isLoading = false,
                     onDismiss = {},
+                    onSeeOnboarding = {}
                 )
             }
         }

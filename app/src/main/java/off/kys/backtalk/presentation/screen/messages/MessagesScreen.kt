@@ -19,6 +19,7 @@ import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.screen.messages.components.MessagesScreenContent
+import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
 import off.kys.backtalk.presentation.screen.preferences.SettingsScreen
 import off.kys.backtalk.presentation.screen.reminders.RemindersScreen
 import off.kys.backtalk.presentation.screen.statistics.StatisticsScreen
@@ -71,7 +72,8 @@ class MessagesScreen : Screen {
                 onDeleteSelected = { viewModel.onEvent(MessagesUiEvent.DeleteSelected) },
                 onCopySelected = { viewModel.onEvent(MessagesUiEvent.CopySelected) },
                 onCloseSelection = { viewModel.onEvent(MessagesUiEvent.ClearSelection) },
-                onNavigatePinned = { viewModel.onEvent(MessagesUiEvent.NavigatePinned) }
+                onNavigatePinned = { viewModel.onEvent(MessagesUiEvent.NavigatePinned) },
+                onNavigateToOnboarding = { navigator.replaceAll(OnboardingScreen()) }
             )
         }
 

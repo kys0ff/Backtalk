@@ -13,6 +13,7 @@ import off.kys.backtalk.presentation.activity.MainActivity
 import off.kys.backtalk.presentation.components.SplitThemeContainer
 import off.kys.backtalk.presentation.screen.changelog.ChangelogScreen
 import off.kys.backtalk.presentation.screen.license.LicenseScreen
+import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
 import off.kys.backtalk.presentation.screen.preferences.components.SettingsScreenContent
 import off.kys.backtalk.presentation.screen.sync.SyncScreen
 import off.kys.backtalk.presentation.state.preferences.SettingsUiState
@@ -38,6 +39,7 @@ class SettingsScreen : Screen {
             onNavigateBack = { navigator.pop() },
             onSyncClicked = { navigator += SyncScreen() },
             onChangelogClick = { navigator += ChangelogScreen() },
+            onSeeOnboarding = { navigator.replaceAll(OnboardingScreen()) },
             onLicenseClicked = { navigator += LicenseScreen() },
             onSimulateCrashClicked = { throw Exception("This is a sample bug report for demonstration.") },
             onCheckUpdates = { mainActivity?.checkForUpdates() }
@@ -58,6 +60,7 @@ private fun SettingsScreenPreview() {
             onNavigateBack = {},
             onSyncClicked = {},
             onChangelogClick = {},
+            onSeeOnboarding = {},
             onLicenseClicked = {},
             onSimulateCrashClicked = {},
             onCheckUpdates = {}

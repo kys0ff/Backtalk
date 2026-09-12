@@ -239,4 +239,9 @@ sealed interface MessagesUiEvent {
      * UI event to mark the swipe hint as shown.
      */
     data object MarkSwipeHintShown : MessagesUiEvent
+
+    /**
+     * UI event to navigate to the onboarding screen from the changelog.
+     */
+    data object SeeOnboarding : MessagesUiEvent
 }

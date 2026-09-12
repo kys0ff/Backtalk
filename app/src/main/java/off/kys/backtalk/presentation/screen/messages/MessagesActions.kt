@@ -20,7 +20,8 @@ data class MessagesActions(
     val onDeleteSelected: () -> Unit = {},
     val onCopySelected: () -> Unit = {},
     val onCloseSelection: () -> Unit = {},
-    val onNavigatePinned: () -> Unit = {}
+    val onNavigatePinned: () -> Unit = {},
+    val onNavigateToOnboarding: () -> Unit = {}
 )
 
 /**
