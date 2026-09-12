@@ -1,3 +1,4 @@
+6a29a82 feat: add see onboarding button to settings screen and make changelog dialog onboarding button optional
 341a61f feat: add option to revisit onboarding from changelog dialog
 bcffb05 feat: enable scrolling in messaging mock and add long-press hint to reminder mock
 c61120c refactor: extract StatelessInputBar and create onboarding mock components

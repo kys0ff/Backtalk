@@ -30,10 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -41,12 +43,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import off.kys.backtalk.R
 import off.kys.backtalk.presentation.state.statistics.DayActivity
 import off.kys.backtalk.presentation.state.statistics.HeatmapDay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
-import androidx.compose.ui.graphics.Brush
 
 @Composable
 fun ActivityBarChart(
@@ -212,13 +214,14 @@ fun AppUsageHeatmap(
                                 baseColor.copy(alpha = alpha)
                             }
 
+                            val contentDesc = stringResource(R.string.statistics_chart_date_count_cd, day.date, day.count)
                             Box(
                                 modifier = Modifier
                                     .size(cellSize)
                                     .background(color, RoundedCornerShape(3.dp))
                                     // Actually tell the OS what this box is for
                                     .semantics {
-                                        contentDescription = "Date: ${day.date}, Count: ${day.count}"
+                                        contentDescription = contentDesc
                                     }
                             )
                         }
@@ -295,7 +298,7 @@ fun MessageTypePieChart(
                     fontWeight = FontWeight.ExtraBold
                 )
                 Text(
-                    text = "Total",
+                    text = stringResource(R.string.statistics_total),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -310,7 +313,7 @@ fun MessageTypePieChart(
                 ChartLegendItem(
                     color = slice.color,
                     label = slice.label,
-                    value = "${percentage.toInt()}%"
+                    value = stringResource(R.string.common_percentage, percentage.toInt())
                 )
             }
         }

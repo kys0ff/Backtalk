@@ -1,7 +1,6 @@
 package off.kys.backtalk.presentation.screen.messages.components
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -126,33 +125,42 @@ fun MediaPickerSheet(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val cameraGranted = permissions[Manifest.permission.CAMERA] ?: (ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED)
-        
+        val cameraGranted =
+            permissions[Manifest.permission.CAMERA] ?: (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED)
+
         val mediaGranted = mediaPermissions.any {
             permissions[it] ?: (ContextCompat.checkSelfPermission(
                 context,
                 it
             ) == PackageManager.PERMISSION_GRANTED)
         }
-        
+
         viewModel.onEvent(MediaPickerEvent.PermissionsResult(cameraGranted, mediaGranted))
     }
 
     LaunchedEffect(Unit) {
-        val hasCamera = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val hasCamera = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
         val hasMedia = mediaPermissions.any {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
-        
+
         if (!hasCamera || !hasMedia) {
             val toRequest = mutableListOf(Manifest.permission.CAMERA)
             toRequest.addAll(mediaPermissions)
             permissionLauncher.launch(toRequest.toTypedArray())
         } else {
-            viewModel.onEvent(MediaPickerEvent.PermissionsResult(true, true))
+            viewModel.onEvent(
+                MediaPickerEvent.PermissionsResult(
+                    cameraGranted = true,
+                    mediaGranted = true
+                )
+            )
         }
     }
 
@@ -201,7 +209,13 @@ fun MediaPickerSheet(
                                 val isSelected = uiState.selectedFolderId == folder.id
                                 FilterChip(
                                     selected = isSelected,
-                                    onClick = { viewModel.onEvent(MediaPickerEvent.SelectFolder(folder.id)) },
+                                    onClick = {
+                                        viewModel.onEvent(
+                                            MediaPickerEvent.SelectFolder(
+                                                folder.id
+                                            )
+                                        )
+                                    },
                                     label = {
                                         Text(
                                             text = folder.name,
@@ -279,7 +293,12 @@ fun MediaPickerSheet(
                                             .fillMaxWidth(),
                                         onSelected = { uri, type ->
                                             val isAdding = uri !in uiState.selectedUris
-                                            viewModel.onEvent(MediaPickerEvent.ToggleMediaSelection(uri, type))
+                                            viewModel.onEvent(
+                                                MediaPickerEvent.ToggleMediaSelection(
+                                                    uri,
+                                                    type
+                                                )
+                                            )
                                             if (isAdding && sheetState.currentValue != SheetValue.Expanded) {
                                                 scope.launch { sheetState.expand() }
                                             }
@@ -548,7 +567,7 @@ private fun GalleryItem(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
-                    text = "GIF",
+                    text = stringResource(R.string.common_gif),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     color = Color.White,
                     fontSize = 10.sp,

@@ -54,7 +54,7 @@ class SyncScreen : Screen {
             when {
                 state.error != null || state.errorRes != null -> {
                     ScaffoldStatus.Error to (state.errorRes?.let { StatusMessage.Res(it) }
-                        ?: StatusMessage.Text(state.error ?: "Unknown error"))
+                        ?: StatusMessage.Res(R.string.sync_error_unknown_message))
                 }
 
                 state.syncStatus == SyncStatus.SYNCING -> ScaffoldStatus.Loading to StatusMessage.Res(
@@ -69,12 +69,12 @@ class SyncScreen : Screen {
                     R.string.sync_enter_pin
                 )
 
-                state.syncStatus == SyncStatus.COMPLETED -> ScaffoldStatus.Info to StatusMessage.Text(
-                    "Sync completed"
+                state.syncStatus == SyncStatus.COMPLETED -> ScaffoldStatus.Info to StatusMessage.Res(
+                    R.string.sync_status_completed
                 )
 
-                state.isDiscovering && state.discoveredDevices.isEmpty() -> ScaffoldStatus.Loading to StatusMessage.Text(
-                    "Searching for devices..."
+                state.isDiscovering && state.discoveredDevices.isEmpty() -> ScaffoldStatus.Loading to StatusMessage.Res(
+                    R.string.sync_status_searching
                 )
 
                 else -> ScaffoldStatus.None to null

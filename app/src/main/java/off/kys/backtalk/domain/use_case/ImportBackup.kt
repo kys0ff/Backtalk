@@ -5,6 +5,7 @@ import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import off.kys.backtalk.R
 import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.data.local.dao.MessagesDao
 import off.kys.backtalk.domain.model.BackupData
@@ -55,7 +56,7 @@ class ImportBackup(
                 } else {
                     // Could be encrypted ZIP (.bkt) or encrypted legacy JSON (.json)
                     if (password.isNullOrBlank()) {
-                        throw IllegalArgumentException("Password required for encrypted backup")
+                        throw IllegalArgumentException(context.getString(R.string.backup_error_password_required))
                     }
 
                     // Try decrypting as binary first (.bkt behavior)
@@ -169,7 +170,7 @@ class ImportBackup(
             }
         }
 
-        if (json.isEmpty()) throw IllegalArgumentException("Invalid backup: backup.json missing")
+        if (json.isEmpty()) throw IllegalArgumentException(context.getString(R.string.backup_error_invalid_missing_json))
         return json to mediaMap
     }
 }

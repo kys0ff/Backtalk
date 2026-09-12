@@ -21,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
+import off.kys.backtalk.R
 
 @Composable
 fun TagFilterBar(
@@ -83,7 +85,7 @@ private fun TagChip(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "#$tag",
+                text = stringResource(R.string.chat_tag_prefix, tag),
                 style = MaterialTheme.typography.labelLarge.copy(textDirection = TextDirection.Content),
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )

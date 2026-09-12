@@ -7,6 +7,7 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import off.kys.backtalk.domain.model.BackupFile
+import off.kys.backtalk.R
 import off.kys.backtalk.domain.repository.BackupRepository
 
 /**
@@ -47,7 +48,7 @@ class BackupRepositoryImpl(private val context: Context) : BackupRepository {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 val buffer = ByteArray(4)
                 val read = inputStream.read(buffer)
-                if (read < 1) throw IllegalStateException("Empty file")
+                if (read < 1) throw IllegalStateException(context.getString(R.string.backup_error_empty_file))
 
                 val firstChar = buffer[0].toInt().toChar()
                 if (firstChar == '{') return@runCatching false // Unencrypted JSON

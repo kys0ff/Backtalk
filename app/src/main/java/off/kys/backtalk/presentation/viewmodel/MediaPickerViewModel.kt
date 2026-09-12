@@ -79,7 +79,7 @@ class MediaPickerViewModel(
             folderList.add(
                 MediaFolder(
                     id = id,
-                    name = item.bucketName ?: "Unknown",
+                    name = item.bucketName ?: application.getString(R.string.common_unknown),
                     firstItemUri = item.uri
                 )
             )

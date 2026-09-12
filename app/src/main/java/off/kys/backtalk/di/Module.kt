@@ -95,7 +95,15 @@ private fun Module.databaseModule() {
             MessagesDatabase::class.java,
             "msgs_db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+            .addMigrations(
+                MIGRATION_1_2,
+                MIGRATION_2_3,
+                MIGRATION_3_4,
+                MIGRATION_4_5,
+                MIGRATION_5_6,
+                MIGRATION_6_7,
+                MIGRATION_7_8
+            )
             .build()
     }
 
@@ -176,7 +184,7 @@ private fun Module.viewModelModule() {
     viewModel { SettingsViewModel(androidApplication(), get(), get(), get()) }
     viewModel { SyncViewModel(get()) }
     viewModel { OnboardingViewModel(androidApplication(), get(), get()) }
-    viewModel { StatisticsViewModel(get()) }
+    viewModel { StatisticsViewModel(get(), androidApplication()) }
     viewModel { RemindersViewModel(get()) }
     viewModel { ChangelogViewModel(get()) }
     viewModel { SharedMediaViewModel(get(), get()) }

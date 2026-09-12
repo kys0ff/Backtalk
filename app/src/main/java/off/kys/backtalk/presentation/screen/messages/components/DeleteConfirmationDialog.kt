@@ -50,7 +50,7 @@ fun DeleteConfirmationDialog(
                 )
                 if (skippedCount > 0) {
                     Text(
-                        text = "Note: $skippedCount messages older than 1 hour will not be deleted.",
+                        text = stringResource(R.string.chat_delete_selected_old_warning, skippedCount),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )

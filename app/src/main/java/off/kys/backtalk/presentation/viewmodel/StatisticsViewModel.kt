@@ -1,6 +1,7 @@
 package off.kys.backtalk.presentation.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
@@ -9,8 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import off.kys.backtalk.R
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
+import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.presentation.state.statistics.DayActivity
 import off.kys.backtalk.presentation.state.statistics.HeatmapDay
@@ -27,8 +30,9 @@ import java.util.Calendar
 import java.util.Locale
 
 class StatisticsViewModel(
-    private val repository: MessagesRepository
-) : ViewModel() {
+    private val repository: MessagesRepository,
+    private val application: Application
+) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(StatisticsUiState())
     val state = _state.asStateFlow()
@@ -258,9 +262,9 @@ class StatisticsViewModel(
         return topFiveGroups.map { group ->
             val rootMsg = group.first()
             val title = if (rootMsg.text.isNotEmpty()) {
-                rootMsg.text.take(20).plus(if (rootMsg.text.length > 20) "..." else emptyString())
+                rootMsg.text.take(20).plus(if (rootMsg.text.length > 20) "…" else emptyString())
             } else {
-                "Media/Voice Thread"
+                application.getString(R.string.statistics_media_voice_thread)
             }
 
             ThreadStat(

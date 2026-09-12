@@ -167,7 +167,7 @@ private fun ChangelogDialogContent(
                                     RecommendedBadge()
                                 }
                                 Text(
-                                    text = "Revisit the app features and guides",
+                                    text = stringResource(R.string.settings_changelog_onboarding_desc),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

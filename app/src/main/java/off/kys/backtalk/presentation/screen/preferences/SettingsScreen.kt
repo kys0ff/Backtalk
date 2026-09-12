@@ -5,16 +5,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import off.kys.backtalk.presentation.activity.MainActivity
-import off.kys.backtalk.presentation.components.SplitThemeContainer
 import off.kys.backtalk.presentation.screen.changelog.ChangelogScreen
 import off.kys.backtalk.presentation.screen.license.LicenseScreen
 import off.kys.backtalk.presentation.screen.onboarding.OnboardingScreen
 import off.kys.backtalk.presentation.screen.preferences.components.SettingsScreenContent
+import off.kys.backtalk.R
 import off.kys.backtalk.presentation.screen.sync.SyncScreen
 import off.kys.backtalk.presentation.state.preferences.SettingsUiState
 import off.kys.backtalk.presentation.viewmodel.SettingsViewModel
@@ -41,29 +40,8 @@ class SettingsScreen : Screen {
             onChangelogClick = { navigator += ChangelogScreen() },
             onSeeOnboarding = { navigator.replaceAll(OnboardingScreen()) },
             onLicenseClicked = { navigator += LicenseScreen() },
-            onSimulateCrashClicked = { throw Exception("This is a sample bug report for demonstration.") },
+            onSimulateCrashClicked = { throw Exception(mainActivity?.getString(R.string.settings_simulate_crash_sample_message)) },
             onCheckUpdates = { mainActivity?.checkForUpdates() }
-        )
-    }
-}
-
-@Preview(
-    showSystemUi = true,
-    device = "id:pixel_10",
-)
-@Composable
-private fun SettingsScreenPreview() {
-    SplitThemeContainer {
-        SettingsScreenContent(
-            state = SettingsUiState(),
-            onEvent = {},
-            onNavigateBack = {},
-            onSyncClicked = {},
-            onChangelogClick = {},
-            onSeeOnboarding = {},
-            onLicenseClicked = {},
-            onSimulateCrashClicked = {},
-            onCheckUpdates = {}
         )
     }
 }

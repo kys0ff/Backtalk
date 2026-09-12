@@ -932,7 +932,7 @@ private fun SharedImageHeader(uris: List<String>, onCancel: () -> Unit) {
 
 @Composable
 fun TimePickerDialog(
-    title: String = "Select Time",
+    title: String = stringResource(R.string.message_scheduling_select_time),
     onDismissRequest: () -> Unit,
     confirmButton: @Composable (() -> Unit),
     dismissButton: @Composable (() -> Unit)? = null,

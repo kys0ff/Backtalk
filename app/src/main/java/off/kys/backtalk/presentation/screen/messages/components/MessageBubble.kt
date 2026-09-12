@@ -79,7 +79,6 @@ import off.kys.backtalk.presentation.screen.components.size_observer.applyWidth
 import off.kys.backtalk.presentation.screen.components.size_observer.observeSize
 import off.kys.backtalk.presentation.screen.messages.LocalAudioPlayer
 import off.kys.backtalk.presentation.screen.preview.ImagePreviewScreen
-import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getFirstLinkOrNull
 import java.io.File
 
@@ -714,7 +713,7 @@ private fun GridImage(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
-                    text = "GIF",
+                    text = stringResource(R.string.common_gif),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     color = Color.White,
                     style = MaterialTheme.typography.labelSmall,
@@ -834,27 +833,35 @@ private fun MessageFooter(
         ) {
             if (isReminder && originalTimestamp != null && targetTimestamp != null) {
                 Text(
-                    text = "${stringResource(R.string.chat_reminder_original_time)} ${
+                    text = stringResource(
+                        R.string.chat_reminder_original_time,
                         dateFormatter.formatMessageTime(originalTimestamp)
-                    }",
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
-                    text = "${stringResource(R.string.chat_reminder_target_time)} ${
+                    text = stringResource(
+                        R.string.chat_reminder_target_time,
                         dateFormatter.formatMessageTime(targetTimestamp)
-                    }",
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline
                 )
             } else {
-                Text(
-                    text = "${if (editedAt != null) stringResource(R.string.chat_sent_at) else emptyString()} ${
-                        dateFormatter.formatMessageTime(timestamp)
-                    }".trim(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
+                if (editedAt != null) {
+                    Text(
+                        text = stringResource(R.string.chat_sent_at, dateFormatter.formatMessageTime(timestamp)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                } else {
+                    Text(
+                        text = dateFormatter.formatMessageTime(timestamp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
             }
             editedAt?.let {
                 Text(
