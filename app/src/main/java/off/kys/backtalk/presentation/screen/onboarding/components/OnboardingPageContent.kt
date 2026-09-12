@@ -42,24 +42,35 @@ fun OnboardingPageContent(
     ) {
         Box(
             modifier = Modifier
-                .padding(top = 32.dp, start = 24.dp, end = 24.dp)
+                .padding(top = 40.dp, start = 24.dp, end = 24.dp)
                 .fillMaxWidth()
+                .height(360.dp)
                 .graphicsLayer {
                     translationY = scrollState.value * 0.4f
-                    alpha = 1f - (scrollState.value.toFloat() / 1000f).coerceIn(0f, 1f)
-                    scaleX = 1f - (scrollState.value.toFloat() / 3000f).coerceIn(0f, 0.15f)
-                    scaleY = 1f - (scrollState.value.toFloat() / 3000f).coerceIn(0f, 0.15f)
+                    alpha = 1f - (scrollState.value.toFloat() / 1500f).coerceIn(0f, 1f)
+                    scaleX = 1f - (scrollState.value.toFloat() / 4000f).coerceIn(0f, 0.15f)
+                    scaleY = 1f - (scrollState.value.toFloat() / 4000f).coerceIn(0f, 0.15f)
                 }
                 .clip(RoundedCornerShape(32.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
             contentAlignment = Alignment.Center
         ) {
-            page.MockContent()
+            when (page) {
+                OnboardingPage.Welcome -> WelcomeMock()
+                OnboardingPage.Messaging -> MessagingMock()
+                OnboardingPage.Voice -> VoiceMock()
+                OnboardingPage.Threads -> ThreadsMock()
+                OnboardingPage.Rules -> RulesMock()
+                OnboardingPage.ReminderInteractive -> ReminderInteractiveMock()
+                OnboardingPage.SyncBackup -> SyncMock()
+                OnboardingPage.Security -> SecurityMock()
+                OnboardingPage.Permissions -> PermissionsMock()
+            }
         }
 
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(horizontal = 24.dp, vertical = 32.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -86,7 +97,7 @@ fun OnboardingPageContent(
                 PermissionSection(state, onUpdatePermissions)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }

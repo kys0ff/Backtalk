@@ -1,6 +1,6 @@
 package off.kys.backtalk.presentation.screen.onboarding.components
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -28,7 +28,7 @@ fun OnboardingScreenContent(
         }
     ) { paddingValues ->
         OnboardingScreenPagerContent(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             pagerState = pagerState,
             state = state,
             onUpdatePermissions = onUpdatePermissions,

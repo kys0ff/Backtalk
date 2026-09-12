@@ -1,9 +1,7 @@
 package off.kys.backtalk.presentation.screen.onboarding.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -24,51 +22,45 @@ fun OnboardingScreenPagerContent(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    HorizontalPager(
+        state = pagerState,
         modifier = modifier
             .fillMaxSize()
-            .padding(paddingValues)
-    ) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            verticalAlignment = Alignment.Top
-        ) { pageIndex ->
-            val page = OnboardingPage.entries[pageIndex]
-            OnboardingPageContent(
-                page = page,
-                state = state,
-                onUpdatePermissions = onUpdatePermissions,
-                modifier = Modifier.graphicsLayer {
-                    val pageOffset = (
-                            (pagerState.currentPage - pageIndex) + pagerState
-                                .currentPageOffsetFraction
-                            )
+            .padding(paddingValues),
+        verticalAlignment = Alignment.Top
+    ) { pageIndex ->
+        val page = OnboardingPage.entries[pageIndex]
+        OnboardingPageContent(
+            page = page,
+            state = state,
+            onUpdatePermissions = onUpdatePermissions,
+            modifier = Modifier.graphicsLayer {
+                val pageOffset = (
+                        (pagerState.currentPage - pageIndex) + pagerState
+                            .currentPageOffsetFraction
+                        )
 
-                    val fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f)
+                val fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f)
 
-                    alpha = lerp(
-                        start = 0.5f,
-                        stop = 1f,
-                        fraction = fraction
-                    )
+                alpha = lerp(
+                    start = 0.5f,
+                    stop = 1f,
+                    fraction = fraction
+                )
 
-                    scaleX = lerp(
-                        start = 0.9f,
-                        stop = 1f,
-                        fraction = fraction
-                    )
-                    scaleY = lerp(
-                        start = 0.9f,
-                        stop = 1f,
-                        fraction = fraction
-                    )
+                scaleX = lerp(
+                    start = 0.9f,
+                    stop = 1f,
+                    fraction = fraction
+                )
+                scaleY = lerp(
+                    start = 0.9f,
+                    stop = 1f,
+                    fraction = fraction
+                )
 
-                    translationX = pageOffset * size.width * 0.1f
-                }
-            )
-        }
+                translationX = pageOffset * size.width * 0.1f
+            }
+        )
     }
 }

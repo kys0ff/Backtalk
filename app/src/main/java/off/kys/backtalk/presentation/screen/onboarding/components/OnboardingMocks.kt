@@ -11,7 +11,6 @@ import off.kys.backtalk.util.emptyString
 import off.kys.backtalk.util.getAssetFile
 
 import kotlinx.collections.immutable.toPersistentList
-import off.kys.backtalk.common.Constants
 import off.kys.backtalk.presentation.model.MessageUiModel
 
 object OnboardingMocks {
