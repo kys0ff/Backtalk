@@ -21,6 +21,7 @@ import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -221,5 +222,73 @@ class MessagesViewModelTest : KoinTest {
         // Then
         coVerify { useCases.insertMessage(message) }
         assertTrue(viewModel.uiState.value.recentlyDeletedMessages.isEmpty())
+    }
+
+    @Test
+    fun `ToggleStartNewThread event should update the flag`() {
+        // Given
+        assertFalse(viewModel.uiState.value.startNewThread)
+
+        // When
+        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(true))
+
+        // Then
+        assertTrue(viewModel.uiState.value.startNewThread)
+
+        // When toggled back off
+        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(false))
+
+        // Then
+        assertFalse(viewModel.uiState.value.startNewThread)
+    }
+
+    @Test
+    fun `a message sent with startNewThread enabled becomes its own thread root`() {
+        // Given an existing message that forms the current thread
+        val existingId = MessageId(100)
+        every { useCases.getAllMessages() } returns flowOf(listOf(createMessageEntity(existingId, "first")))
+        viewModel.onEvent(MessagesUiEvent.LoadMessages)
+        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(true))
+
+        val inserted = mutableListOf<MessageEntity>()
+        coEvery { useCases.insertMessage(capture(inserted)) } returns Unit
+
+        // When
+        viewModel.onEvent(MessagesUiEvent.SendMessage("brand new thought"))
+
+        // Then the new message is a root: threadId is null, so it is grouped on its own.
+        assertTrue(inserted.isNotEmpty())
+        assertEquals(null, inserted.first().threadId)
+        // And the toggle resets so the next message does not silently start another thread.
+        assertFalse(viewModel.uiState.value.startNewThread)
+    }
+
+    @Test
+    fun `replying inherits the thread of the message being replied to`() {
+        // Given a root and one of its replies
+        val rootId = MessageId(200)
+        val replyId = MessageId(201)
+        val root = createMessageEntity(rootId, "root")
+        val reply = MessageEntity(
+            id = replyId,
+            text = "reply",
+            timestamp = System.currentTimeMillis() + 1_000,
+            repliedToId = rootId,
+            threadId = rootId
+        )
+        every { useCases.getAllMessages() } returns flowOf(listOf(root, reply))
+        viewModel.onEvent(MessagesUiEvent.LoadMessages)
+
+        val inserted = mutableListOf<MessageEntity>()
+        coEvery { useCases.insertMessage(capture(inserted)) } returns Unit
+
+        // When replying to the reply (i.e. to a deep message, not the root)
+        viewModel.onEvent(MessagesUiEvent.ReplyTo(viewModel.uiState.value.messages[1]))
+        viewModel.onEvent(MessagesUiEvent.SendMessage("nested reply"))
+
+        // Then it stays inside the original thread instead of being promoted to a root.
+        assertTrue(inserted.isNotEmpty())
+        assertEquals(rootId, inserted.first().threadId)
+        assertEquals(replyId, inserted.first().repliedToId)
     }
 }

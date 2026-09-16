@@ -273,6 +273,8 @@ private fun BoxScope.MessageInputSection(
         },
         replyingTo = state.replyingTo,
         editingMessage = state.editingMessage,
+        startNewThread = state.startNewThread,
+        showNewThreadToggle = state.replyingTo == null && state.messages.isNotEmpty(),
         sharedImageUris = state.sharedImageUris,
         onCancelSharedImage = { actions.onEvent(MessagesUiEvent.ClearSharedImage) }
     )

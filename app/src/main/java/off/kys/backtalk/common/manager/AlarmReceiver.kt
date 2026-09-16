@@ -44,6 +44,7 @@ class AlarmReceiver : BroadcastReceiver(), KoinComponent {
                 text = scheduledMessage.text,
                 timestamp = System.currentTimeMillis(), // Delivery time
                 repliedToId = scheduledMessage.repliedToId,
+                threadId = scheduledMessage.threadId,
                 isReminder = true,
                 originalCreationTimestamp = scheduledMessage.creationTimestamp,
                 scheduledTimestamp = scheduledMessage.scheduledTimestamp,

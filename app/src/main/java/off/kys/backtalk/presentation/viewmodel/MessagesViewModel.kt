@@ -84,6 +84,8 @@ class MessagesViewModel(
             )
 
             is MessagesUiEvent.ReplyTo -> updateReply(event.message)
+            is MessagesUiEvent.ToggleStartNewThread ->
+                _uiState.update { it.copy(startNewThread = event.startNewThread) }
             is MessagesUiEvent.EditMessage -> updateEditingMessage(event.message)
 
             is MessagesUiEvent.ToggleSelection -> toggleSelection(event.id)
@@ -262,6 +264,7 @@ class MessagesViewModel(
 
     private fun sendMediaMessages(uris: List<String>, type: String, description: String?) {
         val replyTo = _uiState.value.replyingTo
+        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
         val smartPointing = preferences.smartImagePointingEnabled
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -315,6 +318,7 @@ class MessagesViewModel(
                                     ?: emptyString() else emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
                                 repliedToId = replyTo?.id,
+                                threadId = threadId,
                                 mediaPaths = chunk,
                                 mediaType = actualMediaType
                             )
@@ -336,7 +340,7 @@ class MessagesViewModel(
             }
         }
         updateReply(null)
-        _uiState.value = _uiState.value.copy(showMediaPicker = false)
+        _uiState.value = _uiState.value.copy(showMediaPicker = false, startNewThread = false)
     }
 
     private fun blinkMessage(id: MessageId?) {
@@ -376,11 +380,14 @@ class MessagesViewModel(
             return
         }
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
+        val replyTo = _uiState.value.replyingTo
+        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
         viewModelScope.launch {
             useCases.scheduleMessage(
                 text = trimmedText,
                 scheduledTime = scheduledTime,
-                repliedToId = _uiState.value.replyingTo?.id
+                repliedToId = replyTo?.id,
+                threadId = threadId
             )
             showScaffoldMessage(
                 StatusMessage.Res(R.string.message_scheduled_success),
@@ -530,6 +537,7 @@ class MessagesViewModel(
             text = text,
             timestamp = timestamp,
             repliedToId = repliedToId,
+            threadId = threadId,
             editedText = editedText,
             editedAt = editedAt,
             voicePath = voicePath,
@@ -585,6 +593,40 @@ class MessagesViewModel(
         _uiState.update { it.copy(filteredMessages = filtered) }
     }
 
+    /**
+     * Decides which thread a message being composed right now belongs to.
+     *
+     * A message starts a new thread when the user explicitly asked for it, and otherwise continues an
+     * existing one. The thread a reply targets is the thread of the message it replies to, which is
+     * what keeps a reply to a deep message inside its own thread instead of promoting it to a root.
+     *
+     * A message that is not a reply continues the most recent thread only while it is still active,
+     * i.e. while it was written less than [Constants.TIME_GAP_FOR_HEADER] after that thread's newest
+     * message. Past that gap the user has clearly moved on, so the message starts a new thread.
+     *
+     * @param replyTo The message the new message is replying to, or null.
+     * @param startNewThread Whether the user explicitly requested a new thread.
+     * @return The ID of the thread root the new message belongs to, or null to make it a new root.
+     */
+    private fun resolveThreadIdForNewMessage(
+        replyTo: MessageUiModel?,
+        startNewThread: Boolean
+    ): MessageId? {
+        if (startNewThread) return null
+
+        if (replyTo != null) return replyTo.threadId ?: replyTo.id
+
+        // Continue the thread of the newest message, but only while that thread is still active.
+        val newest = _uiState.value.messages.maxByOrNull { it.timestamp } ?: return null
+        val lastThreadId = newest.threadId ?: newest.id
+        val lastMessageAt = _uiState.value.messages
+            .filter { (it.threadId ?: it.id) == lastThreadId }
+            .maxOfOrNull { it.timestamp } ?: return null
+
+        val now = System.currentTimeMillis()
+        return lastThreadId.takeIf { now - lastMessageAt < Constants.TIME_GAP_FOR_HEADER }
+    }
+
     private fun sendMessage(text: String) {
         val editingMessage = _uiState.value.editingMessage
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
@@ -607,13 +649,17 @@ class MessagesViewModel(
             return
         }
 
+        val replyTo = _uiState.value.replyingTo
+        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
+
         viewModelScope.launch {
             useCases.insertMessage(
                 MessageEntity(
                     id = MessageId.generate(),
                     text = trimmedText,
                     timestamp = System.currentTimeMillis(),
-                    repliedToId = _uiState.value.replyingTo?.id
+                    repliedToId = replyTo?.id,
+                    threadId = threadId
                 )
             )
             WorkScheduler.scheduleReminders(application, preferences, forceReplace = true)
@@ -720,6 +766,7 @@ class MessagesViewModel(
 
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>, caption: String?) {
         val replyTo = _uiState.value.replyingTo
+        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
@@ -735,6 +782,7 @@ class MessagesViewModel(
                         text = caption ?: application.getString(R.string.chat_media_voice),
                         timestamp = System.currentTimeMillis(),
                         repliedToId = replyTo?.id,
+                        threadId = threadId,
                         voicePath = destFile.absolutePath,
                         voiceDuration = duration,
                         waveformData = waveform
@@ -748,11 +796,11 @@ class MessagesViewModel(
     }
 
     private fun updateEditingMessage(message: MessageUiModel?) {
-        _uiState.update { it.copy(editingMessage = message, replyingTo = null) }
+        _uiState.update { it.copy(editingMessage = message, replyingTo = null, startNewThread = false) }
     }
 
     private fun updateReply(message: MessageUiModel?) {
-        _uiState.update { it.copy(replyingTo = message, editingMessage = null) }
+        _uiState.update { it.copy(replyingTo = message, editingMessage = null, startNewThread = false) }
     }
 
     private fun toggleSelection(id: MessageId) {

@@ -15,6 +15,7 @@ import off.kys.backtalk.data.local.migrations.MIGRATION_4_5
 import off.kys.backtalk.data.local.migrations.MIGRATION_5_6
 import off.kys.backtalk.data.local.migrations.MIGRATION_6_7
 import off.kys.backtalk.data.local.migrations.MIGRATION_7_8
+import off.kys.backtalk.data.local.migrations.MIGRATION_8_9
 import off.kys.backtalk.data.repository.BackupRepositoryImpl
 import off.kys.backtalk.data.repository.ChangelogRepositoryImpl
 import off.kys.backtalk.data.repository.MediaRepositoryImpl
@@ -102,7 +103,8 @@ private fun Module.databaseModule() {
                 MIGRATION_4_5,
                 MIGRATION_5_6,
                 MIGRATION_6_7,
-                MIGRATION_7_8
+                MIGRATION_7_8,
+                MIGRATION_8_9
             )
             .build()
     }
@@ -200,7 +202,8 @@ private fun Module.viewModelModule() {
             onSharedImageSendAction = it.get(),
             onAttachClickAction = it.get(),
             onCancelReplyAction = it.get(),
-            onCancelEditAction = it.get()
+            onCancelEditAction = it.get(),
+            onStartNewThreadToggle = it.get()
         )
     }
 }

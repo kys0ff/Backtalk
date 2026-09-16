@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import off.kys.backtalk.data.local.database.MessagesDatabase
 import off.kys.backtalk.data.local.migrations.MIGRATION_6_7
+import off.kys.backtalk.data.local.migrations.MIGRATION_8_9
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,5 +40,30 @@ class MigrationTest {
         val mediaTypeColumnIndex = cursor.getColumnIndex("mediaType")
         assert(mediaTypeColumnIndex != -1)
         cursor.close()
+    }
+
+    @Test
+    fun migrate8To9() {
+        helper.createDatabase(TEST_DB, 8).apply {
+            execSQL("INSERT INTO messages (id, text, timestamp, isPinned) VALUES (1000, 'Hello', 1000, 0)")
+            close()
+        }
+
+        // Re-open the database with version 9 and provide MIGRATION_8_9
+        val db = helper.runMigrationsAndValidate(TEST_DB, 9, true, MIGRATION_8_9)
+
+        // The threadId column must exist on both tables.
+        val messageCursor = db.query("SELECT * FROM messages WHERE id = 1000")
+        assert(messageCursor.moveToFirst())
+        val threadIdColumnIndex = messageCursor.getColumnIndex("threadId")
+        assert(threadIdColumnIndex != -1)
+        // Pre-existing rows are thread roots, so the column must be left NULL.
+        assert(messageCursor.isNull(threadIdColumnIndex))
+        messageCursor.close()
+
+        val scheduledCursor = db.query("SELECT * FROM scheduled_messages")
+        val scheduledThreadIdColumnIndex = scheduledCursor.getColumnIndex("threadId")
+        scheduledCursor.close()
+        assert(scheduledThreadIdColumnIndex != -1)
     }
 }

@@ -49,6 +49,14 @@ sealed interface MessagesUiEvent {
     data class ReplyTo(val message: MessageUiModel?) : MessagesUiEvent
 
     /**
+     * UI event to toggle whether the next message starts a new thread rather than continuing the
+     * current one.
+     *
+     * @param startNewThread Whether the next message should start a new thread.
+     */
+    data class ToggleStartNewThread(val startNewThread: Boolean) : MessagesUiEvent
+
+    /**
      * UI event to select a message.
      *
      * @param id The ID of the message to select
