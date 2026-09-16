@@ -102,16 +102,7 @@ class InputBarViewModel(
         is InputBarEvent.ScheduleMessage -> handleScheduleMessage(event.text, event.timestamp)
         is InputBarEvent.UpdateReplyingTo -> _uiState.update { it.copy(replyingTo = event.message) }
         is InputBarEvent.UpdateEditingMessage -> _uiState.update { it.copy(editingMessage = event.message) }
-        is InputBarEvent.UpdateStartNewThread -> _uiState.update {
-            it.copy(
-                startNewThread = event.startNewThread,
-                showNewThreadToggle = event.isThreadContext
-            )
-        }
-        is InputBarEvent.ToggleStartNewThread -> {
-            _uiState.update { it.copy(startNewThread = event.startNewThread) }
-            onStartNewThreadToggle(event.startNewThread)
-        }
+        is InputBarEvent.ToggleStartNewThread -> onStartNewThreadToggle(event.startNewThread)
         InputBarEvent.CancelReply -> {
             _uiState.update { it.copy(replyingTo = null) }
             onCancelReplyAction()

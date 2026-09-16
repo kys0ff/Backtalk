@@ -17,8 +17,6 @@ data class InputBarUiState(
     val textFieldState: TextFieldState = TextFieldState(),
     val replyingTo: MessageUiModel? = null,
     val editingMessage: MessageUiModel? = null,
-    val startNewThread: Boolean = false,
-    val showNewThreadToggle: Boolean = false,
     val isRecording: Boolean = false,
     val secondsElapsed: Int = 0,
     val amplitudes: PersistentList<Float> = persistentListOf(),

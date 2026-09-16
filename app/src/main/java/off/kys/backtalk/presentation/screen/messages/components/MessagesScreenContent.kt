@@ -274,7 +274,10 @@ private fun BoxScope.MessageInputSection(
         replyingTo = state.replyingTo,
         editingMessage = state.editingMessage,
         startNewThread = state.startNewThread,
-        showNewThreadToggle = state.replyingTo == null && state.messages.isNotEmpty(),
+        // Replying already picks the thread, and editing does not create a message at all.
+        showNewThreadToggle = state.replyingTo == null &&
+            state.editingMessage == null &&
+            state.messages.isNotEmpty(),
         sharedImageUris = state.sharedImageUris,
         onCancelSharedImage = { actions.onEvent(MessagesUiEvent.ClearSharedImage) }
     )

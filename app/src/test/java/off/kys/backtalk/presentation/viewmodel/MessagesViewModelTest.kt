@@ -243,6 +243,33 @@ class MessagesViewModelTest : KoinTest {
     }
 
     @Test
+    fun `switching reply mode clears a pending startNewThread`() {
+        // Given the toggle was switched on
+        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(true))
+        assertTrue(viewModel.uiState.value.startNewThread)
+
+        // When the user changes their mind and replies to a message instead
+        viewModel.onEvent(MessagesUiEvent.ReplyTo(null))
+
+        // Then the pending flag is dropped, so the reply joins the thread it replies to rather than
+        // silently starting a new one while the toggle is hidden.
+        assertFalse(viewModel.uiState.value.startNewThread)
+    }
+
+    @Test
+    fun `switching edit mode clears a pending startNewThread`() {
+        // Given the toggle was switched on
+        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(true))
+        assertTrue(viewModel.uiState.value.startNewThread)
+
+        // When the user starts editing instead
+        viewModel.onEvent(MessagesUiEvent.EditMessage(null))
+
+        // Then the flag does not survive into the next composed message.
+        assertFalse(viewModel.uiState.value.startNewThread)
+    }
+
+    @Test
     fun `a message sent with startNewThread enabled becomes its own thread root`() {
         // Given an existing message that forms the current thread
         val existingId = MessageId(100)

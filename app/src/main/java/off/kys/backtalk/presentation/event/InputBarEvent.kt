@@ -11,8 +11,6 @@ sealed interface InputBarEvent {
     data class UpdateReplyingTo(val message: MessageUiModel?) : InputBarEvent
     data class UpdateEditingMessage(val message: MessageUiModel?) : InputBarEvent
     data class ToggleStartNewThread(val startNewThread: Boolean) : InputBarEvent
-    data class UpdateStartNewThread(val startNewThread: Boolean, val isThreadContext: Boolean) :
-        InputBarEvent
     data object CancelReply : InputBarEvent
     data object CancelEdit : InputBarEvent
     data object AttachClicked : InputBarEvent
