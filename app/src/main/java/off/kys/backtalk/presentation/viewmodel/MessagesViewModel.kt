@@ -596,13 +596,17 @@ class MessagesViewModel(
     /**
      * Decides which thread a message being composed right now belongs to.
      *
-     * A message starts a new thread when the user explicitly asked for it, and otherwise continues an
-     * existing one. The thread a reply targets is the thread of the message it replies to, which is
-     * what keeps a reply to a deep message inside its own thread instead of promoting it to a root.
+     * Uses a hybrid approach to maintain backward compatibility:
+     * - New messages get an explicit threadId, enabling manual thread control
+     * - The logic respects time gaps to auto-start threads when appropriate
      *
-     * A message that is not a reply continues the most recent thread only while it is still active,
-     * i.e. while it was written less than [Constants.TIME_GAP_FOR_HEADER] after that thread's newest
-     * message. Past that gap the user has clearly moved on, so the message starts a new thread.
+     * A message starts a new thread when:
+     * 1. The user explicitly asked for it via the "New thread" toggle
+     * 2. More than one hour has passed since the last message (natural conversation break)
+     *
+     * Otherwise, it continues an existing thread:
+     * - If replying: joins the thread of the message being replied to
+     * - If not replying: continues the most recent thread (if still active)
      *
      * @param replyTo The message the new message is replying to, or null.
      * @param startNewThread Whether the user explicitly requested a new thread.
@@ -614,17 +618,25 @@ class MessagesViewModel(
     ): MessageId? {
         if (startNewThread) return null
 
-        if (replyTo != null) return replyTo.threadId ?: replyTo.id
+        if (replyTo != null) {
+            // When replying to a message, join its thread.
+            // For legacy messages (threadId == null), treat the message itself as the root.
+            return replyTo.threadId ?: replyTo.id
+        }
 
-        // Continue the thread of the newest message, but only while that thread is still active.
+        // Not a reply: continue the most recent thread if still active
         val newest = _uiState.value.messages.maxByOrNull { it.timestamp } ?: return null
-        val lastThreadId = newest.threadId ?: newest.id
-        val lastMessageAt = _uiState.value.messages
-            .filter { (it.threadId ?: it.id) == lastThreadId }
-            .maxOfOrNull { it.timestamp } ?: return null
-
         val now = System.currentTimeMillis()
-        return lastThreadId.takeIf { now - lastMessageAt < Constants.TIME_GAP_FOR_HEADER }
+        val timeSinceNewest = now - newest.timestamp
+
+        // If more than one hour has passed, start a new thread
+        if (timeSinceNewest > Constants.TIME_GAP_FOR_HEADER) {
+            return null
+        }
+
+        // Within the time window: continue the newest message's thread
+        // For legacy messages (threadId == null), treat them as their own root
+        return newest.threadId ?: newest.id
     }
 
     private fun sendMessage(text: String) {
