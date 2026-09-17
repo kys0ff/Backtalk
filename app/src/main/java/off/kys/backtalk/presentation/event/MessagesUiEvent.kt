@@ -236,6 +236,11 @@ sealed interface MessagesUiEvent {
     data class DeleteMessage(val message: MessageUiModel) : MessagesUiEvent
 
     /**
+     * UI event to undo the last deletion of messages.
+     */
+    data object UndoDeleteMessages : MessagesUiEvent
+
+    /**
      * UI event to mark the swipe hint as shown.
      */
     data object MarkSwipeHintShown : MessagesUiEvent

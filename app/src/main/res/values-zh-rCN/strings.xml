@@ -81,6 +81,8 @@
     <string name="chat_delete_selected_old_warning">注意：超过 1 小时的 %1$d 条消息将不会被删除。</string>
     <string name="chat_delete_selected_title">删除消息？</string>
     <string name="chat_delete_undone_warning">此操作无法撤销。</string>
+    <string name="chat_messages_deleted">已删除消息</string>
+    <string name="chat_undo">撤销</string>
     <string name="chat_edited_at">编辑于 %1$s</string>
     <string name="chat_editing_locked">编辑已锁定</string>
     <string name="chat_input_caption_hint">添加说明…</string>

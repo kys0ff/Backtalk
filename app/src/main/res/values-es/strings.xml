@@ -83,6 +83,8 @@
     <string name="chat_delete_selected_old_warning">Nota: %1$d mensajes con más de 1 hora de antigüedad no se eliminarán.</string>
     <string name="chat_delete_selected_title">¿Eliminar mensajes?</string>
     <string name="chat_delete_undone_warning">Esta acción no se puede deshacer.</string>
+    <string name="chat_messages_deleted">Mensajes eliminados</string>
+    <string name="chat_undo">Deshacer</string>
     <string name="chat_edited_at">editado a las %1$s</string>
     <string name="chat_editing_locked">La edición está bloqueada</string>
     <string name="chat_input_caption_hint">Añadir un comentario…</string>

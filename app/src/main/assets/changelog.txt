@@ -1,3 +1,4 @@
+fed83a6 feat #54: add Simplified Chinese language support and improve string sorting script
 cdfda3c refactor: extract hardcoded strings to string resources and sort strings.xml
 6a29a82 feat: add see onboarding button to settings screen and make changelog dialog onboarding button optional
 341a61f feat: add option to revisit onboarding from changelog dialog

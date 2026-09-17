@@ -55,11 +55,6 @@ fun DeleteConfirmationDialog(
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-                Text(
-                    text = stringResource(R.string.chat_delete_undone_warning),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         },
         confirmButton = {

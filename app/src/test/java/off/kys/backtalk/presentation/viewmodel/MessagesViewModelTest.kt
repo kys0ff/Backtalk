@@ -1,6 +1,8 @@
 package off.kys.backtalk.presentation.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -13,6 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import off.kys.backtalk.common.manager.AlarmScheduler
 import off.kys.backtalk.common.pref.BacktalkPreferences
+import off.kys.backtalk.common.registry.CaptionWordsRegistry
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
@@ -26,6 +29,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MessagesViewModelTest : KoinTest {
@@ -36,20 +40,20 @@ class MessagesViewModelTest : KoinTest {
     private val useCases: MessagesUseCases = mockk(relaxed = true)
     private val preferences: BacktalkPreferences = mockk(relaxed = true)
     private val alarmScheduler: AlarmScheduler = mockk(relaxed = true)
-    private val application: android.app.Application = mockk(relaxed = true)
+    private val application: Application = mockk(relaxed = true)
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         
-        every { application.cacheDir } returns java.io.File("/tmp/cache")
-        every { application.filesDir } returns java.io.File("/tmp/files")
+        every { application.cacheDir } returns File("/tmp/cache")
+        every { application.filesDir } returns File("/tmp/files")
         every { useCases.getAllMessages() } returns flowOf(emptyList())
 
         startKoin {
             modules(module {
                 single { alarmScheduler }
-                single { mockk<off.kys.backtalk.common.registry.CaptionWordsRegistry>(relaxed = true) }
+                single { mockk<CaptionWordsRegistry>(relaxed = true) }
             })
         }
 
@@ -117,6 +121,7 @@ class MessagesViewModelTest : KoinTest {
         val message = createMessageEntity(messageId, "test")
         
         every { useCases.getAllMessages() } returns flowOf(listOf(message))
+        coEvery { useCases.getMessageById(messageId) } returns message
         viewModel.onEvent(MessagesUiEvent.LoadMessages)
 
         viewModel.onEvent(MessagesUiEvent.ToggleSelection(messageId))
@@ -162,6 +167,7 @@ class MessagesViewModelTest : KoinTest {
         val message = createMessageEntity(messageId, "test")
 
         every { useCases.getAllMessages() } returns flowOf(listOf(message))
+        coEvery { useCases.getMessageById(messageId) } returns message
         viewModel.onEvent(MessagesUiEvent.LoadMessages)
 
         viewModel.onEvent(MessagesUiEvent.ToggleImageSelection(messageId, path1))
@@ -191,5 +197,29 @@ class MessagesViewModelTest : KoinTest {
 
         // Then
         assertTrue(viewModel.uiState.value.selectedImagePaths.isEmpty())
+    }
+
+    @Test
+    fun `UndoDeleteMessages should restore deleted messages`() {
+        // Given
+        val messageId = MessageId.generate()
+        val message = createMessageEntity(messageId, "test to undo")
+        
+        every { useCases.getAllMessages() } returns flowOf(listOf(message))
+        coEvery { useCases.getMessageById(messageId) } returns message
+        viewModel.onEvent(MessagesUiEvent.LoadMessages)
+
+        viewModel.onEvent(MessagesUiEvent.ToggleSelection(messageId))
+        viewModel.onEvent(MessagesUiEvent.ConfirmDeleteSelected)
+
+        coVerify { useCases.deleteMessageById(messageId) }
+        assertTrue(viewModel.uiState.value.recentlyDeletedMessages.isNotEmpty())
+
+        // When
+        viewModel.onEvent(MessagesUiEvent.UndoDeleteMessages)
+
+        // Then
+        coVerify { useCases.insertMessage(message) }
+        assertTrue(viewModel.uiState.value.recentlyDeletedMessages.isEmpty())
     }
 }

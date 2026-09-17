@@ -149,10 +149,14 @@ fun MessagesScreenContent(
         }
     }
 
-    LaunchedEffect(state.scaffoldStatus, state.scaffoldMessage) {
+    LaunchedEffect(state.scaffoldStatus, state.scaffoldMessage, state.scaffoldAction) {
         val message = state.scaffoldMessage
         if (message != null) {
-            statusController.show(state.scaffoldStatus, message)
+            statusController.show(
+                status = state.scaffoldStatus,
+                message = message,
+                action = state.scaffoldAction
+            )
         } else {
             statusController.dismiss()
         }

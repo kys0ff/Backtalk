@@ -82,6 +82,8 @@
     <string name="chat_delete_selected_old_warning">Note: %1$d messages older than 1 hour will not be deleted.</string>
     <string name="chat_delete_selected_title">Delete messages?</string>
     <string name="chat_delete_undone_warning">This action cannot be undone.</string>
+    <string name="chat_messages_deleted">Messages deleted</string>
+    <string name="chat_undo">Undo</string>
     <string name="chat_edited_at">edited at %1$s</string>
     <string name="chat_editing_locked">Editing is locked</string>
     <string name="chat_input_caption_hint">Add a caption…</string>

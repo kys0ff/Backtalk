@@ -86,6 +86,8 @@
     <string name="chat_delete_selected_old_warning">ملاحظة: لن يتم حذف %1$d رسالة مضى عليها أكثر من ساعة.</string>
     <string name="chat_delete_selected_title">حذف الرسائل؟</string>
     <string name="chat_delete_undone_warning">لا يمكن التراجع عن هذا الإجراء لاحقًا.</string>
+    <string name="chat_messages_deleted">تم حذف الرسائل</string>
+    <string name="chat_undo">تراجع</string>
     <string name="chat_edited_at">عُدّلت في %1$s</string>
     <string name="chat_editing_locked">التعديل مغلق</string>
     <string name="chat_input_caption_hint">إضافة شرح…</string>

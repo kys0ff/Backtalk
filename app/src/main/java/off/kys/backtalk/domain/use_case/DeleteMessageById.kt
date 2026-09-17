@@ -2,7 +2,6 @@ package off.kys.backtalk.domain.use_case
 
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.repository.MessagesRepository
-import java.io.File
 
 /**
  * Use case for deleting a message by its identifier from the database.
@@ -26,6 +25,9 @@ class DeleteMessageById(
         message.mediaPath?.let { paths.add(it) }
         message.mediaPaths?.let { paths.addAll(it) }
 
+        // NOTE: File deletion is temporarily disabled to support Undo functionality.
+        // A background cleanup task should be implemented for permanent deletion.
+        /*
         paths.forEach { path ->
             if (!repository.isPathReferenced(path)) {
                 File(path).let { file ->
@@ -33,5 +35,6 @@ class DeleteMessageById(
                 }
             }
         }
+        */
     }
 }

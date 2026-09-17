@@ -29,6 +29,7 @@ import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.components.status_scaffold.ScaffoldStatus
+import off.kys.backtalk.presentation.components.status_scaffold.StatusAction
 import off.kys.backtalk.presentation.components.status_scaffold.StatusMessage
 import off.kys.backtalk.presentation.event.MessagesUiEvent
 import off.kys.backtalk.presentation.model.MessageUiModel
@@ -249,6 +250,8 @@ class MessagesViewModel(
                 }
             }
 
+            MessagesUiEvent.UndoDeleteMessages -> undoDeleteMessages()
+
             MessagesUiEvent.MarkSwipeHintShown -> {
                 preferences.swipeHintShown = true
                 _uiState.update { it.copy(swipeHintShown = true) }
@@ -391,6 +394,7 @@ class MessagesViewModel(
     private fun showScaffoldMessage(
         message: StatusMessage,
         status: ScaffoldStatus,
+        action: StatusAction? = null,
         duration: Duration = 3000.milliseconds
     ) {
         scaffoldMessageJob?.cancel()
@@ -398,7 +402,8 @@ class MessagesViewModel(
             _uiState.update {
                 it.copy(
                     scaffoldMessage = message,
-                    scaffoldStatus = status
+                    scaffoldStatus = status,
+                    scaffoldAction = action
                 )
             }
             if (duration > Duration.ZERO) {
@@ -413,7 +418,8 @@ class MessagesViewModel(
         _uiState.update {
             it.copy(
                 scaffoldMessage = null,
-                scaffoldStatus = ScaffoldStatus.None
+                scaffoldStatus = ScaffoldStatus.None,
+                scaffoldAction = null
             )
         }
     }
@@ -644,16 +650,46 @@ class MessagesViewModel(
         val ids = _uiState.value.selectedMessageIds
         val messages = _uiState.value.messages
         viewModelScope.launch {
-            ids.forEach { id ->
-                val message = messages.find { it.id == id }
-                if (message != null && !message.isLocked) {
-                    useCases.deleteMessageById(id)
+            val messagesToDelete = messages.filter { it.id in ids && !it.isLocked }
+            val entities = messagesToDelete.mapNotNull { useCases.getMessageById(it.id) }
+
+            if (entities.isNotEmpty()) {
+                _uiState.update { it.copy(recentlyDeletedMessages = entities.toPersistentList()) }
+
+                ids.forEach { id ->
+                    val message = messages.find { it.id == id }
+                    if (message != null && !message.isLocked) {
+                        useCases.deleteMessageById(id)
+                    }
                 }
+
+                showScaffoldMessage(
+                    StatusMessage.Res(R.string.chat_messages_deleted),
+                    ScaffoldStatus.Info,
+                    action = StatusAction(
+                        label = application.getString(R.string.chat_undo),
+                        onClick = { onEvent(MessagesUiEvent.UndoDeleteMessages) }
+                    ),
+                    duration = 5000.milliseconds
+                )
             }
         }
         _uiState.update { state ->
             val newState = state.copy(selectedMessageIds = persistentSetOf())
             newState.copy(selectionMetrics = calculateSelectionMetrics(newState))
+        }
+    }
+
+    private fun undoDeleteMessages() {
+        val messagesToRestore = _uiState.value.recentlyDeletedMessages
+        if (messagesToRestore.isEmpty()) return
+
+        viewModelScope.launch {
+            messagesToRestore.forEach { entity ->
+                useCases.insertMessage(entity)
+            }
+            _uiState.update { it.copy(recentlyDeletedMessages = persistentListOf()) }
+            dismissScaffoldMessage()
         }
     }
 
