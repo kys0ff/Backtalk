@@ -92,12 +92,13 @@ class MessagesScreen : Screen {
             parameters = {
                 parametersOf(
                     { text: String -> viewModel.onEvent(MessagesUiEvent.SendMessage(text)) },
-                    { path: String, duration: Long, waveform: List<Float> ->
+                    { path: String, duration: Long, waveform: List<Float>, caption: String ->
                         viewModel.onEvent(
                             MessagesUiEvent.SendVoiceMessage(
                                 path,
                                 duration,
-                                waveform
+                                waveform,
+                                caption.takeIf { it.isNotBlank() }
                             )
                         )
                     },

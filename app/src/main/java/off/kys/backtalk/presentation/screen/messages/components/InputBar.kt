@@ -455,7 +455,7 @@ fun StatelessInputBar(
                         isSendButtonVisible = state.isSendButtonVisible,
                         maxDragX = with(LocalDensity.current) { 110.dp.toPx() },
                         onCancelRecording = { onEvent(InputBarEvent.CancelRecording) },
-                        onStopAndSendRecording = { onEvent(InputBarEvent.StopAndSendRecording) },
+                        onStopAndSendRecording = { onEvent(InputBarEvent.StopRecording) },
                         onDragUpdate = { directedX ->
                             onEvent(InputBarEvent.UpdateOffsetX(directedX))
                         },
@@ -466,6 +466,18 @@ fun StatelessInputBar(
                 }
             }
         }
+    }
+
+    state.voicePreview?.let { preview ->
+        VoicePreviewDialog(
+            previewData = preview,
+            isPlaying = state.isPlayingVoicePreview,
+            progress = state.voicePreviewProgress,
+            captionState = state.previewTextFieldState,
+            onTogglePlay = { onEvent(InputBarEvent.ToggleVoicePreviewPlayback) },
+            onCancel = { onEvent(InputBarEvent.CancelVoicePreview) },
+            onSend = { caption -> onEvent(InputBarEvent.SendVoiceWithCaption(caption)) }
+        )
     }
 
     if (state.schedulingStage == SchedulingStage.SelectingDate) {

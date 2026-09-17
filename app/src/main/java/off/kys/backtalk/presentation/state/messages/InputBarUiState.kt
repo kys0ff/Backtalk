@@ -7,6 +7,12 @@ import off.kys.backtalk.presentation.model.MessageUiModel
 import off.kys.backtalk.presentation.status.SchedulingStage
 import java.util.Locale
 
+data class VoicePreviewData(
+    val path: String,
+    val duration: Long,
+    val amplitudes: PersistentList<Float>
+)
+
 data class InputBarUiState(
     val textFieldState: TextFieldState = TextFieldState(),
     val replyingTo: MessageUiModel? = null,
@@ -14,6 +20,10 @@ data class InputBarUiState(
     val isRecording: Boolean = false,
     val secondsElapsed: Int = 0,
     val amplitudes: PersistentList<Float> = persistentListOf(),
+    val voicePreview: VoicePreviewData? = null,
+    val isPlayingVoicePreview: Boolean = false,
+    val voicePreviewProgress: Float = 0f,
+    val previewTextFieldState: TextFieldState = TextFieldState(),
     val showTapHint: Boolean = false,
     val schedulingStage: SchedulingStage = SchedulingStage.Hidden,
     val showPermissionRationale: Boolean = false,

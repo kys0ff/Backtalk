@@ -30,7 +30,9 @@ import off.kys.backtalk.common.pref.BacktalkPreferences
 import off.kys.backtalk.presentation.event.InputBarEvent
 import off.kys.backtalk.presentation.state.messages.InputBarEffect
 import off.kys.backtalk.presentation.state.messages.InputBarUiState
+import off.kys.backtalk.presentation.state.messages.VoicePreviewData
 import off.kys.backtalk.presentation.status.SchedulingStage
+import off.kys.backtalk.util.AudioPlayer
 import off.kys.backtalk.util.AudioRecorder
 import off.kys.backtalk.util.HashUtils
 import off.kys.backtalk.util.MediaUtils
@@ -42,8 +44,9 @@ import kotlin.time.Duration.Companion.milliseconds
 class InputBarViewModel(
     private val application: Application,
     private val preferences: BacktalkPreferences,
+    private val audioPlayer: AudioPlayer,
     private val onMessageSend: (String) -> Unit,
-    private val onVoiceSend: (String, Long, List<Float>) -> Unit,
+    private val onVoiceSend: (String, Long, List<Float>, String) -> Unit,
     private val onMessageSchedule: (String, Long) -> Unit,
     private val onSharedImageSendAction: (List<String>, String) -> Unit,
     private val onAttachClickAction: () -> Unit,
@@ -70,6 +73,26 @@ class InputBarViewModel(
 
     init {
         observeAmplitudes()
+        observeAudioPlayer()
+    }
+
+    private fun observeAudioPlayer() {
+        viewModelScope.launch {
+            audioPlayer.progress.collect { progress ->
+                val preview = _uiState.value.voicePreview
+                if (preview != null && audioPlayer.currentPath.value == preview.path) {
+                    _uiState.update { it.copy(voicePreviewProgress = progress) }
+                }
+            }
+        }
+        viewModelScope.launch {
+            audioPlayer.isPlaying.collect { isPlaying ->
+                val preview = _uiState.value.voicePreview
+                if (preview != null && audioPlayer.currentPath.value == preview.path) {
+                    _uiState.update { it.copy(isPlayingVoicePreview = isPlaying) }
+                }
+            }
+        }
     }
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -89,7 +112,10 @@ class InputBarViewModel(
         InputBarEvent.AttachClicked -> onAttachClickAction()
         InputBarEvent.StartRecording -> startVoiceRecording()
         InputBarEvent.CancelRecording -> cancelVoiceRecording()
-        InputBarEvent.StopAndSendRecording -> stopAndSendVoiceRecording()
+        InputBarEvent.StopRecording -> stopVoiceRecording()
+        InputBarEvent.CancelVoicePreview -> cancelVoicePreview()
+        InputBarEvent.ToggleVoicePreviewPlayback -> toggleVoicePreviewPlayback()
+        is InputBarEvent.SendVoiceWithCaption -> sendVoiceWithCaption(event.caption)
         InputBarEvent.ShowTapHint -> handleShowTapHint()
         InputBarEvent.ClearTapHint -> _uiState.update { it.copy(showTapHint = false) }
         is InputBarEvent.UpdateOffsetX -> _uiState.update { it.copy(offsetX = event.x) }
@@ -179,13 +205,65 @@ class InputBarViewModel(
         audioRecorder.cancelRecording()
     }
 
-    private fun stopAndSendVoiceRecording() {
+    private fun stopVoiceRecording() {
         _uiState.update { it.copy(isRecording = false) }
         val file = audioRecorder.stopRecording()
         if (file != null) {
             val duration = System.currentTimeMillis() - recordingStartTime
-            onVoiceSend(file.absolutePath, duration, _uiState.value.amplitudes)
+            _uiState.update {
+                it.copy(
+                    voicePreview = VoicePreviewData(
+                        path = file.absolutePath,
+                        duration = duration,
+                        amplitudes = it.amplitudes
+                    )
+                )
+            }
         }
+    }
+
+    private fun cancelVoicePreview() {
+        _uiState.value.voicePreview?.let {
+            audioPlayer.stop()
+            File(it.path).delete()
+        }
+        _uiState.update {
+            it.copy(
+                voicePreview = null,
+                isPlayingVoicePreview = false,
+                voicePreviewProgress = 0f
+            )
+        }
+        _uiState.value.previewTextFieldState.clearText()
+    }
+
+    private fun toggleVoicePreviewPlayback() {
+        val preview = _uiState.value.voicePreview ?: return
+        val currentPath = audioPlayer.currentPath.value
+        
+        if (currentPath == preview.path) {
+            if (audioPlayer.isPlaying.value) {
+                audioPlayer.pause()
+            } else {
+                audioPlayer.resume()
+            }
+        } else {
+            audioPlayer.playFile(File(preview.path))
+        }
+    }
+
+    private fun sendVoiceWithCaption(caption: String) {
+        val preview = _uiState.value.voicePreview ?: return
+        audioPlayer.stop()
+        onVoiceSend(preview.path, preview.duration, preview.amplitudes, caption)
+        _uiState.update {
+            it.copy(
+                voicePreview = null,
+                isPlayingVoicePreview = false,
+                voicePreviewProgress = 0f
+            )
+        }
+        _uiState.value.previewTextFieldState.clearText()
     }
 
     private fun handleShowTapHint() {

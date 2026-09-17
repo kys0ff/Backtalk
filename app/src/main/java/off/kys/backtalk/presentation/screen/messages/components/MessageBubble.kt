@@ -401,25 +401,35 @@ private fun MessageInnerContent(
 
                 val isThisPlaying = isPlayingState && currentPathState == message.voicePath
 
-                VoiceMessageBubbleContent(
-                    duration = message.voiceDuration ?: 0L,
-                    waveformData = message.waveformData ?: persistentListOf(),
-                    contentColor = contentColor,
-                    isPlaying = isThisPlaying,
-                    progress = if (isThisPlaying) progressState else 0f,
-                    onTogglePlay = {
-                        if (isThisPlaying) {
-                            audioPlayer.pause()
-                        } else {
-                            if (currentPathState == message.voicePath) {
-                                audioPlayer.resume()
+                Surface(
+                    color = if (message.hasText) contentColor.copy(alpha = 0.1f) else Color.Transparent,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    VoiceMessageBubbleContent(
+                        duration = message.voiceDuration ?: 0L,
+                        waveformData = message.waveformData ?: persistentListOf(),
+                        contentColor = contentColor,
+                        isPlaying = isThisPlaying,
+                        progress = if (isThisPlaying) progressState else 0f,
+                        onTogglePlay = {
+                            if (isThisPlaying) {
+                                audioPlayer.pause()
                             } else {
-                                audioPlayer.playFile(File(message.voicePath))
+                                if (currentPathState == message.voicePath) {
+                                    audioPlayer.resume()
+                                } else {
+                                    audioPlayer.playFile(File(message.voicePath))
+                                }
                             }
                         }
-                    }
-                )
-            } else if (message.hasText) {
+                    )
+                }
+            }
+
+            if (message.hasText) {
+                if (message.hasVoice) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
                 val textContent = @Composable {
                     Column {
                         if (message.editedText != null && showOriginal) {

@@ -193,6 +193,7 @@ private fun Module.viewModelModule() {
         InputBarViewModel(
             application = androidApplication(),
             preferences = get(),
+            audioPlayer = get(),
             onMessageSend = it.get(),
             onVoiceSend = it.get(),
             onMessageSchedule = it.get(),

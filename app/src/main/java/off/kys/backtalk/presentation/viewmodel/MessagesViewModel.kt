@@ -79,7 +79,8 @@ class MessagesViewModel(
             is MessagesUiEvent.SendVoiceMessage -> sendVoiceMessage(
                 event.path,
                 event.duration,
-                event.waveform
+                event.waveform,
+                event.caption
             )
 
             is MessagesUiEvent.ReplyTo -> updateReply(event.message)
@@ -717,7 +718,7 @@ class MessagesViewModel(
         }
     }
 
-    private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>) {
+    private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>, caption: String?) {
         val replyTo = _uiState.value.replyingTo
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
@@ -731,7 +732,7 @@ class MessagesViewModel(
                 useCases.insertMessage(
                     MessageEntity(
                         id = MessageId.generate(),
-                        text = application.getString(R.string.chat_media_voice),
+                        text = caption ?: application.getString(R.string.chat_media_voice),
                         timestamp = System.currentTimeMillis(),
                         repliedToId = replyTo?.id,
                         voicePath = destFile.absolutePath,

@@ -17,7 +17,10 @@ sealed interface InputBarEvent {
     // Voice Recording Actions
     data object StartRecording : InputBarEvent
     data object CancelRecording : InputBarEvent
-    data object StopAndSendRecording : InputBarEvent
+    data object StopRecording : InputBarEvent
+    data object CancelVoicePreview : InputBarEvent
+    data object ToggleVoicePreviewPlayback : InputBarEvent
+    data class SendVoiceWithCaption(val caption: String) : InputBarEvent
     data object ShowTapHint : InputBarEvent
     data object ClearTapHint : InputBarEvent
     data class UpdateOffsetX(val x: Float) : InputBarEvent
