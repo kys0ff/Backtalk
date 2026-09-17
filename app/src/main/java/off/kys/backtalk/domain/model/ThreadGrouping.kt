@@ -2,7 +2,6 @@ package off.kys.backtalk.domain.model
 
 import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
-import off.kys.backtalk.data.local.entity.resolvedThreadId
 
 /**
  * Groups [MessageEntity] records into [Thread]s using a hybrid approach:
@@ -35,9 +34,10 @@ fun groupMessagesIntoThreads(messages: List<MessageEntity>): List<Thread> {
 
     // Find which legacy messages are referenced by new messages
     // These should be treated as explicit roots, not grouped by time
+    val legacyMessageIds = legacyMessages.mapTo(mutableSetOf()) { it.id }
     val legacyRootsReferencedByNewMessages = newMessages
         .mapNotNull { it.threadId }
-        .filter { it in legacyMessages.map { msg -> msg.id } }
+        .filter { it in legacyMessageIds }
         .toSet()
 
     // Split legacy messages into two groups:
@@ -50,12 +50,12 @@ fun groupMessagesIntoThreads(messages: List<MessageEntity>): List<Thread> {
     val pureLegacyThreads = groupLegacyMessagesByTimeGap(pureLegacyMessages, messageMap)
 
     // Group new messages by their explicit threadId
-    val newRoots = newMessages.filter { it.resolvedThreadId == it.id }
-    val allRootIds = (legacyMessages.map { it.id } + newRoots.map { it.id }).toSet()
+    val newRoots = newMessages.filter { it.threadId == it.id }
+    val allRootIds = (legacyMessageIds + newRoots.map { it.id }).toSet()
 
     val repliesByRoot = newMessages
-        .filter { it.resolvedThreadId != it.id && it.resolvedThreadId in allRootIds }
-        .groupBy { it.resolvedThreadId }
+        .filter { it.threadId != it.id && it.threadId in allRootIds }
+        .groupBy { it.threadId!! } // Safe because we filtered threadId != null
 
     // Create threads for explicit legacy roots (with new replies)
     val explicitLegacyThreads = explicitLegacyRoots.map { root ->
@@ -76,7 +76,7 @@ fun groupMessagesIntoThreads(messages: List<MessageEntity>): List<Thread> {
     }
 
     // Handle orphans (messages whose root is missing)
-    val orphans = newMessages.filter { it.resolvedThreadId != it.id && it.resolvedThreadId !in allRootIds }
+    val orphans = newMessages.filter { it.threadId != it.id && it.threadId !in allRootIds }
     val orphanThreads = orphans.map { orphan ->
         Thread(
             root = orphan,
