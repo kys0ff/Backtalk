@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import off.kys.backtalk.R
-import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.MessageId
+import off.kys.backtalk.domain.model.groupMessagesIntoThreads
 import off.kys.backtalk.domain.repository.MessagesRepository
 import off.kys.backtalk.presentation.state.statistics.DayActivity
 import off.kys.backtalk.presentation.state.statistics.HeatmapDay
@@ -222,45 +222,13 @@ class StatisticsViewModel(
     }
 
     private fun calculateTopThreads(messages: List<MessageEntity>): List<ThreadStat> {
-        if (messages.isEmpty()) return emptyList()
+        val topFiveThreads = groupMessagesIntoThreads(messages)
+            .sortedByDescending { it.size }
+            .take(5)
+        val maxCount = topFiveThreads.firstOrNull()?.size ?: 1
 
-        val sorted = messages.sortedBy { it.timestamp }
-        val groups = mutableListOf<MutableList<MessageEntity>>()
-
-        sorted.forEach { message ->
-            var foundGroup = false
-
-            if (message.repliedToId != null) {
-                for (group in groups) {
-                    if (group.first().id == message.repliedToId) {
-                        group.add(message)
-                        foundGroup = true
-                        break
-                    }
-                }
-            }
-
-            if (!foundGroup) {
-                val lastGroup = groups.lastOrNull()
-                if (lastGroup != null) {
-                    val lastMessage = lastGroup.last()
-                    if (message.timestamp - lastMessage.timestamp < Constants.TIME_GAP_FOR_HEADER) {
-                        lastGroup.add(message)
-                        foundGroup = true
-                    }
-                }
-            }
-
-            if (!foundGroup) {
-                groups.add(mutableListOf(message))
-            }
-        }
-
-        val topFiveGroups = groups.sortedByDescending { it.size }.take(5)
-        val maxCount = topFiveGroups.firstOrNull()?.size ?: 1
-
-        return topFiveGroups.map { group ->
-            val rootMsg = group.first()
+        return topFiveThreads.map { thread ->
+            val rootMsg = thread.root
             val title = if (rootMsg.text.isNotEmpty()) {
                 rootMsg.text.take(20).plus(if (rootMsg.text.length > 20) "…" else emptyString())
             } else {
@@ -270,8 +238,8 @@ class StatisticsViewModel(
             ThreadStat(
                 threadId = rootMsg.id,
                 threadTitle = title,
-                messageCount = group.size,
-                ratio = group.size.toFloat() / maxCount
+                messageCount = thread.size,
+                ratio = thread.size.toFloat() / maxCount
             )
         }
     }

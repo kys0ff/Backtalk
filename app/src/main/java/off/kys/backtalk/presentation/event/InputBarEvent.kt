@@ -10,6 +10,7 @@ sealed interface InputBarEvent {
     data class ScheduleMessage(val text: String, val timestamp: Long) : InputBarEvent
     data class UpdateReplyingTo(val message: MessageUiModel?) : InputBarEvent
     data class UpdateEditingMessage(val message: MessageUiModel?) : InputBarEvent
+    data class ToggleStartNewThread(val startNewThread: Boolean) : InputBarEvent
     data object CancelReply : InputBarEvent
     data object CancelEdit : InputBarEvent
     data object AttachClicked : InputBarEvent

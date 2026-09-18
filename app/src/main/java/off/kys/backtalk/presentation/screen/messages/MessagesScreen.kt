@@ -121,7 +121,10 @@ class MessagesScreen : Screen {
                     },
                     { viewModel.onEvent(MessagesUiEvent.ToggleMediaPicker(true)) },
                     { viewModel.onEvent(MessagesUiEvent.ReplyTo(null)) },
-                    { viewModel.onEvent(MessagesUiEvent.EditMessage(null)) }
+                    { viewModel.onEvent(MessagesUiEvent.EditMessage(null)) },
+                    { startNewThread: Boolean ->
+                        viewModel.onEvent(MessagesUiEvent.ToggleStartNewThread(startNewThread))
+                    }
                 )
             }
         )

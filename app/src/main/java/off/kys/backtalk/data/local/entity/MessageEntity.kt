@@ -1,6 +1,7 @@
 package off.kys.backtalk.data.local.entity
 
 import androidx.annotation.Keep
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -14,6 +15,9 @@ import off.kys.backtalk.domain.model.MessageId
  * @property text The body content of the message.
  * @property timestamp The time the message was sent, in milliseconds.
  * @property repliedToId The ID of the message this message is replying to, or null if it's not a reply.
+ * @property threadId The ID of the root message of the thread this message belongs to; a message that
+ * starts a thread carries its own ID here. Null only for messages written before this column existed,
+ * which are grouped into threads by the one-hour gap rule they were originally organised by.
  * @property editedText The content of the message after being edited, or null if it hasn't been edited.
  * @property editedAt The time the message was last edited, or null if it hasn't been edited.
  * @property voicePath The local path to the voice message audio file, if applicable.
@@ -30,6 +34,8 @@ data class MessageEntity(
     val timestamp: Long,
     @Embedded
     val repliedToId: MessageId?,
+    @ColumnInfo(name = "threadId")
+    val threadId: MessageId? = null,
     val editedText: String? = null,
     val editedAt: Long? = null,
     val voicePath: String? = null,
@@ -43,3 +49,4 @@ data class MessageEntity(
     val mediaPaths: List<String>? = null,
     val mediaType: String? = null
 ) : java.io.Serializable
+

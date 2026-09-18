@@ -10,6 +10,7 @@ data class MessageUiModel(
     val text: String,
     val timestamp: Long,
     val repliedToId: MessageId?,
+    val threadId: MessageId?,
     val editedText: String?,
     val editedAt: Long?,
     val voicePath: String?,

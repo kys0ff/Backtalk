@@ -44,6 +44,9 @@ class AlarmReceiver : BroadcastReceiver(), KoinComponent {
                 text = scheduledMessage.text,
                 timestamp = System.currentTimeMillis(), // Delivery time
                 repliedToId = scheduledMessage.repliedToId,
+                // A reminder that was not tied to a thread when it was scheduled becomes the root of
+                // its own thread on delivery, rather than joining whatever came before it.
+                threadId = scheduledMessage.threadId ?: scheduledMessage.id,
                 isReminder = true,
                 originalCreationTimestamp = scheduledMessage.creationTimestamp,
                 scheduledTimestamp = scheduledMessage.scheduledTimestamp,

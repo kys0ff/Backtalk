@@ -155,6 +155,8 @@ fun InputBar(
     messageInput: String,
     replyingTo: MessageUiModel?,
     editingMessage: MessageUiModel?,
+    startNewThread: Boolean = false,
+    showNewThreadToggle: Boolean = false,
     sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
 ) {
@@ -178,6 +180,8 @@ fun InputBar(
         state = state,
         onEvent = viewModel::onEvent,
         effect = viewModel.effect,
+        startNewThread = startNewThread,
+        showNewThreadToggle = showNewThreadToggle,
         sharedImageUris = sharedImageUris,
         onCancelSharedImage = onCancelSharedImage
     )
@@ -194,6 +198,8 @@ fun StatelessInputBar(
     onEvent: (InputBarEvent) -> Unit,
     effect: SharedFlow<InputBarEffect>,
     modifier: Modifier = Modifier,
+    startNewThread: Boolean = false,
+    showNewThreadToggle: Boolean = false,
     sharedImageUris: List<String> = emptyList(),
     onCancelSharedImage: () -> Unit = {},
 ) {
@@ -407,6 +413,17 @@ fun StatelessInputBar(
                     onCancelReply = onCancelReply,
                     onCancelEdit = onCancelEdit
                 )
+
+                AnimatedVisibility(
+                    visible = showNewThreadToggle,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    NewThreadToggle(
+                        isEnabled = startNewThread,
+                        onToggle = { onEvent(InputBarEvent.ToggleStartNewThread(it)) }
+                    )
+                }
 
                 AnimatedVisibility(
                     visible = sharedImageUris.isNotEmpty(),

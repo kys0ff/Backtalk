@@ -20,12 +20,15 @@ import off.kys.backtalk.util.emptyString
  * @param messages The list of messages to display.
  * @param replyingTo The message being replied to, if any.
  * @param editingMessage The message being edited, if any.
+ * @param startNewThread Whether the next message should start a new thread instead of continuing the
+ * current one. Reset after the message is sent.
  * @param selectedMessageIds The set of message IDs that are currently selected.
  */
 data class MessagesUiState(
     val messages: PersistentList<MessageUiModel> = persistentListOf(),
     val replyingTo: MessageUiModel? = null,
     val editingMessage: MessageUiModel? = null,
+    val startNewThread: Boolean = false,
     val selectedMessageIds: PersistentSet<MessageId> = persistentSetOf(),
     val isSearchActive: Boolean = false,
     val searchQuery: String = emptyString(),

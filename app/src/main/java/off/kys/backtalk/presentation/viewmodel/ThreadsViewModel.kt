@@ -9,9 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import off.kys.backtalk.common.Constants
 import off.kys.backtalk.data.local.entity.MessageEntity
 import off.kys.backtalk.domain.model.Thread
+import off.kys.backtalk.domain.model.groupMessagesIntoThreads
 import off.kys.backtalk.domain.use_case_bundle.MessagesUseCases
 import off.kys.backtalk.presentation.state.threads.ThreadsUiState
 
@@ -33,7 +33,7 @@ class ThreadsViewModel(
             useCases.getAllMessages().collectLatest { messages ->
                 allMessages = messages
                 val grouped = withContext(Dispatchers.Default) {
-                    groupMessages(messages).toPersistentList()
+                    groupMessagesIntoThreads(messages).toPersistentList()
                 }
                 _uiState.value = _uiState.value.copy(threads = grouped)
             }
@@ -69,48 +69,5 @@ class ThreadsViewModel(
             root = rootMessage,
             replies = descendants.sortedBy { it.timestamp }
         )
-    }
-
-    private fun groupMessages(messages: List<MessageEntity>): List<Thread> {
-        if (messages.isEmpty()) return emptyList()
-
-        val sorted = messages.sortedBy { it.timestamp }
-        val messageMap = sorted.associateBy { it.id }
-        val groups = mutableListOf<MutableList<MessageEntity>>()
-
-        sorted.forEach { message ->
-            var foundGroup = false
-
-            if (message.repliedToId != null) {
-                for (group in groups) {
-                    if (group.first().id == message.repliedToId) {
-                        group.add(message)
-                        foundGroup = true
-                        break
-                    }
-                }
-            }
-
-            if (!foundGroup) {
-                val lastGroup = groups.lastOrNull()
-                if (lastGroup != null) {
-                    val lastMessage = lastGroup.last()
-                    if (message.timestamp - lastMessage.timestamp < Constants.TIME_GAP_FOR_HEADER) {
-                        lastGroup.add(message)
-                        foundGroup = true
-                    }
-                }
-            }
-
-            if (!foundGroup) {
-                groups.add(mutableListOf(message))
-            }
-        }
-
-        return groups.map { group ->
-            val root = group.first()
-            val repliedTo = root.repliedToId?.let { messageMap[it] }
-            Thread(root = root, replies = group.drop(1), repliedTo = repliedTo)
-        }.reversed()
     }
 }

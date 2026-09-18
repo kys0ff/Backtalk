@@ -21,6 +21,7 @@ object OnboardingMocks {
             text = text,
             timestamp = timestamp,
             repliedToId = repliedToId,
+            threadId = threadId,
             editedText = editedText,
             editedAt = editedAt,
             voicePath = voicePath,

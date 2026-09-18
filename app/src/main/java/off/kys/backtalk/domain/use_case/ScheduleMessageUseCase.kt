@@ -12,15 +12,21 @@ class ScheduleMessageUseCase(
     private val repository: MessagesRepository,
     private val alarmScheduler: AlarmScheduler
 ) {
-    suspend operator fun invoke(text: String, scheduledTime: Long, repliedToId: MessageId? = null) {
+    suspend operator fun invoke(
+        text: String,
+        scheduledTime: Long,
+        repliedToId: MessageId? = null,
+        threadId: MessageId? = null
+    ) {
         val scheduledMessage = ScheduledMessageEntity(
             id = MessageId.generate(),
             text = text,
             creationTimestamp = System.currentTimeMillis(),
             scheduledTimestamp = scheduledTime,
-            repliedToId = repliedToId
+            repliedToId = repliedToId,
+            threadId = threadId
         )
-        
+
         repository.insertScheduledMessage(scheduledMessage)
         alarmScheduler.schedule(scheduledMessage)
     }

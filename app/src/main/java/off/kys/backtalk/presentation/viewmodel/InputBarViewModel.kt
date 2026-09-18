@@ -51,7 +51,8 @@ class InputBarViewModel(
     private val onSharedImageSendAction: (List<String>, String) -> Unit,
     private val onAttachClickAction: () -> Unit,
     private val onCancelReplyAction: () -> Unit,
-    private val onCancelEditAction: () -> Unit
+    private val onCancelEditAction: () -> Unit,
+    private val onStartNewThreadToggle: (Boolean) -> Unit
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(
@@ -101,6 +102,7 @@ class InputBarViewModel(
         is InputBarEvent.ScheduleMessage -> handleScheduleMessage(event.text, event.timestamp)
         is InputBarEvent.UpdateReplyingTo -> _uiState.update { it.copy(replyingTo = event.message) }
         is InputBarEvent.UpdateEditingMessage -> _uiState.update { it.copy(editingMessage = event.message) }
+        is InputBarEvent.ToggleStartNewThread -> onStartNewThreadToggle(event.startNewThread)
         InputBarEvent.CancelReply -> {
             _uiState.update { it.copy(replyingTo = null) }
             onCancelReplyAction()

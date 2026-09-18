@@ -113,6 +113,7 @@
     <string name="chat_reply_image_preview">[图片]</string>
     <string name="chat_replying_to">回复给</string>
     <string name="chat_scroll_to_bottom">滑到底部</string>
+    <string name="chat_start_new_thread">新线程</string>
     <string name="chat_selection_cannot_delete_old">无法删除超过 1 小时的消息</string>
     <string name="chat_selection_count">已选择 %1$d 条</string>
     <string name="chat_sent_at">发送于 %1$s</string>

@@ -123,6 +123,25 @@ Backtalk is built on the principle of **Privacy by Design**:
 
 ---
 
+## Threads
+
+Backtalk groups your messages into threads so that a long note-to-self stays navigable. Open
+**Threads** from the top bar to browse them.
+
+- **Starting a thread**: every message starts a new thread on its own, unless it continues the
+  current one. A message continues the current thread while you are still writing in it, which is
+  the case as long as it was sent less than an hour after that thread's newest message.
+- **Starting a thread manually**: tap the **New thread** toggle above the input bar to make the next
+  message start a thread of its own, even if you have been writing in the current one moments ago.
+  The toggle resets after the message is sent.
+- **Replying inside a thread**: reply to a message to keep your answer next to it. The reply joins
+  the thread of the message you replied to, so replying to a message deep inside a thread keeps the
+  answer in that same thread rather than pulling it out to the top level.
+- **Threads you already had**: messages written before this was introduced keep the grouping they
+  already had, so upgrading does not reshuffle your existing conversations.
+
+---
+
 ## Contributing
 
 Contributions are welcome! If you'd like to improve Backtalk:
