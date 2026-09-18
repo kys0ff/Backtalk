@@ -115,7 +115,6 @@
     <string name="chat_replying_to">Replying to</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_start_new_thread">New thread</string>
-    <string name="chat_start_new_thread_hint">Send the next message as a new thread</string>
     <string name="chat_selection_cannot_delete_old">Cannot delete messages older than 1 hour</string>
     <string name="chat_selection_count">%1$d selected</string>
     <string name="chat_sent_at">sent at %1$s</string>

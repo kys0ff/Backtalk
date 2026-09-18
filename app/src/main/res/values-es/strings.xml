@@ -116,7 +116,6 @@
     <string name="chat_replying_to">Respondiendo a</string>
     <string name="chat_scroll_to_bottom">Deslizar al final</string>
     <string name="chat_start_new_thread">Nuevo hilo</string>
-    <string name="chat_start_new_thread_hint">Enviar el siguiente mensaje como un nuevo hilo</string>
     <string name="chat_selection_cannot_delete_old">No se pueden eliminar mensajes con más de 1 hora de antigüedad</string>
     <string name="chat_selection_count">%1$d seleccionados</string>
     <string name="chat_sent_at">enviado a las %1$s</string>

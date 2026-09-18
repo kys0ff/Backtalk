@@ -119,7 +119,6 @@
     <string name="chat_replying_to">الرد على</string>
     <string name="chat_scroll_to_bottom">انتقال للأسفل</string>
     <string name="chat_start_new_thread">محادثة جديدة</string>
-    <string name="chat_start_new_thread_hint">إرسال الرسالة التالية كمحادثة جديدة</string>
     <string name="chat_selection_cannot_delete_old">لا يمكن حذف الرسائل التي مضى عليها أكثر من ساعة واحدة</string>
     <string name="chat_selection_count">تم اختيار %1$d</string>
     <string name="chat_sent_at">أُرسلت في %1$s</string>
