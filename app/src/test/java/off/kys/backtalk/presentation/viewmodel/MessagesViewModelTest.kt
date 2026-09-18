@@ -283,9 +283,11 @@ class MessagesViewModelTest : KoinTest {
         // When
         viewModel.onEvent(MessagesUiEvent.SendMessage("brand new thought"))
 
-        // Then the new message is a root: threadId is null, so it is grouped on its own.
+        // Then the new message is a root: it points at itself, which is what keeps it out of the
+        // legacy time-gap grouping that a null threadId would put it back into.
         assertTrue(inserted.isNotEmpty())
-        assertEquals(null, inserted.first().threadId)
+        val sent = inserted.first()
+        assertEquals(sent.id, sent.threadId)
         // And the toggle resets so the next message does not silently start another thread.
         assertFalse(viewModel.uiState.value.startNewThread)
     }

@@ -264,7 +264,10 @@ class MessagesViewModel(
 
     private fun sendMediaMessages(uris: List<String>, type: String, description: String?) {
         val replyTo = _uiState.value.replyingTo
-        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
+        // A batch is split into several messages; the first one carries the thread, the rest join it.
+        val firstMessageId = MessageId.generate()
+        val threadId =
+            resolveThreadIdForNewMessage(firstMessageId, replyTo, _uiState.value.startNewThread)
         val smartPointing = preferences.smartImagePointingEnabled
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -313,7 +316,7 @@ class MessagesViewModel(
                         val isLastChunk = index == (mediaPaths.size / 4)
                         useCases.insertMessage(
                             MessageEntity(
-                                id = MessageId.generate(),
+                                id = if (index == 0) firstMessageId else MessageId.generate(),
                                 text = if (isLastChunk) description
                                     ?: emptyString() else emptyString(),
                                 timestamp = System.currentTimeMillis() + index,
@@ -381,7 +384,10 @@ class MessagesViewModel(
         }
         val trimmedText = if (preferences.trimMessagesEnabled) text.trim() else text
         val replyTo = _uiState.value.replyingTo
-        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
+        // A reminder that answers a message keeps that thread. One that does not is left unassigned
+        // and becomes its own thread when it is delivered, since the thread that is current now may
+        // be long gone by then.
+        val threadId = replyTo?.let { it.threadId ?: it.id }
         viewModelScope.launch {
             useCases.scheduleMessage(
                 text = trimmedText,
@@ -608,15 +614,22 @@ class MessagesViewModel(
      * - If replying: joins the thread of the message being replied to
      * - If not replying: continues the most recent thread (if still active)
      *
+     * A message that starts a thread is stored with its **own** ID as the thread ID rather than with
+     * `null`. A null thread ID is reserved for messages written before the column existed, and those
+     * are still grouped by the one-hour gap, so a new root stored as null would be swallowed by the
+     * preceding group instead of starting a thread of its own.
+     *
+     * @param newMessageId The ID the message being composed will be stored under.
      * @param replyTo The message the new message is replying to, or null.
      * @param startNewThread Whether the user explicitly requested a new thread.
-     * @return The ID of the thread root the new message belongs to, or null to make it a new root.
+     * @return The ID of the thread root the new message belongs to. Never null.
      */
     private fun resolveThreadIdForNewMessage(
+        newMessageId: MessageId,
         replyTo: MessageUiModel?,
         startNewThread: Boolean
-    ): MessageId? {
-        if (startNewThread) return null
+    ): MessageId {
+        if (startNewThread) return newMessageId
 
         if (replyTo != null) {
             // When replying to a message, join its thread.
@@ -624,15 +637,13 @@ class MessagesViewModel(
             return replyTo.threadId ?: replyTo.id
         }
 
-        // Not a reply: continue the most recent thread if still active
-        val newest = _uiState.value.messages.maxByOrNull { it.timestamp } ?: return null
-        val now = System.currentTimeMillis()
-        val timeSinceNewest = now - newest.timestamp
+        // Not a reply: continue the most recent thread while it is still active.
+        // `messages` is kept sorted by timestamp, so the newest one is simply the last.
+        val newest = _uiState.value.messages.lastOrNull() ?: return newMessageId
+        val timeSinceNewest = System.currentTimeMillis() - newest.timestamp
 
-        // If more than one hour has passed, start a new thread
-        if (timeSinceNewest > Constants.TIME_GAP_FOR_HEADER) {
-            return null
-        }
+        // Past the gap the user has moved on, so this message starts a thread of its own.
+        if (timeSinceNewest >= Constants.TIME_GAP_FOR_HEADER) return newMessageId
 
         // Within the time window: continue the newest message's thread
         // For legacy messages (threadId == null), treat them as their own root
@@ -662,12 +673,14 @@ class MessagesViewModel(
         }
 
         val replyTo = _uiState.value.replyingTo
-        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
+        val messageId = MessageId.generate()
+        val threadId =
+            resolveThreadIdForNewMessage(messageId, replyTo, _uiState.value.startNewThread)
 
         viewModelScope.launch {
             useCases.insertMessage(
                 MessageEntity(
-                    id = MessageId.generate(),
+                    id = messageId,
                     text = trimmedText,
                     timestamp = System.currentTimeMillis(),
                     repliedToId = replyTo?.id,
@@ -778,7 +791,9 @@ class MessagesViewModel(
 
     private fun sendVoiceMessage(path: String, duration: Long, waveform: List<Float>, caption: String?) {
         val replyTo = _uiState.value.replyingTo
-        val threadId = resolveThreadIdForNewMessage(replyTo, _uiState.value.startNewThread)
+        val messageId = MessageId.generate()
+        val threadId =
+            resolveThreadIdForNewMessage(messageId, replyTo, _uiState.value.startNewThread)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val voiceDir = File(application.filesDir, "voice").apply { mkdirs() }
@@ -790,7 +805,7 @@ class MessagesViewModel(
 
                 useCases.insertMessage(
                     MessageEntity(
-                        id = MessageId.generate(),
+                        id = messageId,
                         text = caption ?: application.getString(R.string.chat_media_voice),
                         timestamp = System.currentTimeMillis(),
                         repliedToId = replyTo?.id,

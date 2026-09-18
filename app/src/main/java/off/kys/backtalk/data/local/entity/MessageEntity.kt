@@ -15,8 +15,9 @@ import off.kys.backtalk.domain.model.MessageId
  * @property text The body content of the message.
  * @property timestamp The time the message was sent, in milliseconds.
  * @property repliedToId The ID of the message this message is replying to, or null if it's not a reply.
- * @property threadId The ID of the root message of the thread this message belongs to, or null if this
- * message is itself a thread root. Defaults to the message's own ID, see [resolvedThreadId].
+ * @property threadId The ID of the root message of the thread this message belongs to; a message that
+ * starts a thread carries its own ID here. Null only for messages written before this column existed,
+ * which are grouped into threads by the one-hour gap rule they were originally organised by.
  * @property editedText The content of the message after being edited, or null if it hasn't been edited.
  * @property editedAt The time the message was last edited, or null if it hasn't been edited.
  * @property voicePath The local path to the voice message audio file, if applicable.
@@ -49,12 +50,3 @@ data class MessageEntity(
     val mediaType: String? = null
 ) : java.io.Serializable
 
-/**
- * The ID of the thread this message belongs to.
- *
- * A `null` [MessageEntity.threadId] means the message is a thread root, so the message's own ID is
- * used. Messages persisted before the `threadId` column existed migrate as `null` and therefore stay
- * roots, which is exactly what the previous time-gap based grouping did for them.
- */
-val MessageEntity.resolvedThreadId: MessageId
-    get() = threadId ?: id
