@@ -137,8 +137,8 @@ Backtalk groups your messages into threads so that a long note-to-self stays nav
 - **Replying inside a thread**: reply to a message to keep your answer next to it. The reply joins
   the thread of the message you replied to, so replying to a message deep inside a thread keeps the
   answer in that same thread rather than pulling it out to the top level.
-- **Quoting across threads**: enable **New thread** while replying to quote a message from another
-  thread. The new message starts its own thread and keeps a reference to the quoted message.
+- **Threads you already had**: messages written before this was introduced keep the grouping they
+  already had, so upgrading does not reshuffle your existing conversations.
 
 ---
 
